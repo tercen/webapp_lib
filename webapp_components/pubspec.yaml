@@ -1,0 +1,30 @@
+name: webapp_components
+description: API model implementation.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  webapp_model:
+    path: ../webapp_model
+  webapp_ui_commons:
+    path: ../webapp_ui_commons
+  webapp_utils:
+    path: ../webapp_utils
+
+  list_picker: ^1.1.0
+  json_string: ^3.0.1
+  syncfusion_flutter_pdf: ^27.2.2
+  
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  test:
+  lints: ^5.0.0
+
+flutter:
+  assets:
+    - assets/img/wait.gif

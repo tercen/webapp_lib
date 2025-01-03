@@ -1,0 +1,15 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "webapp_lib",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    }
+  ],
+  "generated": "2025-01-03T15:02:44.446172Z",
+  "generator": "pub",
+  "generatorVersion": "3.5.4",
+  "pubCache": "file:///home/thiago/.pub-cache"
+}
