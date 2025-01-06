@@ -35,11 +35,35 @@ class ProjectFunctions {
   }
 
 
+  Future<FolderDocument> getOrCreateFolder(String projectId, String owner, String name, {String? parentId}) async {
+    var candidateFolders = _getDocuments(name, true, parentId: parentId);
+
+    if( candidateFolders.isNotEmpty ){
+      return candidateFolders.first as FolderDocument;
+    }
+
+    var factory = tercen.ServiceFactory();
+    var folder = FolderDocument();
+    folder.name = name;
+    folder.isHidden = false;
+    folder.projectId = projectId;
+    folder.folderId = parentId ?? "";
+    folder.acl = Acl()..owner = owner;
+
+    folder = await factory.folderService.create(folder);
+
+    await loadFolderStructure(projectId);
+
+    return folder;
+  }
+
+
+
   List<Document> getProjectFiles(){
     if( !structureLoaded){
       Logger().log(message: "Project file structure has not been loaded");
     }
-    
+
     return folderTreeRoot.getDescendants(folders: true, documents: true).map((e) => e.document).toList();
   }
 
@@ -108,5 +132,19 @@ class ProjectFunctions {
     }
 
     return docs;
+  }
+
+  List<Document> _getDocuments(String name, bool isFolder, {String? parentId}){
+    var candidateFolderNodes = folderTreeRoot.getDescendants(folders: true, documents: true).where((e) => e.document.name == name);
+
+    if( parentId != null && candidateFolderNodes.isNotEmpty ){
+      if( isFolder ){
+        candidateFolderNodes = candidateFolderNodes.where((e) => (e.document as FolderDocument).folderId == parentId);
+      }else{
+        candidateFolderNodes = candidateFolderNodes.where((e) => (e.document as ProjectDocument).folderId == parentId);
+      }
+    }    
+
+    return candidateFolderNodes.map((e) => e.document).toList();
   }
 }
