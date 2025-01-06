@@ -44,6 +44,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "chunked_stream",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/chunked_stream-1.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "clock",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/clock-1.1.2",
       "packageUri": "lib/",
@@ -78,6 +84,12 @@
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/file-7.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "fixnum",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/fixnum-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
     },
     {
       "name": "flutter",
@@ -230,6 +242,30 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "sci_base",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-c1dedecf4a7ab6c353375fd178521694aef0b805/sci_base",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "sci_http_client",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-c1dedecf4a7ab6c353375fd178521694aef0b805/sci_http_client",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "sci_tercen_client",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-c1dedecf4a7ab6c353375fd178521694aef0b805/sci_tercen_client",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "sci_tercen_model",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-c1dedecf4a7ab6c353375fd178521694aef0b805/sci_tercen_model",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "shelf",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/shelf-1.4.1",
       "packageUri": "lib/",
@@ -276,6 +312,12 @@
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/source_span-1.10.1",
       "packageUri": "lib/",
       "languageVersion": "3.1"
+    },
+    {
+      "name": "sprintf",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/sprintf-7.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "stack_trace",
@@ -332,10 +374,22 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "tson",
+      "rootUri": "file:///home/thiago/.pub-cache/git/dtson-7bb00fa9ac17c5df1f12e2c3c636d6def94e579a/",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "typed_data",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/typed_data-1.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "uuid",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/uuid-4.5.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "vector_math",
@@ -357,19 +411,13 @@
     },
     {
       "name": "web",
-      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/web-1.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
-      "name": "web_socket",
-      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/web_socket-0.1.6",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/web-0.5.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "web_socket_channel",
-      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/web_socket_channel-3.0.1",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/web_socket_channel-2.4.5",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -416,7 +464,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2025-01-06T13:21:50.778025Z",
+  "generated": "2025-01-06T14:49:09.938571Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///usr/bin/flutter",
