@@ -15,4 +15,22 @@ class ListUtils{
     return indices;
   }
 
+  static List<int> indexWhereAll(List<dynamic> valueList, dynamic selectedValue) {
+    List<int> indices = [];
+    var idx = 0;
+
+    while (true) {
+      idx = valueList.indexWhere((e) => e == selectedValue, idx);
+
+      if (idx >= 0) {
+        indices.add(idx);
+        idx = idx + 1;
+      } else {
+        break;
+      }
+    }
+
+    return indices;
+  }
+
 }
