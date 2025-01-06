@@ -1,5 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:webapp_ui_commons/mixin/progress_log.dart';
+
+
 // import 'package:flutter/material.dart';
 // import 'package:intl/intl.dart';
 // import 'package:kumo_analysis_app/model/model_holder.dart';
@@ -9,11 +14,13 @@ import 'dart:async';
 // import 'package:kumo_analysis_app/util/util.dart';
 // import 'package:kumo_analysis_app/webapp.dart';
 // import 'package:kumo_analysis_app/webapp_data.dart';
-// import 'package:sci_tercen_client/sci_client.dart' as sci;
-// import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
-// import 'package:tson/tson.dart' as tson;
+import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+import 'package:tson/tson.dart' as tson;
 // import 'package:sci_base/value.dart';
-// import 'package:uuid/uuid.dart';
+import 'package:uuid/uuid.dart';
+import 'package:webapp_utils/string_utils.dart';
+import 'package:webapp_workflow_runner/model/step_setting.dart';
 
 enum RunStatus { init, running, finished, fail }
 
@@ -33,10 +40,10 @@ class WorkflowRunner with ProgressDialog {
   final Map<String, String> gatherMap = {};
   final Map<String, String> multiDsMap = {};
   
-  final List<SettingsEntry> settings = [];
+  final List<StepSetting> settings = [];
   final List<PostRunCallback> postRunCallbacks = [];
 
-  final Value status = ValueHolder<RunStatus>(RunStatus.init);
+  // final Value status = ValueHolder<RunStatus>(RunStatus.init);
 
   String folderSuffix = "";
   String? folderId;
@@ -68,7 +75,7 @@ class WorkflowRunner with ProgressDialog {
     return workflowId ?? "";
   }
 
-  void addSetting(SettingsEntry setting) {
+  void addSetting(StepSetting setting) {
     settings.add(setting);
   }
 
@@ -76,7 +83,7 @@ class WorkflowRunner with ProgressDialog {
     folderSuffix = "$folderSuffix$suf";
   }
 
-  void addSettings(List<SettingsEntry> settings) {
+  void addSettings(List<StepSetting> settings) {
     settings.addAll(settings);
   }
 
@@ -339,7 +346,7 @@ class WorkflowRunner with ProgressDialog {
       bool random = false,
       int nameLength = 5}) async {
     var factory = tercen.ServiceFactory();
-    String name = folderName ?? getRandomString(nameLength);
+    String name = folderName ??  StringUtils.getRandomString(nameLength);
 
     if (random == false && folderName == null) {
       final DateFormat formatter = DateFormat('yyyyMMdd_hhmmss');
@@ -385,7 +392,7 @@ class WorkflowRunner with ProgressDialog {
       throw Exception("Workflow not set in WorkflowRunner.");
     }
 
-    status.value = RunStatus.running;
+    // status.value = RunStatus.running;
     var factory = tercen.ServiceFactory();
 
     var runTitle = getWorkflowName(template);
@@ -526,7 +533,7 @@ class WorkflowRunner with ProgressDialog {
     // }
 
     await Future.delayed(const Duration(milliseconds: 1000), () {
-      status.value = RunStatus.finished;
+      // status.value = RunStatus.finished;
       closeLog();
     });
 
@@ -559,7 +566,7 @@ class WorkflowRunner with ProgressDialog {
   }
 
   sci.DataStep updateOperatorSettings(
-      sci.DataStep stp, List<SettingsEntry> settingsList) {
+      sci.DataStep stp, List<StepSetting> settingsList) {
     for (var setting in settingsList) {
       if (stp.id == setting.stepId) {
         for (var i = 0;
@@ -568,7 +575,7 @@ class WorkflowRunner with ProgressDialog {
           if (stp.model.operatorSettings.operatorRef.propertyValues[i].name ==
               setting.settingName) {
             stp.model.operatorSettings.operatorRef.propertyValues[i].value =
-                setting.textValue;
+                setting.value;
           }
         }
       }

@@ -1,10 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-// import 'package:kumo_analysis_app/components/commons/wait_indicator.dart';
-// import 'package:kumo_analysis_app/util/ui/styles.dart';
-// import 'package:kumo_analysis_app/util/ui_utils.dart';
-import 'package:sci_base/value.dart';
+
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 

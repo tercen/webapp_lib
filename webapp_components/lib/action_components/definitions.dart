@@ -1,0 +1,1 @@
+typedef ActionCallback = Future<void> Function();
