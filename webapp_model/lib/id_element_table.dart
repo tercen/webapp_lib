@@ -1,5 +1,5 @@
 
-
+import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_model/id_element.dart';
 
 
@@ -77,6 +77,18 @@ class IdElementTable {
     }else{
       return columns[column]!;
     }
+  }
 
+
+  static IdElementTable fromTable(sci.Table tercenTbl){
+    IdElementTable uiTable = IdElementTable();
+
+    for (var col in tercenTbl.columns) {
+      var vals = (col.values as List)
+          .map((e) => IdElement(e.toString(), e.toString()))
+          .toList();
+      uiTable.addColumn(col.name, data: vals);
+    }
+    return uiTable;
   }
 }

@@ -10,8 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  url_launcher: ^6.3.0
+  jwt_decoder: ^2.0.1
+
   webapp_components:
     path: ../webapp_components
+  
 
 
 dev_dependencies:

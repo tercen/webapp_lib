@@ -8,8 +8,12 @@ version: 0.0.1
 environment:
   sdk: '>=3.4.3 <4.0.0'
 
-
-
+dependencies:
+  
+  webapp_ui_commons:
+    path: ../webapp_ui_commons
+  webapp_workflow:
+    path: ../webapp_workflow
   # kumo_api:
   #   git:
   #     url: git@github.com:tercen/kumo_api.git
