@@ -200,7 +200,7 @@ class ProjectFunctions {
     return candidateFolderNodes.map((e) => e.document).toList();
   }
 
-  FileDocument _setFileContent(FileDocument fileDoc, dynamic content) {
+  FileDocument setFileContent(FileDocument fileDoc, dynamic content) {
     if (content is Map) {
       fileDoc.addMeta("file.content", json.encode(content));
     } else if (content is String) {
@@ -211,4 +211,6 @@ class ProjectFunctions {
 
     return fileDoc;
   }
+
+
 }
