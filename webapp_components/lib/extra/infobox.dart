@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:webapp_components/commons/id_element.dart';
+import 'package:webapp_model/id_element.dart';
 import 'package:webapp_components/widgets/double_scrollbar_widget.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';

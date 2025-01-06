@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:webapp_model/id_element.dart';
+import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_model/model_handler_base.dart';
 
-import '../commons/id_element.dart';
-import '../commons/id_element_table.dart';
 
 
 typedef InfoBoxBuilderCallback = Container Function(ModelHandlerBase model, IdElement element);

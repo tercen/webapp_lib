@@ -6,7 +6,7 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart' as pd;
-import 'package:webapp_components/commons/id_element_table.dart';
+import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_components/components/list_component.dart';
 
 class ExportPageContent {

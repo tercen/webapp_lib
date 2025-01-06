@@ -1,6 +1,8 @@
 
 
-import 'id_element.dart';
+import 'package:webapp_model/id_element.dart';
+
+
 
 class IdElementTable {
   final Map<String, List<IdElement>> columns = {};

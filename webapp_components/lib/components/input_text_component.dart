@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_components/abstract/definitions.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
-import 'package:webapp_components/commons/id_element.dart';
+import 'package:webapp_model/id_element.dart';
 
 
 import '../mixins/component_base.dart';

@@ -3,7 +3,7 @@ import 'package:webapp_components/abstract/multi_value_component.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
 
 
-import '../commons/id_element.dart';
+import '../../../webapp_model/lib/id_element.dart';
 
 
 mixin class ComponentBase {

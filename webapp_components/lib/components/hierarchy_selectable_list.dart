@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/definitions.dart';
 import 'package:webapp_components/abstract/multi_value_component.dart';
-import 'package:webapp_components/commons/id_element.dart';
-import 'package:webapp_components/commons/id_element_table.dart';
+import 'package:webapp_model/id_element.dart';
+import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_components/components/hierarchy_list.dart';
 import 'package:webapp_components/mixins/checkbox_herarchical_list.dart';
 import 'package:webapp_components/mixins/component_base.dart';

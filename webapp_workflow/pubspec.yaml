@@ -10,12 +10,17 @@ environment:
 
 dependencies:
   intl: ^0.19.0
+  json_string: ^3.0.1
 
   flutter:
     sdk: flutter
+  
+  webapp_model:
+    path: ../webapp_model
 
   webapp_ui_commons:
     path: ../webapp_ui_commons
+
   webapp_utils:
     path: ../webapp_utils
 

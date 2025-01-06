@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:webapp_components/commons/id_element.dart';
-import 'package:webapp_components/commons/id_element_table.dart';
+import 'package:webapp_model/id_element.dart';
+import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_components/components/hierarchy_list.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
