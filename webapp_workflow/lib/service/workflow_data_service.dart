@@ -8,8 +8,9 @@ import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_utils/logger.dart';
 import 'package:webapp_utils/mixin/data_cache.dart';
-import 'package:webapp_workflow_runner/service/workflow_info.dart';
-import 'package:webapp_workflow_runner/util/workflow_functions.dart';
+import 'package:webapp_workflow/service/workflow_info.dart';
+import 'package:webapp_workflow/util/workflow_functions.dart';
+
 
 class WorkflowDataService with DataCache {
   // final Map<String, WorkflowInfo> info = {};
