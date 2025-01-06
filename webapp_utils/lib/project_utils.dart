@@ -5,17 +5,17 @@ import 'package:sci_tercen_client/sci_client.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:webapp_utils/logger.dart';
 
-class ProjectFunctions {
+class ProjectUtils {
   final FolderNode folderTreeRoot = FolderNode(FolderDocument(), true);
   bool structureLoaded = false;
 
-  static final ProjectFunctions _singleton = ProjectFunctions._internal();
+  static final ProjectUtils _singleton = ProjectUtils._internal();
 
-  factory ProjectFunctions() {
+  factory ProjectUtils() {
     return _singleton;
   }
 
-  ProjectFunctions._internal();
+  ProjectUtils._internal();
 
   Future<void> loadFolderStructure(String projectId) async {
     if (projectId != "") {
@@ -79,7 +79,7 @@ class ProjectFunctions {
     doc.acl = Acl()..owner = owner;
     doc.metadata.contentType = "application/json";
     doc.dataUri = "";
-    doc = _setFileContent(doc, {});
+    doc = setFileContent(doc, {});
     doc = await factory.fileService.create(doc);
 
     await loadFolderStructure(projectId);
@@ -97,7 +97,7 @@ class ProjectFunctions {
 
   Future<void> updateFileContent(FileDocument fileDoc, Map content) async {
     var factory = tercen.ServiceFactory();
-    fileDoc = _setFileContent(fileDoc, content);
+    fileDoc = setFileContent(fileDoc, content);
     // ignore: invalid_return_type_for_catch_error
     await factory.fileService.update(fileDoc).catchError((e) => Logger()
         .log(level: Logger.INFO, message: "Unable to update model state file"));

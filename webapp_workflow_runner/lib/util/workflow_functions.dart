@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
-import 'package:webapp_utils/project_functions.dart';
+import 'package:webapp_utils/project_utils.dart';
 
 class WorkflowFunctions {
   static Future<void> updateReadme( sci.Document readmeDocument,
@@ -10,7 +10,7 @@ class WorkflowFunctions {
     var factory = tercen.ServiceFactory();
 
   
-    var readmeDocument =  ProjectFunctions().getProjectFiles().firstWhere(
+    var readmeDocument =  ProjectUtils().getProjectFiles().firstWhere(
         (e) => e.getMeta("WORKFLOW_ID") == workflowId,
         orElse: () => sci.Document());
 
