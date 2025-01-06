@@ -59,6 +59,13 @@ class ProjectUtils {
     return folder;
   }
 
+  List<ProjectDocument> getFolderDocuments(String folderId, String projectId, {bool recursive = false}) {
+    List<ProjectDocument> docs = [];
+ 
+    docs.addAll( FolderNode.getDocuments(folderId, folderTreeRoot, recursive: recursive));
+    return docs;
+  }
+
   Future<FileDocument> getOrCreateFile(
       String projectId, String owner, String name,
       {String? parentId, String contentType = "application/json"}) async {
