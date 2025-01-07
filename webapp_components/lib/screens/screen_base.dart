@@ -2,18 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
-import 'package:webapp_components/abstract/definitions.dart';
+import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/abstract/multi_value_component.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_components/action_components/action_component.dart';
 import 'package:webapp_components/components/horizontal_bar.dart';
 import 'package:webapp_model/webapp_data_base.dart';
-// import 'package:kumo_analysis_app/components/action/action_component.dart';
-// import 'package:kumo_analysis_app/components/component.dart';
-// import 'package:kumo_analysis_app/components/horizontal_bar.dart';
-// import 'package:kumo_analysis_app/model/dictionary.dart';
-// import 'package:kumo_analysis_app/util/ui/styles.dart';
-// import 'package:kumo_analysis_app/webapp_data.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 class Action {
@@ -81,7 +75,7 @@ mixin ScreenBase {
   void updateModel() {
     var comps = getAllComponents();
     for (var comp in comps) {
-      if (comp.getGroupId() != "LAYOUT") {
+      if (comp.getGroupId() != LAYOUT_GROUP) {
         // Remove components like horizontal bar and spacing, which have no value
         if (comp is SingleValueComponent) {
           modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getValue());
@@ -227,9 +221,7 @@ mixin ScreenBase {
   Widget? _buildBlockRow(
       Component comp, ComponentType compType, BuildContext context,
       {bool addPadding = true}) {
-    Widget verticalSpacing = const SizedBox(
-      height: 15,
-    );
+
     Widget paddingWdg = Container();
     if (addPadding) {
       paddingWdg = const SizedBox(

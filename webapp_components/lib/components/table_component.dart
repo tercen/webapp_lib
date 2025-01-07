@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:webapp_components/abstract/definitions.dart';
+import 'package:webapp_components/definitions/component.dart';
+import 'package:webapp_components/definitions/functions.dart';
 import 'package:webapp_components/abstract/multi_value_component.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_model/id_element.dart';

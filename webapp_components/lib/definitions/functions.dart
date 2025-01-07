@@ -6,4 +6,4 @@ typedef WebappCallback = void Function(dynamic data);
 typedef DataFetchCallback = Future<IdElementTable> Function( List<String> parentKeys, String groupId );
 
 
-enum ComponentType {simple, simpleNoLabel, list, multiOption, table}
+

@@ -22,7 +22,7 @@ mixin ProgressDialog {
   String title = "";
   late BuildContext dialogContext;
 
-  void refresh(Function setState){
+  void refreshDialog(Function setState){
     setState(() {});
   }
 
@@ -38,7 +38,7 @@ mixin ProgressDialog {
         context: dialogContext,
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
-            _message.addListener(() => refresh(setState));
+            _message.addListener(() => refreshDialog(setState));
 
             // _message.onChange.listen((onData) {
             //   if (context.mounted) {

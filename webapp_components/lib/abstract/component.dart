@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:webapp_components/abstract/definitions.dart';
+import 'package:webapp_components/definitions/component.dart';
+
 
 abstract class Component with ChangeNotifier {
   Widget buildContent(BuildContext context);

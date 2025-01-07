@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:webapp_components/abstract/definitions.dart';
+
 import 'package:webapp_components/abstract/component.dart';
+import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/mixins/component_base.dart';
 import 'package:webapp_utils/string_utils.dart';
 
@@ -8,7 +9,7 @@ class HorizontalBarComponent  extends Component with ComponentBase {
   final double thickness;
   HorizontalBarComponent({this.thickness = 2}){
     super.id = StringUtils.getRandomString(4);
-    super.groupId = "LAYOUT";
+    super.groupId = LAYOUT_GROUP;
     super.componentLabel = "";
   }
 
