@@ -15,6 +15,9 @@ class SettingsDataService{
   final Map<String, List<SettingsEntry>> _settingsMap = {};
 
   List<SettingsEntry> get( String key ){
+    print("In get");
+    print(_settingsMap);
+    
     if( !_settingsMap.containsKey(key)){
       throw Exception("Key $key not found in settings map");
     }
