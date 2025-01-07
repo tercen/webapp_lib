@@ -13,7 +13,14 @@ import 'package:webapp_workflow/util/workflow_functions.dart';
 
 
 class WorkflowDataService with DataCache {
-  // final Map<String, WorkflowInfo> info = {};
+  static final WorkflowDataService _singleton = WorkflowDataService._internal();
+  
+  factory WorkflowDataService() {
+    return _singleton;
+  }
+  
+  WorkflowDataService._internal();
+  
   final List<WorkflowInfo> _requiredWorkflows = [];
   final Map<String, Workflow> installedWorkflows = {};
   bool infoLoaded = false;

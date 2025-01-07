@@ -4,6 +4,14 @@ import 'package:webapp_components/settings/settings_entry.dart';
 
 
 class SettingsDataService{
+  static final SettingsDataService _singleton = SettingsDataService._internal();
+  
+  factory SettingsDataService() {
+    return _singleton;
+  }
+  
+  SettingsDataService._internal();
+  
   final Map<String, List<SettingsEntry>> _settingsMap = {};
 
   List<SettingsEntry> get( String key ){
