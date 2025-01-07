@@ -5,8 +5,9 @@ import 'package:webapp_components/components/input_text_component.dart';
 import 'package:webapp_components/components/multi_check_component.dart';
 import 'package:webapp_components/components/select_dropdown.dart';
 import 'package:webapp_components/settings/settings_entry.dart';
-import 'package:webapp_components/settings/settings_loader.dart';
+import 'package:webapp_components/service/settings_data_service.dart';
 import 'package:webapp_model/id_element.dart';
+import 'package:webapp_workflow/model/step_setting.dart';
 
 
 class SettingsLoader {
@@ -23,15 +24,17 @@ class SettingsLoader {
     return "|SETTING|";
   }
 
-  static SettingsEntry? settingComponentToSettingEntry(Component component){
+  static StepSetting? settingComponentToStepSetting(Component component){
     if( component.getId().startsWith(settingIdentifier())){
+      //StepId, SettingName
       var identifier = component.getId().replaceAll(settingIdentifier(), "").split(settingIdSeparator());
       if( component is SingleValueComponent ){
-        SettingsEntry entry = SettingsEntry("", identifier[0], identifier[1], "", "", "", component.getValue().id, "");
+        
+        StepSetting entry = StepSetting( identifier[0], identifier[1], component.getValue().id);
         return entry;  
       }
       if( component is MultiValueComponent ){
-        SettingsEntry entry = SettingsEntry("", identifier[0], identifier[1], "", "", "", component.getValue().map((e) => e.id).join(","), "");
+        StepSetting entry = StepSetting( identifier[0], identifier[1], component.getValue().map((e) => e.id).join(","));
         return entry;  
       }
       

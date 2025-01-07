@@ -11,7 +11,7 @@ class SettingsDataService{
   }
   
   SettingsDataService._internal();
-  
+
   final Map<String, List<SettingsEntry>> _settingsMap = {};
 
   List<SettingsEntry> get( String key ){
@@ -27,22 +27,6 @@ class SettingsDataService{
     for( var i = 0; i < nameList.length; i++ ){
       _settingsMap[nameList[i]] = settings[i];
     }
-
-    
-    // var settings = await Future.wait([
-    //   _loadSettingsFile("assets/umap_settings.json"),
-    //   _loadSettingsFile("assets/umap_apply_settings.json"),
-    //   _loadSettingsFile("assets/ml_apply_settings.json"),
-    //   _loadSettingsFile("assets/ml_settings.json")
-    // ]);
-
-
-
-    // _settingsMap["assets/umap_settings.json"] = settings[0];
-    // _settingsMap["assets/umap_apply_settings.json"] = settings[1];
-    // _settingsMap["assets/ml_apply_settings.json"] = settings[2];
-    // _settingsMap["assets/ml_settings.json"] = settings[3];
-    
   }
 
   Future<List<SettingsEntry>> _loadSettingsFile(String path) async {

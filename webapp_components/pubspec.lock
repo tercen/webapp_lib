@@ -664,7 +664,7 @@ packages:
     source: path
     version: "0.0.1"
   webapp_workflow:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../webapp_workflow"
       relative: true

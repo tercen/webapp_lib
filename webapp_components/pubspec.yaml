@@ -7,6 +7,8 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
+  webapp_workflow:
+    path: ../webapp_workflow
   webapp_model:
     path: ../webapp_model
   webapp_ui_commons:
