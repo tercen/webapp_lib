@@ -26,7 +26,7 @@ class WebAppBase with ChangeNotifier {
   String projectHref = "";
   String username = "";
   String teamname = "";
-  String gtToken = "";
+  
 
   // String selectedScreen = "";
   final List<MenuItem> menuItems = [];
@@ -83,6 +83,7 @@ class WebAppBase with ChangeNotifier {
       projectId = Uri.base.queryParameters["projectId"] ?? '';
       late sci.UserSession session;
       String devProjectId = const String.fromEnvironment("PROJECT_ID");
+
       if (devProjectId != "") {
         print("Running in DEV mode");
         var tok = Uri.base.queryParameters["token"] ?? '';
@@ -140,17 +141,11 @@ class WebAppBase with ChangeNotifier {
 
       await initFactory(session.token.token);
       var factory = tercen.ServiceFactory();
-      var userSecretService =
-          factory.userSecretService as sci.UserSecretService;
       var userService = factory.userService as sci.UserService;
 
       await userService.setSession(session);
 
-      var googleCredentials = await userSecretService.getGoogleAccessToken();
-      if (googleCredentials != null && googleCredentials == "") {
-        throw Exception("Google credentials have not been found");
-      }
-      gtToken = googleCredentials!;
+    
 
       if (projectId != "") {
         var project = await factory.projectService.get(projectId);

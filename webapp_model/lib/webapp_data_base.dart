@@ -7,7 +7,7 @@ import 'package:sci_tercen_client/sci_client.dart';
 
 import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
-import 'package:webapp_ui_commons/webapp.dart';
+import 'package:webapp_ui_commons/webapp_base.dart';
 import 'package:webapp_utils/project_utils.dart';
 import 'package:webapp_workflow/service/settings_data_service.dart';
 import 'package:webapp_workflow/service/workflow_data_service.dart';
@@ -32,7 +32,7 @@ class WebAppDataBase with ChangeNotifier {
   bool shouldReload = false;
   bool isInit = false;
 
-  String get gtToken => app.gtToken;
+  // String get gtToken => app.gtToken;
 
   IdElement get project => IdElement(app.projectId, app.projectName);
   IdElement get username => IdElement(app.username, app.username);
