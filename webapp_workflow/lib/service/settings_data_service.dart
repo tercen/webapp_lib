@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:json_string/json_string.dart';
+import 'package:webapp_utils/logger.dart';
 import 'package:webapp_workflow/service/model/settings_entry.dart';
 
 
@@ -18,6 +19,7 @@ class SettingsDataService{
     var settings = await Future.wait(settingsFiles.map((e) => _loadSettingsFile(e)));
 
     for (var i = 0; i < settings.length; i++) {
+      print("Adding ${settingsFiles[i]} to the map");
       _settingsMap[settingsFiles[i]] = settings[i];  
     }
   }

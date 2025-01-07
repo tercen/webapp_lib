@@ -128,9 +128,10 @@ class HierarchySelectableListComponent extends  HierarchyList with ChangeNotifie
   
   @override
   void setValue(List<IdElement> value) {
+    
     for( var v in value ){
-      if( !_selected.contains(v)){
-        _selected.add(v);
+      if( !selectedElements.contains(v)){
+        selectedElements.add(v);
       }
     }
   }
