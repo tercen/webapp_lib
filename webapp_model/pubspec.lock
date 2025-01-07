@@ -497,16 +497,9 @@ packages:
     source: path
     version: "0.0.1"
   webapp_utils:
-    dependency: transitive
-    description:
-      path: "../webapp_utils"
-      relative: true
-    source: path
-    version: "0.0.1"
-  webapp_workflow:
     dependency: "direct main"
     description:
-      path: "../webapp_workflow"
+      path: "../webapp_utils"
       relative: true
     source: path
     version: "0.0.1"

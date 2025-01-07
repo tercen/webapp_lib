@@ -663,13 +663,6 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
-  webapp_workflow:
-    dependency: transitive
-    description:
-      path: "../webapp_workflow"
-      relative: true
-    source: path
-    version: "0.0.1"
   webkit_inspection_protocol:
     dependency: transitive
     description:

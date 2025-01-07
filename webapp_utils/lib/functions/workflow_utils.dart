@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
-import 'package:webapp_utils/project_utils.dart';
+import 'package:webapp_utils/functions/project_utils.dart';
 
-class WorkflowFunctions {
+class WorkflowUtils {
   static Future<void> updateReadme( 
        String workflowId, String text) async {
     var factory = tercen.ServiceFactory();

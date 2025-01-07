@@ -5,13 +5,15 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
 
 
+
 import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_ui_commons/webapp_base.dart';
-import 'package:webapp_utils/project_utils.dart';
-import 'package:webapp_workflow/service/settings_data_service.dart';
-import 'package:webapp_workflow/service/workflow_data_service.dart';
-import 'package:webapp_workflow/service/workflow_steps_mapper.dart';
+import 'package:webapp_utils/functions/project_utils.dart';
+import 'package:webapp_utils/functions/workflow_steps_mapper.dart';
+import 'package:webapp_utils/services/settings_data_service.dart';
+import 'package:webapp_utils/services/workflow_data_service.dart';
+
 
 
 
@@ -49,7 +51,7 @@ class WebAppDataBase with ChangeNotifier {
     await Future.wait([
       workflowService.init(),
       ProjectUtils().loadFolderStructure(projectId),
-      settingsService.loadSettings(settingFiles),
+      settingsService.loadSettings(settingFiles, settingFiles),
       stepsMapper.loadSettingsFile(stepMapperJsonFile)
     ]);
 

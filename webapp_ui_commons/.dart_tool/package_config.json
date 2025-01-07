@@ -506,12 +506,6 @@
       "languageVersion": "3.5"
     },
     {
-      "name": "webapp_workflow",
-      "rootUri": "../../webapp_workflow",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
       "name": "webkit_inspection_protocol",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/webkit_inspection_protocol-1.2.1",
       "packageUri": "lib/",
@@ -536,7 +530,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2025-01-07T17:42:01.637087Z",
+  "generated": "2025-01-07T18:15:32.977509Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///usr/bin/flutter",

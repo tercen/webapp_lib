@@ -17,7 +17,9 @@ dependencies:
       url: https://github.com/tercen/sci_tercen_client
       path: sci_tercen_client
 
-
+  json_string: ^3.0.1
+  webapp_model:
+    path: ../webapp_model
 
 dev_dependencies:
   test:

@@ -1,3 +1,4 @@
+
 class SettingsEntry{
   static const String typeInt = "int";
   static const String typeDouble = "double";
@@ -12,7 +13,7 @@ class SettingsEntry{
   final String stepName;
   final String stepId;
   final String hint;
-  final String type;
+  final String type; 
   final String mode;
   final String section;
   
@@ -41,3 +42,4 @@ class SettingsEntry{
     return "Name: $settingName\nType: $type\nValue: $textValue\nSection: $section";
   }
 }
+

@@ -11,7 +11,8 @@ import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/mixins/infobox_component.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
-import 'package:webapp_utils/list_utils.dart';
+import 'package:webapp_utils/functions/list_utils.dart';
+
 
 class SelectableListComponent
     with ChangeNotifier, ComponentBase, ComponentInfoBox, ComponentCache

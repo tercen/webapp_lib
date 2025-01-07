@@ -3,13 +3,15 @@ import 'package:json_string/json_string.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
-
 import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
-import 'package:webapp_utils/logger.dart';
+
+
+import 'package:webapp_utils/functions/logger.dart';
+import 'package:webapp_utils/functions/workflow_utils.dart';
 import 'package:webapp_utils/mixin/data_cache.dart';
-import 'package:webapp_workflow/service/workflow_info.dart';
-import 'package:webapp_workflow/util/workflow_functions.dart';
+import 'package:webapp_utils/model/workflow_info.dart';
+
 
 
 class WorkflowDataService with DataCache {
@@ -131,13 +133,13 @@ class WorkflowDataService with DataCache {
       case "CompositeRelation":
         CompositeRelation cr = relation as CompositeRelation;
         List<JoinOperator> joList = cr.joinOperators;
-        l.addAll(WorkflowFunctions.getSimpleRelations(cr.mainRelation));
+        l.addAll(WorkflowUtils.getSimpleRelations(cr.mainRelation));
         for (var jo in joList) {
-          l.addAll(WorkflowFunctions.getSimpleRelations(jo.rightRelation));
+          l.addAll(WorkflowUtils.getSimpleRelations(jo.rightRelation));
         }
       case "RenameRelation":
         RenameRelation rr = relation as RenameRelation;
-        l.addAll(WorkflowFunctions.getSimpleRelations(rr.relation));
+        l.addAll(WorkflowUtils.getSimpleRelations(rr.relation));
 
       //
       default:

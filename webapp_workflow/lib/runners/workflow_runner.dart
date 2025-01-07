@@ -19,8 +19,8 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:tson/tson.dart' as tson;
 // import 'package:sci_base/value.dart';
 import 'package:uuid/uuid.dart';
-import 'package:webapp_utils/string_utils.dart';
-import 'package:webapp_workflow/model/step_setting.dart';
+import 'package:webapp_utils/functions/string_utils.dart';
+import 'package:webapp_utils/model/step_setting.dart';
 
 
 enum RunStatus { init, running, finished, fail }

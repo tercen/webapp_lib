@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:json_string/json_string.dart';
-import 'package:webapp_utils/logger.dart';
-import 'package:webapp_workflow/service/model/settings_entry.dart';
+import 'package:webapp_utils/model/settings_entry.dart';
 
 
 class SettingsDataService{
@@ -12,25 +11,21 @@ class SettingsDataService{
   }
   
   SettingsDataService._internal();
+
   final Map<String, List<SettingsEntry>> _settingsMap = {};
 
   List<SettingsEntry> get( String key ){
-    print("In get");
-    print(_settingsMap);
-    
     if( !_settingsMap.containsKey(key)){
       throw Exception("Key $key not found in settings map");
     }
     return _settingsMap[key]!;
   }
 
-  Future<void> loadSettings(List<String> settingsFiles ) async {
-    await Future.wait(settingsFiles.map((e) => _loadSettingsFile(e)));
-    var settings = await Future.wait(settingsFiles.map((e) => _loadSettingsFile(e)));
-
-    for (var i = 0; i < settings.length; i++) {
-      print("Adding ${settingsFiles[i]} to the map");
-      _settingsMap[settingsFiles[i]] = settings[i];  
+  Future<void> loadSettings( List<String> nameList, List<String> assetList  ) async {
+    assert(nameList.length == assetList.length);
+    var settings = await Future.wait(assetList.map((e) => _loadSettingsFile(e)));
+    for( var i = 0; i < nameList.length; i++ ){
+      _settingsMap[nameList[i]] = settings[i];
     }
   }
 

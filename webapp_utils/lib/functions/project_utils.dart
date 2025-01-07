@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:webapp_utils/folder_node.dart';
 import 'package:sci_tercen_client/sci_client.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
-import 'package:webapp_utils/logger.dart';
+import 'package:webapp_utils/functions/logger.dart';
 
 class ProjectUtils {
   final FolderNode folderTreeRoot = FolderNode(FolderDocument(), true);

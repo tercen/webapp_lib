@@ -9,9 +9,7 @@ import 'package:webapp_components/mixins/component_base.dart';
 import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
-import 'package:webapp_utils/list_utils.dart';
-
-
+import 'package:webapp_utils/functions/list_utils.dart';
 
 class MultiSelectTableComponent
     with ChangeNotifier, ComponentBase, ComponentCache
@@ -246,7 +244,8 @@ class MultiSelectTableComponent
 
     var indices = List<int>.generate(nRows, (i) => i);
     if (sortDirection != "" && sortingCol != "") {
-      indices = ListUtils.getSortedIndices(table.columns[sortingCol]!.map((e) => e.label).toList());
+      indices = ListUtils.getSortedIndices(
+          table.columns[sortingCol]!.map((e) => e.label).toList());
 
       if (sortDirection == "desc") {
         indices = indices.reversed.toList();
@@ -296,10 +295,9 @@ class MultiSelectTableComponent
               throw Exception(snapshot.error);
             } else {
               return SizedBox(
-                height: 100,
-                child: TercenWaitIndicator().waitingMessage(suffixMsg: "  Loading Table")
-              );
-
+                  height: 100,
+                  child: TercenWaitIndicator()
+                      .waitingMessage(suffixMsg: "  Loading Table"));
             }
           });
     }
