@@ -5,7 +5,7 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:webapp_utils/project_utils.dart';
 
 class WorkflowFunctions {
-  static Future<void> updateReadme( sci.Document readmeDocument,
+  static Future<void> updateReadme( 
        String workflowId, String text) async {
     var factory = tercen.ServiceFactory();
 
