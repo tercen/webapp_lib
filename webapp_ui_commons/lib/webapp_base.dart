@@ -75,7 +75,7 @@ class WebAppBase with ChangeNotifier {
     return true;
   }
 
-  Future<void> init() async {
+  Future<void> init({bool awaitInit = false}) async {
     if (!isInitialized) {
       await TercenWaitIndicator().init();
 
@@ -152,7 +152,10 @@ class WebAppBase with ChangeNotifier {
         projectName = project.name;
         teamname = project.acl.owner;
       }
-      isInitialized = true;
+      if( !awaitInit ){
+        isInitialized = true;
+      }
+      
     }
   }
 
