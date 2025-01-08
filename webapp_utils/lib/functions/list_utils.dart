@@ -1,3 +1,5 @@
+import 'package:webapp_utils/functions/string_utils.dart';
+
 class ListUtils{
   static List<int> getSortedIndices( List<String> values ){
     List<int> indices = [];
@@ -8,7 +10,11 @@ class ListUtils{
     sortedLabels.sort();
 
     for( var v in sortedLabels ){
-      indices.add( labelList.indexWhere((e) => v == e) );
+      
+      var idx = labelList.indexWhere((e) => v == e);
+      labelList[idx] = StringUtils.getRandomString(5);
+      
+      indices.add( idx );
     }
 
 

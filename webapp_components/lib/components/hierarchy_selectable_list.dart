@@ -11,13 +11,13 @@ import 'package:webapp_components/mixins/component_base.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 
 
-
+//FIXME Error when reordering
 class HierarchySelectableListComponent extends  HierarchyList with ChangeNotifier, ComponentBase, CheckboxHerarchicalList  implements MultiValueComponent {
   // late CheckboxHierarchyList chList ;
   final DataFetchCallback dataFetchFunc;
 
   final List<String> _columnHierarchy = [];
-  final List<IdElement> _selected = [];
+  // final List<IdElement> _selected = [];
   late IdElementTable dataTable;
 
   HierarchySelectableListComponent(id, groupId, componentLabel, hierarchy, this.dataFetchFunc ){
