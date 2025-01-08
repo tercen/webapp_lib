@@ -45,8 +45,35 @@ class IdElementTable {
     return columns[colName];
   }
 
-  IdElementTable filterTable(  String column, String filter ){
-    var idx = ListUtils.indexWhereAllContains(this[column].map((e) => e.label.toLowerCase()).toList(), filter.toLowerCase());
+  IdElementTable filterAndTable(  String column, List<String> filters ){
+    var idxList = ListUtils.indexWhereAllContains(this[column].map((e) => e.label.toLowerCase()).toList(), filters.first.toLowerCase());
+
+    for( var filter in filters ){
+      var newIdx = ListUtils.indexWhereAllContains(this[column].map((e) => e.label.toLowerCase()).toList(), filter.toLowerCase());
+
+      idxList = idxList.toSet().intersection(newIdx.toSet()).toList();
+
+    }
+
+    var idx = idxList.toSet().toList();
+
+    for( var col in this.colNames) {
+      this.columns[col] = idx.map((e) => this[col][e]).toList();
+    }
+
+    return this;
+  }
+
+
+  IdElementTable filterOrTable(  String column, List<String> filters ){
+    var idxList = [];
+
+    for( var filter in filters ){
+      idxList.addAll(ListUtils.indexWhereAllContains(this[column].map((e) => e.label.toLowerCase()).toList(), filter.toLowerCase()));
+    }
+
+    var idx = idxList.toSet().toList();
+
     for( var col in this.colNames) {
       this.columns[col] = idx.map((e) => this[col][e]).toList();
     }
