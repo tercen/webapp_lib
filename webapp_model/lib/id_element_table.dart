@@ -1,6 +1,7 @@
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_model/id_element.dart';
+import 'package:webapp_utils/functions/list_utils.dart';
 
 
 
@@ -44,6 +45,15 @@ class IdElementTable {
     return columns[colName];
   }
 
+  IdElementTable filterTable(  String column, String filter ){
+    var idx = ListUtils.indexWhereAllContains(this[column].map((e) => e.label.toLowerCase()).toList(), filter.toLowerCase());
+    for( var col in this.colNames) {
+      this.columns[col] = idx.map((e) => this[col][e]).toList();
+    }
+
+    return this;
+  }
+
   @override
   String toString(){
     if( columns.isEmpty || colNames.isEmpty ){
@@ -70,7 +80,12 @@ class IdElementTable {
     
   }
 
-  
+
+
+  void operator []=(String column, List<IdElement> values){
+    columns[column] = values;
+  }
+
   List<IdElement> operator [](String column){
     if( !columns.containsKey(column) ){
       return [];
