@@ -39,4 +39,22 @@ class ListUtils{
     return indices;
   }
 
+  static List<int> indexWhereAllContains(List<String> valueList, String val) {
+    List<int> indices = [];
+    var idx = 0;
+
+    while (true) {
+      idx = valueList.indexWhere((e) => e.contains(val), idx);
+
+      if (idx >= 0) {
+        indices.add(idx);
+        idx = idx + 1;
+      } else {
+        break;
+      }
+    }
+
+    return indices;
+  }
+
 }
