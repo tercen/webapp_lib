@@ -17,14 +17,14 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
     super.componentLabel = componentLabel;
   }
 
-  void _select(IdElement el){
+  void select(IdElement el){
     
     if( !selected.contains(el)){
       selected.add(el);
     }
   }
 
-  void _deselect(IdElement el){
+  void deselect(IdElement el){
     selected.remove(el);
   }
 
@@ -33,8 +33,8 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
     var checkIcon = IconButton(
       onPressed: () {
         isSelected ?
-        _deselect(IdElement(id, name)) :
-        _select(IdElement(id, name)) ;
+        deselect(IdElement(id, name)) :
+        select(IdElement(id, name)) ;
 
         notifyListeners();
         if( onClick != null ){

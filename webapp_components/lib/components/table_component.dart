@@ -44,7 +44,7 @@ class MultiSelectTableComponent
     }
   }
 
-  Widget _createHeaderCell(String text) {
+  Widget createHeaderCell(String text) {
     Widget sortingIcon = Container();
     if (sortingCol == text && sortDirection == "asc") {
       sortingIcon = const Icon(Icons.arrow_drop_up);
@@ -99,7 +99,7 @@ class MultiSelectTableComponent
     var nameRows = colNames.map((el) {
       return TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
-          child: _createHeaderCell(el));
+          child: createHeaderCell(el));
     }).toList();
     TableRow row = TableRow(children: [
       const SizedBox(
@@ -111,7 +111,7 @@ class MultiSelectTableComponent
     return row;
   }
 
-  List<IdElement> _idElementToLine(IdElement value) {
+  List<IdElement> idElementToLine(IdElement value) {
     if (!value.id.startsWith("MV")) {
       throw Exception(
           "TableComponent _idElementToLine error. ${value.id}:${value.label} ");
@@ -128,43 +128,43 @@ class MultiSelectTableComponent
     return elLine;
   }
 
-  IdElement _lineToIdElement(List<IdElement> values) {
+  IdElement lineToIdElement(List<IdElement> values) {
     String id = "MV${values.map((e) => e.id).join(valueSeparator)}";
     String value = values.map((e) => e.id).join(valueSeparator);
 
     return IdElement(id, value);
   }
 
-  void _setSelectionRow(List<IdElement> selectionValues) {
+  void setSelectionRow(List<IdElement> selectionValues) {
     var nRows = dataTable.nRows();
     currentRow = -1;
     for (var ri = 0; ri < nRows; ri++) {
       List<IdElement> rowEls =
           colNames.map((col) => dataTable.columns[col]![ri]).toList();
-      var lineEl = _lineToIdElement(rowEls);
-      if (lineEl.id == _lineToIdElement(selectionValues).id) {
+      var lineEl = lineToIdElement(rowEls);
+      if (lineEl.id == lineToIdElement(selectionValues).id) {
         currentRow = ri;
       }
     }
   }
 
-  Widget _wrapSelectable(Widget contentWdg, List<IdElement> selectionValues) {
+  Widget wrapSelectable(Widget contentWdg, List<IdElement> selectionValues) {
     return InkWell(
       onHover: (value) {
         if (!value) {
           currentRow = -1;
         } else {
-          _setSelectionRow(selectionValues);
+          setSelectionRow(selectionValues);
         }
 
         notifyListeners();
       },
       onTap: () {
-        var clickedEl = _lineToIdElement(selectionValues);
-        if (_isSelected(selectionValues)) {
-          _deselect(clickedEl);
+        var clickedEl = lineToIdElement(selectionValues);
+        if (isSelected(selectionValues)) {
+          deselect(clickedEl);
         } else {
-          _select(clickedEl);
+          select(clickedEl);
         }
         notifyListeners();
       },
@@ -172,22 +172,22 @@ class MultiSelectTableComponent
     );
   }
 
-  void _select(IdElement el) {
+  void select(IdElement el) {
     selected.add(el);
   }
 
-  void _deselect(IdElement el) {
+  void deselect(IdElement el) {
     selected.remove(el);
   }
 
-  bool _isSelected(List<IdElement> rowEls) {
-    var lineEl = _lineToIdElement(rowEls);
+  bool isSelected(List<IdElement> rowEls) {
+    var lineEl = lineToIdElement(rowEls);
 
     return selected.any((e) => e.id == lineEl.id);
   }
 
   TableRow createTableRow(List<IdElement> rowEls, {int rowIndex = -1}) {
-    Widget selectedWidget = _isSelected(rowEls)
+    Widget selectedWidget = isSelected(rowEls)
         ? const SizedBox(
             width: 30,
             height: 30,
@@ -197,7 +197,7 @@ class MultiSelectTableComponent
             width: 30,
             height: 30,
           );
-    selectedWidget = _wrapSelectable(selectedWidget, rowEls);
+    selectedWidget = wrapSelectable(selectedWidget, rowEls);
 
     var rowDecoration = const BoxDecoration(color: Colors.white);
     if (rowIndex > -1) {
@@ -212,7 +212,7 @@ class MultiSelectTableComponent
 
     var dataRow = rowEls.map((el) {
       return TableCell(
-        child: _wrapSelectable(
+        child: wrapSelectable(
             SizedBox(
                 height: 30,
                 child: Align(
@@ -311,7 +311,7 @@ class MultiSelectTableComponent
     }
 
     for (var row in selected) {
-      var els = _idElementToLine(row);
+      var els = idElementToLine(row);
       for (var ci = 0; ci < els.length; ci++) {
         tbl.columns[colNames[ci]]!.add(els[ci]);
       }

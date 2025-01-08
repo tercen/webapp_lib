@@ -83,7 +83,7 @@ class LeafSelectableListComponent extends HierarchyList with ChangeNotifier, Com
   }
 
 
-  Widget _createWidget(BuildContext context, IdElementTable table ){
+  Widget createWidget(BuildContext context, IdElementTable table ){
     for( var col in hierarchy ){
       if( !table.columns.containsKey(col)){
         print("[WARNING] Column $col is not present in the hierarchical list. Returning blank.");
@@ -113,7 +113,7 @@ class LeafSelectableListComponent extends HierarchyList with ChangeNotifier, Com
       builder: (context, snapshot){
         if( snapshot.hasData && snapshot.data != null){
           dataTable = snapshot.data;
-          return _createWidget(context, snapshot.data);
+          return createWidget(context, snapshot.data);
         }else if( snapshot.hasError ){
           print("ERROR");
           print(snapshot.error);

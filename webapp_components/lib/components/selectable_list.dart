@@ -50,7 +50,7 @@ class SelectableListComponent
     _cacheKey = key;
   }
 
-  Future<IdElementTable> _callCachedCallback(
+  Future<IdElementTable> callCachedCallback(
       Map<String, dynamic> values) async {
     if (_cacheKey == null) {
       return await dataFetchFunc(getParentIds(), groupId);
@@ -79,14 +79,14 @@ class SelectableListComponent
   Widget buildContent(BuildContext context) {
     var cacheKey = getCacheKey();
     if (hasCachedValue(cacheKey)) {
-      return _createTable(context, getCachedValue(cacheKey));
+      return createTable(context, getCachedValue(cacheKey));
     } else {
       return FutureBuilder(
-          future: _callCachedCallback(getAncestorValues()) as Future<dynamic>?,
+          future: callCachedCallback(getAncestorValues()) as Future<dynamic>?,
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
               addToCache(cacheKey, snapshot.data);
-              return _createTable(context, snapshot.data);
+              return createTable(context, snapshot.data);
             } else if (snapshot.hasError) {
               throw Exception(snapshot.error);
             } else {
@@ -97,7 +97,7 @@ class SelectableListComponent
     }
   }
 
-  Widget _createTable(BuildContext context, IdElementTable dataTable) {
+  Widget createTable(BuildContext context, IdElementTable dataTable) {
     List<Widget> tableRows = [];
     var dataList = dataTable.getValuesByIndex(0) ?? [];
 
@@ -112,13 +112,13 @@ class SelectableListComponent
       lbl =
           labelTransformCallback(IdElement(dataList[i].id, dataList[i].label));
 
-      tableRows.add(_createRow(dataList[i].id, lbl, i % 2 == 0, context));
+      tableRows.add(createRow(dataList[i].id, lbl, i % 2 == 0, context));
     }
 
     return Column(children: tableRows);
   }
 
-  IconButton _checkBox(String id, String name, bool isSelected) {
+  IconButton checkBox(String id, String name, bool isSelected) {
     return IconButton(
         onPressed: () {
           isSelected
@@ -131,11 +131,11 @@ class SelectableListComponent
             : const Icon(Icons.check_box_outline_blank));
   }
 
-  Widget _createRow(String id, String name, bool isEven, BuildContext context) {
+  Widget createRow(String id, String name, bool isEven, BuildContext context) {
     var isSelected =
         [_selected.id, _selected.label].join("_") == [id, name].join("_");
 
-    var checkboxWidget = _checkBox(id, name, isSelected);
+    var checkboxWidget = checkBox(id, name, isSelected);
 
     var rowWdg = Row(
       children: [

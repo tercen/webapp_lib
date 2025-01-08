@@ -73,25 +73,6 @@ class HierarchyList extends ComponentInfoBox {
     return indices;
   }
 
-  List<int> _sortedIndices(List l) {
-    List ls = List.from(l);
-    ls.sort();
-
-    List<int> indices = [];
-
-    for (var el in ls) {
-      var elIdx = findIndices(l, el);
-
-      for (var idx in elIdx) {
-        if (!indices.contains(idx)) {
-          indices.add(idx);
-          break;
-        }
-      }
-    }
-
-    return indices;
-  }
 
   void deselect(String id) {
     var tmpEls =
@@ -135,7 +116,7 @@ class HierarchyList extends ComponentInfoBox {
     return els;
   }
 
-  List<Widget> _createWidgets(BuildContext context, int level,
+  List<Widget> createWidgets(BuildContext context, int level,
       {String? parentId}) {
     List<String> addedIds = [];
     List<Widget> wdg = [];
@@ -156,19 +137,19 @@ class HierarchyList extends ComponentInfoBox {
         addedIds.add(idEl.id);
 
         if (level == maxDepth) {
-          wdg.add(_createTabulatedEntry(
+          wdg.add(createTabulatedEntry(
               level,
               leafCallback(context, idEl.id, idEl.label, ri, level,
                   isEven: ri % 2 == 0),
               isEven: ri % 2 == 0));
         } else {
-          wdg.add(_createTabulatedEntry(
+          wdg.add(createTabulatedEntry(
               level,
               ExpansionTile(
                 initiallyExpanded: expandedLevels.contains(levelColumn),
                 title: nonLeafCallback(context, idEl.id, idEl.label, ri, level,
                     isEven: ri % 2 == 0),
-                children: _createWidgets(context, level + 1, parentId: idEl.id),
+                children: createWidgets(context, level + 1, parentId: idEl.id),
               ),
               isEven: ri % 2 == 0));
         }
@@ -204,7 +185,7 @@ class HierarchyList extends ComponentInfoBox {
     return false;
   }
 
-  Widget _createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
+  Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
     var clr = isEven ? Styles.evenRow : Styles.oddRow;
     var row = Row(mainAxisSize: MainAxisSize.min, children: [
       Container(
@@ -220,6 +201,6 @@ class HierarchyList extends ComponentInfoBox {
   }
 
   List<Widget> buildWidgetTree(BuildContext context) {
-    return _createWidgets(context, 0);
+    return createWidgets(context, 0);
   }
 }
