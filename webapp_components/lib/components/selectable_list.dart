@@ -18,11 +18,11 @@ class SelectableListComponent
     with ChangeNotifier, ComponentBase, ComponentInfoBox, ComponentCache
     implements SingleValueComponent {
   final bool sortByLabel;
-  IdElement _selected = IdElement("", "");
+  IdElement selected = IdElement("", "");
 
   late String Function(IdElement) labelTransformCallback;
 
-  String? _cacheKey;
+  String? cacheKey;
 
   final DataFetchCallback dataFetchFunc;
 
@@ -47,19 +47,19 @@ class SelectableListComponent
   }
 
   void setCacheKey(String key) {
-    _cacheKey = key;
+    cacheKey = key;
   }
 
   Future<IdElementTable> callCachedCallback(
       Map<String, dynamic> values) async {
-    if (_cacheKey == null) {
+    if (cacheKey == null) {
       return await dataFetchFunc(getParentIds(), groupId);
     } else {
-      if (hasCachedValue(_selected.id)) {
-        return getCachedValue(_selected.id) as IdElementTable;
+      if (hasCachedValue(selected.id)) {
+        return getCachedValue(selected.id) as IdElementTable;
       } else {
         var cachedIdElementTable = await dataFetchFunc(getParentIds(), groupId);
-        addToCache(_selected.id, cachedIdElementTable);
+        addToCache(selected.id, cachedIdElementTable);
         return cachedIdElementTable;
       }
     }
@@ -122,8 +122,8 @@ class SelectableListComponent
     return IconButton(
         onPressed: () {
           isSelected
-              ? _selected = IdElement("", "")
-              : _selected = IdElement(id, name);
+              ? selected = IdElement("", "")
+              : selected = IdElement(id, name);
           notifyListeners();
         },
         icon: isSelected
@@ -133,7 +133,7 @@ class SelectableListComponent
 
   Widget createRow(String id, String name, bool isEven, BuildContext context) {
     var isSelected =
-        [_selected.id, _selected.label].join("_") == [id, name].join("_");
+        [selected.id, selected.label].join("_") == [id, name].join("_");
 
     var checkboxWidget = checkBox(id, name, isSelected);
 
@@ -165,7 +165,7 @@ class SelectableListComponent
 
   @override
   IdElement getValue() {
-    return _selected;
+    return selected;
   }
 
   @override
@@ -180,11 +180,11 @@ class SelectableListComponent
 
   @override
   void setValue(IdElement value) {
-    _selected = value;
+    selected = value;
   }
 
   @override
   void reset() {
-    _selected = IdElement("", "");
+    selected = IdElement("", "");
   }
 }

@@ -34,7 +34,7 @@ class MultiSelectTableComponent
     super.componentLabel = componentLabel;
   }
 
-  void _rotateSortingDirection() {
+  void rotateSortingDirection() {
     if (sortDirection == "desc") {
       sortDirection = "";
     } else if (sortDirection == "asc") {
@@ -64,7 +64,7 @@ class MultiSelectTableComponent
                   child: InkWell(
                     onTap: () {
                       if (sortingCol == text) {
-                        _rotateSortingDirection();
+                        rotateSortingDirection();
                       } else {
                         sortingCol = text;
                         sortDirection = "asc";

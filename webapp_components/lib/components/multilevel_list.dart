@@ -14,7 +14,7 @@ class LeafSelectableListComponent extends HierarchyList with ChangeNotifier, Com
   final DataFetchCallback dataFetchFunc;
 
   final List<String> hierarchy;
-  final List<IdElement> _selected = [];
+  final List<IdElement> selected = [];
   late IdElementTable dataTable;
   final Map<String,String> levelTitles;
 
@@ -52,7 +52,7 @@ class LeafSelectableListComponent extends HierarchyList with ChangeNotifier, Com
 
       bool isLineSelected = true;
       for( var v in values ){
-        isLineSelected = isLineSelected && _selected.contains(v);
+        isLineSelected = isLineSelected && selected.contains(v);
       }
       if(isLineSelected){
         for( var ci = 0; ci < columnHierarchy.length; ci++ ){
@@ -129,8 +129,8 @@ class LeafSelectableListComponent extends HierarchyList with ChangeNotifier, Com
   @override
   void setValue(List<IdElement> value) {
     for( var v in value ){
-      if( !_selected.contains(v)){
-        _selected.add(v);
+      if( !selected.contains(v)){
+        selected.add(v);
       }
     }
   }

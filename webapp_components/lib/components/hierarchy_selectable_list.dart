@@ -16,7 +16,7 @@ class HierarchySelectableListComponent extends  HierarchyList with ChangeNotifie
   // late CheckboxHierarchyList chList ;
   final DataFetchCallback dataFetchFunc;
 
-  final List<String> _columnHierarchy = [];
+  final List<String> columnHierarchy = [];
   // final List<IdElement> _selected = [];
   late IdElementTable dataTable;
 
@@ -24,7 +24,7 @@ class HierarchySelectableListComponent extends  HierarchyList with ChangeNotifie
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
-    _columnHierarchy.addAll(hierarchy);
+    columnHierarchy.addAll(hierarchy);
     
   }
 
@@ -86,14 +86,14 @@ class HierarchySelectableListComponent extends  HierarchyList with ChangeNotifie
 
 
   Widget createWidget(BuildContext context, IdElementTable table ){
-    for( var col in _columnHierarchy ){
+    for( var col in columnHierarchy ){
       if( !table.columns.containsKey(col)){
         print("[WARNING] Column $col is not present in the hierarchical list. Returning blank.");
         return Container();
       }
     }
 
-    load(table, _columnHierarchy, selectedElements);
+    load(table, columnHierarchy, selectedElements);
     // chList = CheckboxHierarchyList(table, columnHierarchy, _selected);
     // chList.addListener(selectListener);
 
