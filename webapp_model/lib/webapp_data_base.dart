@@ -49,10 +49,10 @@ class WebAppDataBase with ChangeNotifier {
     _model.clear();
      
     await Future.wait([
-      workflowService.init(workflowRepoJson: workflowRepoJson)//,
-      // ProjectUtils().loadFolderStructure(projectId),
-      // settingsService.loadSettings(settingFiles, settingFiles),
-      // stepsMapper.loadSettingsFile(stepMapperJsonFile)
+      workflowService.init(workflowRepoJson: workflowRepoJson),
+      ProjectUtils().loadFolderStructure(projectId),
+      settingsService.loadSettings(settingFiles, settingFiles),
+      stepsMapper.loadSettingsFile(stepMapperJsonFile)
     ]);
 
     await _loadModel();

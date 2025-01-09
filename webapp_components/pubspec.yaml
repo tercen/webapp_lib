@@ -26,7 +26,3 @@ dependencies:
 dev_dependencies:
   test:
   lints: ^5.0.0
-
-flutter:
-  assets:
-    - assets/img/wait.webp
