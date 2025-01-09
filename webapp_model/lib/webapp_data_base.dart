@@ -45,11 +45,11 @@ class WebAppDataBase with ChangeNotifier {
   }
 
 
-  Future<void> init(String projectId, String projectName, String username, {String workflowRepoJson = "", List<String> settingFiles = const [], String stepMapperJsonFile = ""} ) async{
+  Future<void> init(String projectId, String projectName, String username, {String reposJsonPath = "", List<String> settingFiles = const [], String stepMapperJsonFile = ""} ) async{
     _model.clear();
      
     await Future.wait([
-      workflowService.init(workflowRepoJson: workflowRepoJson),
+      workflowService.init(reposJsonPath: reposJsonPath),
       ProjectUtils().loadFolderStructure(projectId),
       settingsService.loadSettings(settingFiles, settingFiles),
       stepsMapper.loadSettingsFile(stepMapperJsonFile)

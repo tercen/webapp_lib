@@ -75,6 +75,10 @@ class WebAppBase with ChangeNotifier {
     return true;
   }
 
+  Future<void> postInit({bool awaitInit = false}) async {
+    html.window.history.pushState({}, '', projectHref);
+  }
+
   Future<void> init({bool awaitInit = false}) async {
     if (!isInitialized) {
       await TercenWaitIndicator().init();
@@ -134,7 +138,7 @@ class WebAppBase with ChangeNotifier {
         // }
         // print(newUri.toString());
 
-        html.window.history.pushState({}, '', projectHref);
+        // html.window.history.pushState({}, '', projectHref);
       }
 
       navMenu.addLink("Exit App", projectHref);
