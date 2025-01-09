@@ -75,11 +75,12 @@ class WebAppBase with ChangeNotifier {
     return true;
   }
 
-  Future<void> postInit({bool awaitInit = false}) async {
+  Future<void> postInit() async {
     html.window.history.pushState({}, '', projectHref);
+    isInitialized = true;
   }
 
-  Future<void> init({bool awaitInit = false}) async {
+  Future<void> init() async {
     if (!isInitialized) {
       await TercenWaitIndicator().init();
 
@@ -156,9 +157,9 @@ class WebAppBase with ChangeNotifier {
         projectName = project.name;
         teamname = project.acl.owner;
       }
-      if( !awaitInit ){
-        isInitialized = true;
-      }
+      // if( !awaitInit ){
+      //   isInitialized = true;
+      // }
       
     }
   }
