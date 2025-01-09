@@ -16,8 +16,9 @@ class TercenWaitIndicator {
 
   late final Image _indicator;
 
-  Future<void> init({String? assetPath}) async {
-    var bData = await rootBundle.load(assetPath ?? "assets/img/wait.webp");
+  Future<void> init({ByteData? assetData}) async {
+    // var bData = await rootBundle.load(assetPath ?? "assets/img/wait.webp");
+    var bData = assetData ?? await rootBundle.load("assets/img/wait.webp");
     
     
     _indicator = Image.memory( bData.buffer.asUint8List(), width: 125.5*0.5, height: 135.5*0.5, );

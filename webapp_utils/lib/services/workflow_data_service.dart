@@ -27,10 +27,10 @@ class WorkflowDataService with DataCache {
   final Map<String, Workflow> installedWorkflows = {};
   bool infoLoaded = false;
 
-  Future<void> init({String reposJsonPath = "assets/repos.json"}) async {
-    String settingsStr = await rootBundle.loadString(reposJsonPath);
+  Future<void> init({String workflowRepoJson = ""}) async {
+    // String settingsStr = await rootBundle.loadString(reposJsonPath);
     try {
-      final jsonString = JsonString(settingsStr);
+      final jsonString = JsonString(workflowRepoJson);
       final repoInfoMap = jsonString.decodedValueAsMap;
 
       for (int i = 0; i < repoInfoMap["repos"].length; i++) {
