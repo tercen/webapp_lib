@@ -16,8 +16,8 @@ mixin CheckboxHerarchicalList on HierarchyList, ChangeNotifier {
 
     // super.columnHierarchy.addAll(hierarchy);
 
-    nonLeafCallback = _checkboxRowWidget;
-    leafCallback = _checkboxRowWidget;
+    nonLeafCallback = checkboxRowWidget;
+    leafCallback = checkboxRowWidget;
 
     // for( var colName in columnHierarchy ){
     //   List<IdElement> els = table.columns[colName]!;
@@ -26,7 +26,7 @@ mixin CheckboxHerarchicalList on HierarchyList, ChangeNotifier {
     // maxDepth = hierarchicalList.length-1;
   }
 
-  bool _anyChildSelected(int parentLevel, String parentId) {
+  bool anyChildSelected(int parentLevel, String parentId) {
     for (var child in getAllChildren(parentLevel, parentId)) {
       if (isSelected(child)) {
         return true;
@@ -36,7 +36,7 @@ mixin CheckboxHerarchicalList on HierarchyList, ChangeNotifier {
     return false;
   }
 
-  void _checkParentSelection(
+  void checkParentSelection(
       int row, int level, bool isElSelected, String childId) {
     if (level > 0) {
       var parent = hierarchicalList[level - 1][row];
@@ -47,14 +47,14 @@ mixin CheckboxHerarchicalList on HierarchyList, ChangeNotifier {
       }
 
       if (parentIsSelected && !isElSelected) {
-        if (!_anyChildSelected(level - 1, parent.id)) {
+        if (!anyChildSelected(level - 1, parent.id)) {
           deselect(parent.id);
         }
       }
     }
   }
 
-  void _checkChildrenSelection(int level, bool isElSelected, String parentId) {
+  void checkChildrenSelection(int level, bool isElSelected, String parentId) {
     var children = getAllChildren(level, parentId);
 
     for (var child in children) {
@@ -66,15 +66,15 @@ mixin CheckboxHerarchicalList on HierarchyList, ChangeNotifier {
     }
   }
 
-  IconButton _checkBoxWidget(
+  IconButton checkBoxWidget(
       String id, String name, int row, int level, bool isSelected,
       {Function? onClick}) {
     return IconButton(
         onPressed: () {
           isSelected ? deselect(id) : select(id, name);
 
-          _checkParentSelection(row, level, !isSelected, id);
-          _checkChildrenSelection(level, !isSelected, id);
+          checkParentSelection(row, level, !isSelected, id);
+          checkChildrenSelection(level, !isSelected, id);
 
           // notifyListeners();
           if (onClick != null) {
@@ -87,7 +87,7 @@ mixin CheckboxHerarchicalList on HierarchyList, ChangeNotifier {
             : const Icon(Icons.check_box_outline_blank));
   }
 
-  Row _checkboxRowWidget(
+  Row checkboxRowWidget(
       BuildContext context, String id, String name, int row, int level,
       {bool isEven = true}) {
     var isElSelected = isSelected(IdElement(id, name));
@@ -96,7 +96,7 @@ mixin CheckboxHerarchicalList on HierarchyList, ChangeNotifier {
       children: [
         SizedBox(
             width: 50,
-            child: _checkBoxWidget(id, name, row, level, isElSelected)),
+            child: checkBoxWidget(id, name, row, level, isElSelected)),
         Container(
           height: 20,
           color: isEven ? Styles.evenRow : Styles.oddRow,
