@@ -30,22 +30,27 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
   final String fileOwner;
   final String folderId;
 
-  UploadFileComponent(this.projectId, this.fileOwner, {this.folderId = ""});
+  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {this.folderId = ""}){
+    super.id = id;
+    super.groupId = groupId;
+    super.componentLabel = componentLabel;
+  }
 
   Widget buildSingleFileWidget(BuildContext context){
-    return Row(
-      children: [
-        InkWell(
+    return InkWell(
           onTap: () async {
             result = (await FilePicker.platform.pickFiles(allowMultiple: false))!;
             for(var f in result.files){
               processSingleFileDrop(f);
             }
           },
-          child: const Icon(Icons.add_circle_outline_rounded),
-        )
-      ],
-    );
+          child: const Row(
+            children: [
+              Text("Select file    ", style: Styles.text,),
+              Icon(Icons.add_circle_outline_rounded)
+            ],
+          ),
+        );
   }
 
 
@@ -53,7 +58,9 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
     List<Widget> wdgList = [];
     for(int i = 0; i < filesToUpload.length; i++){
       if( filesToUpload[i].filename != "Drag Files Here"){
-        Row entry = Row(
+        
+        Row entry =  Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             filesToUpload[i].uploaded 
                   ? const Icon(Icons.check) 
@@ -61,6 +68,9 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
                         child: const Icon(Icons.delete),
                         onTap: () {
                           filesToUpload.removeAt(i);  
+                          if( filesToUpload.isEmpty){
+                            filesToUpload.add(UploadFile("Drag Files Here", false));
+                          }
                           notifyListeners();                         
                         },
                     ), 
@@ -73,27 +83,21 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
       }
     }
 
-    return wdgList;
+    return  wdgList;
   }
 
 
   Widget buildDragNDropWidget(BuildContext context){
+
     return Stack(
       children: [
-        Container(
-          constraints: BoxConstraints(minHeight: 100, minWidth: 200),
-          decoration: BoxDecoration(border: Border.all(color: Colors.blueGrey), borderRadius: BorderRadius.circular(2.0),color: dvBackground,),
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                children: buildDragNDropFileList(),
-              ),
-
-        ),
-        Container(
-          constraints: BoxConstraints(minHeight: 100, minWidth: 200),
-          child: DropzoneView(
+        
+          Container(
+          constraints: const BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: 400),
+          child:  DropzoneView(
             operation: DragOperation.copy,
             onCreated: (ctrl) => dvController = ctrl,
+
             onLeave: () {
               dvBackground = Colors.white;
               notifyListeners();
@@ -102,14 +106,37 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
               dvBackground = Colors.cyan.shade50;
               notifyListeners();
             },
-            onDropFile:  (ev) async => processSingleFileDrop(ev),
-            onDropFiles: (dynamic ev) => (List<dynamic> ev) => print('Drop multiple: $ev'),
+            onDropFile: (ev) async {
+              processSingleFileDrop(ev);
+              dvBackground = Colors.white;
+              notifyListeners();
+            },
+            onDropFiles: (dynamic ev) {
+              (List<dynamic> ev) => print('Drop multiple: $ev');
+              dvBackground = Colors.white;
+              notifyListeners();
+            } ,
           ),
+        ),
+        Container(
+          constraints: const BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: 400),
+          decoration: BoxDecoration(border: Border.all(color: Colors.blueGrey), borderRadius: BorderRadius.circular(2.0),color: dvBackground,),
+          child: SizedBox(
+            height: double.maxFinite,
+            width: double.maxFinite,
+            child: ListView(
+
+                scrollDirection: Axis.vertical,
+                children: buildDragNDropFileList(),
+              ))
         )
       ],
     );
+
   }
 
+
+  
   
 
   Widget buildUploadActionWidget(BuildContext context){
@@ -126,11 +153,14 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
 
   @override
   Widget buildContent(BuildContext context) {
+    var spacer = const SizedBox(height: 10,);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildSingleFileWidget(context),
+        spacer,
         buildDragNDropWidget(context),
+        spacer,
         buildUploadActionWidget(context)
       ],
     );
