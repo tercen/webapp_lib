@@ -11,6 +11,7 @@ import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_ui_commons/webapp_base.dart';
 import 'package:webapp_utils/functions/project_utils.dart';
 import 'package:webapp_utils/functions/workflow_steps_mapper.dart';
+import 'package:webapp_utils/services/file_data_service.dart';
 import 'package:webapp_utils/services/settings_data_service.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
 
@@ -28,6 +29,7 @@ class WebAppDataBase with ChangeNotifier {
 
   final WorkflowDataService workflowService = WorkflowDataService();
   final SettingsDataService settingsService = SettingsDataService();
+  final FileDataService fileService = FileDataService();
 
   Timer? _saveTimer;
   
