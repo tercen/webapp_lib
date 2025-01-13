@@ -28,6 +28,9 @@ class WorkflowDataService with DataCache {
   bool infoLoaded = false;
 
   Future<void> init({String reposJsonPath = ""}) async {
+    if( reposJsonPath == ""){
+      return;
+    }
     String settingsStr = await rootBundle.loadString(reposJsonPath);
     try {
       final jsonString = JsonString(settingsStr);

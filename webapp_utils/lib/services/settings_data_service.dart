@@ -30,7 +30,9 @@ class SettingsDataService{
   }
 
   Future<List<SettingsEntry>> _loadSettingsFile(String path) async {
-
+    if( path == ""){
+      return [];
+    }
     List<SettingsEntry> settingsList = [];
 
     String settingsStr = await rootBundle.loadString(path);
