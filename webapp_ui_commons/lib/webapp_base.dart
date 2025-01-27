@@ -124,7 +124,10 @@ class WebAppBase with ChangeNotifier {
         }
 
         href = "$href/$username";
-        href = "$href/p/$projectId";
+        if( projectId != ""){
+          href = "$href/p/$projectId";
+        }
+        
         projectHref = href;
 
         // var queryMap = Uri.base.queryParameters;

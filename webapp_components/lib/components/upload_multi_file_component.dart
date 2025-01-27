@@ -43,6 +43,7 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
             for(var f in result.files){
               processSingleFileDrop(f);
             }
+            notifyListeners();
           },
           child: const Row(
             children: [
@@ -53,6 +54,9 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
         );
   }
 
+  bool isUploaded( String filename ){
+    return uploadedFiles.map((e) => e.label).any((fname) => fname == filename);
+  }
 
   List<Widget> buildDragNDropFileList(){
     List<Widget> wdgList = [];
@@ -62,7 +66,7 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
         Row entry =  Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            filesToUpload[i].uploaded 
+            isUploaded(filesToUpload[i].filename)
                   ? const Icon(Icons.check) 
                   : InkWell(
                         child: const Icon(Icons.delete),
@@ -147,6 +151,7 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
           : Styles.buttonDisabled,
       onPressed: () async{
         isEnabled ? await doUpload(context) : null;
+        notifyListeners();
       }, 
       child: const Text("Upload", style: Styles.textButton,));
   }
@@ -175,9 +180,10 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
     for( int i = 0; i < htmlFileList.length; i++ ){
       
       DropzoneFileInterface file = htmlFileList[i];
+      
+
       log("Uploading ${file.name}", dialogTitle: "File Uploading");
       var bytes = await dvController.getFileData(file);
-
       var fileId = await fileService.uploadFile(file.name, projectId, fileOwner, bytes, folderId: folderId);
       uploadedFiles.add(IdElement(fileId, file.name));
     }
@@ -190,6 +196,8 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
       var fileId = await fileService.uploadFile(file.name, projectId, fileOwner, bytes, folderId: folderId);
       uploadedFiles.add(IdElement(fileId, file.name));
     }
+
+
     closeLog();
 
   }
@@ -203,7 +211,7 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
     if( ev is PlatformFile){
       updateFilesToUploadSingle(ev);
     }
-    notifyListeners();
+    
   }
 
   void updateFilesToUpload(DropzoneFileInterface wf){
