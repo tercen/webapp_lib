@@ -105,16 +105,19 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   Future<void> _saveModel() async{
-    var projectId = app.projectId;
-    var user = app.username;
-    var folder = await  ProjectUtils().getOrCreateFolder(projectId, user, ".tercen", parentId: "");
-    var viewFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_view", parentId: folder.id);
-    var navFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_nav", parentId: folder.id);
+    if( app.projectId != ""){
+      var projectId = app.projectId;
+      var user = app.username;
+      var folder = await  ProjectUtils().getOrCreateFolder(projectId, user, ".tercen", parentId: "");
+      var viewFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_view", parentId: folder.id);
+      var navFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_nav", parentId: folder.id);
 
-    await Future.wait([
-      ProjectUtils().updateFileContent(viewFile, _idElMapToJson(_model)),
-      ProjectUtils().updateFileContent(navFile, _idElMapToJson(app.getPersistentData()))
-    ]);
+      await Future.wait([
+        ProjectUtils().updateFileContent(viewFile, _idElMapToJson(_model)),
+        ProjectUtils().updateFileContent(navFile, _idElMapToJson(app.getPersistentData()))
+      ]);      
+    }
+
   }
 
 
