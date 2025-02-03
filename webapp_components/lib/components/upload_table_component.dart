@@ -86,7 +86,7 @@ class UploadTableComponent extends UploadFileComponent {
       // ...
     }
 
-    return file.id;
+    return csvTask.fileDocumentId;
   }
 
   Stream<TaskEvent> taskStream(String taskId) async* {
