@@ -95,8 +95,8 @@ class WebAppDataBase with ChangeNotifier {
       var user = app.username;
       
       var folder = await  ProjectUtils().getOrCreateFolder(projectId, user, ".tercen", parentId: "");
-      var viewFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_view", parentId: folder.id);
-      var navFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_nav", parentId: folder.id);
+      var viewFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_view_04", parentId: folder.id);
+      var navFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_nav_04", parentId: folder.id);
 
       _model.addAll(  _jsonToIdElMap(ProjectUtils().getFileContent(viewFile) ) );
       app.loadPersistentData( _jsonToIdElMap(ProjectUtils().getFileContent(navFile) ) );
@@ -109,8 +109,8 @@ class WebAppDataBase with ChangeNotifier {
       var projectId = app.projectId;
       var user = app.username;
       var folder = await  ProjectUtils().getOrCreateFolder(projectId, user, ".tercen", parentId: "");
-      var viewFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_view", parentId: folder.id);
-      var navFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_nav", parentId: folder.id);
+      var viewFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_view_04", parentId: folder.id);
+      var navFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_nav_04", parentId: folder.id);
 
       await Future.wait([
         ProjectUtils().updateFileContent(viewFile, _idElMapToJson(_model)),
