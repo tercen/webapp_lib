@@ -83,7 +83,8 @@ class WorkflowDataService with DataCache {
 
   String _isInRepoFile(Document libObj) {
     for (var info in _requiredWorkflows) {
-      if (info.url == libObj.url.uri && info.version == libObj.version) {
+      var isCorrectVersion = info.version != "" && info.version == libObj.version;
+      if (info.url == libObj.url.uri && isCorrectVersion) {
         return info.iid;
       }
     }
