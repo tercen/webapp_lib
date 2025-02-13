@@ -11,6 +11,7 @@ import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/functions/workflow_utils.dart';
 import 'package:webapp_utils/mixin/data_cache.dart';
 import 'package:webapp_utils/model/workflow_info.dart';
+import 'package:webapp_utils/services/file_data_service.dart';
 
 
 
@@ -69,6 +70,8 @@ class WorkflowDataService with DataCache {
 
     var reqWkfs = _getRequiredWorkflowsIds(libObjs);
 
+    print("Got ${reqWkfs.length} required workflows");
+
     var workflows = await factory.workflowService.list(reqWkfs[0]);
 
     for (var i = 0; i < workflows.length; i++) {
@@ -83,7 +86,9 @@ class WorkflowDataService with DataCache {
 
   String _isInRepoFile(Document libObj) {
     for (var info in _requiredWorkflows) {
-      var isCorrectVersion = info.version != "" && info.version == libObj.version;
+      
+      var isCorrectVersion = info.version == "NONE" || info.version == libObj.version;
+      // print("${info.url == libObj.url.uri} :::: $isCorrectVersion");
       if (info.url == libObj.url.uri && isCorrectVersion) {
         return info.iid;
       }
@@ -105,7 +110,11 @@ class WorkflowDataService with DataCache {
     List<String> ids = [];
     List<String> iids = [];
     for (var obj in libObjs) {
+      print("Checking ${obj.url.uri}");
       var iid = _isInRepoFile(obj);
+      print("IID: $iid");
+      print("........");
+
       if (iid != "") {
         ids.add(obj.id);
         iids.add(iid);
@@ -155,13 +164,15 @@ class WorkflowDataService with DataCache {
   Future<IdElementTable> fetchWorkflowImages(Workflow wkf,
       {List<String> contentTypes = const ["image"],
       List<String> excludedFiles = const [],
-      List<String> nameFilter = const []}) async {
+      List<String> nameFilter = const [],
+      List<String> includeStepId = const [],
+      bool force = false}) async {
     var key = "${wkf.id}_${contentTypes.join("_")}";
     if (excludedFiles.isNotEmpty) {
       key = "${key}_${excludedFiles.join("_")}";
     }
 
-    if (hasCachedValue(key)) {
+    if (hasCachedValue(key) && !force) {
       return getCachedValue(key);
     }
 
@@ -176,7 +187,10 @@ class WorkflowDataService with DataCache {
     List<Relation> rels = [];
     Map<String, List<String>> stepRelationMap = {};
     for (var stp in wkf.steps) {
-      if (stp.kind == "DataStep") {
+      print("Checking ${stp.name} :: ${stp.id} [$includeStepId]");
+      var shouldIncludeStep = includeStepId.isEmpty || includeStepId.contains(stp.id);
+      if (stp.kind == "DataStep" && shouldIncludeStep) {
+        print("Getting simple relations for ${stp.name}");
         DataStep dStp = stp as DataStep;
         // print("Adding schemas for ${dStp.computedRelation.}");
         var relList = _getSimpleRelations(dStp.computedRelation);
@@ -259,5 +273,28 @@ class WorkflowDataService with DataCache {
     var stp = wkf.steps.firstWhere((e) => e.id == stepId);
 
     return IdElement(stp.id, stp.name);
+  }
+
+  
+  Future<IdElementTable> fetchImageData(IdElementTable workflowImageTable ) async {
+    assert(workflowImageTable.colNames.contains("workflow"));
+    assert(workflowImageTable.colNames.contains("image"));
+
+    var uniqueWorkflowIds = workflowImageTable["workflow"].map((e) => e.id).toSet().toList();
+    var uniqueStepIds = workflowImageTable["image"].map((e) => e.id).toSet().toList();
+
+    var outTbl = IdElementTable();
+    var factory = tercen.ServiceFactory();
+    var workflows = await  factory.workflowService.list(uniqueWorkflowIds);
+    for( var w in workflows ){
+      var newTbl = await fetchWorkflowImages(w, includeStepId: uniqueStepIds, force: true);
+      if( outTbl.colNames.isEmpty ){
+        outTbl = newTbl;
+      }else{
+        outTbl.append(newTbl);
+      }
+    }
+
+    return outTbl;
   }
 }

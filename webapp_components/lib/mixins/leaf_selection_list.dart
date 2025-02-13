@@ -6,14 +6,15 @@ import 'package:webapp_components/mixins/infobox_component.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 mixin LeafSelectionList on HierarchyList, ComponentInfoBox, ChangeNotifier {
+  
   @override
   void load(IdElementTable idElementTable, List<String> hierarchy,
       List<IdElement> selection,
-      {infoBoxBuilder, Map<String, String> titles = const {}}) {
+      {infoBoxBuilder, Map<String, String> titles = const {}, bool multi = false}) {
     super.clearLists();
     super.load(idElementTable, hierarchy, selection, titles: titles);
 
-    super.multiSelection = false;
+    super.multiSelection = multi;
     super.infoBoxBuilder = infoBoxBuilder;
 
     nonLeafCallback = _nonLeafLevelWidget;
@@ -69,7 +70,9 @@ mixin LeafSelectionList on HierarchyList, ComponentInfoBox, ChangeNotifier {
     );
     return InkWell(
       onTap: () {
-        isElSelected ? deselect(id) : select(id, name);
+
+          isElSelected ? deselect(id) : select(id, name);
+        
 
         notifyListeners();
       },

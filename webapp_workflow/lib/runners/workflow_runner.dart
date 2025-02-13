@@ -37,6 +37,7 @@ class WorkflowRunner with ProgressDialog {
   final List<String> initStepIds = [];
   final Map<String, sci.Filters> filterMap = {};
   final Map<String, sci.Relation> tableMap = {};
+  final Map<String, String> tableDocumentMap = {};
   final Map<String, String> tableNameMap = {};
   final Map<String, String> gatherMap = {};
   final Map<String, String> multiDsMap = {};
@@ -170,6 +171,10 @@ class WorkflowRunner with ProgressDialog {
     if( name != null && name != ""){
       tableNameMap[stepId] = name;
     }
+  }
+
+  void addTableDocument(String stepId, String documentId) {
+    tableDocumentMap[stepId] = documentId;
   }
 
   void addDocument(String stepId, String documentId) {
@@ -388,6 +393,23 @@ class WorkflowRunner with ProgressDialog {
 
   }
 
+  Future<sci.Relation> _loadDocumentInMemory(String docId) async {
+    var factory = tercen.ServiceFactory();
+    print("Checking: $docId");
+
+    var sch = await factory.tableSchemaService.get(docId);
+    var table = await factory.tableSchemaService.select(sch.id, sch.columns.where((e) => e != ".ci").map((e) => e.name).toList(), 0, sch.nRows);
+    
+    // var uuid = const Uuid();
+    var rrel = sci.RenameRelation();
+    rrel.inNames.addAll(table.columns.map((e) => e.name).toList());
+    rrel.outNames.addAll(table.columns.map((e) => e.name).toList());
+    rrel.relation = sci.SimpleRelation()..id = sch.id;
+    
+    return rrel;
+
+  }
+
   Future<sci.Workflow> doRun(BuildContext context) async {
     if( template.id == ""){
       throw Exception("Workflow not set in WorkflowRunner.");
@@ -396,11 +418,18 @@ class WorkflowRunner with ProgressDialog {
     // status.value = RunStatus.running;
     var factory = tercen.ServiceFactory();
 
+
+
     var runTitle = getWorkflowName(template);
 
     openDialog(context);
 
     log("Set up", dialogTitle: runTitle);
+
+    for( var entry in tableDocumentMap.entries ){
+      tableMap[entry.key] = await _loadDocumentInMemory(entry.value);
+    }
+
 
 
 

@@ -17,6 +17,16 @@ class IdElementTable {
     }
   }
 
+
+  void append(IdElementTable otherTable){
+    assert( colNames.length == otherTable.colNames.length );
+    for( var cn in colNames ){
+      assert( otherTable.colNames.contains(cn));
+
+      columns[cn]!.addAll(otherTable[cn]);
+    }
+  }
+
   int nRows(){
     if( colNames.isEmpty){
       return 0;

@@ -17,12 +17,14 @@ class LeafSelectableListComponent extends HierarchyList with ChangeNotifier, Com
   final List<IdElement> selected = [];
   late IdElementTable dataTable;
   final Map<String,String> levelTitles;
+  final bool multi;
 
-  LeafSelectableListComponent(id, groupId, componentLabel, this.hierarchy, this.dataFetchFunc, {infoBoxBuilder, this.levelTitles = const {}} ){
+  LeafSelectableListComponent(id, groupId, componentLabel, this.hierarchy, this.dataFetchFunc, {infoBoxBuilder, this.levelTitles = const {}, this.multi = false} ){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
+    // super.multiSelection= multi;
    
   }
 
@@ -46,14 +48,15 @@ class LeafSelectableListComponent extends HierarchyList with ChangeNotifier, Com
       tbl.addColumn(col);
     }
     
-   
     for( var i = 0; i < dataTable.nRows(); i++){
       var values = dataTable.getValuesByRow(i, cols: columnHierarchy);
 
-      bool isLineSelected = true;
+
+      bool isLineSelected = false;
       for( var v in values ){
-        isLineSelected = isLineSelected && selected.contains(v);
+        isLineSelected = isLineSelected || super.selectedElements.any((e) => e.id == v.id);
       }
+
       if(isLineSelected){
         for( var ci = 0; ci < columnHierarchy.length; ci++ ){
           tbl.columns[columnHierarchy[ci]]!.add(values[ci]);
@@ -91,7 +94,7 @@ class LeafSelectableListComponent extends HierarchyList with ChangeNotifier, Com
       }
     }
 
-    load(table, hierarchy, selectedElements, infoBoxBuilder: super.infoBoxBuilder);
+    load(table, hierarchy, selectedElements, infoBoxBuilder: super.infoBoxBuilder, multi: multi);
     // levelList = LeafSelectionList(table, columnHierarchy, _selected, levelTitles: levelTitles);
     // addListener(selectListener);
     return Column(

@@ -184,9 +184,17 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   Future<Workflow> fetchWorkflow(String id) async{
-    
     var factory = tercen.ServiceFactory();
     return factory.workflowService.get(id);
+  }
+
+  Future<List<Workflow>> fetchProjectWorkflows(String projectId) async {
+    var projectFiles = ProjectUtils().getProjectFiles();
+
+    var workflowIds = projectFiles.where((e) => e.subKind == "Workflow").map((e) => e.id).toList();
+    var factory = tercen.ServiceFactory();
+
+    return workflowIds.isEmpty ? [] : await factory.workflowService.list(workflowIds);
   }
 
 
