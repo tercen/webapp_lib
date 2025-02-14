@@ -74,16 +74,34 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "cross_file",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/cross_file-0.3.4+2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "crypto",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/crypto-3.0.6",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
+      "name": "ffi",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/ffi-2.1.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "file",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/file-7.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "file_picker",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/file_picker-8.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "fixnum",
@@ -96,6 +114,30 @@
       "rootUri": "file:///usr/bin/flutter/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "flutter_dropzone",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/flutter_dropzone-4.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
+      "name": "flutter_dropzone_platform_interface",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/flutter_dropzone_platform_interface-2.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
+      "name": "flutter_dropzone_web",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/flutter_dropzone_web-4.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.24",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
     },
     {
       "name": "flutter_web_plugins",
@@ -512,6 +554,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "win32",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/win32-5.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "xml",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/xml-6.5.0",
       "packageUri": "lib/",
@@ -530,7 +578,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2025-01-09T13:56:44.547346Z",
+  "generated": "2025-02-14T18:08:15.642994Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///usr/bin/flutter",

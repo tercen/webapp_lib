@@ -11,8 +11,6 @@ import 'package:webapp_components/components/upload_multi_file_component.dart';
 
 import 'package:webapp_model/id_element.dart';
 
-import 'package:webapp_utils/services/file_data_service.dart';
-
 import 'dart:typed_data';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
