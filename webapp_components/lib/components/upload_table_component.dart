@@ -70,6 +70,8 @@ class UploadTableComponent extends UploadFileComponent {
 
     var docToUpload = FileDocument()
         ..name = filename
+        ..isHidden = false
+        ..isPublic = true
         ..projectId = projectId
         ..folderId = folderId
         ..acl.owner = owner
