@@ -169,7 +169,8 @@ class UploadTableComponent extends UploadFileComponent {
 
     // await factory.tableSchemaService.update(sch);
 
-    return "";
+    print("Finish upload. File document id is: ${csvTask.fileDocumentId}");
+    return csvTask.fileDocumentId;
 
   }
 
