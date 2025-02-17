@@ -30,7 +30,7 @@ class FileDataService{
     
     var factory = tercen.ServiceFactory();
     
-    var splitter = LineSplitter().bind(factory.fileService.download(fileId).map((event) => utf8.decode(event)));
+    var splitter = LineSplitter().bind(factory.fileService.download(fileId).transform(utf8.decoder)  );
     
         
     return splitter.first;

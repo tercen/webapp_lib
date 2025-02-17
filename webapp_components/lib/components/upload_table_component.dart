@@ -61,7 +61,7 @@ class UploadTableComponent extends UploadFileComponent {
   Future<void> _createFileSchema(String fileId) async {
     var fileService = FileDataService();
     print("Creating schema");
-    print(fileService.downloadFileAsString(fileId));
+    print(await fileService.downloadFileAsString(fileId));
   }
 
 
