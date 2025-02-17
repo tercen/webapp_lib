@@ -8,6 +8,7 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:webapp_components/components/upload_multi_file_component.dart';
+import 'package:webapp_utils/services/file_data_service.dart';
 
 import 'package:webapp_model/id_element.dart';
 
@@ -57,6 +58,12 @@ class UploadTableComponent extends UploadFileComponent {
     
   }
 
+  Future<void> _createFileSchema(String fileId) async {
+    var fileService = FileDataService();
+    print("Creating schema");
+    print(fileService.downloadFileAsString(fileId));
+  }
+
 
   Future<String> uploadFile(String filename, String projectId, String owner, Uint8List data, {String folderId = ""} ) async {
     var factory = tercen.ServiceFactory();
@@ -86,13 +93,15 @@ class UploadTableComponent extends UploadFileComponent {
     ..hasHeaders = true
     ..encoding = utf8.name;
     
-
+    _createFileSchema(file.id);
     var csvTask = CSVTask()
     ..fileDocumentId = file.id
     ..projectId = projectId
     ..owner = file.acl.owner
     ..params = parserParams
     ..state = InitState();
+
+
 
     csvTask =
         await factory.taskService.create(csvTask) as CSVTask;

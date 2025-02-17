@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
@@ -23,6 +24,17 @@ class FileDataService{
     var file = await factory.fileService.upload(docToUpload, Stream.fromIterable([data]) );
     return file.id;
 
+  }
+
+  Future<String> downloadFileAsString(String fileId ) async {
+    
+    var factory = tercen.ServiceFactory();
+    
+    var splitter = LineSplitter().bind(factory.fileService.download(fileId).map((event) => utf8.decode(event)));
+    
+    
+    
+    return splitter.first;
   }
 
   Future<String> uploadFileAsTable(String filename, String projectId, String owner, Uint8List data, {String folderId = ""}) async{
