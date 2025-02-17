@@ -84,24 +84,27 @@ class UploadTableComponent extends UploadFileComponent {
     var numLines = 5;
     print("Creating schema");
     var csvLines = await fileService.downloadFileLinesAsString(fileId, numLines: numLines);
-    print("LINES!");
+    print("LINES (${csvLines.length})!");
     print(csvLines);
     var headers = csvLines.first.split(separator);
     print("HEADERS>$headers");
-    var numCols= headers.length;
+
     print("A");
-    var lineIt = Iterable<int>.generate(numLines-1);
-    print("B");
-    var values = lineIt.map((line) => csvLines[line+1].split(separator)).toList();
-    print("C");
-    print(values);
-    var colValues = lineIt.map( (line) => Iterable<int>.generate(numCols).map((colIdx) =>  values[line+1][colIdx] ).toList() ).toList();
+
+    List<List<String>> columns = [];
+    for( var line = 1; line< csvLines.length; line++){
+      var lineVals = csvLines[line].split(separator);
+      for( var col = 0; line < headers.length; col++){
+        var v = lineVals[col];
+        line == 1 ? columns.add([v]) : columns[col].add(v);
+    }
+
     
 
     print("HEADER 1");
     print(headers.first);
     print("COLUMN 1");
-    print(colValues.first);
+    print(columns.first);
     
 
     // var sch = Schema();
