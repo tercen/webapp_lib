@@ -93,7 +93,9 @@ class UploadTableComponent extends UploadFileComponent {
 
     List<List<String>> columns = [];
     for( var line = 1; line< csvLines.length; line++){
+      print("B");
       var lineVals = csvLines[line].split(separator);
+      print(lineVals);
       for( var col = 0; line < headers.length; col++){
         var v = lineVals[col];
         line == 1 ? columns.add([v]) : columns[col].add(v);
