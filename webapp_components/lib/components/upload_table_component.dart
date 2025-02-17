@@ -96,13 +96,18 @@ class UploadTableComponent extends UploadFileComponent {
     }
 
     
-
-    var sch = Schema();
+    var factory = tercen.ServiceFactory();
+    var file = await factory.fileService.get(fileId);
+    var sch = Schema()
+    ..projectId = file.projectId
+    ..acl.owner = file.acl.owner;
     for( var col = 0; col < headers.length; col++){
       sch.columns.add( columnFromCsvColumn( headers[col], columns[col]  ) );
     }
 
-    var factory = tercen.ServiceFactory();
+    
+
+    
     sch = await factory.tableSchemaService.create(sch);
 
     print(sch.columns.length);
