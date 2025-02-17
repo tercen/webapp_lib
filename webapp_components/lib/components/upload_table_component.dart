@@ -88,7 +88,7 @@ class UploadTableComponent extends UploadFileComponent {
     print("HEADERS>$headers");
     var numCols= headers.length;
     var lineIt = Iterable<int>.generate(numLines-1);
-    var values = lineIt.map((line) => (await csvLines[line+1]).split(separator)).toList();
+    var values = lineIt.map((line) => csvLines[line+1].split(separator)).toList();
     
     var colValues = lineIt.map( (line) => Iterable<int>.generate(numCols).map((colIdx) =>  values[line+1][colIdx] ).toList() ).toList();
 
