@@ -103,13 +103,15 @@ class UploadTableComponent extends UploadFileComponent {
     var stream = taskStream(csvTask.id);
 
 
-    await for (var _ in stream) {
-      // ...
+    await for (var evt in stream) {
+      print(evt.toJson());
     }
 
     csvTask =
         await factory.taskService.get(csvTask.id) as CSVTask;
 
+    print("TASK INFO");
+    print(csvTask.toJson());
     var sch = await factory.tableSchemaService.get(csvTask.schemaId);
     sch.isHidden = false;
     sch.isPublic = true;
