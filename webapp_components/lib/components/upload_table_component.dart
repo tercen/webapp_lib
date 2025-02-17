@@ -102,6 +102,11 @@ class UploadTableComponent extends UploadFileComponent {
       sch.columns.add( columnFromCsvColumn( headers[col], columns[col]  ) );
     }
 
+    var factory = tercen.ServiceFactory();
+    sch = await factory.tableSchemaService.create(sch);
+
+    print(sch.columns.length);
+
     return sch;
   }
 
@@ -135,6 +140,7 @@ class UploadTableComponent extends UploadFileComponent {
     ..encoding = utf8.name;
     
     var inputSchema = await _createFileSchema(file.id);
+
 
 
     print(inputSchema.toJson());
