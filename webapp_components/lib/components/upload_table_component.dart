@@ -62,7 +62,7 @@ class UploadTableComponent extends UploadFileComponent {
     var factory = tercen.ServiceFactory();
 
     var metadata = CSVFileMetadata()
-      ..separator = '\t'
+      ..separator = ','
       ..quote = '"'
       ..contentType = 'text/csv'
       ..contentEncoding = utf8.name;
@@ -70,8 +70,6 @@ class UploadTableComponent extends UploadFileComponent {
 
     var docToUpload = FileDocument()
         ..name = filename
-        ..isHidden = false
-        ..isPublic = true
         ..projectId = projectId
         ..folderId = folderId
         ..acl.owner = owner
