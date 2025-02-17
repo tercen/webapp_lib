@@ -32,13 +32,18 @@ class FileDataService{
     
     var splitter = LineSplitter().bind(factory.fileService.download(fileId).transform(utf8.decoder)  ).take(numLines);
     
+
+    await splitter.forEach( (e) {
+      print("RECEIVING");
+      print(e);
+    });
     // int numLines = await splitter.length;
     // print( "Splitter has $numLines lines");
     
     List<String> lines = [];
     for( var i = 0; i < numLines; i++){
       print("Downloading line $i");
-      
+      // await splitter.
       lines.add(await splitter.first);
       print("ADDED");
       print(lines[i]);
