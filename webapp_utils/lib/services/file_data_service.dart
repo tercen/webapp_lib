@@ -30,7 +30,7 @@ class FileDataService{
     
     var factory = tercen.ServiceFactory();
     
-    var splitter = LineSplitter().bind(factory.fileService.download(fileId).transform(utf8.decoder)  );
+    var splitter = LineSplitter().bind(factory.fileService.download(fileId).transform(utf8.decoder)  ).take(numLines);
     
     // int numLines = await splitter.length;
     // print( "Splitter has $numLines lines");
@@ -40,7 +40,8 @@ class FileDataService{
       print("Downloading line $i");
       
       lines.add(await splitter.first);
-      print("Downloaded ${lines[i]}");
+      print("ADDED");
+      print(lines[i]);
     }
     // List<Future<String>> lines = [];
     // for( var i = 0; i < numLines; i++){
