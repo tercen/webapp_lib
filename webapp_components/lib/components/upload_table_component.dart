@@ -58,10 +58,47 @@ class UploadTableComponent extends UploadFileComponent {
     
   }
 
-  Future<void> _createFileSchema(String fileId) async {
+  bool isNumeric(String s) {
+    return double.tryParse(s) != null;
+  }
+
+  bool isInt( String s){
+    return int.tryParse(s) != null;
+  }
+
+  ColumnSchema columnFromCsvColumn( String colName, List<dynamic> values ){
+    
+    var dataType = "string";
+    if(values.any((e) => !isNumeric(e))){
+      dataType = values.any((e) => !isInt(e)) ? "double" : "int";
+    }
+
+    return ColumnSchema(  )
+        ..name = colName
+        ..type = dataType;
+      
+  }
+
+  Future<void> _createFileSchema(String fileId, {String separator = ","}) async {
     var fileService = FileDataService();
+    var numLines = 5;
     print("Creating schema");
-    print(await fileService.downloadFileAsString(fileId));
+    var csvLines = await fileService.downloadFileLinesAsString(fileId, numLines: numLines);
+    var headers = csvLines.first.split(separator);
+    var numCols= headers.length;
+    var lineIt = Iterable<int>.generate(numLines-1);
+    var values = lineIt.map((line) => csvLines[line+1].split(separator)).toList();
+    
+    var colValues = lineIt.map( (line) => Iterable<int>.generate(numCols).map((colIdx) =>  values[line+1][colIdx] ).toList() ).toList();
+
+    print("HEADER 1");
+    print(headers.first);
+    print("COLUMN 1");
+    print(colValues.first);
+    
+
+    // var sch = Schema();
+    // sch.columns.add(element)
   }
 
 
