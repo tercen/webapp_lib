@@ -27,31 +27,15 @@ class FileDataService{
   }
 
   Future<List<String>> downloadFileLinesAsString(String fileId, {int numLines = 5} )  async {
-    
     var factory = tercen.ServiceFactory();
     
     var splitter = LineSplitter().bind(factory.fileService.download(fileId).transform(utf8.decoder)  ).take(numLines);
     
-
-    await splitter.forEach( (e) {
-      print("RECEIVING");
-      print(e);
-    });
-    // int numLines = await splitter.length;
-    // print( "Splitter has $numLines lines");
-    
     List<String> lines = [];
-    for( var i = 0; i < numLines; i++){
-      print("Downloading line $i");
-      // await splitter.
-      lines.add(await splitter.first);
-      print("ADDED");
-      print(lines[i]);
-    }
-    // List<Future<String>> lines = [];
-    // for( var i = 0; i < numLines; i++){
-    //   lines.add(splitter.elementAt(i));
-    // }
+    splitter.forEach( (e) {
+      lines.add(e);
+    });
+    
     
     return lines;
   }
