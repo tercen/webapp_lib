@@ -32,8 +32,7 @@ class FileDataService{
     
     var splitter = LineSplitter().bind(factory.fileService.download(fileId).map((event) => utf8.decode(event)));
     
-    
-    
+        
     return splitter.first;
   }
 
