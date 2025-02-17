@@ -84,6 +84,8 @@ class UploadTableComponent extends UploadFileComponent {
     var numLines = 5;
     print("Creating schema");
     var csvLines = await fileService.downloadFileLinesAsString(fileId, numLines: numLines);
+    print("LINES!");
+    print(csvLines);
     var headers = csvLines.first.split(separator);
     print("HEADERS>$headers");
     var numCols= headers.length;
@@ -91,9 +93,10 @@ class UploadTableComponent extends UploadFileComponent {
     var lineIt = Iterable<int>.generate(numLines-1);
     print("B");
     var values = lineIt.map((line) => csvLines[line+1].split(separator)).toList();
-    
-    var colValues = lineIt.map( (line) => Iterable<int>.generate(numCols).map((colIdx) =>  values[line+1][colIdx] ).toList() ).toList();
     print("C");
+    print(values);
+    var colValues = lineIt.map( (line) => Iterable<int>.generate(numCols).map((colIdx) =>  values[line+1][colIdx] ).toList() ).toList();
+    
 
     print("HEADER 1");
     print(headers.first);
