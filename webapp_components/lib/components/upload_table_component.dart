@@ -85,6 +85,7 @@ class UploadTableComponent extends UploadFileComponent {
     print("Creating schema");
     var csvLines = await fileService.downloadFileLinesAsString(fileId, numLines: numLines);
     var headers = csvLines.first.split(separator);
+    print("HEADERS>$headers");
     var numCols= headers.length;
     var lineIt = Iterable<int>.generate(numLines-1);
     var values = lineIt.map((line) => csvLines[line+1].split(separator)).toList();
@@ -130,7 +131,9 @@ class UploadTableComponent extends UploadFileComponent {
     ..hasHeaders = true
     ..encoding = utf8.name;
     
-    _createFileSchema(file.id);
+    await _createFileSchema(file.id);
+
+    
     var csvTask = CSVTask()
     ..fileDocumentId = file.id
     ..projectId = projectId
