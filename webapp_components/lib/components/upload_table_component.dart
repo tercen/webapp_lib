@@ -62,7 +62,7 @@ class UploadTableComponent extends UploadFileComponent {
     var factory = tercen.ServiceFactory();
 
     var metadata = CSVFileMetadata()
-      ..separator = ','
+      ..separator = '\t'
       ..quote = '"'
       ..contentType = 'text/csv'
       ..contentEncoding = utf8.name;
@@ -110,7 +110,7 @@ class UploadTableComponent extends UploadFileComponent {
     csvTask =
         await factory.taskService.get(csvTask.id) as CSVTask;
 
-    var sch = await factory.tableSchemaService.get(csvTask.id);
+    var sch = await factory.tableSchemaService.get(csvTask.schemaId);
     sch.isHidden = false;
     sch.isPublic = true;
 
