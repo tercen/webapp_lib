@@ -35,7 +35,6 @@ class FileDataService{
     List<String> lines = [];
     await splitter.forEach( (e) {
       lines.add(e);
-      print("ADDED: ${lines[lines.length-1]}");
     });
 
     return lines;
