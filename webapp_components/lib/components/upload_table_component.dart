@@ -137,6 +137,8 @@ class UploadTableComponent extends UploadFileComponent {
     var inputSchema = await _createFileSchema(file.id);
 
 
+    print(inputSchema.toJson());
+
     var csvTask = CSVTask()
     ..fileDocumentId = file.id
     ..schema = inputSchema
@@ -161,7 +163,6 @@ class UploadTableComponent extends UploadFileComponent {
     csvTask =
         await factory.taskService.get(csvTask.id) as CSVTask;
 
-    print(csvTask.toJson());
 
     // var sch = await factory.tableSchemaService.get(csvTask.schemaId);
     // sch.isHidden = false;
