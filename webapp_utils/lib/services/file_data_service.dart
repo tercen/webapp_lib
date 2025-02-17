@@ -27,16 +27,16 @@ class FileDataService{
   }
 
   Future<List<String>> downloadFileLinesAsString(String fileId, {int numLines = 5} )  async {
+    
     var factory = tercen.ServiceFactory();
     
     var splitter = LineSplitter().bind(factory.fileService.download(fileId).transform(utf8.decoder)  ).take(numLines);
     
     List<String> lines = [];
-    splitter.forEach( (e) {
+    await splitter.forEach( (e) {
       lines.add(e);
     });
-    
-    
+
     return lines;
   }
 
