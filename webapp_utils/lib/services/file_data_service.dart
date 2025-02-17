@@ -31,12 +31,15 @@ class FileDataService{
     var factory = tercen.ServiceFactory();
     
     var splitter = LineSplitter().bind(factory.fileService.download(fileId).transform(utf8.decoder)  );
-
-
+    
+    int numLines = await splitter.length;
+    print( "Splitter has $numLines lines");
+    
     List<String> lines = [];
     for( var i = 0; i < numLines; i++){
       print("Downloading line $i");
         lines.add(await splitter.elementAt(i));
+      print("Downloaded ${lines[i]}");
     }
     // List<Future<String>> lines = [];
     // for( var i = 0; i < numLines; i++){
