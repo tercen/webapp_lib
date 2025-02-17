@@ -79,23 +79,16 @@ class UploadTableComponent extends UploadFileComponent {
       
   }
 
-  Future<void> _createFileSchema(String fileId, {String separator = ","}) async {
+  Future<Schema> _createFileSchema(String fileId, {String separator = ","}) async {
     var fileService = FileDataService();
     var numLines = 5;
-    print("Creating schema");
     var csvLines = await fileService.downloadFileLinesAsString(fileId, numLines: numLines);
-    print("LINES (${csvLines.length})!");
-    print(csvLines);
     var headers = csvLines.first.split(separator);
-    print("HEADERS>$headers");
 
-    print("A");
 
     List<List<String>> columns = [];
     for( var line = 1; line< csvLines.length; line++){
-      print("B");
       var lineVals = csvLines[line].split(separator);
-      print(lineVals);
       for( var col = 0; col < headers.length; col++){
         var v = lineVals[col];
         line == 1 ? columns.add([v]) : columns[col].add(v);
@@ -104,14 +97,12 @@ class UploadTableComponent extends UploadFileComponent {
 
     
 
-    print("HEADER 1");
-    print(headers.first);
-    print("COLUMN 1");
-    print(columns.first);
-    
+    var sch = Schema();
+    for( var col = 0; col < headers.length; col++){
+      sch.columns.add( columnFromCsvColumn( headers[col], columns[col]  ) );
+    }
 
-    // var sch = Schema();
-    // sch.columns.add(element)
+    return sch;
   }
 
 
@@ -143,11 +134,12 @@ class UploadTableComponent extends UploadFileComponent {
     ..hasHeaders = true
     ..encoding = utf8.name;
     
-    await _createFileSchema(file.id);
+    var inputSchema = await _createFileSchema(file.id);
 
 
     var csvTask = CSVTask()
     ..fileDocumentId = file.id
+    ..schema = inputSchema
     ..projectId = projectId
     ..owner = file.acl.owner
     ..params = parserParams
