@@ -75,6 +75,7 @@ class UploadTableComponent extends UploadFileComponent {
 
     return ColumnSchema(  )
         ..name = colName
+        ..id = colName
         ..type = dataType;
       
   }
@@ -106,10 +107,10 @@ class UploadTableComponent extends UploadFileComponent {
     }
 
     
-
+    sch.nRows = 4001;
     
     sch = await factory.tableSchemaService.create(sch);
-
+    
     print(sch.columns.length);
 
     return sch;
