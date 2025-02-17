@@ -97,6 +97,7 @@ class UploadTableComponent extends UploadFileComponent {
       for( var col = 0; line < headers.length; col++){
         var v = lineVals[col];
         line == 1 ? columns.add([v]) : columns[col].add(v);
+      }
     }
 
     
