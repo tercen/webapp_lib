@@ -66,13 +66,22 @@ class UploadTableComponent extends UploadFileComponent {
     return int.tryParse(s) != null;
   }
 
+  bool checkAll( List array, Function test ){
+    var allEq = true;
+
+    for( var v in array ){
+      allEq = allEq && test(v);
+    }
+    return allEq;
+  }
+
   ColumnSchema columnFromCsvColumn( String colName, List<dynamic> values ){
     
     var dataType = "string";
     print("Parsing ${values.first} - ${double.tryParse(values.first)}");
-    if(values.any((e) => !isNumeric(e))){
-      
-      dataType = values.any((e) => !isInt(e)) ? "double" : "int";
+    
+    if( checkAll(values, isNumeric) ){
+      dataType = checkAll(values, isInt) ? "int" : "double";
     }
 
     print("Adding column $colName of type $dataType ($values)");
