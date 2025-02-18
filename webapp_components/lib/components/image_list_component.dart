@@ -37,9 +37,10 @@ class ImageListComponent extends ListComponent {
       var font = pd.PdfStandardFont(pd.PdfFontFamily.helvetica, 40);
       var titleSz = font.measureString(content.title);
       var bmp = pd.PdfBitmap(content.content);
-
+      var hMargin = pdfDoc.pageSettings.margins.left+pdfDoc.pageSettings.margins.right;
+      var vMargin = pdfDoc.pageSettings.margins.top+pdfDoc.pageSettings.margins.bottom;
       pdfDoc.pageSettings.size =
-          Size((bmp.height as double) + titleSz.height + 15, bmp.width as double);
+          Size((bmp.height as double) + titleSz.height + 10 + vMargin, (bmp.width as double)+hMargin);
       if (bmp.height > bmp.width) {
         pdfDoc.pageSettings.orientation = pd.PdfPageOrientation.portrait;
       } else {
@@ -53,7 +54,7 @@ class ImageListComponent extends ListComponent {
           bounds: Rect.fromLTWH(0, 0, titleSz.width, titleSz.height));
       page.graphics.drawImage(
           bmp,
-          Rect.fromLTWH(0, titleSz.height + 15, bmp.width as double,
+          Rect.fromLTWH(0, titleSz.height + 10, bmp.width as double,
               bmp.height as double));
     }
 
