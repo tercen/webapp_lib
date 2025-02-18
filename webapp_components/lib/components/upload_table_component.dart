@@ -69,8 +69,9 @@ class UploadTableComponent extends UploadFileComponent {
   ColumnSchema columnFromCsvColumn( String colName, List<dynamic> values ){
     
     var dataType = "string";
+    print("Parsing ${values.first} - ${double.tryParse(values.first)}");
     if(values.any((e) => !isNumeric(e))){
-      print(double.tryParse(values.first));
+      
       dataType = values.any((e) => !isInt(e)) ? "double" : "int";
     }
 
