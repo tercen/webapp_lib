@@ -70,6 +70,7 @@ class UploadTableComponent extends UploadFileComponent {
     
     var dataType = "string";
     if(values.any((e) => !isNumeric(e))){
+      print(double.tryParse(values.first));
       dataType = values.any((e) => !isInt(e)) ? "double" : "int";
     }
 
