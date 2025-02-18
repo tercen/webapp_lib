@@ -81,7 +81,7 @@ class UploadTableComponent extends UploadFileComponent {
     print("Parsing ${values.first} - ${double.tryParse(values.first)}");
     
     if( checkAll(values, isNumeric) ){
-      dataType = "numeric"; //checkAll(values, isInt) ? "int" : "double";
+      dataType = checkAll(values, isInt) ? "int32" : "double";
     }
 
     print("Adding column $colName of type $dataType ($values)");
