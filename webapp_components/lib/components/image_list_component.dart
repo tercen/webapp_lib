@@ -35,10 +35,11 @@ class ImageListComponent extends ListComponent {
   pd.PdfDocument addEntryPage(pd.PdfDocument pdfDoc, dynamic content) {
     if (content is ExportPageContent) {
       var font = pd.PdfStandardFont(pd.PdfFontFamily.helvetica, 40);
-
+      var titleSz = font.measureString(content.title);
       var bmp = pd.PdfBitmap(content.content);
+
       pdfDoc.pageSettings.size =
-          Size(bmp.height as double, bmp.width as double);
+          Size((bmp.height as double) + titleSz.height + 15, bmp.width as double);
       if (bmp.height > bmp.width) {
         pdfDoc.pageSettings.orientation = pd.PdfPageOrientation.portrait;
       } else {
@@ -46,7 +47,7 @@ class ImageListComponent extends ListComponent {
       }
 
       var page = pdfDoc.pages.add();
-      var titleSz = font.measureString(content.title);
+      
 
       page.graphics.drawString(content.title, font,
           bounds: Rect.fromLTWH(0, 0, titleSz.width, titleSz.height));
