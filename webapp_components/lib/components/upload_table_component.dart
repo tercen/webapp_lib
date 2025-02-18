@@ -100,18 +100,20 @@ class UploadTableComponent extends UploadFileComponent {
     var factory = tercen.ServiceFactory();
     var file = await factory.fileService.get(fileId);
     var sch = Schema()
+    ..name = file.name
     ..projectId = file.projectId
     ..acl.owner = file.acl.owner;
+    
     for( var col = 0; col < headers.length; col++){
       sch.columns.add( columnFromCsvColumn( headers[col], columns[col]  ) );
     }
 
     
-    sch.nRows = 4001;
+    
     
     sch = await factory.tableSchemaService.create(sch);
     
-    print(sch.columns.length);
+
 
     return sch;
   }
@@ -149,8 +151,7 @@ class UploadTableComponent extends UploadFileComponent {
 
 
 
-    print(inputSchema.toJson());
-
+    
     var csvTask = CSVTask()
     ..fileDocumentId = file.id
     ..schema = inputSchema
@@ -175,14 +176,15 @@ class UploadTableComponent extends UploadFileComponent {
     csvTask =
         await factory.taskService.get(csvTask.id) as CSVTask;
 
-
+    print("FINISHED UPLOADING!");
+    print(csvTask.toJson());
     // var sch = await factory.tableSchemaService.get(csvTask.schemaId);
     // sch.isHidden = false;
     // sch.isPublic = true;
 
     // await factory.tableSchemaService.update(sch);
 
-    print("Finish upload. File document id is: ${csvTask.fileDocumentId}");
+
     return csvTask.fileDocumentId;
 
   }
