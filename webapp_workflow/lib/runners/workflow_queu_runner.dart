@@ -5,12 +5,17 @@ import 'package:webapp_workflow/runners/workflow_runner.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
+typedef PostRunIdCallback = Future<void> Function(String workflowId);
 class WorkflowQueuRunner extends WorkflowRunner{
   WorkflowQueuRunner(super.projectId, super.teamName, super.template);
+  final List<PostRunIdCallback> postRunIdCallbacks = [];
 
+  void addIdPostRun(PostRunIdCallback callback ){
+    postRunIdCallbacks.add(callback);
+
+  }
 
   @override
-
   Future<sci.Workflow> doRun(BuildContext context) async {
     if( template.id == ""){
       throw Exception("Workflow not set in WorkflowRunner.");
@@ -159,6 +164,10 @@ class WorkflowQueuRunner extends WorkflowRunner{
 
     for (var f in postRunCallbacks) {
       await f();
+    }
+
+    for (var f in postRunIdCallbacks) {
+      await f(doneWorkflow.id);
     }
 
 
