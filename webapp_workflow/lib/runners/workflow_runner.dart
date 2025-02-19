@@ -127,7 +127,7 @@ class WorkflowRunner with ProgressDialog {
     return filterExpr;
   }
 
-  sci.RenameRelation _createDocumentRelation(String documentId) {
+  sci.RenameRelation createDocumentRelation(String documentId) {
     var uuid = const Uuid();
     sci.Table tbl = sci.Table()..nRows = 1;
     sci.Column col = sci.Column()
@@ -178,7 +178,7 @@ class WorkflowRunner with ProgressDialog {
   }
 
   void addDocument(String stepId, String documentId) {
-    tableMap[stepId] = _createDocumentRelation(documentId);
+    tableMap[stepId] = createDocumentRelation(documentId);
   }
 
   void addGatherStepPattern(String stepId, String pattern) {
@@ -393,7 +393,7 @@ class WorkflowRunner with ProgressDialog {
 
   }
 
-  Future<sci.Relation> _loadDocumentInMemory(String docId) async {
+  Future<sci.Relation> loadDocumentInMemory(String docId) async {
     var factory = tercen.ServiceFactory();
     print("Checking: $docId");
 
@@ -427,7 +427,7 @@ class WorkflowRunner with ProgressDialog {
     log("Set up", dialogTitle: runTitle);
 
     for( var entry in tableDocumentMap.entries ){
-      tableMap[entry.key] = await _loadDocumentInMemory(entry.value);
+      tableMap[entry.key] = await loadDocumentInMemory(entry.value);
     }
 
 
@@ -613,11 +613,11 @@ class WorkflowRunner with ProgressDialog {
     return stp;
   }
 
-  List<sci.Step> _getTopSteps(List<sci.Step> steps) {
+  List<sci.Step> getTopSteps(List<sci.Step> steps) {
     return steps.where((e) => e.inputs.isEmpty).toList();
   }
 
-  List<sci.Step> _getParents(sci.Step step, sci.Workflow workflow) {
+  List<sci.Step> getParents(sci.Step step, sci.Workflow workflow) {
     List<sci.Step> parents = [];
     var links = workflow.links;
 
@@ -634,12 +634,12 @@ class WorkflowRunner with ProgressDialog {
     return parents;
   }
 
-  String _getStepStatus(sci.Step stp, sci.Workflow workflow) {
+  String getStepStatus(sci.Step stp, sci.Workflow workflow) {
     if (stp.state.taskState.kind == "DoneState") {
       return "Done.......";
     }
 
-    var parents = _getParents(stp, workflow);
+    var parents = getParents(stp, workflow);
 
     bool allParentsDone = true;
     for (var parent in parents) {
@@ -655,7 +655,7 @@ class WorkflowRunner with ProgressDialog {
     }
   }
 
-  List<sci.Step> _getChildren(sci.Step parent, sci.Workflow workflow) {
+  List<sci.Step> getChildren(sci.Step parent, sci.Workflow workflow) {
     List<sci.Step> children = [];
     var links = workflow.links;
 
@@ -675,27 +675,27 @@ class WorkflowRunner with ProgressDialog {
   void updateStepProgress(sci.Workflow workflow, {sci.Step? step}) {
     if (step == null) {
       stepProgressMessage = "";
-      var topSteps = _getTopSteps(workflow.steps);
+      var topSteps = getTopSteps(workflow.steps);
       for (var stp in topSteps) {
-        stepProgressMessage += _getStepStatus(stp, workflow);
+        stepProgressMessage += getStepStatus(stp, workflow);
         stepProgressMessage += "....";
         stepProgressMessage += stp.name;
         stepProgressMessage += "\n";
       }
 
       for (var stp in topSteps) {
-        var children = _getChildren(stp, workflow);
+        var children = getChildren(stp, workflow);
         for (var child in children) {
           updateStepProgress(workflow, step: child);
         }
       }
     } else {
-      stepProgressMessage += _getStepStatus(step, workflow);
+      stepProgressMessage += getStepStatus(step, workflow);
       stepProgressMessage += "....";
       stepProgressMessage += step.name;
       stepProgressMessage += "\n";
 
-      var children = _getChildren(step, workflow);
+      var children = getChildren(step, workflow);
       for (var child in children) {
         updateStepProgress(workflow, step: child);
       }
