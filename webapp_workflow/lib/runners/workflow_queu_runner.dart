@@ -120,9 +120,9 @@ class WorkflowQueuRunner extends WorkflowRunner{
 
     Fluttertoast.showToast(
         msg: "Workflow ${workflow.name} started",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM_LEFT,
-        timeInSecForIosWeb: 2,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM_RIGHT,
+        timeInSecForIosWeb: 5,
         backgroundColor: Colors.lightBlue[100],
         textColor: Styles.black,
         fontSize: 16.0
