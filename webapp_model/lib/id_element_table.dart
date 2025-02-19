@@ -35,6 +35,24 @@ class IdElementTable {
   }
 
 
+  IdElementTable select(List<int> rows, {List<String>? cols}){
+    cols ??= colNames;
+
+    var outTbl = IdElementTable();
+
+    for( var colName in cols ){
+      List<IdElement> rowValues = [];
+      for( var row in rows ){
+        rowValues.add( columns[colName]![row] );
+      }
+      outTbl.addColumn(colName, data:rowValues);
+      
+    }
+
+    return outTbl;
+  }
+
+
   List<IdElement> getValuesByRow(int row, {List<String>? cols}){
     List<IdElement> rowValues = [];
 
