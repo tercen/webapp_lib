@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_workflow/runners/workflow_runner.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
@@ -110,6 +112,16 @@ class WorkflowQueuRunner extends WorkflowRunner{
 
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
+
+    Fluttertoast.showToast(
+        msg: "Workflow ${workflow.name} started",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM_LEFT,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.lightBlue[100],
+        textColor: Styles.black,
+        fontSize: 16.0
+    );
 
 
     workflow = await factory.workflowService.get(workflow.id);
