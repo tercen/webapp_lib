@@ -239,7 +239,7 @@ class WorkflowDataService with DataCache {
                 var ct = tbl.columns[1].values[i];
                 contentTypeList.add(IdElement("", ct));
                 if( isDev ){
-                  print("Is dev...");
+                  print("Is dev. Content type is ${contentTable.columns[0].values.runtimeType}");
                   bytes.add(IdElement(
                       "", contentTable.columns[0].values));
                 }else{
