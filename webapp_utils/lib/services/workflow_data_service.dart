@@ -222,7 +222,7 @@ class WorkflowDataService with DataCache {
         var isDev = Uri.base.hasPort && Uri.base.port > 10000;
         print("isDev: $isDev (${Uri.base})");
         if( isDev ){
-          contentTable = await factory.tableSchemaService.select(sch.id, ["filename", ".content"], 0, sch.nRows);
+          contentTable = await factory.tableSchemaService.select(sch.id, [ ".content"], 0, sch.nRows);
         }
         for (var i = 0; i < tbl.nRows; i++) {
           if (contentTypes.any((contentType) =>
@@ -240,7 +240,7 @@ class WorkflowDataService with DataCache {
                 contentTypeList.add(IdElement("", ct));
                 if( isDev ){
                   bytes.add(IdElement(
-                      "", contentTable.columns[1].values));
+                      "", contentTable.columns[0].values));
                 }else{
                   var bytesStream = factory.tableSchemaService
                       .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
