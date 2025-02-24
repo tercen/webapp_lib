@@ -241,7 +241,7 @@ class WorkflowDataService with DataCache {
                 if( isDev ){
                   print("Is dev. Content type is ${contentTable.columns[0].values[i].runtimeType}");
                   bytes.add(IdElement(
-                      "", contentTable.columns[0].values[i]));
+                      "", String.fromCharCodes( base64Decode( contentTable.columns[0].values[i]) ) ));
                 }else{
                   var bytesStream = factory.tableSchemaService
                       .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
