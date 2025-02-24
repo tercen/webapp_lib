@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:json_string/json_string.dart';
 
@@ -166,7 +168,7 @@ class WorkflowDataService with DataCache {
       List<String> excludedFiles = const [],
       List<String> nameFilter = const [],
       List<String> includeStepId = const [],
-      bool force = false}) async {
+      bool force = false, bool isDev = false}) async {
     var key = "${wkf.id}_${contentTypes.join("_")}";
     if (excludedFiles.isNotEmpty) {
       key = "${key}_${excludedFiles.join("_")}";
@@ -216,6 +218,10 @@ class WorkflowDataService with DataCache {
             0,
             sch.nRows);
         List<String> uniqueAddedNames = [];
+        Table contentTable = Table();
+        if( isDev ){
+          contentTable = await factory.tableSchemaService.select(sch.id, ["filename", ".content"], 0, sch.nRows);
+        }
         for (var i = 0; i < tbl.nRows; i++) {
           if (contentTypes.any((contentType) =>
               tbl.columns[1].values[i].contains(contentType))) {
@@ -225,18 +231,24 @@ class WorkflowDataService with DataCache {
             if (!excludedFiles.contains(fname) && filterInclude) {
               if (!uniqueAddedNames.contains(fname)) {
                 uniqueAddedNames.add(fname);
-                var bytesStream = factory.tableSchemaService
-                    .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
-                var imgBytes = await bytesStream.toList();
-
                 workflowNames.add(IdElement("", wkf.name));
                 stepNames.add(step);
                 filenames.add(IdElement("", fname));
                 var ct = tbl.columns[1].values[i];
                 contentTypeList.add(IdElement("", ct));
+                if( isDev ){
+                  bytes.add(IdElement(
+                      "", contentTable.columns[1].values));
+                }else{
+                  var bytesStream = factory.tableSchemaService
+                      .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
+                  var imgBytes = await bytesStream.toList();
 
-                bytes.add(IdElement(
-                    "", String.fromCharCodes(Uint8List.fromList(imgBytes[0]))));
+                  
+
+                  bytes.add(IdElement(
+                      "", String.fromCharCodes(Uint8List.fromList(imgBytes[0]))));
+                }
               }
             }
           }
