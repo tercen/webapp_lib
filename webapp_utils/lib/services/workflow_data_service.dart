@@ -189,10 +189,10 @@ class WorkflowDataService with DataCache {
     List<Relation> rels = [];
     Map<String, List<String>> stepRelationMap = {};
     for (var stp in wkf.steps) {
-      print("Checking ${stp.name} :: ${stp.id} [$includeStepId]");
+      // print("Checking ${stp.name} :: ${stp.id} [$includeStepId]");
       var shouldIncludeStep = includeStepId.isEmpty || includeStepId.contains(stp.id);
       if (stp.kind == "DataStep" && shouldIncludeStep) {
-        print("Getting simple relations for ${stp.name}");
+        // print("Getting simple relations for ${stp.name}");
         DataStep dStp = stp as DataStep;
         // print("Adding schemas for ${dStp.computedRelation.}");
         var relList = _getSimpleRelations(dStp.computedRelation);
@@ -239,9 +239,9 @@ class WorkflowDataService with DataCache {
                 var ct = tbl.columns[1].values[i];
                 contentTypeList.add(IdElement("", ct));
                 if( isDev ){
-                  
+                  print("Is dev...");
                   bytes.add(IdElement(
-                      "", String.fromCharCodes( base64Decode(contentTable.columns[0].values))));
+                      "", contentTable.columns[0].values));
                 }else{
                   var bytesStream = factory.tableSchemaService
                       .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
