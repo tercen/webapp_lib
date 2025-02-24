@@ -203,7 +203,7 @@ class WorkflowDataService with DataCache {
 
     var schList =
         await factory.tableSchemaService.list(rels.map((e) => e.id).toList());
-
+    
     for (var sch in schList) {
       var step = _getRelationStep(wkf, stepRelationMap, sch.id);
       if (_isFileSchema(sch)) {
@@ -220,6 +220,7 @@ class WorkflowDataService with DataCache {
         List<String> uniqueAddedNames = [];
         Table contentTable = Table();
         var isDev = Uri.base.hasPort && Uri.base.port > 10000;
+        print("isDev: $isDev (${Uri.base})");
         if( isDev ){
           contentTable = await factory.tableSchemaService.select(sch.id, ["filename", ".content"], 0, sch.nRows);
         }
