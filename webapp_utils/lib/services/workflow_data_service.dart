@@ -220,7 +220,7 @@ class WorkflowDataService with DataCache {
         List<String> uniqueAddedNames = [];
         Table contentTable = Table();
         var isDev = Uri.base.hasPort && Uri.base.port > 10000;
-        print("isDev: $isDev (${Uri.base})");
+        
         if( isDev ){
           contentTable = await factory.tableSchemaService.select(sch.id, [ ".content"], 0, sch.nRows);
         }
@@ -239,8 +239,9 @@ class WorkflowDataService with DataCache {
                 var ct = tbl.columns[1].values[i];
                 contentTypeList.add(IdElement("", ct));
                 if( isDev ){
+                  
                   bytes.add(IdElement(
-                      "", contentTable.columns[0].values));
+                      "", String.fromCharCodes( base64Decode(contentTable.columns[0].values))));
                 }else{
                   var bytesStream = factory.tableSchemaService
                       .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
