@@ -168,7 +168,7 @@ class WorkflowDataService with DataCache {
       List<String> excludedFiles = const [],
       List<String> nameFilter = const [],
       List<String> includeStepId = const [],
-      bool force = false, bool isDev = false}) async {
+      bool force = false}) async {
     var key = "${wkf.id}_${contentTypes.join("_")}";
     if (excludedFiles.isNotEmpty) {
       key = "${key}_${excludedFiles.join("_")}";
@@ -219,6 +219,7 @@ class WorkflowDataService with DataCache {
             sch.nRows);
         List<String> uniqueAddedNames = [];
         Table contentTable = Table();
+        var isDev = Uri.base.hasPort && Uri.base.port > 10000;
         if( isDev ){
           contentTable = await factory.tableSchemaService.select(sch.id, ["filename", ".content"], 0, sch.nRows);
         }
