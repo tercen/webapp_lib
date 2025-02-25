@@ -122,7 +122,7 @@ class WorkflowQueuRunner extends WorkflowRunner{
         msg: "Workflow ${workflow.name} started",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM_LEFT,
-        webBgColor: Colors.lightBlue[100],
+        webBgColor: "linear-gradient(to bottom, #5555ff, #aaaaff)",
         timeInSecForIosWeb: 5,
         backgroundColor: Colors.lightBlue[100],
         textColor: Styles.black,
