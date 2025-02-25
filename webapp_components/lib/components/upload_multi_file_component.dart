@@ -18,11 +18,13 @@ class UploadFile {
 
 class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog implements MultiValueComponent {
   late FilePickerResult result;
+
   late DropzoneViewController dvController;
   Color dvBackground = Colors.white;
   final List<DropzoneFileInterface> htmlFileList = [];
   final List<PlatformFile> platformFileList = [];
   final List<UploadFile> filesToUpload = [UploadFile("Drag Files Here", false)];
+  List<String>? allowedMime;
 
   final List<IdElement> uploadedFiles = [];
 
@@ -30,10 +32,11 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
   final String fileOwner;
   final String folderId;
 
-  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {this.folderId = ""}){
+  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {this.folderId = "", this.allowedMime}){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
+
   }
 
   Widget buildSingleFileWidget(BuildContext context){
@@ -99,6 +102,7 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
           Container(
           constraints: const BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: 400),
           child:  DropzoneView(
+            mime: allowedMime,
             operation: DragOperation.copy,
             onCreated: (ctrl) => dvController = ctrl,
 
