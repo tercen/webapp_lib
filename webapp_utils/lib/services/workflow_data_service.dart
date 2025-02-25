@@ -312,4 +312,25 @@ class WorkflowDataService with DataCache {
 
     return outTbl;
   }
+
+    bool canCancelWorkflow(IdElementTable row){
+    return row["status"][0].label != "Done" && row["status"][0].label != "Failed" && row["status"][0].label != "Unknown";
+  }
+
+  Future<void> cancelWorkflow(IdElementTable row) async {
+
+    
+    var workflowId = row["name"][0].id;
+
+
+    var factory = tercen.ServiceFactory();
+    var workflow = await factory.workflowService.get(workflowId);
+
+    var taskId = workflow.meta.firstWhere((e) => e.key == "run.task.id").value;
+    await factory.taskService.cancelTask(taskId);
+    
+    await factory.workflowService.delete(workflow.id, workflow.rev);
+    
+    
+  }
 }
