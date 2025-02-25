@@ -31,8 +31,10 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
   final String projectId;
   final String fileOwner;
   final String folderId;
+  final double maxHeight;
+  final bool multiFile;
 
-  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {this.folderId = "", this.allowedMime}){
+  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {this.folderId = "", this.allowedMime, this.maxHeight = 400, this.multiFile = true}){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -100,9 +102,10 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
       children: [
         
           Container(
-          constraints: const BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: 400),
+          constraints:  BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: this.maxHeight),
           child:  DropzoneView(
             mime: allowedMime,
+            
             operation: DragOperation.copy,
             onCreated: (ctrl) => dvController = ctrl,
 
@@ -127,7 +130,7 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
           ),
         ),
         Container(
-          constraints: const BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: 400),
+          constraints:  BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: this.maxHeight),
           decoration: BoxDecoration(border: Border.all(color: Colors.blueGrey), borderRadius: BorderRadius.circular(2.0),color: dvBackground,),
           child: SizedBox(
             height: double.maxFinite,
