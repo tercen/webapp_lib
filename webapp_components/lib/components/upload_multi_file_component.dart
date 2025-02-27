@@ -34,8 +34,11 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
   final double maxHeight;
   final double? maxWidth;
   final bool multiFile;
+  final bool showUploadButton;
 
-  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {this.folderId = "", this.allowedMime, this.maxHeight = 400, this.multiFile = true, this.maxWidth}){
+  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {
+    this.folderId = "", this.allowedMime, this.maxHeight = 400, this.multiFile = true,
+    this.maxWidth, this.showUploadButton = true}){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -153,7 +156,8 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
 
   Widget buildUploadActionWidget(BuildContext context){
     var isEnabled = filesToUpload.isNotEmpty;
-    return ElevatedButton(
+    if( showUploadButton ){
+      return ElevatedButton(
       style: isEnabled
           ? Styles.buttonEnabled
           : Styles.buttonDisabled,
@@ -162,6 +166,11 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
         notifyListeners();
       }, 
       child: const Text("Upload", style: Styles.textButton,));
+
+    }else{
+      return Container();
+    }
+
   }
 
   @override
