@@ -113,6 +113,10 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
             operation: DragOperation.copy,
             onCreated: (ctrl) => dvController = ctrl,
 
+            onDropInvalid: (value) {
+              dvBackground = Colors.white;
+              notifyListeners();
+            },
             onLeave: () {
               dvBackground = Colors.white;
               notifyListeners();
