@@ -32,9 +32,10 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
   final String fileOwner;
   final String folderId;
   final double maxHeight;
+  final double? maxWidth;
   final bool multiFile;
 
-  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {this.folderId = "", this.allowedMime, this.maxHeight = 400, this.multiFile = true}){
+  UploadFileComponent(id, groupId, componentLabel, this.projectId, this.fileOwner, {this.folderId = "", this.allowedMime, this.maxHeight = 400, this.multiFile = true, this.maxWidth}){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -102,7 +103,7 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
       children: [
         
           Container(
-          constraints:  BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: this.maxHeight),
+          constraints:  maxWidth == null ? BoxConstraints(minHeight: 100, minWidth: 100, maxHeight: this.maxHeight) : BoxConstraints(minHeight: 100, minWidth: 100, maxWidth: maxWidth!, maxHeight: this.maxHeight),
           child:  DropzoneView(
             mime: allowedMime,
             
