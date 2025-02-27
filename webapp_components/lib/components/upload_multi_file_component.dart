@@ -189,8 +189,10 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
   }
 
   Future<void> doUpload(BuildContext context) async{
-    openDialog(context);
-    log("File upload in progress. Please wait.", dialogTitle: "File Uploading");
+    if( showUploadButton ){
+      openDialog(context);
+      log("File upload in progress. Please wait.", dialogTitle: "File Uploading");
+    }
     
     var fileService = FileDataService();
 
@@ -198,8 +200,9 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
       
       DropzoneFileInterface file = htmlFileList[i];
       
-
-      log("Uploading ${file.name}", dialogTitle: "File Uploading");
+      if( showUploadButton ){
+        log("Uploading ${file.name}", dialogTitle: "File Uploading");
+      }
       var bytes = await dvController.getFileData(file);
       var fileId = await fileService.uploadFile(file.name, projectId, fileOwner, bytes, folderId: folderId);
       uploadedFiles.add(IdElement(fileId, file.name));
@@ -208,14 +211,17 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
     for( int i = 0; i < platformFileList.length; i++ ){
       PlatformFile file = platformFileList[i];
       var bytes = file.bytes!;
-      log("Uploading ${file.name}", dialogTitle: "File Uploading");
+      if( showUploadButton ){
+        log("Uploading ${file.name}", dialogTitle: "File Uploading");
+      }
 
       var fileId = await fileService.uploadFile(file.name, projectId, fileOwner, bytes, folderId: folderId);
       uploadedFiles.add(IdElement(fileId, file.name));
     }
 
-
-    closeLog();
+    if( showUploadButton ){
+      closeLog();
+    }
 
   }
 
