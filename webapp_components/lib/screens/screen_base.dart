@@ -201,7 +201,7 @@ mixin ScreenBase {
         Expanded(
             child: Container(
                 constraints: const BoxConstraints(
-                    minHeight: 30, maxHeight: double.maxFinite, maxWidth: double.maxFinite),
+                    minHeight: 30, maxHeight: double.maxFinite),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
