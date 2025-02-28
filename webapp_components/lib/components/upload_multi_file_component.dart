@@ -138,7 +138,7 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
           ),
         ),
         Container(
-          constraints:  BoxConstraints(minHeight: 100, minWidth: 200, maxHeight: this.maxHeight),
+          constraints:  maxWidth == null ? BoxConstraints(minHeight: 100, minWidth: 100, maxHeight: this.maxHeight) : BoxConstraints(minHeight: 100, minWidth: 100, maxWidth: maxWidth!, maxHeight: this.maxHeight),
           decoration: BoxDecoration(border: Border.all(color: Colors.blueGrey), borderRadius: BorderRadius.circular(2.0),color: dvBackground,),
           child: SizedBox(
             height: double.maxFinite,
