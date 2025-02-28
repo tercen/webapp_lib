@@ -45,7 +45,7 @@ class MultiCheckComponentFetch extends MultiCheckComponent with ComponentCache {
             throw Exception(snapshot.error);
           } else {
             return TercenWaitIndicator()
-                .waitingMessage(suffixMsg: "Loading display gates");
+                .waitingMessage(suffixMsg: "Loading data");
           }
         });
   }
