@@ -268,7 +268,12 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
 
   @override
   List<IdElement> getValue() {
-    return filesToUpload.map((e) => IdElement(e.filename, e.filename) ).toList();
+    if( uploadedFiles.isEmpty ){
+      return filesToUpload.map((e) => IdElement(e.filename, e.filename) ).toList();
+    }else{
+      return uploadedFiles;
+    }
+    
   }
 
   @override
