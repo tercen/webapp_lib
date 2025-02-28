@@ -9,10 +9,11 @@ import 'package:webapp_components/widgets/wait_indicator.dart';
 
 class MultiCheckComponentFetch extends MultiCheckComponent with ComponentCache {
   DataFetchCallback optionsFetchCallback;
+  final String emptyMessage;
 
   MultiCheckComponentFetch(
       super.id, super.groupId, super.componentLabel, this.optionsFetchCallback,
-      {super.columns = 5});
+      {super.columns = 5, this.emptyMessage = "No data available"});
 
   Future<IdElementTable> fetchCachedOptions() async {
     var key = getKey();
@@ -32,8 +33,8 @@ class MultiCheckComponentFetch extends MultiCheckComponent with ComponentCache {
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             if (snapshot.data!.colNames.isEmpty) {
-              return const Text(
-                  "Select a prepared data folder to see available gates");
+              return Text(
+                  emptyMessage);
             } else {
               options.clear();
               options
