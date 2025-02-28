@@ -49,7 +49,7 @@ class MultiCheckComponentFetch extends MultiCheckComponent with ComponentCache {
   
     return 
         Container( color: Colors.amber,
-        constraints: BoxConstraints(minWidth: 800),
+        constraints: BoxConstraints(minWidth: 1500),
         child:  buildCheckTable(),);
   
 
