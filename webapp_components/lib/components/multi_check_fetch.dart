@@ -13,7 +13,7 @@ class MultiCheckComponentFetch extends MultiCheckComponent with ComponentCache {
 
   MultiCheckComponentFetch(
       super.id, super.groupId, super.componentLabel, this.optionsFetchCallback,
-      {super.columns = 5, this.emptyMessage = "No data available", super.hasSelectAll = false, super.selectAll = false});
+      {super.columns = 5, this.emptyMessage = "No data available", super.hasSelectAll = false, super.selectAll = false, super.columnWidth});
 
   Future<IdElementTable> fetchCachedOptions() async {
     var key = getKey();
