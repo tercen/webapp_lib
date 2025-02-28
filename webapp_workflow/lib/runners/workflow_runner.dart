@@ -55,6 +55,9 @@ class WorkflowRunner with ProgressDialog {
   String workflowSuffix = "";
   String stepProgressMessage = "";
 
+  bool isInit = false;
+  var workflow = sci.Workflow();
+
   final List<String> stepsToRemove = [];
 
   
@@ -410,102 +413,195 @@ class WorkflowRunner with ProgressDialog {
 
   }
 
-  Future<sci.Workflow> doRun(BuildContext context) async {
-    if( template.id == ""){
-      throw Exception("Workflow not set in WorkflowRunner.");
-    }
 
-    // status.value = RunStatus.running;
+  Future<void> setupRun(BuildContext context) async {
+    if( !isInit ){
+      if( template.id == ""){
+            throw Exception("Workflow not set in WorkflowRunner.");
+          }
+
+          // status.value = RunStatus.running;
+          var factory = tercen.ServiceFactory();
+
+
+
+          var runTitle = getWorkflowName(template);
+
+          log("Set up", dialogTitle: runTitle);
+
+          for( var entry in tableDocumentMap.entries ){
+            tableMap[entry.key] = await loadDocumentInMemory(entry.value);
+          }
+
+
+
+
+          //-----------------------------------------
+          // Copy template into project
+          //-----------------------------------------
+          workflow =
+              await factory.workflowService.copyApp(template.id, projectId);
+
+          for (var stepToRemove in stepsToRemove) {
+            workflow = removeStepFromWorkflow(stepToRemove, workflow);
+          }
+
+          //-----------------------------------------
+          // Step-specific setup
+          //-----------------------------------------
+          for (var stp in workflow.steps) {
+            if (stp.kind == "DataStep") {
+              stp = updateOperatorSettings(stp as sci.DataStep, settings);
+            }
+
+            if (shouldResetStep(stp)) {
+              stp.state.taskState = sci.InitState();
+              stp.state.taskId = "";
+            }
+
+            if (multiDsMap.containsKey(stp.id)) {
+              var tmpStp = stp as sci.DataStep;
+              tmpStp.parentDataStepId = multiDsMap[stp.id]!;
+            }
+
+            if (filterMap.containsKey(stp.id)) {
+              sci.DataStep dataStp = stp as sci.DataStep;
+              dataStp.model.filters = filterMap[stp.id]!;
+            }
+
+            if (tableMap.containsKey(stp.id)) {
+              sci.TableStep tmpStp = stp as sci.TableStep;
+              tmpStp.model.relation = tableMap[stp.id]!;
+              tmpStp.state.taskState = sci.DoneState();
+
+              if( tableNameMap.containsKey(stp.id)){
+                tmpStp.name = tableNameMap[stp.id]!;
+              }
+
+              stp = tmpStp;
+            }
+
+            if (gatherMap.containsKey(stp.id)) {
+              (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
+            }
+          }
+
+          //-----------------------------------------
+          // General workflow parameters
+          //-----------------------------------------
+          if (folderId == null) {
+            sci.FolderDocument folder = await createFolder(projectId, teamName);
+            workflow.folderId = folder.id;
+          } else {
+            workflow.folderId = folderId!;
+          }
+
+          workflow.name = getWorkflowName(workflow);
+              
+          
+          workflow.acl = sci.Acl()..owner = teamName;
+          workflow.id = "";
+          workflow.rev = "";
+
+          workflow.isHidden = false;
+          workflow.isDeleted = false;
+
+          workflow = await factory.workflowService.create(workflow);
+          workflowId = workflow.id;
+
+    }
+  }
+
+
+  Future<sci.Workflow> doRunStep(BuildContext context, String stepId) async {
     var factory = tercen.ServiceFactory();
 
-
-
+    openDialog(context);
+    await setupRun(context);
     var runTitle = getWorkflowName(template);
 
-    openDialog(context);
-
-    log("Set up", dialogTitle: runTitle);
-
-    for( var entry in tableDocumentMap.entries ){
-      tableMap[entry.key] = await loadDocumentInMemory(entry.value);
-    }
-
-
-
-
-    //-----------------------------------------
-    // Copy template into project
-    //-----------------------------------------
-    var workflow =
-        await factory.workflowService.copyApp(template.id, projectId);
-
-    for (var stepToRemove in stepsToRemove) {
-      workflow = removeStepFromWorkflow(stepToRemove, workflow);
-    }
-
-    //-----------------------------------------
-    // Step-specific setup
-    //-----------------------------------------
-    for (var stp in workflow.steps) {
-      if (stp.kind == "DataStep") {
-        stp = updateOperatorSettings(stp as sci.DataStep, settings);
-      }
-
-      if (shouldResetStep(stp)) {
-        stp.state.taskState = sci.InitState();
-        stp.state.taskId = "";
-      }
-
-      if (multiDsMap.containsKey(stp.id)) {
-        var tmpStp = stp as sci.DataStep;
-        tmpStp.parentDataStepId = multiDsMap[stp.id]!;
-      }
-
-      if (filterMap.containsKey(stp.id)) {
-        sci.DataStep dataStp = stp as sci.DataStep;
-        dataStp.model.filters = filterMap[stp.id]!;
-      }
-
-      if (tableMap.containsKey(stp.id)) {
-        sci.TableStep tmpStp = stp as sci.TableStep;
-        tmpStp.model.relation = tableMap[stp.id]!;
-        tmpStp.state.taskState = sci.DoneState();
-
-        if( tableNameMap.containsKey(stp.id)){
-          tmpStp.name = tableNameMap[stp.id]!;
+    List<String> stepsToRestore = [];
+    var stpName = "STEP";
+    for( var stp in workflow.steps ){
+      if( !(stp is sci.TableStep || stp.state.taskState is sci.DoneState || stp.state.taskState is sci.FailedState) ){
+        if( stp.id == stepId ){
+          stp.state.taskState = sci.InitState();
+          stpName = stp.name;
+        }else{
+          stp.state.taskState = sci.DoneState();
+          stepsToRestore.add(stp.id);
         }
-
-        stp = tmpStp;
-      }
-
-      if (gatherMap.containsKey(stp.id)) {
-        (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
       }
     }
 
+    await factory.workflowService.update(workflow);
+
     //-----------------------------------------
-    // General workflow parameters
+    // Task preparation and running
     //-----------------------------------------
-    if (folderId == null) {
-      sci.FolderDocument folder = await createFolder(projectId, teamName);
-      workflow.folderId = folder.id;
-    } else {
-      workflow.folderId = folderId!;
+    sci.RunWorkflowTask workflowTask = sci.RunWorkflowTask()
+      ..state = sci.InitState()
+      ..owner = teamName
+      ..projectId = projectId
+      ..workflowId = workflow.id
+      ..workflowRev = workflow.rev;
+
+    workflowTask =
+        await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
+
+    var taskStream = workflowStream(workflowTask.id);
+
+    log("Running ${stpName}", dialogTitle: runTitle);
+
+    await for (var evt in taskStream) {
+      if (evt is sci.TaskProgressEvent) {
+        log("Running ${stpName}\n\nTask Log\n${evt.message}",
+            dialogTitle: runTitle);
+      } else if (evt is sci.TaskLogEvent) {
+        log("Running ${stpName}\n\nTask Log\n${evt.message}",
+            dialogTitle: runTitle);
+      } 
     }
 
-    workflow.name = getWorkflowName(workflow);
-        
-    
-    workflow.acl = sci.Acl()..owner = teamName;
-    workflow.id = "";
-    workflow.rev = "";
+    var doneWorkflow = await factory.workflowService.get(workflow.id);
 
-    workflow.isHidden = false;
-    workflow.isDeleted = false;
+    for (var stp in doneWorkflow.steps) {
+      stp.state.taskState.throwIfNotDone();
+    }
 
-    workflow = await factory.workflowService.create(workflow);
+    log("$stepProgressMessage\n\n \nRunning final updates", dialogTitle: runTitle);    
+    for (var f in postRunCallbacks) {
+      await f();
+    }
 
-    workflowId = workflow.id;
+
+    for( var stp in doneWorkflow.steps ){
+      if( stepsToRestore.contains(stp.id )){
+        stp.state.taskState = sci.InitState();
+      }
+    }
+
+    await factory.workflowService.update(doneWorkflow);
+
+
+    await Future.delayed(const Duration(milliseconds: 1000), () {
+      // status.value = RunStatus.finished;
+      closeLog();
+    });
+
+    workflowId = doneWorkflow.id;
+    workflow = doneWorkflow;
+
+    return doneWorkflow;
+
+  }
+
+  Future<sci.Workflow> doRun(BuildContext context) async {
+    var factory = tercen.ServiceFactory();
+
+    openDialog(context);
+    await setupRun(context);
+    var runTitle = getWorkflowName(template);
 
     //-----------------------------------------
     // Task preparation and running
@@ -568,6 +664,7 @@ class WorkflowRunner with ProgressDialog {
     });
 
     workflowId = doneWorkflow.id;
+    workflow = doneWorkflow;
 
     return doneWorkflow;
   }
