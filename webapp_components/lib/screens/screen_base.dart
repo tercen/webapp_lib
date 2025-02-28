@@ -237,7 +237,7 @@ mixin ScreenBase {
               constraints: const BoxConstraints(maxWidth: 250),
               child: _wrap(_buildLabel(comp.label()))),
           Container(
-              // constraints: const BoxConstraints(maxWidth: double.maxFinite),
+              constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width*0.8  ),
               child: _wrap(comp.buildContent(context))),
         ]);
       }
@@ -268,7 +268,6 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                  width: double.maxFinite,
                   child: _wrap(comp.buildContent(context)),
                 )),
             paddingWdg,
