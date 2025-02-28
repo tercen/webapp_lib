@@ -18,7 +18,10 @@ import 'package:sci_tercen_client/sci_client.dart';
 
 
 class UploadTableComponent extends UploadFileComponent {
-  UploadTableComponent(super.id, super.groupId, super.componentLabel, super.projectId, super.fileOwner);
+  UploadTableComponent(super.id, super.groupId, super.componentLabel, super.projectId, super.fileOwner, {
+    super.folderId, super.allowedMime, super.maxHeight = 400, super.multiFile = true,
+    super.maxWidth, super.showUploadButton = true
+  });
 
   @override
   Future<void> doUpload(BuildContext context) async{
