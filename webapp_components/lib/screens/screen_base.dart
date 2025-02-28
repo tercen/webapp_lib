@@ -268,6 +268,7 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
+                  width: double.infinity,
                   child: _wrap(comp.buildContent(context)),
                 )),
             paddingWdg,
