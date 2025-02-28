@@ -33,7 +33,7 @@ class UploadTableComponent extends UploadFileComponent {
       
       log("Uploading ${file.name}", dialogTitle: "File Uploading");
       var bytes = await dvController.getFileData(file);
-      var fileId = await uploadFile(file.name, projectId, fileOwner, bytes, folderId: folderId);
+      var fileId = await uploadFileAsTable(file.name, projectId, fileOwner, bytes, folderId: folderId);
       uploadedFiles.add(IdElement(fileId, file.name));
     }
 
@@ -42,7 +42,7 @@ class UploadTableComponent extends UploadFileComponent {
       var bytes = file.bytes!;
       log("Uploading ${file.name}", dialogTitle: "File Uploading");
 
-      var fileId = await uploadFile(file.name, projectId, fileOwner, bytes, folderId: folderId);
+      var fileId = await uploadFileAsTable(file.name, projectId, fileOwner, bytes, folderId: folderId);
       uploadedFiles.add(IdElement(fileId, file.name));
     }
 
@@ -135,7 +135,7 @@ class UploadTableComponent extends UploadFileComponent {
   }
 
 
-  Future<String> uploadFile(String filename, String projectId, String owner, Uint8List data, {String folderId = ""} ) async {
+  Future<String> uploadFileAsTable(String filename, String projectId, String owner, Uint8List data, {String folderId = ""} ) async {
     var factory = tercen.ServiceFactory();
 
     var metadata = CSVFileMetadata()
