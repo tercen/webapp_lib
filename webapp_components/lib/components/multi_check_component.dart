@@ -73,6 +73,7 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
               deselect(IdElement(opt.id, opt.label));
             }
           }
+          allSelected = false;
 
         }
 
