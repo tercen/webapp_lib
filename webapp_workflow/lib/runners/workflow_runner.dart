@@ -55,11 +55,12 @@ class WorkflowRunner with ProgressDialog {
   String workflowSuffix = "";
   String stepProgressMessage = "";
 
-  bool isInit = false;
+  var isInit = false;
   var workflow = sci.Workflow();
 
   final List<String> stepsToRemove = [];
 
+  final List<sci.Pair> settingsByName = [];
   
 
   WorkflowRunner( this.projectId, this.teamName, this.template) {
@@ -70,6 +71,13 @@ class WorkflowRunner with ProgressDialog {
     // }
 
 
+  }
+
+  /// Setting by name will search through the steps in a workflow looking for a matching name
+  /// If it finds, then the value is set.
+  /// Useful when the same setting repeats across steps (e.g. seed)
+  void addSettingByName(String settingName, String settingValue ){
+    settingsByName.add(sci.Pair.from(settingName, settingValue) );
   }
 
   void setNewWorkflowName( String name ){
@@ -424,7 +432,6 @@ class WorkflowRunner with ProgressDialog {
           var factory = tercen.ServiceFactory();
 
 
-
           var runTitle = getWorkflowName(template);
 
           log("Set up", dialogTitle: runTitle);
@@ -452,6 +459,7 @@ class WorkflowRunner with ProgressDialog {
           for (var stp in workflow.steps) {
             if (stp.kind == "DataStep") {
               stp = updateOperatorSettings(stp as sci.DataStep, settings);
+              stp = updateOperatorSettingsByName(stp, settingsByName);
             }
 
             if (shouldResetStep(stp)) {
@@ -690,6 +698,20 @@ class WorkflowRunner with ProgressDialog {
 
     }
 
+  }
+
+  sci.DataStep updateOperatorSettingsByName(
+      sci.DataStep stp, List<sci.Pair> settingsList) {
+    for (var setting in settingsList) {
+      var nProps = stp.model.operatorSettings.operatorRef.propertyValues.length;
+      for( var i = 0; i < nProps; i++ ){
+        if (stp.model.operatorSettings.operatorRef.propertyValues[i].name == setting.key ){
+          stp.model.operatorSettings.operatorRef.propertyValues[i].value =
+                setting.value;
+        }
+      }
+    }
+    return stp;
   }
 
   sci.DataStep updateOperatorSettings(
