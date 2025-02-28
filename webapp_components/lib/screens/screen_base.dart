@@ -237,7 +237,7 @@ mixin ScreenBase {
               constraints: const BoxConstraints(maxWidth: 250),
               child: _wrap(_buildLabel(comp.label()))),
           Container(
-              constraints: const BoxConstraints(maxWidth: 500),
+              // constraints: const BoxConstraints(maxWidth: 500),
               child: _wrap(comp.buildContent(context))),
         ]);
       }
