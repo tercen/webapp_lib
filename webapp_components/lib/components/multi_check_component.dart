@@ -144,10 +144,7 @@ TableRow createSelectAllRow(){
 
   @override
   Widget buildContent(BuildContext context) {
-    return 
-        Container( color: Colors.amber,
-        constraints: BoxConstraints(minWidth: 800),
-        child:  buildCheckTable(),);
+    return  buildCheckTable();
   }
 
   void setOptions(List<IdElement> optList) {
