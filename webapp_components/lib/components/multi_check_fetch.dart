@@ -45,7 +45,14 @@ class MultiCheckComponentFetch extends MultiCheckComponent with ComponentCache {
                     }
                     selectAll = false;
                   }
-              return super.buildCheckTable();
+              // return  super.buildCheckTable();
+  
+    return 
+        Container( color: Colors.amber,
+        constraints: BoxConstraints(minWidth: 800),
+        child:  buildCheckTable(),);
+  
+
             }
           } else if (snapshot.hasError) {
             throw Exception(snapshot.error);
