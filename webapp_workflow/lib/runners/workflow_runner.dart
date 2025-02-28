@@ -705,7 +705,7 @@ class WorkflowRunner with ProgressDialog {
     for (var setting in settingsList) {
       var nProps = stp.model.operatorSettings.operatorRef.propertyValues.length;
       for( var i = 0; i < nProps; i++ ){
-        if (stp.model.operatorSettings.operatorRef.propertyValues[i].name == setting.key ){
+        if (stp.model.operatorSettings.operatorRef.propertyValues[i].name.toLowerCase() == setting.key.toLowerCase() ){
           stp.model.operatorSettings.operatorRef.propertyValues[i].value =
                 setting.value;
         }
