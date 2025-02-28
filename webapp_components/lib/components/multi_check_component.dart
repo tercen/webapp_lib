@@ -10,8 +10,10 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
   final List<IdElement> options = [];
   final List<IdElement> selected = [];
   final int columns;
+  final bool hasSelectAll;
+  bool selectAll;
 
-  MultiCheckComponent(id, groupId, componentLabel, {this.columns = 5}){
+  MultiCheckComponent(id, groupId, componentLabel, {this.columns = 5, this.hasSelectAll = false, this.selectAll = false}){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -51,13 +53,61 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
     ],);
 }
 
+  Widget selectAllCheckBox( ) {
+
+    var checkIcon = IconButton(
+      onPressed: () {
+        if( selectAll){
+          for( var opt in options ){
+            if( !selected.contains(IdElement(opt.id, opt.label))) {
+              select(IdElement(opt.id, opt.label));
+            }
+          }
+        }else{
+          for( var opt in options ){
+            if( selected.contains(IdElement(opt.id, opt.label))) {
+              deselect(IdElement(opt.id, opt.label));
+            }
+          }
+        }
+
+        notifyListeners();
+      },
+      icon: selectAll
+          ? const Icon(Icons.check_box_outlined)
+          : const Icon(Icons.check_box_outline_blank));
+
+    return Row(children: [
+      checkIcon,
+      Text("Select All", style: Styles.text,)
+    ],);
+}
+
+
+TableRow createSelectAllRow(){
+  int nCols = options.length > columns ? columns : options.length;
+  List<Widget> rowWidgets = [];
+
+  rowWidgets.add(selectAllCheckBox());
+  for( var ci = 1; ci < nCols; ci++ ){  
+    rowWidgets.add(Container());
+  }
+
+  return TableRow(children: rowWidgets);
+}
 
   Widget buildCheckTable(){
-        int nCols = options.length > columns ? columns : options.length;
+    int nCols = options.length > columns ? columns : options.length;
     int nRows = (options.length / columns).ceil();
 
     int idx = 0;
     List<TableRow> tableRows = [];
+    if( hasSelectAll ){
+      for( var ci = 0; ci < nCols; ci++ ){  
+        tableRows.add( createSelectAllRow() );
+      }
+    }
+    
     for( var ri = 0; ri < nRows; ri++ ){
       
       List<Widget> rowWidgets = [];
@@ -86,7 +136,15 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
 
   void setOptions(List<IdElement> optList) {
     options.clear();
+    
     options.addAll(optList);
+
+    if( selectAll ){
+      for( var opt in options ){
+        select(IdElement(opt.id, opt.label));
+      }
+      selectAll = false;
+    }
   }
 
 

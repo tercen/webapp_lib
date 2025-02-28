@@ -13,7 +13,7 @@ class MultiCheckComponentFetch extends MultiCheckComponent with ComponentCache {
 
   MultiCheckComponentFetch(
       super.id, super.groupId, super.componentLabel, this.optionsFetchCallback,
-      {super.columns = 5, this.emptyMessage = "No data available"});
+      {super.columns = 5, this.emptyMessage = "No data available", super.hasSelectAll = false, super.selectAll = false});
 
   Future<IdElementTable> fetchCachedOptions() async {
     var key = getKey();
@@ -39,6 +39,12 @@ class MultiCheckComponentFetch extends MultiCheckComponent with ComponentCache {
               options.clear();
               options
                   .addAll(snapshot.data!.columns[snapshot.data!.colNames[0]]!);
+                  if( selectAll ){
+                    for( var opt in options ){
+                      select(IdElement(opt.id, opt.label));
+                    }
+                    selectAll = false;
+                  }
               return super.buildCheckTable();
             }
           } else if (snapshot.hasError) {
