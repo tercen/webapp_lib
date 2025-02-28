@@ -12,12 +12,14 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
   final int columns;
   final bool hasSelectAll;
   bool selectAll;
+  late bool allSelected;
   double? columnWidth;
 
   MultiCheckComponent(id, groupId, componentLabel, {this.columns = 5, this.hasSelectAll = false, this.selectAll = false, this.columnWidth}){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
+    allSelected = selectAll;
   }
 
   void select(IdElement el){
@@ -58,23 +60,25 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
 
     var checkIcon = IconButton(
       onPressed: () {
-        if( selectAll){
+        if( !allSelected){
           for( var opt in options ){
             if( !selected.contains(IdElement(opt.id, opt.label))) {
               select(IdElement(opt.id, opt.label));
             }
           }
+          allSelected = true;
         }else{
           for( var opt in options ){
             if( selected.contains(IdElement(opt.id, opt.label))) {
               deselect(IdElement(opt.id, opt.label));
             }
           }
+
         }
 
         notifyListeners();
       },
-      icon: selectAll
+      icon: allSelected
           ? const Icon(Icons.check_box_outlined)
           : const Icon(Icons.check_box_outline_blank));
 
