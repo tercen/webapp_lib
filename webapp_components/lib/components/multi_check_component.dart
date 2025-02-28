@@ -12,8 +12,9 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
   final int columns;
   final bool hasSelectAll;
   bool selectAll;
+  double? columnWidth;
 
-  MultiCheckComponent(id, groupId, componentLabel, {this.columns = 5, this.hasSelectAll = false, this.selectAll = false}){
+  MultiCheckComponent(id, groupId, componentLabel, {this.columns = 5, this.hasSelectAll = false, this.selectAll = false, this.columnWidth}){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -103,9 +104,7 @@ TableRow createSelectAllRow(){
     int idx = 0;
     List<TableRow> tableRows = [];
     if( hasSelectAll ){
-      for( var ci = 0; ci < nCols; ci++ ){  
-        tableRows.add( createSelectAllRow() );
-      }
+      tableRows.add( createSelectAllRow() );
     }
     
     for( var ri = 0; ri < nRows; ri++ ){
@@ -122,7 +121,16 @@ TableRow createSelectAllRow(){
 
       tableRows.add(TableRow(children: rowWidgets));
     } 
-    return Table( children: tableRows, );
+      
+    Map<int, TableColumnWidth>? colWidthMap;
+    if( columnWidth != null ){
+      colWidthMap = {};
+      for( var ci = 0; ci < nCols; ci++ ){
+        colWidthMap[ci] = FixedColumnWidth(columnWidth!);
+      }
+    }
+
+    return Table( columnWidths: colWidthMap, children: tableRows, );
 
 
   }
