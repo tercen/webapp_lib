@@ -14,7 +14,9 @@ class RangeValidator extends NumericValidator{
   }
 
   bool isValid( String value ){
-    if(super.isValid(value)){
+    if( value == ""){
+      return true;
+    }else if(super.isValid(value)){
       var numVal = double.parse(value);
       var res = this.inclusiveMin ? numVal >= min : numVal > min;
       res = res && (this.inclusiveMin ? numVal <= max : numVal < max);
