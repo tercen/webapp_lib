@@ -246,6 +246,10 @@ mixin ScreenBase {
       );
     }
 
+    if( comp is InputValidator ){
+      (comp as InputValidator).validate();
+    }
+
     if (comp.isActive()) {
       if (compType == ComponentType.simple) {
         return Row(children: [

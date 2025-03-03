@@ -10,6 +10,11 @@ mixin InputValidator {
     validators.add(validator);
   }
 
+
+  void validate(){
+    print("Validte of the mixin");
+  }
+
   void validateInputList( List<IdElement> els ) {
     results.clear();
     for( var el in els ){
@@ -22,11 +27,13 @@ mixin InputValidator {
     if( clearPrevious ){
       results.clear();
     }
+    
     var value = el.label;
     validators.map((validator) {
+      
       var isValid = validator.isValid(value);
       var msg = isValid ? validator.getInvalidMessage(value: value) : "";
-      
+      print("Validating $value: $isValid : $msg");;
       return ValidatorResult(isValid, msg);
     }).toList();
   }

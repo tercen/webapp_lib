@@ -22,9 +22,12 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
   }
 
   @override
-  Widget buildContent(BuildContext context) {
+  void validate(){
     validateSingleInput(getValue());
-    
+  }
+
+  @override
+  Widget buildContent(BuildContext context) {
     return TextField(
         controller: controller,
         onTapOutside: (event) {
@@ -55,8 +58,11 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
     controller.addListener(callback);
   }
 
+  
+
   void onLoseFocus(void Function() callback) {
     onFocusLostFunctions.add(callback);
+    
   }
 
   @override
