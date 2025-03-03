@@ -302,7 +302,7 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                  child: _wrap(buildContent(comp, context) )),
+                  child: _wrap(buildContent(comp, context) ),
                 )),
             paddingWdg,
           ],
