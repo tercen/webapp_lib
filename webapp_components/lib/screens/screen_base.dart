@@ -7,6 +7,7 @@ import 'package:webapp_components/abstract/multi_value_component.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_components/action_components/action_component.dart';
 import 'package:webapp_components/components/horizontal_bar.dart';
+import 'package:webapp_components/mixins/input_validator.dart';
 import 'package:webapp_model/webapp_data_base.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
@@ -211,9 +212,25 @@ mixin ScreenBase {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(Component comp) {
+    
+    var style = Styles.textH2;
+    if( comp is InputValidator ){
+      var validateResults = (comp as InputValidator).results;
+      if(validateResults.any((t) => !t.isValid)){
+        style = TextStyle(color: Colors.red[400]).merge(style);
+
+        return Row(children: [
+          Icon(Icons.error_outline, color: Colors.red[400],),
+           Text(
+            comp.label(),
+            style: style,
+          )
+        ],);
+      }
+    }
     return Text(
-      text,
+      comp.label(),
       style: Styles.textH2,
     );
   }
@@ -235,7 +252,7 @@ mixin ScreenBase {
           paddingWdg,
           Container(
               constraints: const BoxConstraints(maxWidth: 250),
-              child: _wrap(_buildLabel(comp.label()))),
+              child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width*0.6  ),
               child: _wrap(comp.buildContent(context))),
@@ -250,7 +267,7 @@ mixin ScreenBase {
                 alignment: Alignment.topLeft,
                 child: Container(
                     constraints: const BoxConstraints(maxWidth: 250),
-                    child: _wrap(_buildLabel(comp.label())))),
+                    child: _wrap(_buildLabel(comp)))),
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(

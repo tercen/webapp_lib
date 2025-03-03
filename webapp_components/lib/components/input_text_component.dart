@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webapp_components/definitions/component.dart';
+import 'package:webapp_components/mixins/input_validator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_model/id_element.dart';
@@ -7,7 +8,7 @@ import 'package:webapp_model/id_element.dart';
 
 import '../mixins/component_base.dart';
 
-class InputTextComponent with ChangeNotifier, ComponentBase implements SingleValueComponent {
+class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator implements SingleValueComponent {
   final TextEditingController controller = TextEditingController();
 
   final List<void Function()> onChangeFunctions = [];
@@ -22,6 +23,8 @@ class InputTextComponent with ChangeNotifier, ComponentBase implements SingleVal
 
   @override
   Widget buildContent(BuildContext context) {
+    validateSingleInput(getValue());
+    
     return TextField(
         controller: controller,
         onTapOutside: (event) {
@@ -49,7 +52,6 @@ class InputTextComponent with ChangeNotifier, ComponentBase implements SingleVal
 
 
   void onChange(void Function() callback) {
-    
     controller.addListener(callback);
   }
 
