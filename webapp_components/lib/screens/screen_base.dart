@@ -219,7 +219,7 @@ mixin ScreenBase {
       var validateResults = (comp as InputValidator).results;
 
       if(validateResults.any((t) => !t.isValid)){
-        style = TextStyle(color: Colors.red[400]).merge(style);
+        style = style.merge(TextStyle(color: Colors.red[400]));
 
         return Row(children: [
           Icon(Icons.error_outline, color: Colors.red[400],),
@@ -247,9 +247,11 @@ mixin ScreenBase {
         for( var vr in validateResults ){
           if( !vr.isValid ){
             compMessages.add(
-              Text(
+              Padding(padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+              child: Text(
                 vr.message, style: TextStyle(fontSize: 12, color: Colors.red[400]),
-              )
+              ) ,)
+              
             );
           }
         }
