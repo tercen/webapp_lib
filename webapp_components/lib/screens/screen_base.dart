@@ -247,7 +247,7 @@ mixin ScreenBase {
           if( !vr.isValid ){
             compMessages.add(
               Text(
-                vr.message, style: TextStyle(fontSize: 9, color: Colors.red[400]),
+                vr.message, style: TextStyle(fontSize: 12, color: Colors.red[400]),
               )
             );
           }

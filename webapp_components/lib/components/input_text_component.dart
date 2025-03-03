@@ -29,6 +29,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
   @override
   Widget buildContent(BuildContext context) {
     return TextField(
+        key: Key("$id$groupId"),
         controller: controller,
         onChanged: (value) => notifyListeners(),
         onTapOutside: (event) {
