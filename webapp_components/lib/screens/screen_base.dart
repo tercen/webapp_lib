@@ -217,10 +217,7 @@ mixin ScreenBase {
     var style = Styles.textH2;
     if( comp is InputValidator ){
       var validateResults = (comp as InputValidator).results;
-      print("Testing validation of ${comp.label()} (${validateResults.length} validation results)");;
-      for( var vr in validateResults ){
-        print(vr.isValid);
-      }
+
       if(validateResults.any((t) => !t.isValid)){
         style = TextStyle(color: Colors.red[400]).merge(style);
 
@@ -240,6 +237,26 @@ mixin ScreenBase {
     );
   }
 
+  Widget buildContent( Component comp, BuildContext context ){
+    if( comp is InputValidator ){
+      var validateResults = (comp as InputValidator).results;
+      if(validateResults.any((t) => !t.isValid)){
+        List<Widget> compMessages = [comp.buildContent(context)];
+
+        for( var vr in validateResults ){
+          if( !vr.isValid ){
+            compMessages.add(
+              Text(
+                vr.message, style: TextStyle(fontSize: 9, color: Colors.red[400]),
+              )
+            );
+          }
+        }
+      }
+    }
+    return comp.buildContent(context);
+  }
+
   Widget? _buildBlockRow(
       Component comp, ComponentType compType, BuildContext context,
       {bool addPadding = true}) {
@@ -251,9 +268,7 @@ mixin ScreenBase {
       );
     }
 
-    if( comp is InputValidator ){
-      (comp as InputValidator).validate();
-    }
+
 
     if (comp.isActive()) {
       if (compType == ComponentType.simple) {
@@ -264,7 +279,7 @@ mixin ScreenBase {
               child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width*0.6  ),
-              child: _wrap(comp.buildContent(context))),
+              child: _wrap(buildContent(comp, context) )),
         ]);
       }
 
@@ -314,6 +329,12 @@ mixin ScreenBase {
           blockType == ComponentBlockType.collapsed;
       for (var ci = 0; ci < componentList.length; ci++) {
         var comp = componentList[ci];
+
+        if( comp.component is InputValidator ){
+          print("Validating ${comp.component.label()}");
+          (comp as InputValidator).validate();
+        }
+
         var row = _buildBlockRow(comp.component, comp.componentType, context,
             addPadding: isExpBlock);
         if (row != null) {

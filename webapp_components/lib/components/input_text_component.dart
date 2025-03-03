@@ -34,6 +34,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
           for( var func in onFocusLostFunctions){
             func();
           }
+          notifyListeners();
         },
         style: Styles.text,
         decoration: InputDecoration(
