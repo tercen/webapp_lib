@@ -14,11 +14,12 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
   final List<void Function()> onChangeFunctions = [];
   final List<void Function()> onFocusLostFunctions = [];
 
-
+  late final Key inputKey;
   InputTextComponent(id, groupId, componentLabel){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
+    inputKey = Key("$id$groupId");
   }
 
   @override
@@ -29,7 +30,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
   @override
   Widget buildContent(BuildContext context) {
     return TextField(
-        key: Key("$id$groupId"),
+        key: inputKey,
         controller: controller,
         onChanged: (value) => notifyListeners(),
         onTapOutside: (event) {
