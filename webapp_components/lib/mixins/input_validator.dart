@@ -32,7 +32,7 @@ mixin InputValidator {
     validators.map((validator) {
       
       var isValid = validator.isValid(value);
-      var msg = isValid ? validator.getInvalidMessage(value: value) : "";
+      var msg = isValid ?  "" : validator.getInvalidMessage(value: value);
       print("Validating $value: $isValid : $msg");;
       return ValidatorResult(isValid, msg);
     }).toList();

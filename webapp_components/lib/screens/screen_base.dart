@@ -217,6 +217,10 @@ mixin ScreenBase {
     var style = Styles.textH2;
     if( comp is InputValidator ){
       var validateResults = (comp as InputValidator).results;
+      print("Testing validation of ${comp.label()} (${validateResults.length} validation results)");;
+      for( var vr in validateResults ){
+        print(vr.isValid);
+      }
       if(validateResults.any((t) => !t.isValid)){
         style = TextStyle(color: Colors.red[400]).merge(style);
 
