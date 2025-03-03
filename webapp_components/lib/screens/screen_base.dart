@@ -238,10 +238,11 @@ mixin ScreenBase {
   }
 
   Widget buildContent( Component comp, BuildContext context ){
+    List<Widget> compMessages = [comp.buildContent(context)];
     if( comp is InputValidator ){
       var validateResults = (comp as InputValidator).results;
       if(validateResults.any((t) => !t.isValid)){
-        List<Widget> compMessages = [comp.buildContent(context)];
+        
 
         for( var vr in validateResults ){
           if( !vr.isValid ){
@@ -252,16 +253,16 @@ mixin ScreenBase {
             );
           }
         }
-              return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: compMessages,
-      );
+             
       }
 
 
     }
-    return comp.buildContent(context);
+     return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: compMessages,
+      );
   }
 
   Widget? _buildBlockRow(
