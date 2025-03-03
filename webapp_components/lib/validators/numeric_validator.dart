@@ -4,6 +4,6 @@ class NumericValidator extends ValidatorBase{
   NumericValidator(super.id, {super.invalidMessage = "Input |@| must be numeric."});
 
   bool isValid( String value ){
-    return int.tryParse(value) != null || double.tryParse(value) != null;
+    return value == "" || int.tryParse(value) != null || double.tryParse(value) != null;
   }
 }

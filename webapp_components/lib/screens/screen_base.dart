@@ -226,6 +226,7 @@ mixin ScreenBase {
 
         return Row(children: [
           Icon(Icons.error_outline, color: Colors.red[400],),
+          SizedBox(width: 10,),
            Text(
             comp.label(),
             style: style,
