@@ -332,7 +332,7 @@ mixin ScreenBase {
 
         if( comp.component is InputValidator ){
           print("Validating ${comp.component.label()}");
-          (comp as InputValidator).validate();
+          (comp.component as InputValidator).validate();
         }
 
         var row = _buildBlockRow(comp.component, comp.componentType, context,
