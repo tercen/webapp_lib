@@ -7,7 +7,11 @@ class RangeValidator extends NumericValidator{
   final int max;
   final bool inclusiveMax;
   
-  RangeValidator(super.id, this.min, this.max, {this.inclusiveMin = true, this.inclusiveMax = true});
+  RangeValidator(super.id, this.min, this.max, {this.inclusiveMin = true, this.inclusiveMax = true }){
+    var gt = inclusiveMin ? ">=" : ">";
+    var lt = inclusiveMax ? "<=" : "<";
+    super.invalidMessage = "Value must be $min $gt |@| $lt $max";
+  }
 
   bool isValid( String value ){
     if(super.isValid(value)){

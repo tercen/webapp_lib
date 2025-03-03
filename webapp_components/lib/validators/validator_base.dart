@@ -1,6 +1,6 @@
 class ValidatorBase {
   final String id;
-  final String invalidMessage;
+  String invalidMessage;
 
   ValidatorBase(this.id, {this.invalidMessage = "Input |@| is invalid."});
   
