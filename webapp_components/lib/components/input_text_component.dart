@@ -30,6 +30,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
   Widget buildContent(BuildContext context) {
     return TextField(
         controller: controller,
+        onChanged: (value) => notifyListeners(),
         onTapOutside: (event) {
           for( var func in onFocusLostFunctions){
             func();

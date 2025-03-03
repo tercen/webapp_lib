@@ -252,7 +252,14 @@ mixin ScreenBase {
             );
           }
         }
+              return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: compMessages,
+      );
       }
+
+
     }
     return comp.buildContent(context);
   }
@@ -295,7 +302,7 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                  child: _wrap(comp.buildContent(context)),
+                  child: _wrap(buildContent(comp, context) )),
                 )),
             paddingWdg,
           ],
@@ -331,7 +338,7 @@ mixin ScreenBase {
         var comp = componentList[ci];
 
         if( comp.component is InputValidator ){
-          print("Validating ${comp.component.label()}");
+          print("Validating ${comp.component.label()} in buildComponents");
           (comp.component as InputValidator).validate();
         }
 
