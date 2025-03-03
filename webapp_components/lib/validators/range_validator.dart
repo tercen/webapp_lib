@@ -1,6 +1,7 @@
+import 'package:webapp_components/validators/numeric_validator.dart';
 import 'package:webapp_components/validators/validator_base.dart';
 
-class RangeValidator extends ValidatorBase{
+class RangeValidator extends NumericValidator{
   final int min;
   final bool inclusiveMin;
   final int max;
