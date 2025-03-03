@@ -249,7 +249,7 @@ mixin ScreenBase {
             compMessages.add(
               Padding(padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
               child: Text(
-                vr.message, style: TextStyle(fontSize: 12, color: Colors.red[400]),
+                vr.message, style: TextStyle(fontSize: 13, color: Colors.red[400]),
               ) ,)
               
             );
@@ -341,7 +341,6 @@ mixin ScreenBase {
         var comp = componentList[ci];
 
         if( comp.component is InputValidator ){
-          print("Validating ${comp.component.label()} in buildComponents");
           (comp.component as InputValidator).validate();
         }
 
