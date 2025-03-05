@@ -221,28 +221,52 @@ class WorkflowDataService with DataCache {
         Table contentTable = Table();
         var isDev = Uri.base.hasPort && Uri.base.port > 10000;
         
+
         if( isDev ){
-          contentTable = await factory.tableSchemaService.select(sch.id, [ ".content"], 0, sch.nRows);
-        }
-        for (var i = 0; i < tbl.nRows; i++) {
-          if (contentTypes.any((contentType) =>
-              tbl.columns[1].values[i].contains(contentType))) {
-            var fname = tbl.columns[0].values[i];
+          // Avoid CORS issue with downloading image through browser request
+          contentTable = await factory.tableSchemaService.select(sch.id, [sch.columns[nameIdx].name,  ".content"], 0, sch.nRows);
+          var uniqueNames = (tbl.columns[0].values as List<String>).toSet();
+
+          for( var fname in uniqueNames ){
             var filterInclude = nameFilter.isEmpty ||
-                nameFilter.any((name) => fname.contains(name));
+                  nameFilter.any((name) => fname.contains(name));
             if (!excludedFiles.contains(fname) && filterInclude) {
-              if (!uniqueAddedNames.contains(fname)) {
-                uniqueAddedNames.add(fname);
-                workflowNames.add(IdElement("", wkf.name));
-                stepNames.add(step);
-                filenames.add(IdElement("", fname));
-                var ct = tbl.columns[1].values[i];
-                contentTypeList.add(IdElement("", ct));
-                if( isDev ){
-                  print("Is dev. Content type is ${contentTable.columns[0].values[i].runtimeType}");
-                  bytes.add(IdElement(
-                      "", String.fromCharCodes( base64Decode( contentTable.columns[0].values[i]) ) ));
-                }else{
+              uniqueAddedNames.add(fname);
+              workflowNames.add(IdElement("", wkf.name));
+              stepNames.add(step);
+              filenames.add(IdElement("", fname));
+
+              var bStr = "";
+              for (var i = 0; i < tbl.nRows; i++){
+                var tname = tbl.columns[0].values[i];
+                if( fname == tname){
+                  var newBStr = String.fromCharCodes( base64Decode( contentTable.columns[1].values[i]) );
+                  bStr = "$bStr$newBStr";
+                }
+              }
+              bytes.add(IdElement("", bStr));
+            }
+          }
+        }else{
+          for (var i = 0; i < tbl.nRows; i++) {
+            if (contentTypes.any((contentType) =>
+                tbl.columns[1].values[i].contains(contentType))) {
+              var fname = tbl.columns[0].values[i];
+              var filterInclude = nameFilter.isEmpty ||
+                  nameFilter.any((name) => fname.contains(name));
+              if (!excludedFiles.contains(fname) && filterInclude) {
+                if (!uniqueAddedNames.contains(fname)) {
+                  uniqueAddedNames.add(fname);
+                  workflowNames.add(IdElement("", wkf.name));
+                  stepNames.add(step);
+                  filenames.add(IdElement("", fname));
+                  var ct = tbl.columns[1].values[i];
+
+                  contentTypeList.add(IdElement("", ct));
+
+                    
+
+
                   var bytesStream = factory.tableSchemaService
                       .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
                   var imgBytes = await bytesStream.toList();
@@ -251,11 +275,14 @@ class WorkflowDataService with DataCache {
 
                   bytes.add(IdElement(
                       "", String.fromCharCodes(Uint8List.fromList(imgBytes[0]))));
+                
                 }
               }
             }
           }
+       
         }
+
       }
     }
 
