@@ -225,8 +225,8 @@ class WorkflowDataService with DataCache {
 
           List<Pair> uniqueNameType = [];
           for (var i = 0; i < tbl.nRows; i++){
-            var name = tbl.columns[1].values[0];
-            var cType = tbl.columns[1].values[1];
+            var name = tbl.columns[0].values[i];
+            var cType = tbl.columns[1].values[i];
 
             if(!uniqueNameType.any((e) => e.key == name)){
               uniqueNameType.add(Pair.from(name, cType));
