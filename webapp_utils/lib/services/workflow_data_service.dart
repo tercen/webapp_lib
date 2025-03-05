@@ -189,12 +189,9 @@ class WorkflowDataService with DataCache {
     List<Relation> rels = [];
     Map<String, List<String>> stepRelationMap = {};
     for (var stp in wkf.steps) {
-      // print("Checking ${stp.name} :: ${stp.id} [$includeStepId]");
       var shouldIncludeStep = includeStepId.isEmpty || includeStepId.contains(stp.id);
       if (stp.kind == "DataStep" && shouldIncludeStep) {
-        // print("Getting simple relations for ${stp.name}");
         DataStep dStp = stp as DataStep;
-        // print("Adding schemas for ${dStp.computedRelation.}");
         var relList = _getSimpleRelations(dStp.computedRelation);
         rels.addAll(relList);
         stepRelationMap[dStp.id] = relList.map((e) => e.id).toList();
@@ -225,21 +222,36 @@ class WorkflowDataService with DataCache {
         if( isDev ){
           // Avoid CORS issue with downloading image through browser request
           contentTable = await factory.tableSchemaService.select(sch.id, [sch.columns[nameIdx].name,  ".content"], 0, sch.nRows);
-          var uniqueNames = (tbl.columns[0].values as List<String>).toSet();
 
-          for( var fname in uniqueNames ){
+          List<Pair> uniqueNameType = [];
+          for (var i = 0; i < tbl.nRows; i++){
+            var name = tbl.columns[1].values[0];
+            var cType = tbl.columns[1].values[1];
+
+            if(!uniqueNameType.any((e) => e.key == name)){
+              uniqueNameType.add(Pair.from(name, cType));
+            }
+          }
+
+          
+
+          for( var nameContent in uniqueNameType ){
+            var isCorrectType = (contentTypes.any((contentType) =>
+                nameContent.value.contains(contentType))) ;
+
             var filterInclude = nameFilter.isEmpty ||
-                  nameFilter.any((name) => fname.contains(name));
-            if (!excludedFiles.contains(fname) && filterInclude) {
-              uniqueAddedNames.add(fname);
+                  nameFilter.any((name) => nameContent.key.contains(name));
+
+            if (!excludedFiles.contains(nameContent.key) && filterInclude && isCorrectType) {
+              uniqueAddedNames.add(nameContent.key);
               workflowNames.add(IdElement("", wkf.name));
               stepNames.add(step);
-              filenames.add(IdElement("", fname));
+              filenames.add(IdElement("", nameContent.key));
 
               var bStr = "";
               for (var i = 0; i < tbl.nRows; i++){
                 var tname = tbl.columns[0].values[i];
-                if( fname == tname){
+                if( nameContent.key == tname){
                   var newBStr = String.fromCharCodes( base64Decode( contentTable.columns[1].values[i]) );
                   bStr = "$bStr$newBStr";
                 }
@@ -296,6 +308,7 @@ class WorkflowDataService with DataCache {
 
     return tbl;
   }
+
 
   IdElement _getRelationStep(
       Workflow wkf, Map<String, List<String>> stepRelationMap, String schId) {
