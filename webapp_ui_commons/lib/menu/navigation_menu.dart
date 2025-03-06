@@ -164,27 +164,27 @@ class NavigationMenu with ChangeNotifier {
    List<Widget> infoEntries = [];
     if( project != "" ){
       infoEntries.add(
-        Text("Project: $project", style: Styles()["gray"],)
+        Text("Project: $project", style: Styles()["textGray"],)
       );
     }else{
       infoEntries.add(
-        Text("No project loaded", style: Styles()["gray"],)
+        Text("No project loaded", style: Styles()["textGray"],)
       );
     }
 
     if( team != ""){
       infoEntries.add(
-        Text("$team($user)", style: Styles()["gray"],)
+        Text("$team($user)", style: Styles()["textGray"],)
       );
     }else{
       infoEntries.add(
-        Text("$user", style: Styles()["gray"],)
+        Text("$user", style: Styles()["textGray"],)
       );
     }
 
     if( webApp != ""){
       infoEntries.add(
-        Text("App: $webApp", style: Styles()["gray"],)
+        Text("App: $webApp", style: Styles()["textGray"],)
       );
     }
 
