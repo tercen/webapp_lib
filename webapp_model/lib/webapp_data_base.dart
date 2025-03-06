@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
 
-
-
 import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_ui_commons/webapp_base.dart';
@@ -14,25 +12,25 @@ import 'package:webapp_utils/functions/workflow_steps_mapper.dart';
 import 'package:webapp_utils/services/file_data_service.dart';
 import 'package:webapp_utils/services/settings_data_service.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
-
-
-
-
+import 'package:webapp_utils/services/user_data_service.dart';
+import 'package:webapp_utils/services/project_data_service.dart';
 
 class WebAppDataBase with ChangeNotifier {
   final WebAppBase app;
   WebAppDataBase(this.app);
 
   final WorkflowStepsMapper stepsMapper = WorkflowStepsMapper();
-  
+
   final Map<String, List<IdElement>> _model = {};
 
   final WorkflowDataService workflowService = WorkflowDataService();
   final SettingsDataService settingsService = SettingsDataService();
   final FileDataService fileService = FileDataService();
+  final UserDataService userService = UserDataService();
+  final ProjectDataService projectService = ProjectDataService();
 
   Timer? _saveTimer;
-  
+
   bool shouldReload = false;
   bool isInit = false;
 
@@ -42,14 +40,16 @@ class WebAppDataBase with ChangeNotifier {
   IdElement get username => IdElement(app.username, app.username);
   IdElement get teamname => IdElement(app.teamname, app.teamname);
 
-  void printModel(){
+  void printModel() {
     print(_model);
   }
 
-
-  Future<void> init(String projectId, String projectName, String username, {String reposJsonPath = "", List<String> settingFiles = const [], String stepMapperJsonFile = ""} ) async{
+  Future<void> init(String projectId, String projectName, String username,
+      {String reposJsonPath = "",
+      List<String> settingFiles = const [],
+      String stepMapperJsonFile = ""}) async {
     _model.clear();
-     
+
     await Future.wait([
       workflowService.init(reposJsonPath: reposJsonPath),
       ProjectUtils().loadFolderStructure(projectId),
@@ -59,79 +59,86 @@ class WebAppDataBase with ChangeNotifier {
 
     await _loadModel();
 
-    _saveTimer ??= Timer.periodic( const Duration(seconds: 5), (timer){
+    _saveTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
       _saveModel();
     });
 
-    isInit = true;    
-    
+    isInit = true;
   }
 
-  
   //==================================================
   // State Files Management
   //==================================================
   Map _idElMapToJson(Map idElMap) {
     Map<String, List> jsonMap = {};
-    for( var entry in idElMap.entries ){
-      
+    for (var entry in idElMap.entries) {
       jsonMap[entry.key] = entry.value.map((e) => e.toString()).toList();
-
     }
     return jsonMap;
-  } 
+  }
 
   Map<String, List<IdElement>> _jsonToIdElMap(Map jsonMap) {
     Map<String, List<IdElement>> idElMap = {};
-    for( var entry in jsonMap.entries ){
-      idElMap[entry.key] = entry.value.map<IdElement>((e) => IdElement(e.split("IdElement").first, e.split("IdElement").last)  ).toList();
+    for (var entry in jsonMap.entries) {
+      idElMap[entry.key] = entry.value
+          .map<IdElement>((e) =>
+              IdElement(e.split("IdElement").first, e.split("IdElement").last))
+          .toList();
     }
     return idElMap;
-  } 
-
-  Future<void> _loadModel() async {
-    if( app.projectId != ""){
-      var projectId = app.projectId;
-      var user = app.username;
-      
-      var folder = await  ProjectUtils().getOrCreateFolder(projectId, user, ".tercen", parentId: "");
-      var viewFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_view_04", parentId: folder.id);
-      var navFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_nav_04", parentId: folder.id);
-
-      _model.addAll(  _jsonToIdElMap(ProjectUtils().getFileContent(viewFile) ) );
-      app.loadPersistentData( _jsonToIdElMap(ProjectUtils().getFileContent(navFile) ) );
-    }
-
   }
 
-  Future<void> _saveModel() async{
-    if( app.projectId != ""){
+  Future<void> _loadModel() async {
+    if (app.projectId != "") {
       var projectId = app.projectId;
       var user = app.username;
-      var folder = await  ProjectUtils().getOrCreateFolder(projectId, user, ".tercen", parentId: "");
-      var viewFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_view_04", parentId: folder.id);
-      var navFile = await ProjectUtils().getOrCreateFile(projectId, user, "${user}_nav_04", parentId: folder.id);
+
+      var folder = await ProjectUtils()
+          .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
+      var viewFile = await ProjectUtils().getOrCreateFile(
+          projectId, user, "${user}_view_04",
+          parentId: folder.id);
+      var navFile = await ProjectUtils().getOrCreateFile(
+          projectId, user, "${user}_nav_04",
+          parentId: folder.id);
+
+      _model.addAll(_jsonToIdElMap(ProjectUtils().getFileContent(viewFile)));
+      app.loadPersistentData(
+          _jsonToIdElMap(ProjectUtils().getFileContent(navFile)));
+    }
+  }
+
+  Future<void> _saveModel() async {
+    if (app.projectId != "") {
+      var projectId = app.projectId;
+      var user = app.username;
+      var folder = await ProjectUtils()
+          .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
+      var viewFile = await ProjectUtils().getOrCreateFile(
+          projectId, user, "${user}_view_04",
+          parentId: folder.id);
+      var navFile = await ProjectUtils().getOrCreateFile(
+          projectId, user, "${user}_nav_04",
+          parentId: folder.id);
 
       await Future.wait([
         ProjectUtils().updateFileContent(viewFile, _idElMapToJson(_model)),
-        ProjectUtils().updateFileContent(navFile, _idElMapToJson(app.getPersistentData()))
-      ]);      
+        ProjectUtils()
+            .updateFileContent(navFile, _idElMapToJson(app.getPersistentData()))
+      ]);
     }
-
   }
 
-
-  String _buildKey( String key, String groupKey ){
+  String _buildKey(String key, String groupKey) {
     return "${groupKey}_$key";
   }
 
-  IdElement getFirstOrEmpty( String key, String groupKey ){
+  IdElement getFirstOrEmpty(String key, String groupKey) {
     key = _buildKey(key, groupKey);
-    
 
-    if( _model.containsKey(key)){
+    if (_model.containsKey(key)) {
       var result = _model[key]!;
-      if( result.isNotEmpty ){
+      if (result.isNotEmpty) {
         return result.first;
       }
     }
@@ -139,51 +146,70 @@ class WebAppDataBase with ChangeNotifier {
     return IdElement("", "");
   }
 
-
-  List<IdElement> getData( String key, String groupKey ){
+  List<IdElement> getData(String key, String groupKey) {
     key = _buildKey(key, groupKey);
     List<IdElement> result = [];
 
-    if( _model.containsKey(key)){
+    if (_model.containsKey(key)) {
       result = _model[key]!;
     }
 
     return result;
   }
 
-
-  void clearData( String key, String groupKey ){
+  void clearData(String key, String groupKey) {
     key = _buildKey(key, groupKey);
-    if( _model.containsKey(key)){
+    if (_model.containsKey(key)) {
       _model.remove(key);
     }
   }
 
-
-  void setData( String key, String groupKey, IdElement value, {bool multiple = false} ){
+  void setData(String key, String groupKey, IdElement value,
+      {bool multiple = false}) {
     key = _buildKey(key, groupKey);
 
-    if( _model.containsKey(key) && multiple){
+    if (_model.containsKey(key) && multiple) {
       var vals = List<IdElement>.from(_model[key]!);
       vals.add(value);
       _model[key] = vals;
-    }else{
+    } else {
       _model[key] = [value];
     }
-
   }
 
+  //==================================================
+  // Project File State Check
+  //==================================================
+  bool hasProject() {
+    return app.projectId != "";
+  }
 
-  
-  Workflow getWorkflow(String key){
-    
-    if( !workflowService.installedWorkflows.containsKey(key)){
+  //-------------------------------------------------------------
+  //DATA FETCH Functions
+  //-------------------------------------------------------------
+
+  Future<List<String>> fetchUserList() async {
+    return await userService.fetchUserList(app.username);
+  }
+
+  Future<void> createOrLoadProject(IdElement projectEl, String username) async {
+    var project = await projectService.doCreateProject(projectEl, username);
+
+    app.projectId = project.id;
+    app.projectName = project.name;
+    app.username = username;
+    app.teamname = project.acl.owner;
+    await init(app.projectId, app.projectName, username);
+  }
+
+  Workflow getWorkflow(String key) {
+    if (!workflowService.installedWorkflows.containsKey(key)) {
       throw Exception("Failed to find workflow with key '$key'");
     }
     return workflowService.installedWorkflows[key]!;
   }
 
-  Future<Workflow> fetchWorkflow(String id) async{
+  Future<Workflow> fetchWorkflow(String id) async {
     var factory = tercen.ServiceFactory();
     return factory.workflowService.get(id);
   }
@@ -191,45 +217,59 @@ class WebAppDataBase with ChangeNotifier {
   Future<List<Workflow>> fetchProjectWorkflows(String projectId) async {
     var projectFiles = ProjectUtils().getProjectFiles();
 
-    var workflowIds = projectFiles.where((e) => e.subKind == "Workflow").map((e) => e.id).toList();
+    var workflowIds = projectFiles
+        .where((e) => e.subKind == "Workflow")
+        .map((e) => e.id)
+        .toList();
     var factory = tercen.ServiceFactory();
 
-    return workflowIds.isEmpty ? [] : await factory.workflowService.list(workflowIds);
+    return workflowIds.isEmpty
+        ? []
+        : await factory.workflowService.list(workflowIds);
   }
 
-
-
-
-  Future<void> projectFilesUpdated() async{
-    ProjectUtils().loadFolderStructure( app.projectId ).then((value) => notifyListeners());
+  Future<void> projectFilesUpdated() async {
+    ProjectUtils()
+        .loadFolderStructure(app.projectId)
+        .then((value) => notifyListeners());
   }
 
-
-  Future<void> reloadProjectFiles() async{
-    await ProjectUtils().loadFolderStructure( app.projectId ).then((value) => notifyListeners());
+  Future<void> reloadProjectFiles() async {
+    await ProjectUtils()
+        .loadFolderStructure(app.projectId)
+        .then((value) => notifyListeners());
   }
 
-  List<Document> getProjectFiles(){
-    return ProjectUtils().folderTreeRoot.getDescendants(folders: true, documents: true).map((e) => e.document).toList();
+  List<Document> getProjectFiles() {
+    return ProjectUtils()
+        .folderTreeRoot
+        .getDescendants(folders: true, documents: true)
+        .map((e) => e.document)
+        .toList();
   }
 
-  Future<IdElementTable> fetchWorkflowImagesSummary( List<String> parentKeys, String groupId ) async {
+  Future<IdElementTable> fetchWorkflowImagesSummary(
+      List<String> parentKeys, String groupId) async {
     var workflowEl = getData(parentKeys.first, groupId).first;
-    
+
     var factory = tercen.ServiceFactory();
     var wkf = await factory.workflowService.get(workflowEl.id);
 
-    return workflowService.fetchWorkflowImages(wkf, contentTypes: ["image", "text"]);
+    return workflowService
+        .fetchWorkflowImages(wkf, contentTypes: ["image", "text"]);
   }
 
-  Future<IdElementTable> fetchWorkflowImagesByWorkflow( Workflow workflow, {List<String> contentTypes = const ["image"], List<String> excludedFiles = const []} ) async {
-    return workflowService.fetchWorkflowImages(workflow, contentTypes: contentTypes, excludedFiles: excludedFiles);
+  Future<IdElementTable> fetchWorkflowImagesByWorkflow(Workflow workflow,
+      {List<String> contentTypes = const ["image"],
+      List<String> excludedFiles = const []}) async {
+    return workflowService.fetchWorkflowImages(workflow,
+        contentTypes: contentTypes, excludedFiles: excludedFiles);
   }
 
   Future<IdElementTable> fetchWorkflowSummary(IdElement workflowEl) async {
-      var factory = tercen.ServiceFactory();
-      var wkf = await factory.workflowService.get(workflowEl.id);
-      return workflowService.fetchWorkflowImages(wkf, contentTypes: ["text"], nameFilter: ["Summary"]);
+    var factory = tercen.ServiceFactory();
+    var wkf = await factory.workflowService.get(workflowEl.id);
+    return workflowService.fetchWorkflowImages(wkf,
+        contentTypes: ["text"], nameFilter: ["Summary"]);
   }
-  
 }

@@ -353,7 +353,7 @@ class WorkflowDataService with DataCache {
     return outTbl;
   }
 
-    bool canCancelWorkflow(IdElementTable row){
+  bool canCancelWorkflow(IdElementTable row){
     return row["status"][0].label != "Done" && row["status"][0].label != "Failed" && row["status"][0].label != "Unknown";
   }
 
@@ -372,5 +372,83 @@ class WorkflowDataService with DataCache {
     await factory.workflowService.delete(workflow.id, workflow.rev);
     
     
+  }
+
+  Future<List<Workflow>> fetchWorkflowsRemote(String projectId) async{
+    var factory = tercen.ServiceFactory();
+    var projObjs = await factory.projectDocumentService.findProjectObjectsByLastModifiedDate(startKey: [projectId, '0000'], endKey: [projectId, '9999']);
+    var workflowIds = projObjs.where((e) => e.subKind == "Workflow").map((e) => e.id).toList();
+
+    return await factory.workflowService.list(workflowIds);
+  }
+
+
+  Future<Map<String, String>> getWorkflowStatus(Workflow workflow) async {
+    var meta = workflow.meta;
+    var results = {"status":"", "error":"", "finished":"true"};
+    results["status"] = "Unknown";
+    
+
+    if(meta.any((e) => e.key == "run.task.id")){
+
+      var factory = tercen.ServiceFactory();
+
+      List<String> currentOnQueuWorkflow = [];
+      List<String> currentOnQueuStep = [];
+      List<State> currentOnQueuStatus = [];
+      var compTasks = await factory.taskService.getTasks(["RunComputationTask"]);
+        for( var ct in compTasks ){
+          if( ct is RunComputationTask){
+            for( var p in ct.environment ){
+              if( p.key == "workflow.id"){
+                currentOnQueuWorkflow.add(p.value);
+              }
+              if( p.key == "step.id"){
+                currentOnQueuStep.add(p.value);
+                currentOnQueuStatus.add(ct.state);
+              }
+            }
+          }
+        }
+      
+      var isRunning = currentOnQueuWorkflow.contains(workflow.id);
+      var isFail = workflow.steps.any((e) => e.state.taskState is FailedState );
+
+
+      if( isFail ){
+        results["status"] = "Failed";
+        results["error"] = meta.firstWhere((e) => e.key.contains("run.error"), orElse: () => Pair.from("", "")).value;
+        if( meta.any((e) => e.key == "run.error.reason")){
+          results["error"] = meta.firstWhere((e) => e.key == "run.error.reason").value;
+        }else{
+          results["error"] = "${results["error"]}\n\nNo Error Details were Provided.";
+        }
+        results["finished"] = isRunning ? "false" : "true";
+      }else{
+        var status = isRunning ? "Running" : "Pending";
+        var allInit = true;
+        var allDone = true;
+        results["finished"] = isRunning ? "false" : "true";
+        
+        for( var s in workflow.steps ){
+          for( var i = 0; i < currentOnQueuStep.length; i++ ){
+            if( currentOnQueuStep[i] == s.id && currentOnQueuWorkflow[i] == workflow.id ){
+              status = currentOnQueuStatus[i] is PendingState ? "Pending" : "Running";
+            }
+          }
+         
+          allInit = allInit && (s.state.taskState is InitState);
+          allDone = allDone && (s.state.taskState is DoneState);
+        }
+        if( allInit  ){
+          status = "Not Started";
+        }
+        if( allDone ){
+          status = "Done";
+        }
+        results["status"] = status;
+      }
+    }
+    return results;
   }
 }

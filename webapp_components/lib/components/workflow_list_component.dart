@@ -1,8 +1,3 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
-import 'dart:html' as html;
-
 import 'package:flutter/material.dart';
 
 import 'package:webapp_components/components/action_list_component.dart';
@@ -10,9 +5,7 @@ import 'package:webapp_components/components/action_list_component.dart';
 
 
 import 'package:webapp_model/id_element_table.dart';
-import 'package:webapp_components/components/list_component.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
-import 'package:webapp_utils/functions/list_utils.dart';
 
 import 'package:webapp_components/widgets/wait_indicator.dart';
 
@@ -100,7 +93,14 @@ class WorkflowListComponent extends ActionListComponent {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(padding: const EdgeInsets.all(50),
-          child: Text(emptyMessage, style: Styles.textH2,),)
+          child: Row(
+            children: [
+              TercenWaitIndicator().indicator,
+              SizedBox(width: 10,),
+              Text(emptyMessage, style: Styles.textH2,)
+            ],
+          )
+          ,)
         ],
       );
       wdgList.add(emptyRow);
