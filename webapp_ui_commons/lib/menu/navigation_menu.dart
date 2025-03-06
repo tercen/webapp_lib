@@ -114,8 +114,11 @@ class NavigationMenu with ChangeNotifier {
     );
   }
 
-  Widget buildMenuWidget() {
+  Widget buildMenuWidget({Widget? banner}) {
     List<Widget> entries = [];
+    if( banner != null ){
+      entries.add(banner);
+    }
     for (var i = 0; i < _menuItems.length; i++) {
       var item = _menuItems[i];
       if (item.label == "") {
@@ -132,6 +135,8 @@ class NavigationMenu with ChangeNotifier {
     for (var entry in _menuLinks.entries) {
       entries.add(_createExitButton(entry.key, entry.value));
     }
+
+
 
     return SizedBox.expand(
       child: SingleChildScrollView(child: Column(children: entries)),

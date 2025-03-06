@@ -219,8 +219,7 @@ class WebAppBase with ChangeNotifier {
       child: Container(
         color: Colors.white,
         child: Align(
-            alignment: Alignment.topLeft, child: 
-                Column( children: [banner, SizedBox(height: 50,), navMenu.buildMenuWidget()] )
+            alignment: Alignment.topLeft, child: navMenu.buildMenuWidget(banner: banner)
           ),
       ),
       // ),
