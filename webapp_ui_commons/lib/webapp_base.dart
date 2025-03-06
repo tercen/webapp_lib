@@ -15,7 +15,7 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_model/id_element.dart';
 import 'package:webapp_ui_commons/menu/menu_item.dart';
-import 'package:webapp_ui_commons/menu/naviagtion_menu.dart';
+import 'package:webapp_ui_commons/menu/navigation_menu.dart';
 
 import 'package:sci_http_client/http_auth_client.dart' as auth_http;
 
