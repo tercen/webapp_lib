@@ -140,15 +140,21 @@ class NavigationMenu with ChangeNotifier {
       entries.add(_createExitButton(entry.key, entry.value));
     }
 
-    entries.add( Expanded(child: Container()) );
+    
     entries.add( Text("Test") );
 
-    return SizedBox.expand(
+    Widget w1 = SizedBox.expand(
       child: SingleChildScrollView(child: Column(children: entries)),
-    ); 
-    // return Column(
-    //   children: entries,
-    // );
+    );
+    Widget w2 = Text("data");
+
+    return  Column(
+      children: [
+        Expanded(child: w1),
+        w2
+      ],
+    );
+    
   }
 
   void toggle(int index) {
