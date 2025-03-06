@@ -9,6 +9,7 @@ class NavigationMenu with ChangeNotifier {
   final Map<String, String> _menuLinks = {};
   String project = "";
   String user = "";
+  String team = "";
   String webApp = "";
   
 
@@ -141,20 +142,57 @@ class NavigationMenu with ChangeNotifier {
     }
 
     
-    entries.add( Text("Test") );
 
-    Widget w1 = SizedBox.expand(
+    Widget entriesWdg = SizedBox.expand(
       child: SingleChildScrollView(child: Column(children: entries)),
     );
-    Widget w2 = Text("data");
+  
+    var infoEntries = createInfoWidgets();
+
+
 
     return  Column(
       children: [
-        Expanded(child: Container(color: Colors.amber, child: w1)),
-        w2
+        Expanded(child: Container( child: entriesWdg )),
+        infoEntries
       ],
     );
     
+  }
+
+  Widget createInfoWidgets(){
+   List<Widget> infoEntries = [];
+    if( project != "" ){
+      infoEntries.add(
+        Text("Project: $project", style: Styles()["gray"],)
+      );
+    }else{
+      infoEntries.add(
+        Text("No project loaded", style: Styles()["gray"],)
+      );
+    }
+
+    if( team != ""){
+      infoEntries.add(
+        Text("$team($user)", style: Styles()["gray"],)
+      );
+    }else{
+      infoEntries.add(
+        Text("$user", style: Styles()["gray"],)
+      );
+    }
+
+    if( webApp != ""){
+      infoEntries.add(
+        Text("App: $webApp", style: Styles()["gray"],)
+      );
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: infoEntries,
+    );
   }
 
   void toggle(int index) {
