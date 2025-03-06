@@ -7,6 +7,10 @@ class NavigationMenu with ChangeNotifier {
   String selectedScreen = "";
   final List<MenuItem> _menuItems = [];
   final Map<String, String> _menuLinks = {};
+  String project = "";
+  String user = "";
+  String webApp = "";
+  
 
   NavigationMenu();
 
@@ -137,6 +141,7 @@ class NavigationMenu with ChangeNotifier {
     }
 
 
+    entries.add(Column(mainAxisAlignment: MainAxisAlignment.end, children: [ Text("Test")],));
 
     return SizedBox.expand(
       child: SingleChildScrollView(child: Column(children: entries)),
