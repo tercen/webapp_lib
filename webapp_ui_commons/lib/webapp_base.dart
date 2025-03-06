@@ -249,7 +249,7 @@ class WebAppBase with ChangeNotifier {
       //   title: banner,
       // ),
       body: SafeArea(
-        right: true,
+        right: false,
         child: CustomScrollView(
           clipBehavior: Clip.none,
           slivers: [
