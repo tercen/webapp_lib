@@ -242,9 +242,9 @@ class WebAppBase with ChangeNotifier {
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [leftPanelWidget, 
-        SizedBox(width: 4, child: Container(color: Styles()["white"],),),
+        SizedBox(width: 4, child: Container(color: Colors.white,),),
           SizedBox(width: 1, child: Container(color: Styles()["gray"],),),
-        SizedBox(width: 4, child: Container(color: Styles()["white"],),),
+        SizedBox(width: 4, child: Container(color: Colors.white,),),
          contentPanelWidget]);
 
     return Scaffold(
