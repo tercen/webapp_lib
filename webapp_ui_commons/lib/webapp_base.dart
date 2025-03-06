@@ -240,7 +240,7 @@ class WebAppBase with ChangeNotifier {
     Widget wdg = Row(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
-        children: [leftPanelWidget, contentPanelWidget]);
+        children: [leftPanelWidget, SizedBox(width: 2, child: Container(color: Colors.amber,),) contentPanelWidget]);
 
     return Scaffold(
       backgroundColor: Colors.white,
