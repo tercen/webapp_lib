@@ -219,7 +219,9 @@ class WebAppBase with ChangeNotifier {
       child: Container(
         color: Colors.white,
         child: Align(
-            alignment: Alignment.topLeft, child: navMenu.buildMenuWidget()),
+            alignment: Alignment.topLeft, child: 
+                Column( children: [banner, SizedBox(height: 50,), navMenu.buildMenuWidget()] )
+          ),
       ),
       // ),
     );
@@ -241,13 +243,13 @@ class WebAppBase with ChangeNotifier {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        toolbarHeight: 125,
-        titleSpacing: 0,
-        title: banner,
-      ),
+      // appBar: AppBar(
+      //   toolbarHeight: 125,
+      //   titleSpacing: 0,
+      //   title: banner,
+      // ),
       body: SafeArea(
-        right: false,
+        right: true,
         child: CustomScrollView(
           clipBehavior: Clip.none,
           slivers: [
