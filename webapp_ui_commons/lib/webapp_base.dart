@@ -26,6 +26,8 @@ class WebAppBase with ChangeNotifier {
   String projectHref = "";
   String username = "";
   String teamname = "";
+  String appName = "";
+  String appVersion = "";
   
 
   // String selectedScreen = "";
