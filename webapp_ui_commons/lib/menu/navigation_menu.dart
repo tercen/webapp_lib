@@ -143,7 +143,8 @@ class NavigationMenu with ChangeNotifier {
 
     // entries.add(Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.end, children: [ Text("Test")],));
 
-    return Column(
+    return Expanded(child: 
+    Column(
       children: [
         Align(
           alignment: Alignment.topLeft,
@@ -156,7 +157,7 @@ class NavigationMenu with ChangeNotifier {
           child: Text("TEST"),
         )
       ],
-    ); ;
+    )); ;
     // return Column(
     //   children: entries,
     // );
