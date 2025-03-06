@@ -18,6 +18,7 @@ import 'package:webapp_ui_commons/menu/menu_item.dart';
 import 'package:webapp_ui_commons/menu/navigation_menu.dart';
 
 import 'package:sci_http_client/http_auth_client.dart' as auth_http;
+import 'package:webapp_ui_commons/styles/styles.dart';
 
 class WebAppBase with ChangeNotifier {
   bool isInitialized = false;
@@ -240,7 +241,11 @@ class WebAppBase with ChangeNotifier {
     Widget wdg = Row(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
-        children: [leftPanelWidget, SizedBox(width: 2, child: Container(color: Colors.amber,),), contentPanelWidget]);
+        children: [leftPanelWidget, 
+        SizedBox(width: 4, child: Container(color: Styles()["white"],),),
+          SizedBox(width: 1, child: Container(color: Styles()["gray"],),),
+        SizedBox(width: 4, child: Container(color: Styles()["white"],),),
+         contentPanelWidget]);
 
     return Scaffold(
       backgroundColor: Colors.white,
