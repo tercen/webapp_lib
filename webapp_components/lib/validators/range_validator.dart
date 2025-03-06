@@ -1,5 +1,5 @@
 import 'package:webapp_components/validators/numeric_validator.dart';
-import 'package:webapp_components/validators/validator_base.dart';
+
 
 class RangeValidator extends NumericValidator{
   final int min;
@@ -7,7 +7,7 @@ class RangeValidator extends NumericValidator{
   final int max;
   final bool inclusiveMax;
   
-  RangeValidator(super.id, this.min, this.max, {this.inclusiveMin = true, this.inclusiveMax = true }){
+  RangeValidator(this.min, this.max, {this.inclusiveMin = true, this.inclusiveMax = true }){
     var gt = inclusiveMin ? ">=" : ">";
     var lt = inclusiveMax ? "<=" : "<";
     super.invalidMessage = "Value must be $min $gt |@| $lt $max";

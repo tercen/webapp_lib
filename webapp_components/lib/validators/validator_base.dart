@@ -1,8 +1,7 @@
 class ValidatorBase {
-  final String id;
   String invalidMessage;
 
-  ValidatorBase(this.id, {this.invalidMessage = "Input |@| is invalid."});
+  ValidatorBase({this.invalidMessage = "Input |@| is invalid."});
   
   bool isValid( String value ){
     throw Exception("isValid is not implemented for ValidatorBase");
