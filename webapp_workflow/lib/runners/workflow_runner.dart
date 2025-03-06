@@ -41,6 +41,7 @@ class WorkflowRunner with ProgressDialog {
   final Map<String, String> tableNameMap = {};
   final Map<String, String> gatherMap = {};
   final Map<String, String> multiDsMap = {};
+  final Map<String, String> filterValueUpdate = {};
   
   final List<StepSetting> settings = [];
   final List<PostRunCallback> postRunCallbacks = [];
@@ -78,6 +79,11 @@ class WorkflowRunner with ProgressDialog {
   /// Useful when the same setting repeats across steps (e.g. seed)
   void addSettingByName(String settingName, String settingValue ){
     settingsByName.add(sci.Pair.from(settingName, settingValue) );
+  }
+
+  void updateFilterValue(String filterName, String factor, String newValue ){
+    var key = "$filterName|@|$factor";
+    filterValueUpdate[key] = newValue;
   }
 
   void setNewWorkflowName( String name ){
@@ -422,6 +428,25 @@ class WorkflowRunner with ProgressDialog {
   }
 
 
+  sci.DataStep updateFilterValues(sci.DataStep step){
+
+    for( var filter in step.model.filters.namedFilters ){
+      var filters = filterValueUpdate.entries.where((e) => e.key.contains(filter.name) ).toList();
+      if(  filters.isNotEmpty ){
+        for( var f in filter.filterExprs ){
+          var fExpr = f as sci.FilterExpr;
+          var filterExprs = filters.where((e) => e.key.contains(f.factor.name) ).toList();
+          if(filterExprs.isNotEmpty ){
+            for( var fe in filterExprs ){
+              fExpr.stringValue = fe.value;
+            }
+          }
+        }
+      }
+    }
+    return step;
+  }
+
   Future<void> setupRun(BuildContext context) async {
     if( !isInit ){
       if( template.id == ""){
@@ -458,7 +483,8 @@ class WorkflowRunner with ProgressDialog {
           //-----------------------------------------
           for (var stp in workflow.steps) {
             if (stp.kind == "DataStep") {
-              stp = updateOperatorSettings(stp as sci.DataStep, settings);
+              stp = updateFilterValues(stp as sci.DataStep);
+              stp = updateOperatorSettings(stp, settings);
               stp = updateOperatorSettingsByName(stp, settingsByName);
             }
 
