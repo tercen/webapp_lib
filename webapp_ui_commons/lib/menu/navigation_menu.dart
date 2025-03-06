@@ -150,7 +150,7 @@ class NavigationMenu with ChangeNotifier {
 
     return  Column(
       children: [
-        Expanded(child: w1),
+        Expanded(child: Container(color: Colors.amber, child: w1)),
         w2
       ],
     );
