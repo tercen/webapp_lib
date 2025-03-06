@@ -67,7 +67,7 @@ class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implement
 
     var expTile = ExpansionTile(
       key: GlobalKey(),
-      title: Text(title, style: Styles.textH2,),
+      title: Text(title, style: Styles()["textH2"],),
       controller: expansionControllers.last,
       children: [wdg],
     );

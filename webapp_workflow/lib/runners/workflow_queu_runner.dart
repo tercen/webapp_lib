@@ -126,7 +126,7 @@ class WorkflowQueuRunner extends WorkflowRunner{
         webBgColor: "linear-gradient(to bottom, #aaaaff, #eeeeaff)",
         timeInSecForIosWeb: 5,
         backgroundColor: Colors.lightBlue[100],
-        textColor: Styles.black,
+        textColor: Styles()["black"],
         fontSize: 16.0
     );
 

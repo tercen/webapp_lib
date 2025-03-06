@@ -21,7 +21,7 @@ class Action {
   Widget build() {
     bool enabled = enabledCallback != null ? enabledCallback!() : true;
     return ElevatedButton(
-      style: enabled ? Styles.buttonEnabled : Styles.buttonDisabled,
+      style: enabled ? Styles()["buttonEnabled"] : Styles()["buttonDisabled"],
       onPressed: () {
         if (enabled) {
           actionCallback();
@@ -29,7 +29,7 @@ class Action {
       },
       child: Text(
         actionName,
-        style: Styles.textButton,
+        style: Styles()["textButton"],
       ),
     );
   }
@@ -214,7 +214,7 @@ mixin ScreenBase {
 
   Widget _buildLabel(Component comp) {
     
-    var style = Styles.textH2;
+    var style = Styles()["textH2"];
     if( comp is InputValidator ){
       var validateResults = (comp as InputValidator).results;
 
@@ -233,7 +233,7 @@ mixin ScreenBase {
     }
     return Text(
       comp.label(),
-      style: Styles.textH2,
+      style: Styles()["textH2"],
     );
   }
 
@@ -358,7 +358,7 @@ mixin ScreenBase {
         widgetRows.add(ExpansionTile(
           title: Text(
             blockOrder[bi],
-            style: Styles.textH2,
+            style: Styles()["textH2"],
           ),
           initiallyExpanded: blockType == ComponentBlockType.expanded,
           children: blockWidgets,

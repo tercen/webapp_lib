@@ -151,14 +151,14 @@ class SelectableListComponent
         Flexible(
             child: Text(
           name,
-          style: Styles.text,
+          style: Styles()["text"],
         )),
       ],
     );
 
     return Container(
       constraints: const BoxConstraints(minHeight: 45),
-      color: isEven ? Styles.evenRow : Styles.oddRow,
+      color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
       child: rowWdg,
     );
   }

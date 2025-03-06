@@ -18,12 +18,12 @@ class NavigationMenu with ChangeNotifier {
     bool isSelected = item.label == selectedScreen;
 
     var bgColor =
-        item.isEnabled() && isSelected ? Styles.selectedMenuBg : Colors.white;
-    var textStyle = isSelected ? Styles.menuTextSelected : Styles.menuText;
+        item.isEnabled() && isSelected ? Styles()["selectedMenuBg"] : Colors.white;
+    var textStyle = isSelected ? Styles()["menuTextSelected"] : Styles()["menuText"];
 
     var padding = const EdgeInsets.symmetric(vertical: 5, horizontal: 5);
     if (!item.isEnabled()) {
-      textStyle = Styles.menuTextDisabled;
+      textStyle = Styles()["menuTextDisabled"];
     }
 
     var inkWll = InkWell(
@@ -85,11 +85,11 @@ class NavigationMenu with ChangeNotifier {
           children: [
             Text(
               label,
-              style: Styles.textHref,
+              style: Styles()["textHref"],
             ),
-            const Icon(
+            Icon(
               Icons.exit_to_app_outlined,
-              color: Styles.linkBLue,
+              color: Styles()["linkBlue"],
             )
           ],
         ));
@@ -105,7 +105,7 @@ class NavigationMenu with ChangeNotifier {
         ),
         Container(
           height: 1,
-          color: Colors.black26,
+          color: Styles()["lightBlack"],
         ),
         SizedBox(
           height: 3,

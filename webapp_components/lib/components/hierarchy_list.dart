@@ -186,7 +186,7 @@ class HierarchyList extends ComponentInfoBox {
   }
 
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
-    var clr = isEven ? Styles.evenRow : Styles.oddRow;
+    var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
     var row = Row(mainAxisSize: MainAxisSize.min, children: [
       Container(
         constraints: BoxConstraints(minWidth: level * 50),

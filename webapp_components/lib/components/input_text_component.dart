@@ -51,9 +51,9 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
         onTapOutside: (event) {
           
         },
-        style: Styles.text,
+        style: Styles()["text"],
         decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: Styles.borderRounding),
+          border: OutlineInputBorder(borderRadius: Styles()["borderRounding"]),
         )))
     ;
   }

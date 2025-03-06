@@ -54,9 +54,9 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
             }
             notifyListeners();
           },
-          child: const Row(
+          child: Row(
             children: [
-              Text("Select file    ", style: Styles.text,),
+              Text("Select file    ", style: Styles()["text"],),
               Icon(Icons.add_circle_outline_rounded)
             ],
           ),
@@ -87,12 +87,12 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
                           notifyListeners();                         
                         },
                     ), 
-            Text(filesToUpload[i].filename, style: Styles.text)
+            Text(filesToUpload[i].filename, style: Styles()["text"])
           ],
         );           
         wdgList.add(entry);
       }else{
-        wdgList.add(Text(filesToUpload[i].filename, style: Styles.text));
+        wdgList.add(Text(filesToUpload[i].filename, style: Styles()["text"]));
       }
     }
 
@@ -163,13 +163,13 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
     if( showUploadButton ){
       return ElevatedButton(
       style: isEnabled
-          ? Styles.buttonEnabled
-          : Styles.buttonDisabled,
+          ? Styles()["buttonEnabled"]
+          : Styles()["buttonDisabled"],
       onPressed: () async{
         isEnabled ? await doUpload(context) : null;
         notifyListeners();
       }, 
-      child: const Text("Upload", style: Styles.textButton,));
+      child:  Text("Upload", style: Styles()["textButton"],));
 
     }else{
       return Container();

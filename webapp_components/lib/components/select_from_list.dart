@@ -39,7 +39,7 @@ class SelectFromListComponent with ChangeNotifier, ComponentBase implements Sing
       selectedUser != "" 
           ? Text(
               selectedUser,
-              style: Styles.text,
+              style: Styles()["text"],
             )
           : Container()
     ]);

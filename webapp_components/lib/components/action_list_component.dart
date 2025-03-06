@@ -79,7 +79,7 @@ class ActionListComponent extends ListComponent {
         constraints: const BoxConstraints(minHeight: 50),
         child:Row(
           children: [
-            Text(headerName.toUpperCase(), style: Styles.textH2,),
+            Text(headerName.toUpperCase(), style: Styles()["textH2"],),
             sortIcon
           ],
         ));
@@ -120,7 +120,7 @@ class ActionListComponent extends ListComponent {
 
     var actionCell =  Expanded(
       flex: colWidths.last,
-      child: const Center(child:Text("ACTIONS", style: Styles.textH2))
+      child: Center(child:Text("ACTIONS", style: Styles()["textH2"]))
     );
     headerCells.add(actionCell);
     return Row(
@@ -136,7 +136,7 @@ class ActionListComponent extends ListComponent {
     List<Widget> cells = [];
     for( var i = 0; i < columnList.length; i++ ){
       // var st = Styles.text.merge(TextStyle(color: textColor));
-      var st = Styles.text;
+      var st = Styles()["text"];
 
       cells.add(Expanded(
         flex: colWidths[i],
@@ -185,7 +185,7 @@ class ActionListComponent extends ListComponent {
 
 
     return Container(
-      color: isEven ? Styles.evenRow : Styles.oddRow,
+      color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
       constraints: const BoxConstraints(minHeight: 30),
       child: row);
   }
@@ -243,7 +243,7 @@ class ActionListComponent extends ListComponent {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(padding: const EdgeInsets.all(50),
-          child: Text(emptyMessage, style: Styles.textH2,),)
+          child: Text(emptyMessage, style: Styles()["textH2"],),)
         ],
       );
       wdgList.add(emptyRow);
@@ -275,7 +275,7 @@ class ActionListComponent extends ListComponent {
             expandedRows.remove(i);
           }
         },
-        children: [SelectableText(errorMessage, style: Styles.textFile) ],
+        children: [SelectableText(errorMessage, style: Styles()["textFile"]) ],
       );
     
     

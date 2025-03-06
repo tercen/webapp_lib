@@ -99,10 +99,10 @@ mixin CheckboxHerarchicalList on HierarchyList, ChangeNotifier {
             child: checkBoxWidget(id, name, row, level, isElSelected)),
         Container(
           height: 20,
-          color: isEven ? Styles.evenRow : Styles.oddRow,
+          color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
           child: Text(
             name,
-            style: Styles.text,
+            style: Styles()["text"],
           ),
         )
       ],

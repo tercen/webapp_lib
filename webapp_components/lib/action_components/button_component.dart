@@ -21,8 +21,8 @@ class ButtonActionComponent implements ActionComponent {
   Widget buildContent(BuildContext context) {
     bool btnEnabled = isEnabled();
     return ElevatedButton( style: btnEnabled
-                        ? Styles.buttonEnabled
-                        : Styles.buttonDisabled,
+                        ? Styles()["buttonEnabled"]
+                        : Styles()["buttonDisabled"],
                     onPressed: () async {
                       btnEnabled
                           ? _doAction() // Change function here
@@ -30,7 +30,7 @@ class ButtonActionComponent implements ActionComponent {
                     },
                     child: Text(
                       componentLabel,
-                      style: Styles.textButton,
+                      style: Styles()["textButton"],
                     ));
   }
 

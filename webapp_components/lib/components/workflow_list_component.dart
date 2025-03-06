@@ -97,7 +97,7 @@ class WorkflowListComponent extends ActionListComponent {
             children: [
               TercenWaitIndicator().indicator,
               SizedBox(width: 10,),
-              Text(emptyMessage, style: Styles.textH2,)
+              Text(emptyMessage, style: Styles()["textH2"],)
             ],
           )
           ,)
@@ -117,11 +117,11 @@ class WorkflowListComponent extends ActionListComponent {
   @override
   Widget createEntry(List<dynamic> values, List<ListAction> actions, int rowIdx, IdElementTable rowValues){
     var isEven = rowIdx % 2 == 0;
-    var textColor = rowValues[detailColumn].first.label == "" ? Styles.black : const Color.fromARGB(255, 255, 37, 37);
+    var textColor = rowValues[detailColumn].first.label == "" ? Styles()["black"] : Styles()["red"];
     
     List<Widget> cells = [];
     for( var i = 0; i < columnList.length; i++ ){
-      var st = Styles.text.merge(TextStyle(color: textColor));
+      var st = Styles()["text"].merge(TextStyle(color: textColor));
 
       cells.add(Expanded(
         flex: colWidths[i],
@@ -173,7 +173,7 @@ class WorkflowListComponent extends ActionListComponent {
 
 
     return Container(
-      color: isEven ? Styles.evenRow : Styles.oddRow,
+      color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
       constraints: const BoxConstraints(minHeight: 30),
       child: row);
   }
@@ -204,7 +204,7 @@ class WorkflowListComponent extends ActionListComponent {
         children: [
           Padding(padding: EdgeInsets.fromLTRB(20, 5, 20, 10),
           child:
-          SelectableText("$errorMessage\n\nLink to Workflow:\n$baseUrl/w/$workflowId", style: Styles.textFile) )
+          SelectableText("$errorMessage\n\nLink to Workflow:\n$baseUrl/w/$workflowId", style: Styles()["textFile"]) )
           ],
       );
     

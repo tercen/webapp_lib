@@ -20,9 +20,9 @@ class MultiLineInputTextComponent extends InputTextComponent {
                 func();
               }
             },
-            style: Styles.text,
+            style: Styles()["text"],
             decoration: InputDecoration(
-              border: OutlineInputBorder(borderRadius: Styles.borderRounding),
+              border: OutlineInputBorder(borderRadius: Styles()["borderRounding"]),
             )));
   }
 }

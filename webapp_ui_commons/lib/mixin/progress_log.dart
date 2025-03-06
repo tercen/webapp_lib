@@ -46,7 +46,7 @@ mixin ProgressDialog {
             //   }
             // });
             return AlertDialog(
-              title: Text(title, style: Styles.textH2,),
+              title: Text(title, style: Styles()["textH2"],),
               content:   _buildMessageWidget(),
             );
           });
@@ -66,7 +66,7 @@ mixin ProgressDialog {
       children: [
         Text(
           _message.message,
-          style: Styles.text,
+          style: Styles()["text"],
         ),
         Padding(
           padding: const EdgeInsets.all(30),

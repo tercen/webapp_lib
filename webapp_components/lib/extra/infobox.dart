@@ -37,9 +37,9 @@ class InfoBoxBuilder with ChangeNotifier {
                 child: TercenWaitIndicator().indicator,
               ),
 
-              const Align(
+              Align(
                 alignment: Alignment.center,
-                child: Text("Loading", style: Styles.text,),
+                child: Text("Loading", style: Styles()["text"],),
               )
             ],
           );
@@ -51,7 +51,7 @@ class InfoBoxBuilder with ChangeNotifier {
     var dialog = AlertDialog(
       title:  Text(
         idEl.label,
-        style: Styles.textH1,
+        style: Styles()["textH1"],
       ),
       content: Container(
         constraints: const BoxConstraints( maxHeight: 700, maxWidth: 1200),

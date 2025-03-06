@@ -75,7 +75,7 @@ class MultiSelectTableComponent
                       children: [
                         Text(
                           text,
-                          style: Styles.textBold,
+                          style: Styles()["textBold"],
                         ),
                         sortingIcon
                       ],
@@ -199,14 +199,14 @@ class MultiSelectTableComponent
           );
     selectedWidget = wrapSelectable(selectedWidget, rowEls);
 
-    var rowDecoration = const BoxDecoration(color: Colors.white);
+    var rowDecoration = BoxDecoration(color: Styles()["white"]);
     if (rowIndex > -1) {
       if (rowIndex == currentRow) {
-        rowDecoration = const BoxDecoration(color: Styles.hoverBg);
+        rowDecoration =  BoxDecoration(color: Styles()["hoverBg"]);
       } else {
         rowDecoration = rowIndex % 2 == 0
-            ? const BoxDecoration(color: Styles.evenRow)
-            : const BoxDecoration(color: Styles.oddRow);
+            ? BoxDecoration(color: Styles()["evenRow"])
+            : BoxDecoration(color: Styles()["oddRow"]);
       }
     }
 
@@ -219,7 +219,7 @@ class MultiSelectTableComponent
                     alignment: Alignment.centerLeft,
                     child: Text(
                       el.label,
-                      style: Styles.text,
+                      style: Styles()["text"],
                     ))),
             rowEls),
       );

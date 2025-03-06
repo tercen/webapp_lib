@@ -33,14 +33,14 @@ class TercenWaitIndicator {
         children: [
           Text(
             prefixMsg,
-            style: Styles.text,
+            style: Styles()["text"],
           ),
           prefixMsg != "" ? const SizedBox(width: 10,) : Container(),
           SizedBox(width: 25, height: 25, child: _indicator),
           suffixMsg != "" ? const SizedBox(width: 10,) : Container(),
           Text(
             suffixMsg,
-            style: Styles.text,
+            style: Styles()["text"],
           ),
         ],
       ),

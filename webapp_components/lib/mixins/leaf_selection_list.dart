@@ -37,7 +37,7 @@ mixin LeafSelectionList on HierarchyList, ComponentInfoBox, ChangeNotifier {
       alignment: Alignment.centerLeft,
       child: Text(
         name,
-        style: Styles.textH2,
+        style: Styles()["textH2"],
       ),
     );
   }
@@ -63,7 +63,7 @@ mixin LeafSelectionList on HierarchyList, ComponentInfoBox, ChangeNotifier {
           alignment: Alignment.centerLeft,
           child: Text(
             name.split("/").last,
-            style: Styles.text,
+            style: Styles()["text"],
           ),
         )
       ],

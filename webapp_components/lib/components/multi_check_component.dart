@@ -52,7 +52,7 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
 
     return Row(children: [
       checkIcon,
-      Text(name, style: Styles.text,)
+      Text(name, style: Styles()["text"],)
     ],);
 }
 
@@ -85,7 +85,7 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
 
     return Row(children: [
       checkIcon,
-      Text("Select All", style: Styles.text,)
+      Text("Select All", style: Styles()["text"],)
     ],);
 }
 

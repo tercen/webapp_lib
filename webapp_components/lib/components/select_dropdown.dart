@@ -21,7 +21,7 @@ class SelectDropDownComponent
   @override
   Widget buildContent(BuildContext context) {
     var wdg = DropdownButton(
-        borderRadius: Styles.borderRounding,
+        borderRadius: Styles()["borderRounding"],
         value: selected,
         icon: const Icon(Icons.arrow_downward),
         focusColor: Colors.transparent,
@@ -30,7 +30,7 @@ class SelectDropDownComponent
             value: value,
             child: Text(
               value.label,
-              style: Styles.text,
+              style: Styles()["text"],
             ),
           );
         }).toList(),
