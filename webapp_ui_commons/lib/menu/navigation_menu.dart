@@ -141,11 +141,22 @@ class NavigationMenu with ChangeNotifier {
     }
 
 
-    entries.add(Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.end, children: [ Text("Test")],));
+    // entries.add(Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.end, children: [ Text("Test")],));
 
-    return SizedBox.expand(
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox.expand(
       child: SingleChildScrollView(child: Column(children: entries)),
-    );
+    ),
+        ),
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: Text("TEST"),
+        )
+      ],
+    ); ;
     // return Column(
     //   children: entries,
     // );
