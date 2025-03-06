@@ -140,24 +140,12 @@ class NavigationMenu with ChangeNotifier {
       entries.add(_createExitButton(entry.key, entry.value));
     }
 
+    entries.add( Expanded(child: Container()) );
+    entries.add( Text("Test") );
 
-    // entries.add(Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.end, children: [ Text("Test")],));
-
-    return Expanded(child: 
-    Column(
-      children: [
-        Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox.expand(
+    return SizedBox.expand(
       child: SingleChildScrollView(child: Column(children: entries)),
-    ),
-        ),
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: Text("TEST"),
-        )
-      ],
-    )); ;
+    ); 
     // return Column(
     //   children: entries,
     // );
