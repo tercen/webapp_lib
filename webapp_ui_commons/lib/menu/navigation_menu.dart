@@ -141,7 +141,7 @@ class NavigationMenu with ChangeNotifier {
     }
 
 
-    entries.add(Column(mainAxisAlignment: MainAxisAlignment.end, children: [ Text("Test")],));
+    entries.add(Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.end, children: [ Text("Test")],));
 
     return SizedBox.expand(
       child: SingleChildScrollView(child: Column(children: entries)),
