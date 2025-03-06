@@ -278,7 +278,11 @@ class UploadFileComponent with ChangeNotifier, ComponentBase, ProgressDialog imp
 
   @override
   bool isFulfilled() {
-    return filesToUpload.isNotEmpty;
+    if( showUploadButton == true ){
+      return uploadedFiles.isNotEmpty;
+    }else{
+      return filesToUpload.isNotEmpty && filesToUpload[0].filename != "Drag Files Here";
+    }
   }
 
   @override
