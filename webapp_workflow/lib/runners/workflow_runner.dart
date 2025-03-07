@@ -327,7 +327,7 @@ class WorkflowRunner with ProgressDialog {
     
     var factors = convertToStepFactors(keys, getFactorNames(stepId));
     var filterKey = "$stepId$filterName";
-    print("Adding andFilter to filter key $filterKey");
+
     sci.Filter andFilter = sci.Filter()
       ..logical = "and"
       ..not = false;
@@ -340,7 +340,6 @@ class WorkflowRunner with ProgressDialog {
     }
 
     if (!filterMap.containsKey(filterKey)) {
-      print("\tMap does not contain key. Creating.");
       sci.NamedFilter namedFilter = sci.NamedFilter()
         ..logical = "or"
         ..not = false
@@ -351,7 +350,6 @@ class WorkflowRunner with ProgressDialog {
       filters.namedFilters.add(namedFilter);
       filterMap[filterKey] = namedFilter; //filters;
     } else {
-      print("\tMap already contains key. Updating.");
       sci.NamedFilter namedFilter = filterMap[filterKey]!;
       namedFilter.filterExprs.add(andFilter);
       filterMap[filterKey] = namedFilter;
@@ -433,7 +431,7 @@ class WorkflowRunner with ProgressDialog {
 
 
   sci.DataStep updateFilterValues(sci.DataStep step){
-// var key = "$filterName|@|$factor";
+    // var key = "$filterName|@|$factor";
     print("Updating filter values");
     for( var filter in step.model.filters.namedFilters ){
       var filters = filterValueUpdate.entries.where((e) => e.key.contains(filter.name) ).toList();
@@ -500,7 +498,6 @@ class WorkflowRunner with ProgressDialog {
               
               for( var mapEntry in filterMap.entries ){
                 if( mapEntry.key.contains(stp.id)){
-                  print("Adding filter ${mapEntry.value.name} to step ${stp.name}");
                   stp.model.filters.namedFilters.add(mapEntry.value);
                 }
               }
