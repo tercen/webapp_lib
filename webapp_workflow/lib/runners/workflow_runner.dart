@@ -547,16 +547,19 @@ class WorkflowRunner with ProgressDialog {
           }
 
           workflow.name = getWorkflowName(workflow);
-
-
           workflow.acl = sci.Acl()..owner = teamName;
-          // workflow.id = "";
-          // workflow.rev = "";
-
           workflow.isHidden = false;
           workflow.isDeleted = false;
 
-          await factory.workflowService.update(workflow);
+          if( workflow.id == "" || workflow.rev == ""){
+            workflow.id = "";
+            workflow.rev = "";
+
+            workflow = await factory.workflowService.create(workflow);
+          }else{
+            await factory.workflowService.update(workflow);
+            workflow = await factory.workflowService.get(workflow.id);
+          }
           workflowId = workflow.id;
           isInit = true;
     }
