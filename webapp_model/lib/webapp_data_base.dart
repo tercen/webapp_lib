@@ -238,6 +238,10 @@ class WebAppDataBase with ChangeNotifier {
     await ProjectUtils()
         .loadFolderStructure(app.projectId)
         .then((value) => notifyListeners());
+
+    app.navMenu.project = app.projectName;
+    app.navMenu.user = app.username;
+    app.navMenu.team = app.teamname;
   }
 
   List<Document> getProjectFiles() {
