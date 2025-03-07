@@ -650,8 +650,6 @@ class WorkflowRunner with ProgressDialog {
     await setupRun(context);
     var runTitle = getWorkflowName(template);
 
-    return sci.Workflow();
-
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
