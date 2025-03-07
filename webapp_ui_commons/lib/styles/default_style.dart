@@ -15,7 +15,7 @@ class DefaultStyle extends StyleBase {
     styleMap["red"] = Color.fromARGB(255, 255, 37, 37);
 
     styleMap["selectedBg"] = Color.fromARGB(255, 101, 155, 255);
-    styleMap["selectedMenuBg"] = Color.fromARGB(255, 51, 65, 85);
+    styleMap["selectedMenuBg"] = Color.fromARGB(255, 103, 153, 178);
     styleMap["selectedMenuFg"] = Color.fromARGB(255, 240, 240, 230);
     styleMap["hoverBg"] = Color.fromARGB(100, 175, 172, 221);
     styleMap["tooltipBg"] = Color.fromARGB(199, 14, 11, 62);
@@ -106,9 +106,10 @@ class DefaultStyle extends StyleBase {
         shape: RoundedRectangleBorder(
           borderRadius: styleMap["borderRounding"],
         ),
-        textStyle: TextStyle(color: styleMap["white"]).merge( styleMap["textBold"] ),
-        backgroundColor: Color.fromARGB(255, 40, 60, 70),
+        textStyle: styleMap["textButton"],
+        backgroundColor: Color.fromARGB(255, 123, 205, 205),
         foregroundColor: styleMap["white"]);
+
     styleMap["buttonDisabled"] = ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: styleMap["borderRounding"],
