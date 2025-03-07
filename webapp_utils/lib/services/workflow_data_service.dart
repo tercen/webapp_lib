@@ -68,7 +68,11 @@ class WorkflowDataService with DataCache {
 
     var libObjs = await factory.documentService
         .getLibrary('', [], ["Workflow"], [], 0, -1);
-    print("Reading workflows from library (${libObjs.length})");
+    
+    print("Found following workflows in library:");
+    for( var lo in libObjs ){
+      print("\t${lo.name}");
+    }
 
     var reqWkfs = _getRequiredWorkflowsIds(libObjs);
 
