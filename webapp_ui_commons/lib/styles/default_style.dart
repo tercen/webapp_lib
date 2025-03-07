@@ -106,7 +106,7 @@ class DefaultStyle extends StyleBase {
         shape: RoundedRectangleBorder(
           borderRadius: styleMap["borderRounding"],
         ),
-        textStyle: styleMap["textButton"],
+        // textStyle: styleMap["textButton"],
         backgroundColor: Color.fromARGB(255, 123, 205, 205),
         foregroundColor: styleMap["white"]);
 
