@@ -35,7 +35,7 @@ class WorkflowRunner with ProgressDialog {
   final sci.Workflow template;
   
   final List<String> initStepIds = [];
-  final Map<String, sci.Filters> filterMap = {};
+  final Map<String, sci.NamedFilter> filterMap = {};
   final Map<String, sci.Relation> tableMap = {};
   final Map<String, String> tableDocumentMap = {};
   final Map<String, String> tableNameMap = {};
@@ -323,9 +323,9 @@ class WorkflowRunner with ProgressDialog {
     return factors;
   }
 
-  void addAndFilter(String stepId, List<String> keys, List<dynamic> values) {
+  void addAndFilter(String filterName, String stepId, List<String> keys, List<dynamic> values) {
     var factors = convertToStepFactors(keys, getFactorNames(stepId));
-
+    var filterKey = "$stepId$filterName";
     sci.Filter andFilter = sci.Filter()
       ..logical = "and"
       ..not = false;
@@ -337,20 +337,20 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
-    if (!filterMap.containsKey(stepId)) {
-      sci.NamedFilter tubeSpecFilter = sci.NamedFilter()
+    if (!filterMap.containsKey(filterKey)) {
+      sci.NamedFilter namedFilter = sci.NamedFilter()
         ..logical = "or"
         ..not = false
-        ..name = "Keep only";
-      tubeSpecFilter.filterExprs.add(andFilter);
+        ..name = filterName;
+      namedFilter.filterExprs.add(andFilter);
 
       sci.Filters filters = sci.Filters()..removeNaN = true;
-      filters.namedFilters.add(tubeSpecFilter);
-      filterMap[stepId] = filters;
+      filters.namedFilters.add(namedFilter);
+      filterMap[filterKey] = namedFilter; //filters;
     } else {
-      sci.Filters filters = filterMap[stepId]!;
-      filters.namedFilters[0].filterExprs.add(andFilter);
-      filterMap[stepId] = filters;
+      sci.NamedFilter namedFilter = filterMap[stepId]!;
+      namedFilter.filterExprs.add(andFilter);
+      filterMap[filterKey] = namedFilter;
     }
   }
 
@@ -500,7 +500,8 @@ class WorkflowRunner with ProgressDialog {
 
             if (filterMap.containsKey(stp.id)) {
               sci.DataStep dataStp = stp as sci.DataStep;
-              dataStp.model.filters = filterMap[stp.id]!;
+              dataStp.model.filters.namedFilters.add(filterMap[stp.id]!);
+              // dataStp.model.filters = filterMap[stp.id]!;
             }
 
             if (tableMap.containsKey(stp.id)) {

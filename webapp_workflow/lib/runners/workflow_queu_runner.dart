@@ -59,7 +59,8 @@ class WorkflowQueuRunner extends WorkflowRunner{
 
       if (filterMap.containsKey(stp.id)) {
         sci.DataStep dataStp = stp as sci.DataStep;
-        dataStp.model.filters = filterMap[stp.id]!;
+        dataStp.model.filters.namedFilters.add(filterMap[stp.id]!);
+        // dataStp.model.filters = filterMap[stp.id]!;
       }
 
       if (tableMap.containsKey(stp.id)) {

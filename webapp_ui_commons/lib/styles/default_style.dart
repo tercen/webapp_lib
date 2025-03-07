@@ -106,15 +106,15 @@ class DefaultStyle extends StyleBase {
         shape: RoundedRectangleBorder(
           borderRadius: styleMap["borderRounding"],
         ),
-        // textStyle: styleMap["textButton"],
-        backgroundColor: Color.fromARGB(255, 123, 205, 205),
+        textStyle: TextStyle(fontWeight: FontWeight.bold),
+        backgroundColor: styleMap["selectedMenuBg"],
         foregroundColor: styleMap["white"]);
 
     styleMap["buttonDisabled"] = ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: styleMap["borderRounding"],
         ),
-        backgroundColor: styleMap["gray"],
-        foregroundColor: styleMap["darkGray"]);
+        backgroundColor: styleMap["darkGray"],
+        foregroundColor: styleMap["black"]);
   }
 }
