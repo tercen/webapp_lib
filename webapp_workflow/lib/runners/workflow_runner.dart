@@ -492,6 +492,14 @@ class WorkflowRunner with ProgressDialog {
               stp = updateFilterValues(stp as sci.DataStep);
               stp = updateOperatorSettings(stp, settings);
               stp = updateOperatorSettingsByName(stp, settingsByName);
+
+              
+              for( var mapEntry in filterMap.entries ){
+                if( mapEntry.key.contains(stp.id)){
+                  print("Adding filter ${mapEntry.value.name} to step ${stp.name}");
+                  stp.model.filters.namedFilters.add(mapEntry.value);
+                }
+              }
             }
 
             if (shouldResetStep(stp)) {
@@ -505,13 +513,7 @@ class WorkflowRunner with ProgressDialog {
             }
 
             // if (filterMap.containsKey(stp.id)) {
-              sci.DataStep dataStp = stp as sci.DataStep;
-              for( var mapEntry in filterMap.entries ){
-                if( mapEntry.key.contains(stp.id)){
-                  print("Adding filter ${mapEntry.value.name} to step ${stp.name}");
-                  dataStp.model.filters.namedFilters.add(mapEntry.value);
-                }
-              }
+
               // dataStp.model.filters.namedFilters.add(filterMap[stp.id]!);
               // dataStp.model.filters = filterMap[stp.id]!;
             // }
