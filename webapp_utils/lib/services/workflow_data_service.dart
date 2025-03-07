@@ -439,12 +439,19 @@ class WorkflowDataService with DataCache {
         var allInit = true;
         var allDone = true;
         results["finished"] = isRunning ? "false" : "true";
-        
+        bool isAllPending = true;
         for( var s in workflow.steps ){
           for( var i = 0; i < currentOnQueuStep.length; i++ ){
             if( currentOnQueuStep[i] == s.id && currentOnQueuWorkflow[i] == workflow.id ){
+              if( currentOnQueuStatus[i] is! PendingState ){
+                isAllPending = false;
+              }
               status = currentOnQueuStatus[i] is PendingState ? "Pending" : "Running";
             }
+          }
+
+          if( status == "Pending" && !isAllPending ){
+            status = "Running";
           }
          
           allInit = allInit && (s.state.taskState is InitState);
