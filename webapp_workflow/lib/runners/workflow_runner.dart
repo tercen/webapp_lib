@@ -81,7 +81,7 @@ class WorkflowRunner with ProgressDialog {
     settingsByName.add(sci.Pair.from(settingName, settingValue) );
   }
 
-  void updateFilterValue(String filterName, String factor, String newValue ){
+  void changeFilterValue(String filterName, String factor, String newValue ){
     var key = "$filterName|@|$factor";
     filterValueUpdate[key] = newValue;
   }
@@ -429,14 +429,19 @@ class WorkflowRunner with ProgressDialog {
 
 
   sci.DataStep updateFilterValues(sci.DataStep step){
-
+// var key = "$filterName|@|$factor";
+    print("Updating filter values");
     for( var filter in step.model.filters.namedFilters ){
       var filters = filterValueUpdate.entries.where((e) => e.key.contains(filter.name) ).toList();
+
       if(  filters.isNotEmpty ){
+        print("\tWill update ${filters.length} filter on step ${step.name}");
         for( var f in filter.filterExprs ){
           var fExpr = f as sci.FilterExpr;
+          print("\t\t${fExpr.factor.name}");
           var filterExprs = filters.where((e) => e.key.contains(f.factor.name) ).toList();
           if(filterExprs.isNotEmpty ){
+            print("\t\tUpdating");
             for( var fe in filterExprs ){
               print("updating filter ${filter.name} value of step ${step.name}");
               fExpr.stringValue = fe.value;
@@ -499,7 +504,7 @@ class WorkflowRunner with ProgressDialog {
               tmpStp.parentDataStepId = multiDsMap[stp.id]!;
             }
 
-            if (filterMap.containsKey(stp.id)) {
+            // if (filterMap.containsKey(stp.id)) {
               sci.DataStep dataStp = stp as sci.DataStep;
               for( var mapEntry in filterMap.entries ){
                 if( mapEntry.key.contains(stp.id)){
@@ -507,9 +512,9 @@ class WorkflowRunner with ProgressDialog {
                   dataStp.model.filters.namedFilters.add(mapEntry.value);
                 }
               }
-              dataStp.model.filters.namedFilters.add(filterMap[stp.id]!);
+              // dataStp.model.filters.namedFilters.add(filterMap[stp.id]!);
               // dataStp.model.filters = filterMap[stp.id]!;
-            }
+            // }
 
             if (tableMap.containsKey(stp.id)) {
               sci.TableStep tmpStp = stp as sci.TableStep;
