@@ -324,8 +324,10 @@ class WorkflowRunner with ProgressDialog {
   }
 
   void addAndFilter(String filterName, String stepId, List<String> keys, List<dynamic> values) {
+    
     var factors = convertToStepFactors(keys, getFactorNames(stepId));
     var filterKey = "$stepId$filterName";
+    print("Adding andFilter to filter key $filterKey");
     sci.Filter andFilter = sci.Filter()
       ..logical = "and"
       ..not = false;
@@ -338,6 +340,7 @@ class WorkflowRunner with ProgressDialog {
     }
 
     if (!filterMap.containsKey(filterKey)) {
+      print("\tMap does not contain key. Creating.");
       sci.NamedFilter namedFilter = sci.NamedFilter()
         ..logical = "or"
         ..not = false
@@ -348,7 +351,8 @@ class WorkflowRunner with ProgressDialog {
       filters.namedFilters.add(namedFilter);
       filterMap[filterKey] = namedFilter; //filters;
     } else {
-      sci.NamedFilter namedFilter = filterMap[stepId]!;
+      print("\tMap already contains key. Updating.");
+      sci.NamedFilter namedFilter = filterMap[filterKey]!;
       namedFilter.filterExprs.add(andFilter);
       filterMap[filterKey] = namedFilter;
     }
@@ -497,7 +501,7 @@ class WorkflowRunner with ProgressDialog {
               for( var mapEntry in filterMap.entries ){
                 if( mapEntry.key.contains(stp.id)){
                   print("Adding filter ${mapEntry.value.name} to step ${stp.name}");
-                  // stp.model.filters.namedFilters.add(mapEntry.value);
+                  stp.model.filters.namedFilters.add(mapEntry.value);
                 }
               }
             }
