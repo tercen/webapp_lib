@@ -133,7 +133,7 @@ class WorkflowDataService with DataCache {
 
     for( var info in _requiredWorkflows ){
       if( !foundIids.contains( info.iid)){
-        err = "$err\n* ${info.url} (version ${info.name})";
+        err = "$err\n* ${info.url} (version ${info.version})";
       }
     }
     return err;
