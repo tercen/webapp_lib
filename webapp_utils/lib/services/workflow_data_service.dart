@@ -14,7 +14,7 @@ import 'package:webapp_utils/functions/workflow_utils.dart';
 import 'package:webapp_utils/mixin/data_cache.dart';
 import 'package:webapp_utils/model/workflow_info.dart';
 
-
+import 'package:sci_tercen_client/sci_client.dart' as sci;
 
 
 class WorkflowDataService with DataCache {
@@ -123,9 +123,20 @@ class WorkflowDataService with DataCache {
 
     if (!_allWorkflowsInstalled(iids)) {
       print("Did not find all needed workflows");
-      throw Exception("ERR_MISSING_TEMPLATE");
+      throw  sci.ServiceError(1, "Missing Required Templates", missingTemplateErrorMessage(iids));
     }
     return [ids, iids];
+  }
+
+  String missingTemplateErrorMessage(List<String> foundIids){
+    var err = "The following templates or versions were not found in any of your library teams:\n";
+
+    for( var info in _requiredWorkflows ){
+      if( !foundIids.contains( info.iid)){
+        err = "$err\n* ${info.url} (version ${info.name})";
+      }
+    }
+    return err;
   }
 
   bool _isFileSchema(Schema sch) {
