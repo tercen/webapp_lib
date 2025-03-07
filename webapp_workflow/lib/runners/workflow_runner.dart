@@ -438,6 +438,7 @@ class WorkflowRunner with ProgressDialog {
           var filterExprs = filters.where((e) => e.key.contains(f.factor.name) ).toList();
           if(filterExprs.isNotEmpty ){
             for( var fe in filterExprs ){
+              print("updating filter ${filter.name} value of step ${step.name}");
               fExpr.stringValue = fe.value;
             }
           }
@@ -500,6 +501,12 @@ class WorkflowRunner with ProgressDialog {
 
             if (filterMap.containsKey(stp.id)) {
               sci.DataStep dataStp = stp as sci.DataStep;
+              for( var mapEntry in filterMap.entries ){
+                if( mapEntry.key.contains(stp.id)){
+                  print("Adding filter ${mapEntry.value.name} to step ${stp.name}");
+                  dataStp.model.filters.namedFilters.add(mapEntry.value);
+                }
+              }
               dataStp.model.filters.namedFilters.add(filterMap[stp.id]!);
               // dataStp.model.filters = filterMap[stp.id]!;
             }
@@ -637,6 +644,8 @@ class WorkflowRunner with ProgressDialog {
     openDialog(context);
     await setupRun(context);
     var runTitle = getWorkflowName(template);
+
+    return sci.Workflow();
 
     //-----------------------------------------
     // Task preparation and running

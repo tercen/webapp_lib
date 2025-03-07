@@ -106,7 +106,6 @@ class DefaultStyle extends StyleBase {
         shape: RoundedRectangleBorder(
           borderRadius: styleMap["borderRounding"],
         ),
-        textStyle: TextStyle(fontWeight: FontWeight.bold),
         backgroundColor: styleMap["selectedMenuBg"],
         foregroundColor: styleMap["white"]);
 
