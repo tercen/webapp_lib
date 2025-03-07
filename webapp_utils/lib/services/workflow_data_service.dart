@@ -69,14 +69,7 @@ class WorkflowDataService with DataCache {
     var libObjs = await factory.documentService
         .getLibrary('', [], ["Workflow"], [], 0, -1);
     
-    print("Found following workflows in library:");
-    for( var lo in libObjs ){
-      print("\t${lo.name}");
-    }
-
     var reqWkfs = _getRequiredWorkflowsIds(libObjs);
-
-    print("Got ${reqWkfs.length} required workflows");
 
     var workflows = await factory.workflowService.list(reqWkfs[0]);
 
@@ -115,19 +108,21 @@ class WorkflowDataService with DataCache {
   List<List<String>> _getRequiredWorkflowsIds(List<Document> libObjs) {
     List<String> ids = [];
     List<String> iids = [];
+    print("Checking library for required workflows");
     for (var obj in libObjs) {
-      print("Checking ${obj.url.uri}");
+      print("\tChecking ${obj.url.uri}");
       var iid = _isInRepoFile(obj);
-      print("IID: $iid");
-      print("........");
+      // print("IID: $iid");
 
       if (iid != "") {
+        print("\tFound");
         ids.add(obj.id);
         iids.add(iid);
       }
     }
 
     if (!_allWorkflowsInstalled(iids)) {
+      print("Did not find all needed workflows");
       throw Exception("ERR_MISSING_TEMPLATE");
     }
     return [ids, iids];
