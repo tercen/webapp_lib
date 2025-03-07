@@ -497,7 +497,7 @@ class WorkflowRunner with ProgressDialog {
               for( var mapEntry in filterMap.entries ){
                 if( mapEntry.key.contains(stp.id)){
                   print("Adding filter ${mapEntry.value.name} to step ${stp.name}");
-                  stp.model.filters.namedFilters.add(mapEntry.value);
+                  // stp.model.filters.namedFilters.add(mapEntry.value);
                 }
               }
             }
