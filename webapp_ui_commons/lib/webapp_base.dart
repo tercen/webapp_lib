@@ -207,8 +207,6 @@ class WebAppBase with ChangeNotifier {
       navMenu.selectedScreen = screenLabel;
       _menuKeys[screenLabel]   = ValueKey<int>(Random().nextInt(1 << 32 - 1));
     }
-    notifyListeners();
-    
   }
 
   Widget getSelectedScreen() {
@@ -219,6 +217,7 @@ class WebAppBase with ChangeNotifier {
   }
 
   Scaffold buildScaffoldPage() {
+    print("Building scaffold page with screen ${getSelectedScreen()}");
     Widget banner = Container(
       color: Colors.white,
       child: Wrap(
