@@ -23,14 +23,17 @@ class MultiCheckComponent with ChangeNotifier, ComponentBase implements MultiVal
   }
 
   void select(IdElement el){
-    
     if( !selected.contains(el)){
       selected.add(el);
+      if(options.where((e) => selected.contains(e)).length == options.length){
+        allSelected = true;
+      }
     }
   }
 
   void deselect(IdElement el){
     selected.remove(el);
+    allSelected = false;
   }
 
   Widget checkBox( String id, String name, bool isSelected, {Function? onClick}) {

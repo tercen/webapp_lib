@@ -561,7 +561,7 @@ class WorkflowRunner with ProgressDialog {
 
             workflow = await factory.workflowService.create(workflow);
           }else{
-            print("UPDATEING workflow");
+
             await factory.workflowService.update(workflow);
             workflow = await factory.workflowService.get(workflow.id);
           }
@@ -783,7 +783,8 @@ class WorkflowRunner with ProgressDialog {
   }
 
   List<sci.Step> getTopSteps(List<sci.Step> steps) {
-    return steps.where((e) => e.inputs.isEmpty).toList();
+    
+    return steps.where((e) => e.inputs.isEmpty && e is! sci.GroupStep).toList();
   }
 
   List<sci.Step> getParents(sci.Step step, sci.Workflow workflow) {
