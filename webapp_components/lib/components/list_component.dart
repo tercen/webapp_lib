@@ -14,6 +14,7 @@ import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implements SingleValueComponent {
+  final List<int> expandedRows = [];
 
   //ACTION Controls
   bool isBusy = false; // Download can take a bit
@@ -46,14 +47,21 @@ class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implement
     var colName = table.colNames.first;
     var data = table.columns[colName]!;
 
-
-    var listEntries = data.map((e) {
+    var rows = new List<int>.generate(10, (i) => i);
+    var listEntries = rows.map((row) {
       if( collapsible ){
-        return collapsibleWrap("Content", createListEntry(e));
+        return collapsibleWrap(row, "Content", createListEntry(data[row]));
       }else{
-        return createListEntry(e);
+        return createListEntry(data[row]);
       }
-    } ).toList();
+    }).toList();
+    // var listEntries = data.map((e) {
+    //   if( collapsible ){
+    //     return collapsibleWrap("Content", createListEntry(e));
+    //   }else{
+    //     return createListEntry(e);
+    //   }
+    // } ).toList();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -62,13 +70,21 @@ class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implement
   }
   
 
-  Widget collapsibleWrap( String title, Widget wdg){
+  Widget collapsibleWrap( int row, String title, Widget wdg){
     expansionControllers.add(ExpansionTileController());
 
     var expTile = ExpansionTile(
       key: GlobalKey(),
       title: Text(title, style: Styles()["textH2"],),
       controller: expansionControllers.last,
+      initiallyExpanded: expandedRows.contains(row),
+        onExpansionChanged: (isExpanded) {
+          if(isExpanded ){
+            expandedRows.add(row);
+          }else{
+            expandedRows.remove(row);
+          }
+        },
       children: [wdg],
     );
     

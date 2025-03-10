@@ -131,7 +131,7 @@ class ImageListComponent extends ListComponent {
         widgetExportContent.add(ExportPageContent(title, imgData));
 
         if (collapsible == true) {
-          wdg = collapsibleWrap(title, wdg);
+          wdg = collapsibleWrap(ri, title, wdg);
         }
         wdgList.add(wdg);
       }
