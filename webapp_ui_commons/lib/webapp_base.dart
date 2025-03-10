@@ -202,6 +202,14 @@ class WebAppBase with ChangeNotifier {
     return _menuKeys[menuLabel]!;
   }
 
+  void selectScreen( String screenLabel ){
+    if( _menuKeys.keys.contains(screenLabel )){
+      navMenu.selectedScreen = screenLabel;
+      _menuKeys[screenLabel]   = ValueKey<int>(Random().nextInt(1 << 32 - 1));
+    }
+    
+  }
+
   Widget getSelectedScreen() {
     var screen = navMenu.getSelectedEntry();
     _menuKeys[screen.label] = ValueKey<int>(Random().nextInt(1 << 32 - 1));

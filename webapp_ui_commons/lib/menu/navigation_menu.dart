@@ -19,6 +19,7 @@ class NavigationMenu with ChangeNotifier {
     return _menuItems.firstWhere((e) => e.label == selectedScreen);
   }
 
+
   Widget _createMenuEntry(MenuItem item) {
     bool isSelected = item.label == selectedScreen;
 
