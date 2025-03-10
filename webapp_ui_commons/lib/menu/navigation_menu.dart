@@ -19,7 +19,11 @@ class NavigationMenu with ChangeNotifier {
     return _menuItems.firstWhere((e) => e.label == selectedScreen);
   }
 
+  void selectScreen(String label){
+                selectedScreen = label;
+            notifyListeners();
 
+  }
   Widget _createMenuEntry(MenuItem item) {
     bool isSelected = item.label == selectedScreen;
 
@@ -36,8 +40,7 @@ class NavigationMenu with ChangeNotifier {
         hoverColor: Colors.transparent,
         onTap: () {
           if (item.isEnabled()) {
-            selectedScreen = item.label;
-            notifyListeners();
+            selectScreen(item.label);
           }
         },
         child: Padding(

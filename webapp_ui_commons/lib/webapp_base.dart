@@ -207,6 +207,7 @@ class WebAppBase with ChangeNotifier {
       navMenu.selectedScreen = screenLabel;
       _menuKeys[screenLabel]   = ValueKey<int>(Random().nextInt(1 << 32 - 1));
     }
+    notifyListeners();
   }
 
   Widget getSelectedScreen() {
