@@ -14,6 +14,7 @@ import 'package:webapp_utils/services/settings_data_service.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
 import 'package:webapp_utils/services/user_data_service.dart';
 import 'package:webapp_utils/services/project_data_service.dart';
+import 'package:webapp_utils/model/workflow_setting.dart';
 
 class WebAppDataBase with ChangeNotifier {
   final WebAppBase app;
@@ -29,7 +30,8 @@ class WebAppDataBase with ChangeNotifier {
   final UserDataService userService = UserDataService();
   final ProjectDataService projectService = ProjectDataService();
 
-  Timer? _saveTimer;
+  List<WorkflowSetting> workflowSettings = [];
+  Timer? saveTimer;
 
   bool shouldReload = false;
   bool isInit = false;
@@ -56,15 +58,61 @@ class WebAppDataBase with ChangeNotifier {
       stepsMapper.loadSettingsFile(stepMapperJsonFile)
     ]);
 
-    for( var template in workflowService.installedWorkflows.values ){
-      var opSettings = template.steps.where((step) => step is DataStep ).map((step) => (step as DataStep).model.operatorSettings );
+    var factory = tercen.ServiceFactory();
+
+    for (var template in workflowService.installedWorkflows.values) {
+      var dataSteps = template.steps
+          .whereType<DataStep>()
+          .where((step) =>
+              step.model.operatorSettings.operatorRef.operatorId != "")
+          .toList();
+      var opIds = dataSteps
+          .map((step) => step.model.operatorSettings.operatorRef.operatorId)
+          .toList();
+      var operators = await factory.operatorService.list(opIds);
+
+      List<int>.generate(operators.length, (i) => i).map((i) {});
+      for (var i = 0; i < operators.length; i++) {
+        var step = dataSteps[i];
+        var op = operators[i];
+        workflowSettings.addAll(op.properties.map((prop) {
+          if (prop is DoubleProperty) {
+            return WorkflowSetting(step.name, step.id, prop.name,
+                prop.defaultValue.toString(), "double", prop.description);
+          }
+          if (prop is StringProperty) {
+            return WorkflowSetting(step.name, step.id, prop.name,
+                prop.defaultValue, "string", prop.description);
+          }
+          if (prop is BooleanProperty) {
+            return WorkflowSetting(step.name, step.id, prop.name,
+                prop.defaultValue.toString(), "boolean", prop.description);
+          }
+          if (prop is EnumeratedProperty) {
+            var kind = prop.isSingleSelection ? "ListSingle" : "ListMultiple";
+            return WorkflowSetting(step.name, step.id, prop.name,
+                prop.defaultValue, kind, prop.description,
+                isSingleSelection: prop.isSingleSelection,
+                opOptions: prop.values);
+          }
+
+          return WorkflowSetting(
+              step.name, step.id, prop.name, "", "string", prop.description);
+        }));
+      }
     }
-
-
 
     await loadModel();
 
-    _saveTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
+    saveTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
+      saveModel();
+    });
+
+    isInit = true;
+
+    await loadModel();
+
+    saveTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
       saveModel();
     });
 
@@ -74,7 +122,7 @@ class WebAppDataBase with ChangeNotifier {
   //==================================================
   // State Files Management
   //==================================================
-  void clear(){
+  void clear() {
     _model.clear();
   }
 
