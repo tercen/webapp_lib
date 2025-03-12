@@ -48,7 +48,7 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> init(String projectId, String projectName, String username,
       {String reposJsonPath = "",
-      List<String> settingFiles = const [],
+      String settingFilterFile = "",
       String stepMapperJsonFile = ""}) async {
     clear();
 
