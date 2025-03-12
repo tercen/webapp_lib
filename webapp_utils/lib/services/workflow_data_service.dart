@@ -10,6 +10,7 @@ import 'package:webapp_model/id_element_table.dart';
 
 
 import 'package:webapp_utils/functions/logger.dart';
+import 'package:webapp_utils/functions/project_utils.dart';
 import 'package:webapp_utils/functions/workflow_utils.dart';
 import 'package:webapp_utils/mixin/data_cache.dart';
 import 'package:webapp_utils/model/workflow_info.dart';
@@ -467,5 +468,31 @@ class WorkflowDataService with DataCache {
       }
     }
     return results;
+  }
+
+  Workflow getWorkflow(String key) {
+    if (!installedWorkflows.containsKey(key)) {
+      throw Exception("Failed to find workflow with key '$key'");
+    }
+    return installedWorkflows[key]!;
+  }
+
+  Future<Workflow> fetchWorkflow(String id) async {
+    var factory = tercen.ServiceFactory();
+    return factory.workflowService.get(id);
+  }
+
+  Future<List<Workflow>> fetchProjectWorkflows(String projectId) async {
+    var projectFiles = ProjectUtils().getProjectFiles();
+
+    var workflowIds = projectFiles
+        .where((e) => e.subKind == "Workflow")
+        .map((e) => e.id)
+        .toList();
+    var factory = tercen.ServiceFactory();
+
+    return workflowIds.isEmpty
+        ? []
+        : await factory.workflowService.list(workflowIds);
   }
 }

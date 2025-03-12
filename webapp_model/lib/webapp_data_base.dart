@@ -53,9 +53,15 @@ class WebAppDataBase with ChangeNotifier {
     await Future.wait([
       workflowService.init(reposJsonPath: reposJsonPath),
       ProjectUtils().loadFolderStructure(projectId),
-      settingsService.loadSettings(settingFiles, settingFiles),
       stepsMapper.loadSettingsFile(stepMapperJsonFile)
     ]);
+
+    for( var template in workflowService.installedWorkflows.values ){
+      template.steps.where((step) => step is DataStep ).map((step) => (step as DataStep).model.operatorSettings ).map((opSetting) => print(opSetting.toJson()));
+
+    }
+
+
 
     await _loadModel();
 
@@ -200,32 +206,6 @@ class WebAppDataBase with ChangeNotifier {
     app.username = username;
     app.teamname = project.acl.owner;
     await init(app.projectId, app.projectName, username);
-  }
-
-  Workflow getWorkflow(String key) {
-    if (!workflowService.installedWorkflows.containsKey(key)) {
-      throw Exception("Failed to find workflow with key '$key'");
-    }
-    return workflowService.installedWorkflows[key]!;
-  }
-
-  Future<Workflow> fetchWorkflow(String id) async {
-    var factory = tercen.ServiceFactory();
-    return factory.workflowService.get(id);
-  }
-
-  Future<List<Workflow>> fetchProjectWorkflows(String projectId) async {
-    var projectFiles = ProjectUtils().getProjectFiles();
-
-    var workflowIds = projectFiles
-        .where((e) => e.subKind == "Workflow")
-        .map((e) => e.id)
-        .toList();
-    var factory = tercen.ServiceFactory();
-
-    return workflowIds.isEmpty
-        ? []
-        : await factory.workflowService.list(workflowIds);
   }
 
   Future<void> projectFilesUpdated() async {
