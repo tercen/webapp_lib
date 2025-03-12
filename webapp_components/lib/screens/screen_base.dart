@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
+import 'package:webapp_components/components/label_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/abstract/multi_value_component.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
@@ -71,6 +72,15 @@ mixin ScreenBase {
     }
 
     addComponent(blockId, horizBar);
+  }
+
+  void addHeading( String blockId, String text, {Component? parent} ){
+    var headingComp = LabelComponent(text);
+    if( parent != null ){
+      headingComp.addParent(parent);
+    }
+
+    addComponent(blockId, headingComp);
   }
 
   void updateModel() {
