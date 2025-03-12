@@ -1,8 +1,10 @@
+import 'dart:collection';
+
 import 'package:webapp_components/abstract/component.dart';
 import 'package:webapp_components/abstract/multi_value_component.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_model/id_element.dart';
-
+import 'package:sci_tercen_client/sci_client.dart';
 
 
 mixin class ComponentBase {
@@ -10,6 +12,7 @@ mixin class ComponentBase {
   late final String groupId;
   late final String componentLabel;
  
+  final List<Pair> _metaList = [];
 
   final List<Component> ancestors = [];
 
@@ -80,6 +83,21 @@ mixin class ComponentBase {
       
     }
     return vals;
+  }
+
+
+  List<Pair> get meta => UnmodifiableListView(_metaList);
+
+  bool hasMeta(String key){
+    return _metaList.any((m) => m.key == key);
+  }
+
+  void addMeta(String key, String value){
+    if( !hasMeta(key)){
+      _metaList.add(Pair.from(key, value));
+    }else{
+      // TODO define behavior here
+    }
   }
 
 }
