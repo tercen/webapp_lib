@@ -101,4 +101,8 @@ mixin class ComponentBase {
     }
   }
 
+  Pair? getMeta(String key){
+    return _metaList.firstWhere((m) => m.key == key, orElse: null);
+  }
+
 }
