@@ -48,7 +48,7 @@ class WebAppDataBase with ChangeNotifier {
       {String reposJsonPath = "",
       List<String> settingFiles = const [],
       String stepMapperJsonFile = ""}) async {
-    _model.clear();
+    clear();
 
     await Future.wait([
       workflowService.init(reposJsonPath: reposJsonPath),
@@ -57,16 +57,15 @@ class WebAppDataBase with ChangeNotifier {
     ]);
 
     for( var template in workflowService.installedWorkflows.values ){
-      template.steps.where((step) => step is DataStep ).map((step) => (step as DataStep).model.operatorSettings ).map((opSetting) => print(opSetting.toJson()));
-
+      var opSettings = template.steps.where((step) => step is DataStep ).map((step) => (step as DataStep).model.operatorSettings );
     }
 
 
 
-    await _loadModel();
+    await loadModel();
 
     _saveTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
-      _saveModel();
+      saveModel();
     });
 
     isInit = true;
@@ -75,6 +74,10 @@ class WebAppDataBase with ChangeNotifier {
   //==================================================
   // State Files Management
   //==================================================
+  void clear(){
+    _model.clear();
+  }
+
   Map _idElMapToJson(Map idElMap) {
     Map<String, List> jsonMap = {};
     for (var entry in idElMap.entries) {
@@ -94,7 +97,7 @@ class WebAppDataBase with ChangeNotifier {
     return idElMap;
   }
 
-  Future<void> _loadModel() async {
+  Future<void> loadModel() async {
     if (app.projectId != "") {
       var projectId = app.projectId;
       var user = app.username;
@@ -114,7 +117,7 @@ class WebAppDataBase with ChangeNotifier {
     }
   }
 
-  Future<void> _saveModel() async {
+  Future<void> saveModel() async {
     if (app.projectId != "") {
       var projectId = app.projectId;
       var user = app.username;
@@ -135,12 +138,12 @@ class WebAppDataBase with ChangeNotifier {
     }
   }
 
-  String _buildKey(String key, String groupKey) {
+  String buildKey(String key, String groupKey) {
     return "${groupKey}_$key";
   }
 
   IdElement getFirstOrEmpty(String key, String groupKey) {
-    key = _buildKey(key, groupKey);
+    key = buildKey(key, groupKey);
 
     if (_model.containsKey(key)) {
       var result = _model[key]!;
@@ -153,7 +156,7 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   List<IdElement> getData(String key, String groupKey) {
-    key = _buildKey(key, groupKey);
+    key = buildKey(key, groupKey);
     List<IdElement> result = [];
 
     if (_model.containsKey(key)) {
@@ -164,7 +167,7 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   void clearData(String key, String groupKey) {
-    key = _buildKey(key, groupKey);
+    key = buildKey(key, groupKey);
     if (_model.containsKey(key)) {
       _model.remove(key);
     }
@@ -172,7 +175,7 @@ class WebAppDataBase with ChangeNotifier {
 
   void setData(String key, String groupKey, IdElement value,
       {bool multiple = false}) {
-    key = _buildKey(key, groupKey);
+    key = buildKey(key, groupKey);
 
     if (_model.containsKey(key) && multiple) {
       var vals = List<IdElement>.from(_model[key]!);
