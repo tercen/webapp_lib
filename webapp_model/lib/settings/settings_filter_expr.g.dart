@@ -8,6 +8,7 @@ part of 'settings_filter_expr.dart';
 
 SettingsFilterExpr _$SettingsFilterExprFromJson(Map<String, dynamic> json) =>
     SettingsFilterExpr(
+      screen: json['screen'] as String,
       type: json['type'] as String,
       stepId: json['stepId'] as String?,
       stepName: json['stepName'] as String?,
@@ -16,6 +17,7 @@ SettingsFilterExpr _$SettingsFilterExprFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SettingsFilterExprToJson(SettingsFilterExpr instance) =>
     <String, dynamic>{
+      'screen': instance.screen,
       'type': instance.type,
       'stepId': instance.stepId,
       'stepName': instance.stepName,

@@ -5,10 +5,9 @@ part "settings_filter.g.dart";
 
 @JsonSerializable()
 class SettingsFilter {
-  final String screen;
   final List<SettingsFilterExpr> filters;
 
-  SettingsFilter({required this.screen, required this.filters});
+  SettingsFilter({required this.filters});
 
   factory SettingsFilter.fromJson(Map<String, dynamic> json) =>
       _$SettingsFilterFromJson(json);

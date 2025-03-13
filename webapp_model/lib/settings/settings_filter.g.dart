@@ -8,7 +8,6 @@ part of 'settings_filter.dart';
 
 SettingsFilter _$SettingsFilterFromJson(Map<String, dynamic> json) =>
     SettingsFilter(
-      screen: json['screen'] as String,
       filters: (json['filters'] as List<dynamic>)
           .map((e) => SettingsFilterExpr.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -16,6 +15,5 @@ SettingsFilter _$SettingsFilterFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SettingsFilterToJson(SettingsFilter instance) =>
     <String, dynamic>{
-      'screen': instance.screen,
       'filters': instance.filters,
     };
