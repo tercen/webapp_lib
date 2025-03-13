@@ -689,14 +689,23 @@ class WorkflowRunner with ProgressDialog {
         log("$stepProgressMessage\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
       } else {
-        if (evt is sci.TaskStateEvent) {
-          if (evt.state is sci.DoneState) {
-            // var runningWorkflow =
-            //     await factory.workflowService.get(workflow.id);
-            updateStepProgress(workflow);
-            log("$stepProgressMessage\n\n \n ", dialogTitle: runTitle);
-          }
+        // sci.PatchRecords <-- the event
+        if ( evt is sci.PatchRecords ){
+          
+          (evt as sci.PatchRecords).apply(workflow);
+          updateStepProgress(workflow);
+          log("$stepProgressMessage\n\n \n ", dialogTitle: runTitle);
         }
+        // if (evt is sci.TaskStateEvent) {
+        //   if (evt.state is sci.DoneState) {
+        //     // factory.patchRecordService.patch(sci.Patch)
+        //     // var runningWorkflow =
+        //     //     await factory.workflowService.get(workflow.id);
+            
+        //     updateStepProgress(workflow);
+        //     log("$stepProgressMessage\n\n \n ", dialogTitle: runTitle);
+        //   }
+        // }
       }
     }
 

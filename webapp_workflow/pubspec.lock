@@ -404,38 +404,38 @@ packages:
     dependency: transitive
     description:
       path: sci_base
-      ref: "1.3.0"
-      resolved-ref: c1dedecf4a7ab6c353375fd178521694aef0b805
+      ref: "1.3.1"
+      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.0"
+    version: "1.3.1"
   sci_http_client:
     dependency: transitive
     description:
       path: sci_http_client
-      ref: "1.3.0"
-      resolved-ref: c1dedecf4a7ab6c353375fd178521694aef0b805
+      ref: "1.3.1"
+      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.0"
+    version: "1.3.1"
   sci_tercen_client:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       path: sci_tercen_client
-      ref: "1.3.0"
-      resolved-ref: c1dedecf4a7ab6c353375fd178521694aef0b805
+      ref: "1.3.1"
+      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.0"
+    version: "1.3.1"
   sci_tercen_model:
     dependency: transitive
     description:
       path: sci_tercen_model
-      ref: "1.3.0"
-      resolved-ref: c1dedecf4a7ab6c353375fd178521694aef0b805
+      ref: "1.3.1"
+      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.0"
+    version: "1.3.1"
   shelf:
     dependency: transitive
     description:

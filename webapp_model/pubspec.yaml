@@ -15,6 +15,9 @@ dependencies:
     path: ../webapp_ui_commons
   webapp_utils:
     path: ../webapp_utils
+  
+  json_annotation: ^4.9.0
+  json_serializable: ^6.9.0
   # webapp_workflow:
     # path: ../webapp_workflow
   # kumo_api:
@@ -42,7 +45,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-
+  build_runner: ^2.3.3
 
 flutter:
   uses-material-design: true

@@ -6,3 +6,6 @@ dart pub global run mono_repo
 
 mono_repo pub get
 
+# Generate Json serializable classes
+dart run build_runner build
+
