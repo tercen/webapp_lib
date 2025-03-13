@@ -9,9 +9,9 @@ part of 'settings_filter_expr.dart';
 SettingsFilterExpr _$SettingsFilterExprFromJson(Map<String, dynamic> json) =>
     SettingsFilterExpr(
       type: json['type'] as String,
-      stepId: json['stepId'] as String,
-      stepName: json['stepName'] as String,
-      settingNames: json['settingNames'] as String,
+      stepId: json['stepId'] as String?,
+      stepName: json['stepName'] as String?,
+      settingNames: json['settingNames'] as String?,
     );
 
 Map<String, dynamic> _$SettingsFilterExprToJson(SettingsFilterExpr instance) =>
