@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:json_string/json_string.dart';
+import 'package:webapp_model/settings/settings_filter.dart';
 import 'package:webapp_utils/model/settings_entry.dart';
 
 
@@ -9,8 +10,19 @@ class SettingsDataService{
   factory SettingsDataService() {
     return _singleton;
   }
+
   
   SettingsDataService._internal();
+
+  SettingsFilter settingsFilters = SettingsFilter(filters: []);
+
+  Future<void> loadSettingsFilter(String assetPath) async {
+    var assetString = await rootBundle.loadString(assetPath);
+    final jsonString = JsonString(assetString);
+
+    settingsFilters = SettingsFilter.fromJson(jsonString.decodedValueAsMap);
+   
+  }
 
   final Map<String, List<SettingsEntry>> _settingsMap = {};
 
