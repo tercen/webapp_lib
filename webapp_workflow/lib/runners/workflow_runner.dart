@@ -681,6 +681,7 @@ class WorkflowRunner with ProgressDialog {
     log(stepProgressMessage, dialogTitle: runTitle);
 
     await for (var evt in taskStream) {
+      print(evt.toJson());
       if (evt is sci.TaskProgressEvent) {
         log("$stepProgressMessage\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
