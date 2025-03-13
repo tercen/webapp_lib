@@ -690,9 +690,9 @@ class WorkflowRunner with ProgressDialog {
       } else {
         if (evt is sci.TaskStateEvent) {
           if (evt.state is sci.DoneState) {
-            var runningWorkflow =
-                await factory.workflowService.get(workflow.id);
-            updateStepProgress(runningWorkflow);
+            // var runningWorkflow =
+            //     await factory.workflowService.get(workflow.id);
+            updateStepProgress(workflow);
             log("$stepProgressMessage\n\n \n ", dialogTitle: runTitle);
           }
         }
