@@ -115,6 +115,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
   @override
   void setComponentValue(value) {
     controller.text = value;
+    updateValue();
   }
   
   void updateValue(){

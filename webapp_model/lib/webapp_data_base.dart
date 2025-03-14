@@ -100,30 +100,27 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   Future<void> loadModel() async {
-    // if (app.projectId != "") {
-    //   var projectId = app.projectId;
-    //   var user = app.username;
+    if (app.projectId != "") {
+      var projectId = app.projectId;
+      var user = app.username;
 
-    //   var folder = await projectService
-    //       .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
-    //   var viewFile = await projectService.getOrCreateFile(
-    //       projectId, user, "${user}_view_04",
-    //       parentId: folder.id);
-    //   var navFile = await projectService.getOrCreateFile(
-    //       projectId, user, "${user}_nav_04",
-    //       parentId: folder.id);
+      var folder = await projectService
+          .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
+      var viewFile = await projectService.getOrCreateFile(
+          projectId, user, "${user}_view_05",
+          parentId: folder.id);
+      var navFile = await projectService.getOrCreateFile(
+          projectId, user, "${user}_nav_05",
+          parentId: folder.id);
 
-    //   _model.addAll(_jsonToIdElMap(projectService.getFileContent(viewFile)));
-    //   app.loadPersistentData(
-    //       _jsonToIdElMap(projectService.getFileContent(navFile)));
-    // }
+      _model = ViewState.fromJson((projectService.getFileContent(viewFile))); 
+      app.loadPersistentData(projectService.getFileContent(navFile));
+    }
   }
 
 
   Future<void> saveModel() async {
     if (app.projectId != "") {
-      print("SAVING model on ${app.projectName}");
-
       var projectId = app.projectId;
       var user = app.username;
       var folder = await projectService
@@ -142,11 +139,11 @@ class WebAppDataBase with ChangeNotifier {
       }
 
 
-      await Future.wait([
-        projectService.updateFileContent(viewFile, _model.toJson()),
-        projectService.updateFileContent(
-            navFile, _idElMapToJson(app.getPersistentData()))
-      ]);
+      // await Future.wait([
+      //   projectService.updateFileContent(viewFile, _model.toJson()),
+      //   projectService.updateFileContent(
+      //       navFile, _idElMapToJson(app.getPersistentData()))
+      // ]);
     }
   }
 

@@ -178,10 +178,10 @@ class WebAppBase with ChangeNotifier {
     };
   }
 
-  void loadPersistentData(Map<String, List<IdElement>> stateMap) {
+  void loadPersistentData(Map<String, List<String>> stateMap) {
     for (var entry in stateMap.entries) {
       if (entry.key == "APP_selectedScreen") {
-        navMenu.selectedScreen = entry.value.first.id;
+        navMenu.selectedScreen = entry.value.first;
       }
     }
   }

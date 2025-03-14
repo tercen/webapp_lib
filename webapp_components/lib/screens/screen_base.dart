@@ -85,11 +85,9 @@ mixin ScreenBase {
   }
 
   void updateModel() {
-    print("Updating model");
     var comps = getAllComponents();
     for (var comp in comps) {
       if( comp is Serializable ){
-        print("\tUpdating ${comp.getId()} to value ${(comp as Serializable).getValuesAsString(comp.getId(), comp.getGroupId())}");
         modelLayer.setData(comp.getId(), comp.getGroupId(), (comp as Serializable).getValuesAsString(comp.getId(), comp.getGroupId()));
       }
       // if (comp.getGroupId() != LAYOUT_GROUP) {
