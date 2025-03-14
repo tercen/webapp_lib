@@ -50,7 +50,6 @@ class SettingsDataService{
     }
     var assetString = await rootBundle.loadString(assetPath);
     final jsonString = JsonString(assetString);
-
     workflowStepsMapper = WorkflowSteps.fromJson(jsonString.decodedValueAsMap);
   }
 

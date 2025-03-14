@@ -54,7 +54,7 @@ class WebAppDataBase with ChangeNotifier {
       // workflowService.init(reposJsonPath: reposJsonPath),
       projectService.loadFolderStructure(projectId),
       settingsService.loadWorkflowStepMapper(stepMapperJsonFile),
-      settingsService.loadSettingsFilter(stepMapperJsonFile),
+      settingsService.loadSettingsFilter(settingFilterFile),
       settingsService.loadTemplateConfig(stepMapperJsonFile)
     ]);
 
