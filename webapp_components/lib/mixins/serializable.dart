@@ -10,10 +10,11 @@ mixin Serializable {
 
 
   void initValue(String screenId, String key, List<String> values, {bool notify = true}) {
-    setValue(screenId, key, values, notify: false);
+    setValue(screenId, key, values, notify: notify);
   }
 
-  void setValue(String screenId, String key, List<String> values, {bool notify = true}) {
+  void setValue(String screenId, String key, List<String> values, {bool notify = false}) {
+    print("NEW Value ${values}");
     componentData.clear();
     componentData.add(ComponentData(id: screenId, key: key, values: values));
 
@@ -23,7 +24,7 @@ mixin Serializable {
     
   }
 
-  void addValues(String key, String screenId, List<String> values, {bool notify = true}) {
+  void addValues(String key, String screenId, List<String> values, {bool notify = false}) {
     for (var cd in componentData) {
       if (cd.key == key) {
         cd.values.addAll(values);

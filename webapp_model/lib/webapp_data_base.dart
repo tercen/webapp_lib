@@ -137,8 +137,6 @@ class WebAppDataBase with ChangeNotifier {
           projectId, user, "${user}_nav_05",
           parentId: folder.id);
 
-      print(_model.toJson());
-
 
       await Future.wait([
         projectService.updateFileContent(viewFile, _model.toJson()),
