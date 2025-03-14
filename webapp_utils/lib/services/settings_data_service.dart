@@ -33,6 +33,9 @@ class SettingsDataService{
 
 
   Future<void> loadTemplateConfig(String assetPath ) async {
+    if( assetPath == ""){
+      return;
+    }
     var assetString = await rootBundle.loadString(assetPath);
     final jsonString = JsonString(assetString);
 
@@ -42,6 +45,9 @@ class SettingsDataService{
 
 
   Future<void> loadWorkflowStepMapper(String assetPath ) async {
+    if( assetPath == ""){
+      return;
+    }
     var assetString = await rootBundle.loadString(assetPath);
     final jsonString = JsonString(assetString);
 
@@ -49,6 +55,9 @@ class SettingsDataService{
   }
 
   Future<void> loadSettingsFilter(String assetPath) async {
+    if( assetPath == ""){
+      return;
+    }
     var assetString = await rootBundle.loadString(assetPath);
     final jsonString = JsonString(assetString);
 
