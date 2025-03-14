@@ -267,7 +267,6 @@ class WebAppDataBase with ChangeNotifier {
     print("Found the following workflows:");
     for( var w in installedWorkflows ){
       print("\t${w.name} :: ${w.version} :: ${w.url.uri}");
-      print(w.toJson());
     }
     List<RequiredTemplate> missing = [];
 
