@@ -12,5 +12,8 @@ abstract class Component with ChangeNotifier {
   bool isActive();
   bool isFulfilled();
 
+  dynamic getComponentValue();
+  void setComponentValue(dynamic value);
+
   ComponentType getComponentType();
 }

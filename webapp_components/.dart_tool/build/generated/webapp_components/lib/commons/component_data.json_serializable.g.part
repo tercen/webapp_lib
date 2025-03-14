@@ -1,0 +1,18 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+ComponentData _$ComponentDataFromJson(Map<String, dynamic> json) =>
+    ComponentData(
+      id: json['id'] as String,
+      key: json['key'] as String,
+      values:
+          (json['values'] as List<dynamic>).map((e) => e as String).toList(),
+    );
+
+Map<String, dynamic> _$ComponentDataToJson(ComponentData instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'key': instance.key,
+      'values': instance.values,
+    };

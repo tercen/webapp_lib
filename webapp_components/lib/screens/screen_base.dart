@@ -9,6 +9,7 @@ import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_components/action_components/action_component.dart';
 import 'package:webapp_components/components/horizontal_bar.dart';
 import 'package:webapp_components/mixins/input_validator.dart';
+import 'package:webapp_components/mixins/serializable.dart';
 import 'package:webapp_model/webapp_data_base.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
@@ -66,28 +67,33 @@ mixin ScreenBase {
 
   void addHorizontalBar(String blockId,
       {Component? parent, double thickness = 2}) {
-    var horizBar = HorizontalBarComponent(thickness: thickness);
-    if (parent != null) {
-      horizBar.addParent(parent);
-    }
+    // var horizBar = HorizontalBarComponent(thickness: thickness);
+    // if (parent != null) {
+    //   horizBar.addParent(parent);
+    // }
 
-    addComponent(blockId, horizBar);
+    // addComponent(blockId, horizBar);
   }
 
   void addHeading( String blockId, String text, {Component? parent} ){
-    var headingComp = LabelComponent(text);
-    if( parent != null ){
-      headingComp.addParent(parent);
-    }
+    // var headingComp = LabelComponent(text);
+    // if( parent != null ){
+    //   headingComp.addParent(parent);
+    // }
 
-    addComponent(blockId, headingComp);
+    // addComponent(blockId, headingComp);
   }
 
   void updateModel() {
     var comps = getAllComponents();
     for (var comp in comps) {
+      if( comp is Serializable ){
+        
+        modelLayer.setData(comp.getId(), comp.getGroupId(), (comp as Serializable).getValuesAsString(comp.getId(), comp.getGroupId()));
+      }
       if (comp.getGroupId() != LAYOUT_GROUP) {
         // Remove components like horizontal bar and spacing, which have no value
+        
         if (comp is SingleValueComponent) {
           modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getValue());
         }

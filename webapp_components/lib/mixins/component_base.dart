@@ -19,18 +19,18 @@ mixin class ComponentBase {
 
   String getKey(){
     var key = "${getId()}_${getGroupId()}";
-    for( var comp in ancestors ){
-      if( comp is SingleValueComponent ){
-        key = "$key${comp.getValue().id}";
-      }
+    // for( var comp in ancestors ){
+    //   if( comp is SingleValueComponent ){
+    //     key = "$key${comp.getValue().id}";
+    //   }
 
-      if( comp is MultiValueComponent ){
-        var vals = comp.getValue();
-        for( var val in vals ){
-          key = "$key${val.id}";
-        }
-      }
-    }
+    //   if( comp is MultiValueComponent ){
+    //     var vals = comp.getValue();
+    //     for( var val in vals ){
+    //       key = "$key${val.id}";
+    //     }
+    //   }
+    // }
 
     return key;
   }
@@ -74,15 +74,15 @@ mixin class ComponentBase {
   Map<String, List<IdElement>> getAncestorValues(){
     Map<String, List<IdElement>> vals = {};
 
-    for( var ancestor in ancestors ){
-      if( ancestor is SingleValueComponent   ){
-        vals[ancestor.getId()] = [ancestor.getValue()];
-      }
-      if( ancestor is MultiValueComponent ){
-        vals[ancestor.getId()] = ancestor.getValue();
-      }
+    // for( var ancestor in ancestors ){
+    //   if( ancestor is SingleValueComponent   ){
+    //     vals[ancestor.getId()] = [ancestor.getValue()];
+    //   }
+    //   if( ancestor is MultiValueComponent ){
+    //     vals[ancestor.getId()] = ancestor.getValue();
+    //   }
       
-    }
+    // }
     return vals;
   }
 

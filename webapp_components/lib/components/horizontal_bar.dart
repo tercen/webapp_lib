@@ -1,53 +1,53 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
-import 'package:webapp_components/abstract/component.dart';
-import 'package:webapp_components/definitions/component.dart';
-import 'package:webapp_components/mixins/component_base.dart';
-import 'package:webapp_utils/functions/string_utils.dart';
+// import 'package:webapp_components/abstract/component.dart';
+// import 'package:webapp_components/definitions/component.dart';
+// import 'package:webapp_components/mixins/component_base.dart';
+// import 'package:webapp_utils/functions/string_utils.dart';
 
-class HorizontalBarComponent  extends Component with ComponentBase {
-  final double thickness;
-  HorizontalBarComponent({this.thickness = 2}){
-    super.id = StringUtils.getRandomString(4);
-    super.groupId = LAYOUT_GROUP;
-    super.componentLabel = "";
-  }
+// class HorizontalBarComponent  extends Component with ComponentBase {
+//   final double thickness;
+//   HorizontalBarComponent({this.thickness = 2}){
+//     super.id = StringUtils.getRandomString(4);
+//     super.groupId = LAYOUT_GROUP;
+//     super.componentLabel = "";
+//   }
 
-  @override
-  Widget buildContent(BuildContext context) {
-    return Container(
-      height: thickness,
-      color: Colors.black,
-    );
-  }
+//   @override
+//   Widget buildContent(BuildContext context) {
+//     return Container(
+//       height: thickness,
+//       color: Colors.black,
+//     );
+//   }
 
-  @override
-  ComponentType getComponentType() {
-    return ComponentType.simpleNoLabel;
-  }
+//   @override
+//   ComponentType getComponentType() {
+//     return ComponentType.simpleNoLabel;
+//   }
 
   
 
-  @override
-  void reset(){
+//   @override
+//   void reset(){
     
-  } 
+//   } 
 
-  // @override
-  // bool isActive() {
-  //   return true;
-  // }
+//   // @override
+//   // bool isActive() {
+//   //   return true;
+//   // }
 
-  @override
-  bool isFulfilled() {
-    return true;
-  }
+//   @override
+//   bool isFulfilled() {
+//     return true;
+//   }
 
-  @override
-  String label() {
-    return "";
-  }
+//   @override
+//   String label() {
+//     return "";
+//   }
 
   
 
-}
+// }

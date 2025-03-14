@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:webapp_components/abstract/component.dart';
 import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/mixins/input_validator.dart';
+import 'package:webapp_components/mixins/serializable.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_model/id_element.dart';
@@ -8,7 +10,8 @@ import 'package:webapp_model/id_element.dart';
 
 import '../mixins/component_base.dart';
 
-class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator implements SingleValueComponent {
+class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Serializable implements Component {
+  final Map<String, dynamic> valueMap = {};
   final TextEditingController controller = TextEditingController();
 
   final List<void Function()> onChangeFunctions = [];
@@ -19,12 +22,14 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
-
+    controller.addListener(updateValue);
   }
+
+
 
   @override
   void validate(){
-    validateSingleInput(getValue());
+    // validateSingleInput(getValue()['text']);
   }
 
   @override
@@ -65,9 +70,9 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
   }
 
 
-  void setData(data) {
-    controller.text = data;
-  }
+  // void setData(data) {
+  //   controller.text = data;
+  // }
 
 
 
@@ -83,16 +88,6 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
   }
 
   @override
-  IdElement getValue() {
-    return IdElement(controller.text, controller.text);
-  }
-
-  @override
-  void setValue(IdElement value) {
-    controller.text = value.label;
-  }
-  
-  @override
   bool isFulfilled() {
     return controller.text != "";
   }
@@ -102,5 +97,18 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
     return ComponentType.simple;
   }
   
+  @override
+  getComponentValue() {
+    return controller.text;
+  }
+  
+  @override
+  void setComponentValue(value) {
+    controller.text = value;
+  }
+  
+  void updateValue(){
+    setValue(id, getGroupId(),  [controller.text]);
+  }
 
 }

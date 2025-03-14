@@ -170,11 +170,10 @@ class WebAppBase with ChangeNotifier {
     }
   }
 
-  Map<String, List<IdElement>> getPersistentData() {
+  Map<String, List<String>> getPersistentData() {
     return {
       "APP_selectedScreen": [
-        IdElement(
-            navMenu.getSelectedEntry().label, navMenu.getSelectedEntry().label)
+        navMenu.getSelectedEntry().label
       ]
     };
   }
