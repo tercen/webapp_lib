@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:json_string/json_string.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
 import 'package:webapp_model/id_element.dart';
@@ -100,7 +101,7 @@ class ProjectDataService with DataCache {
 
   Future<void> updateFileContent(FileDocument fileDoc, Map content) async {
     var factory = tercen.ServiceFactory();
-    fileDoc = setFileContent(fileDoc,  jsonEncode( content ) );
+    fileDoc = setFileContent(fileDoc,  jsonEncode( JsonString(content as String)  ) );
     // ignore: invalid_return_type_for_catch_error
     await factory.fileService.update(fileDoc).catchError((e) => Logger()
         .log(level: Logger.INFO, message: "Unable to update model state file"));

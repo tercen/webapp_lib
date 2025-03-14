@@ -120,7 +120,7 @@ class WebAppDataBase with ChangeNotifier {
       print(projectService.getFileContent(viewFile));
       var map = Map<String, List<String>>.from((projectService.getFileContent(viewFile)));
       
-      _model = ViewState.fromJson( map as Map<String, List<String>> ); 
+      _model = ViewState.fromJson( map ); 
       // app.loadPersistentData(projectService.getFileContent(navFile));
     }
   }
