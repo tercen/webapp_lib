@@ -22,7 +22,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
-    controller.addListener(updateValue);
+    // controller.addListener(updateValue);
     updateTrack.addListener(modelUpdated);
   }
 
@@ -45,6 +45,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
     return Focus(
       onFocusChange: (hasFocus) {
         if( !hasFocus ){
+          setValue(id, getGroupId(),  [controller.text], notify: false);
           for( var func in onFocusLostFunctions){
             func();
           }
@@ -59,10 +60,11 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
           for( var func in onChangeFunctions){
             func();
           }
+          setValue(id, getGroupId(),  [controller.text], notify: false);
           notifyListeners();
         } ,
         onTapOutside: (event) {
-          
+          setValue(id, getGroupId(),  [controller.text], notify: false);
         },
         style: Styles()["text"],
         decoration: InputDecoration(

@@ -122,6 +122,8 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> saveModel() async {
     if (app.projectId != "") {
+      print("SAVING model on ${app.projectName}");
+
       var projectId = app.projectId;
       var user = app.username;
       var folder = await projectService
@@ -134,6 +136,8 @@ class WebAppDataBase with ChangeNotifier {
       var navFile = await projectService.getOrCreateFile(
           projectId, user, "${user}_nav_05",
           parentId: folder.id);
+
+      print(_model.toJson());
 
 
       await Future.wait([
