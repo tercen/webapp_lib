@@ -53,9 +53,9 @@ class WebAppDataBase with ChangeNotifier {
       String stepMapperJsonFile = ""}) async {
     clear();
 
+    await projectService.loadFolderStructure(projectId);
     await Future.wait([
       // workflowService.init(reposJsonPath: reposJsonPath),
-      projectService.loadFolderStructure(projectId),
       settingsService.loadTemplateConfig(reposJsonPath),
       settingsService.loadSettingsFilter(settingFilterFile),
       settingsService.loadWorkflowStepMapper(stepMapperJsonFile)      
