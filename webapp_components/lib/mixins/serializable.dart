@@ -10,6 +10,7 @@ mixin Serializable {
 
 
   void initValue(String id, String screenId, List<String> values, {bool notify = true}) {
+    print("Initializing with value: $values");
     setValue(id, screenId, values, notify: notify);
   }
 
