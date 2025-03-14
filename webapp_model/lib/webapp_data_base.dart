@@ -118,7 +118,7 @@ class WebAppDataBase with ChangeNotifier {
 
       print("File content");
       print(projectService.getFileContent(viewFile));
-      var map = Map<String, List<String>>.from((projectService.getFileContent(viewFile)));
+      var map =projectService.getFileContent(viewFile);
       
       _model = ViewState.fromJson( map ); 
       // app.loadPersistentData(projectService.getFileContent(navFile));
