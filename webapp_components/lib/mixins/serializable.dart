@@ -14,7 +14,6 @@ mixin Serializable {
   }
 
   void setValue(String screenId, String key, List<String> values, {bool notify = false}) {
-    print("NEW Value ${values}");
     componentData.clear();
     componentData.add(ComponentData(id: screenId, key: key, values: values));
 
