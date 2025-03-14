@@ -88,7 +88,7 @@ class WorkflowDataService with DataCache {
     var factory = tercen.ServiceFactory();
 
     var libObjs = await factory.documentService
-        .getLibrary('', teamList, ["Workflow"], [], 0, -1);
+        .getLibrary('', [], ["Workflow"], [], 0, -1);
     
     var workflows = await factory.workflowService.list(libObjs.map((o) => o.id).toList());
 
