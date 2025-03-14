@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
 import 'package:webapp_components/components/label_component.dart';
 import 'package:webapp_components/definitions/component.dart';
-import 'package:webapp_components/abstract/multi_value_component.dart';
-import 'package:webapp_components/abstract/single_value_component.dart';
+// import 'package:webapp_components/abstract/multi_value_component.dart';
+// import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_components/action_components/action_component.dart';
 import 'package:webapp_components/components/horizontal_bar.dart';
 import 'package:webapp_components/mixins/input_validator.dart';
@@ -88,26 +88,25 @@ mixin ScreenBase {
     var comps = getAllComponents();
     for (var comp in comps) {
       if( comp is Serializable ){
-        
         modelLayer.setData(comp.getId(), comp.getGroupId(), (comp as Serializable).getValuesAsString(comp.getId(), comp.getGroupId()));
       }
-      if (comp.getGroupId() != LAYOUT_GROUP) {
-        // Remove components like horizontal bar and spacing, which have no value
+      // if (comp.getGroupId() != LAYOUT_GROUP) {
+      //   // Remove components like horizontal bar and spacing, which have no value
         
-        if (comp is SingleValueComponent) {
-          modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getValue());
-        }
+      //   if (comp is SingleValueComponent) {
+      //     modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getValue());
+      //   }
 
-        if (comp is MultiValueComponent) {
-          var values = comp.getValue();
-          modelLayer.clearData(comp.getId(), comp.getGroupId());
+      //   if (comp is MultiValueComponent) {
+      //     var values = comp.getValue();
+      //     modelLayer.clearData(comp.getId(), comp.getGroupId());
 
-          for (var v in values) {
-            modelLayer.setData(comp.getId(), comp.getGroupId(), v,
-                multiple: true);
-          }
-        }
-      }
+      //     for (var v in values) {
+      //       modelLayer.setData(comp.getId(), comp.getGroupId(), v,
+      //           multiple: true);
+      //     }
+      //   }
+      // }
     }
   }
 
@@ -138,16 +137,17 @@ mixin ScreenBase {
 
         serComp.setValue(comp.getId(), comp.getGroupId(), modelValue);
       }
-      var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
-      if (modelValue.isNotEmpty) {
-        if (comp is SingleValueComponent) {
-          comp.setValue(modelValue.first);
-        }
+      // var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
 
-        if (comp is MultiValueComponent) {
-          comp.setValue(modelValue);
-        }
-      }
+      // if (modelValue.isNotEmpty) {
+      //   if (comp is SingleValueComponent) {
+      //     comp.setValue(modelValue.first);
+      //   }
+
+      //   if (comp is MultiValueComponent) {
+      //     comp.setValue(modelValue);
+      //   }
+      // }
     }
 
     // updateTimer = Timer.periodic(const Duration(seconds: 1), (timer){
