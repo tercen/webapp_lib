@@ -262,7 +262,7 @@ class WebAppDataBase with ChangeNotifier {
     var requiredWorkflows = settingsService.requiredWorkflows;
     Logger().log(level: Logger.INFO, message: "Reading workflows for ${app.teamname} / ${app.username}");
     var installedWorkflows = await workflowService
-        .readWorkflowsFromLib2(team: app.teamname, user: app.username);
+        .readWorkflowsFromLib2();
     List<RequiredTemplate> missing = [];
 
     for (var reqWkf in requiredWorkflows) {
