@@ -161,16 +161,16 @@ class WebAppDataBase with ChangeNotifier {
   //   return "";
   // }
 
-  // List<String> getData(String key, String groupKey) {
-  //   key = buildKey(key, groupKey);
-  //   List<String> result = [];
+  List<String> getData(String key, String groupKey) {
+    key = buildKey(key, groupKey);
+    List<String> result = [];
 
-  //   if (_model.containsKey(key)) {
-  //     result = _model[key]!;
-  //   }
+    if (_model.hasKey(key)) {
+      result = _model[key];
+    }
 
-  //   return result;
-  // }
+    return result;
+  }
 
   void clearData(String key, String groupKey) {
     // key = buildKey(key, groupKey);

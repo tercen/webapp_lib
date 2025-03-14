@@ -132,6 +132,12 @@ mixin ScreenBase {
     List<Component> components = getAllComponents();
     this.modelLayer = modelLayer;
     for (var comp in components) {
+      if( comp is Serializable ){
+        var serComp = comp as Serializable;
+        var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());  
+
+        serComp.setValue(comp.getId(), comp.getGroupId(), modelValue);
+      }
       var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
       if (modelValue.isNotEmpty) {
         if (comp is SingleValueComponent) {

@@ -1,21 +1,33 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
 import 'package:webapp_components/commons/component_data.dart';
 
 mixin Serializable {
   final List<ComponentData> componentData = [];
+  ValueNotifier updateTrack = ValueNotifier<int>(0);
   static const String LIST_BREAK = "|@|";
 
-  void setValue(String screenId, String key, List<String> values) {
+  void setValue(String screenId, String key, List<String> values, {bool notify = true}) {
     componentData.clear();
     componentData.add(ComponentData(id: screenId, key: key, values: values));
+
+    if(notify){
+      updateTrack.value = Random().nextInt(1<<32-1);
+    }
+    
   }
 
-  void addValues(String key, String screenId, List<String> values) {
+  void addValues(String key, String screenId, List<String> values, {bool notify = true}) {
     for (var cd in componentData) {
       if (cd.key == key) {
         cd.values.addAll(values);
       }
     }
     componentData.add(ComponentData(id: screenId, key: key, values: values));
+    if(notify){
+      updateTrack.value = Random().nextInt(1<<32-1);
+    }
   }
 
   List<String> getValues(String key, String screenId) {

@@ -23,9 +23,17 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
     super.groupId = groupId;
     super.componentLabel = componentLabel;
     controller.addListener(updateValue);
+    updateTrack.addListener(modelUpdated);
   }
 
-
+  void modelUpdated(){
+    var serValues = getValues(id, groupId);
+    if( serValues.isEmpty ){
+      controller.text = "";
+    }else{
+      controller.text = serValues.first;
+    }
+  }
 
   @override
   void validate(){
@@ -108,7 +116,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
   }
   
   void updateValue(){
-    setValue(id, getGroupId(),  [controller.text]);
+    setValue(id, getGroupId(),  [controller.text], notify: false);
   }
 
 }
