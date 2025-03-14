@@ -137,16 +137,12 @@ class WebAppDataBase with ChangeNotifier {
           projectId, user, "${user}_nav_05",
           parentId: folder.id);
 
-      for( var o in _model.objects ){
-        print(o.toJson());
-      }
 
-
-      // await Future.wait([
-      //   projectService.updateFileContent(viewFile, _model.toJson()),
-      //   projectService.updateFileContent(
-      //       navFile, _idElMapToJson(app.getPersistentData()))
-      // ]);
+      await Future.wait([
+        projectService.updateFileContent(viewFile,   _model.toJson()),
+        projectService.updateFileContent(
+            navFile, _idElMapToJson(app.getPersistentData()))
+      ]);
     }
   }
 
