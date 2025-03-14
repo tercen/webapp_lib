@@ -186,9 +186,17 @@ class ProjectDataService with DataCache {
   }
 
   List<Document> _getDocuments(String name, bool isFolder, {String? parentId}) {
+    print("Searching for $name");
     var candidateFolderNodes = folderTreeRoot
         .getDescendants(folders: true, documents: true)
         .where((e) => e.document.name == name);
+    print("Found ${candidateFolderNodes.length} candidates");
+
+    var allFiles = folderTreeRoot
+        .getDescendants(folders: true, documents: true).map((e) => e.document.name);
+    for( var f in allFiles ){
+      print("\t${f}");
+    }
 
     if (parentId != null && candidateFolderNodes.isNotEmpty) {
       if (isFolder) {

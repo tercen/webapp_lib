@@ -139,7 +139,7 @@ class WebAppDataBase with ChangeNotifier {
 
 
       await Future.wait([
-        projectService.updateFileContent(viewFile,   _model.toJson()),
+        projectService.updateFileContent(viewFile,  _model.toJson()),
         projectService.updateFileContent(
             navFile, _idElMapToJson(app.getPersistentData()))
       ]);
