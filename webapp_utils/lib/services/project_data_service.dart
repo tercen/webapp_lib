@@ -189,13 +189,13 @@ class ProjectDataService with DataCache {
     print("Searching for $name");
     var candidateFolderNodes = folderTreeRoot
         .getDescendants(folders: true, documents: true)
-        .where((e) => e.document.name == name);
+        .where((e) => e.document.name.trim() == name.trim());
     print("Found ${candidateFolderNodes.length} candidates");
 
     var allFiles = folderTreeRoot
         .getDescendants(folders: true, documents: true).map((e) => e.document.name);
     for( var f in allFiles ){
-      print("\t${f}");
+      print("\t${f}.trim()");
     }
 
     if (parentId != null && candidateFolderNodes.isNotEmpty) {
