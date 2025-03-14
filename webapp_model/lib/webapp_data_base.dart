@@ -292,7 +292,7 @@ class WebAppDataBase with ChangeNotifier {
       var workflows = await factory.workflowService.list( workflowsToFetch.map((wkfPair) => wkfPair.value).toList() );
 
       for( var wkfPair in workflowsToFetch ){
-        var workflow = workflows.firstWhere((w) => w.id == wkfPair.key);
+        var workflow = workflows.firstWhere((w) => w.id == wkfPair.value);
         workflowService.addWorkflow(wkfPair.key, workflow);
       }
     }
