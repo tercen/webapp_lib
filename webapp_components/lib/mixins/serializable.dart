@@ -9,13 +9,13 @@ mixin Serializable {
   static const String LIST_BREAK = "|@|";
 
 
-  void initValue(String screenId, String key, List<String> values, {bool notify = true}) {
-    setValue(screenId, key, values, notify: notify);
+  void initValue(String id, String screenId, List<String> values, {bool notify = true}) {
+    setValue(id, screenId, values, notify: notify);
   }
 
-  void setValue(String screenId, String key, List<String> values, {bool notify = false}) {
+  void setValue(String id, String screenId, List<String> values, {bool notify = false}) {
     componentData.clear();
-    componentData.add(ComponentData(id: screenId, key: key, values: values));
+    componentData.add(ComponentData(id: id, key: screenId, values: values));
 
     if(notify){
       updateTrack.value = Random().nextInt(1<<32-1);
@@ -23,32 +23,32 @@ mixin Serializable {
     
   }
 
-  void addValues(String key, String screenId, List<String> values, {bool notify = false}) {
+  void addValues(String id, String screenId, List<String> values, {bool notify = false}) {
     for (var cd in componentData) {
-      if (cd.key == key) {
+      if (cd.key == id) {
         cd.values.addAll(values);
       }
     }
-    componentData.add(ComponentData(id: screenId, key: key, values: values));
+    componentData.add(ComponentData(id: screenId, key: id, values: values));
     if(notify){
       updateTrack.value = Random().nextInt(1<<32-1);
     }
   }
 
-  List<String> getValues(String key, String screenId) {
+  List<String> getValues(String id, String screenId) {
     return componentData
         .firstWhere(
-          (data) => data.key == key && data.id == screenId,
-          orElse: () => ComponentData(id: screenId, key: key, values: []),
+          (data) => data.key == id && data.id == screenId,
+          orElse: () => ComponentData(id: screenId, key: id, values: []),
         )
         .values;
   }
 
-  String getValuesAsString(String key, String screenId) {
+  String getValuesAsString(String id, String screenId) {
     return componentData
         .firstWhere(
-          (data) => data.key == key && data.id == screenId,
-          orElse: () => ComponentData(id: screenId, key: key, values: []),
+          (data) => data.key == id && data.id == screenId,
+          orElse: () => ComponentData(id: screenId, key: id, values: []),
         )
         .values
         .join(Serializable.LIST_BREAK);
