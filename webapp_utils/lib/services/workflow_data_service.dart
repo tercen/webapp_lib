@@ -7,15 +7,18 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
 import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
+import 'package:webapp_model/settings/required_template.dart';
+import 'package:webapp_model/settings/template_config.dart';
 
 
 import 'package:webapp_utils/functions/logger.dart';
-import 'package:webapp_utils/functions/project_utils.dart';
+
 import 'package:webapp_utils/functions/workflow_utils.dart';
 import 'package:webapp_utils/mixin/data_cache.dart';
 import 'package:webapp_utils/model/workflow_info.dart';
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:webapp_utils/model/workflow_setting.dart';
 
 
 class WorkflowDataService with DataCache {
@@ -27,117 +30,191 @@ class WorkflowDataService with DataCache {
   
   WorkflowDataService._internal();
   
-  final List<WorkflowInfo> _requiredWorkflows = [];
-  final Map<String, Workflow> installedWorkflows = {};
-  bool infoLoaded = false;
+  // final List<WorkflowInfo> _requiredWorkflows = [];
+  final Map<String, Workflow> _installedWorkflows = {};
+  List<WorkflowSetting> workflowSettings = [];
+  // bool infoLoaded = false;
 
   Future<void> init({String reposJsonPath = ""}) async {
-    if( reposJsonPath == ""){
-      return;
-    }
-    String settingsStr = await rootBundle.loadString(reposJsonPath);
-    try {
-      final jsonString = JsonString(settingsStr);
-      final repoInfoMap = jsonString.decodedValueAsMap;
+    // if( reposJsonPath == ""){
+    //   return;
+    // }
+    // String settingsStr = await rootBundle.loadString(reposJsonPath);
+    // try {
+    //   final jsonString = JsonString(settingsStr);
+    //   final repoInfoMap = jsonString.decodedValueAsMap;
 
-      for (int i = 0; i < repoInfoMap["repos"].length; i++) {
-        Map<String, dynamic> jsonEntry = repoInfoMap["repos"][i];
+    //   for (int i = 0; i < repoInfoMap["repos"].length; i++) {
+    //     Map<String, dynamic> jsonEntry = repoInfoMap["repos"][i];
 
-        WorkflowInfo workflow = WorkflowInfo(jsonEntry["iid"],
-            jsonEntry["name"], jsonEntry["url"], jsonEntry["version"]);
+    //     WorkflowInfo workflow = WorkflowInfo(jsonEntry["iid"],
+    //         jsonEntry["name"], jsonEntry["url"], jsonEntry["version"]);
 
-        _requiredWorkflows.add(workflow);
+    //     _requiredWorkflows.add(workflow);
 
-        infoLoaded = true;
-      }
-    } on Exception catch (e) {
-      print('Invalid JSON: $e');
-    }
+    //     infoLoaded = true;
+    //   }
+    // } on Exception catch (e) {
+    //   print('Invalid JSON: $e');
+    // }
 
-    await readWorkflowsFromLib();
+    // await readWorkflowsFromLib();
   }
 
-  Future<Map<String, Workflow>> readWorkflowsFromLib() async {
-    if (installedWorkflows.isNotEmpty) {
-      return installedWorkflows;
-    }
 
-    if (!infoLoaded) {
-      await init();
+  void addWorkflow( String iid, Workflow workflow ){
+    _installedWorkflows[iid] = workflow;
+  }
+
+  Workflow getWorkflow(String key) {
+    if (!_installedWorkflows.containsKey(key)) {
+      throw ServiceError(500, "Failed to find workflow with key '$key'");
     }
+    return _installedWorkflows[key]!;
+  }
+
+
+  Future<List<sci.Workflow>> readWorkflowsFromLib2(String team, {String? user}) async {
+    var teamList = user == null ? [team] : [team, user];
+
     var factory = tercen.ServiceFactory();
 
     var libObjs = await factory.documentService
-        .getLibrary('', [], ["Workflow"], [], 0, -1);
+        .getLibrary('', teamList, ["Workflow"], [], 0, -1);
     
-    var reqWkfs = _getRequiredWorkflowsIds(libObjs);
+    var workflows = await factory.workflowService.list(libObjs.map((o) => o.id).toList());
 
-    var workflows = await factory.workflowService.list(reqWkfs[0]);
-
-    for (var i = 0; i < workflows.length; i++) {
-      Logger().log(
-          level: Logger.INFO,
-          message: " Adding ${workflows[i].name} to ${reqWkfs[1][i]} ");
-      installedWorkflows[reqWkfs[1][i]] = workflows[i];
-    }
-
-    return installedWorkflows;
+    return workflows;
   }
 
-  String _isInRepoFile(Document libObj) {
-    for (var info in _requiredWorkflows) {
+  // Future<Map<String, Workflow>> readWorkflowsFromLib() async {
+
+  //   if (installedWorkflows.isNotEmpty) {
+  //     return installedWorkflows;
+  //   }
+
+  //   if (!infoLoaded) {
+  //     await init();
+  //   }
+  //   var factory = tercen.ServiceFactory();
+
+  //   var libObjs = await factory.documentService
+  //       .getLibrary('', [], ["Workflow"], [], 0, -1);
+    
+  //   var reqWkfs = _getRequiredWorkflowsIds(libObjs);
+
+  //   var workflows = await factory.workflowService.list(reqWkfs[0]);
+
+  //   for (var i = 0; i < workflows.length; i++) {
+  //     Logger().log(
+  //         level: Logger.INFO,
+  //         message: " Adding ${workflows[i].name} to ${reqWkfs[1][i]} ");
+  //     installedWorkflows[reqWkfs[1][i]] = workflows[i];
+  //   }
+
+  //   return installedWorkflows;
+  // }
+
+  // String _isInRepoFile(Document libObj) {
+  //   for (var info in _requiredWorkflows) {
       
-      var isCorrectVersion = info.version == "NONE" || info.version == libObj.version;
-      // print("${info.url == libObj.url.uri} :::: $isCorrectVersion");
-      if (info.url == libObj.url.uri && isCorrectVersion) {
-        return info.iid;
+  //     var isCorrectVersion = info.version == "NONE" || info.version == libObj.version;
+  //     // print("${info.url == libObj.url.uri} :::: $isCorrectVersion");
+  //     if (info.url == libObj.url.uri && isCorrectVersion) {
+  //       return info.iid;
+  //     }
+  //   }
+
+  //   return "";
+  // }
+
+  // bool _allWorkflowsInstalled(List<String> iids) {
+  //   for (var wi in _requiredWorkflows) {
+  //     if (!iids.contains(wi.iid)) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // }
+
+  // List<List<String>> _getRequiredWorkflowsIds(List<Document> libObjs) {
+  //   List<String> ids = [];
+  //   List<String> iids = [];
+  //   print("Checking library for required workflows");
+  //   for (var obj in libObjs) {
+  //     print("\tChecking ${obj.url.uri}");
+  //     var iid = _isInRepoFile(obj);
+  //     // print("IID: $iid");
+
+  //     if (iid != "") {
+  //       print("\tFound");
+  //       ids.add(obj.id);
+  //       iids.add(iid);
+  //     }
+  //   }
+
+  //   if (!_allWorkflowsInstalled(iids)) {
+  //     print("Did not find all needed workflows");
+  //     throw  sci.ServiceError(1, "Missing Required Templates", missingTemplateErrorMessage(iids));
+  //   }
+  //   return [ids, iids];
+  // }
+
+  // String missingTemplateErrorMessage(List<String> foundIids){
+  //   var err = "The following templates or versions were not found in any of your library teams:\n";
+
+  //   for( var info in _requiredWorkflows ){
+  //     if( !foundIids.contains( info.iid)){
+  //       err = "$err\n* ${info.url} (version ${info.version})";
+  //     }
+  //   }
+  //   return err;
+  // }
+
+  Future<void> loadWorkflowSettings() async {
+    var factory = tercen.ServiceFactory();
+
+    for (var template in _installedWorkflows.values) {
+      var dataSteps = template.steps
+          .whereType<DataStep>()
+          .where((step) =>
+              step.model.operatorSettings.operatorRef.operatorId != "")
+          .toList();
+      var opIds = dataSteps
+          .map((step) => step.model.operatorSettings.operatorRef.operatorId)
+          .toList();
+      var operators = await factory.operatorService.list(opIds);
+
+      List<int>.generate(operators.length, (i) => i).map((i) {});
+      for (var i = 0; i < operators.length; i++) {
+        var step = dataSteps[i];
+        var op = operators[i];
+        workflowSettings.addAll(op.properties.map((prop) {
+          if (prop is DoubleProperty) {
+            return WorkflowSetting(step.name, step.id, prop.name,
+                prop.defaultValue.toString(), "double", prop.description);
+          }
+          if (prop is StringProperty) {
+            return WorkflowSetting(step.name, step.id, prop.name,
+                prop.defaultValue, "string", prop.description);
+          }
+          if (prop is BooleanProperty) {
+            return WorkflowSetting(step.name, step.id, prop.name,
+                prop.defaultValue.toString(), "boolean", prop.description);
+          }
+          if (prop is EnumeratedProperty) {
+            var kind = prop.isSingleSelection ? "ListSingle" : "ListMultiple";
+            return WorkflowSetting(step.name, step.id, prop.name,
+                prop.defaultValue, kind, prop.description,
+                isSingleSelection: prop.isSingleSelection,
+                opOptions: prop.values);
+          }
+
+          return WorkflowSetting(
+              step.name, step.id, prop.name, "", "string", prop.description);
+        }));
       }
     }
-
-    return "";
-  }
-
-  bool _allWorkflowsInstalled(List<String> iids) {
-    for (var wi in _requiredWorkflows) {
-      if (!iids.contains(wi.iid)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  List<List<String>> _getRequiredWorkflowsIds(List<Document> libObjs) {
-    List<String> ids = [];
-    List<String> iids = [];
-    print("Checking library for required workflows");
-    for (var obj in libObjs) {
-      print("\tChecking ${obj.url.uri}");
-      var iid = _isInRepoFile(obj);
-      // print("IID: $iid");
-
-      if (iid != "") {
-        print("\tFound");
-        ids.add(obj.id);
-        iids.add(iid);
-      }
-    }
-
-    if (!_allWorkflowsInstalled(iids)) {
-      print("Did not find all needed workflows");
-      throw  sci.ServiceError(1, "Missing Required Templates", missingTemplateErrorMessage(iids));
-    }
-    return [ids, iids];
-  }
-
-  String missingTemplateErrorMessage(List<String> foundIids){
-    var err = "The following templates or versions were not found in any of your library teams:\n";
-
-    for( var info in _requiredWorkflows ){
-      if( !foundIids.contains( info.iid)){
-        err = "$err\n* ${info.url} (version ${info.version})";
-      }
-    }
-    return err;
   }
 
   bool _isFileSchema(Schema sch) {
@@ -159,15 +236,16 @@ class WorkflowDataService with DataCache {
       case "CompositeRelation":
         CompositeRelation cr = relation as CompositeRelation;
         List<JoinOperator> joList = cr.joinOperators;
-        l.addAll(WorkflowUtils.getSimpleRelations(cr.mainRelation));
+        l.addAll(_getSimpleRelations(cr.mainRelation));
         for (var jo in joList) {
-          l.addAll(WorkflowUtils.getSimpleRelations(jo.rightRelation));
+          l.addAll(_getSimpleRelations(jo.rightRelation));
         }
+        break;
       case "RenameRelation":
         RenameRelation rr = relation as RenameRelation;
-        l.addAll(WorkflowUtils.getSimpleRelations(rr.relation));
-
-      //
+        l.addAll(_getSimpleRelations(rr.relation));
+        break;
+      
       default:
     }
 
@@ -470,21 +548,14 @@ class WorkflowDataService with DataCache {
     return results;
   }
 
-  Workflow getWorkflow(String key) {
-    if (!installedWorkflows.containsKey(key)) {
-      throw Exception("Failed to find workflow with key '$key'");
-    }
-    return installedWorkflows[key]!;
-  }
+
 
   Future<Workflow> fetchWorkflow(String id) async {
     var factory = tercen.ServiceFactory();
     return factory.workflowService.get(id);
   }
 
-  Future<List<Workflow>> fetchProjectWorkflows(String projectId) async {
-    var projectFiles = ProjectUtils().getProjectFiles();
-
+  Future<List<Workflow>> fetchProjectWorkflows(List<Document> projectFiles) async {
     var workflowIds = projectFiles
         .where((e) => e.subKind == "Workflow")
         .map((e) => e.id)
@@ -495,4 +566,25 @@ class WorkflowDataService with DataCache {
         ? []
         : await factory.workflowService.list(workflowIds);
   }
+
+  Future<void> updateFile( Document document,
+       String text) async {
+      var factory = tercen.ServiceFactory();
+      var downloadStream = factory.fileService.download(document.id);
+      var fileBytes = await downloadStream.toList();
+
+      var readmeTxt = utf8.decode(fileBytes[0]);
+
+      var notes = text.split("\n").map((e) => "> $e").join("  \n");
+      notes += "  \n\n";
+      notes = "## Run Notes  \n$notes";
+      readmeTxt = notes + readmeTxt;
+
+      var doc = await factory.fileService.get(document.id);
+      Stream<List> dataStream =
+          Stream.fromIterable(Iterable.castFrom([utf8.encode(readmeTxt)]));
+      factory.fileService.upload(doc, dataStream);
+  }
+
 }
+

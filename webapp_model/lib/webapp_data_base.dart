@@ -6,21 +6,19 @@ import 'package:sci_tercen_client/sci_client.dart';
 
 import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
+import 'package:webapp_model/settings/required_template.dart';
 import 'package:webapp_ui_commons/webapp_base.dart';
-import 'package:webapp_utils/functions/project_utils.dart';
-import 'package:webapp_utils/functions/workflow_steps_mapper.dart';
 import 'package:webapp_utils/services/file_data_service.dart';
 import 'package:webapp_utils/services/settings_data_service.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
 import 'package:webapp_utils/services/user_data_service.dart';
 import 'package:webapp_utils/services/project_data_service.dart';
-import 'package:webapp_utils/model/workflow_setting.dart';
 
 class WebAppDataBase with ChangeNotifier {
   final WebAppBase app;
   WebAppDataBase(this.app);
 
-  final WorkflowStepsMapper stepsMapper = WorkflowStepsMapper();
+  // final WorkflowStepsMapper stepsMapper = WorkflowStepsMapper();
 
   final Map<String, List<IdElement>> _model = {};
 
@@ -30,7 +28,6 @@ class WebAppDataBase with ChangeNotifier {
   final UserDataService userService = UserDataService();
   final ProjectDataService projectService = ProjectDataService();
 
-  List<WorkflowSetting> workflowSettings = [];
   Timer? saveTimer;
 
   bool shouldReload = false;
@@ -53,63 +50,16 @@ class WebAppDataBase with ChangeNotifier {
     clear();
 
     await Future.wait([
-      workflowService.init(reposJsonPath: reposJsonPath),
-      ProjectUtils().loadFolderStructure(projectId),
-      stepsMapper.loadSettingsFile(stepMapperJsonFile)
+      // workflowService.init(reposJsonPath: reposJsonPath),
+      projectService.loadFolderStructure(projectId),
+      settingsService.loadWorkflowStepMapper(stepMapperJsonFile),
+      settingsService.loadSettingsFilter(stepMapperJsonFile),
+      settingsService.loadTemplateConfig(stepMapperJsonFile)
     ]);
 
-    var factory = tercen.ServiceFactory();
-
-    for (var template in workflowService.installedWorkflows.values) {
-      var dataSteps = template.steps
-          .whereType<DataStep>()
-          .where((step) =>
-              step.model.operatorSettings.operatorRef.operatorId != "")
-          .toList();
-      var opIds = dataSteps
-          .map((step) => step.model.operatorSettings.operatorRef.operatorId)
-          .toList();
-      var operators = await factory.operatorService.list(opIds);
-
-      List<int>.generate(operators.length, (i) => i).map((i) {});
-      for (var i = 0; i < operators.length; i++) {
-        var step = dataSteps[i];
-        var op = operators[i];
-        workflowSettings.addAll(op.properties.map((prop) {
-          if (prop is DoubleProperty) {
-            return WorkflowSetting(step.name, step.id, prop.name,
-                prop.defaultValue.toString(), "double", prop.description);
-          }
-          if (prop is StringProperty) {
-            return WorkflowSetting(step.name, step.id, prop.name,
-                prop.defaultValue, "string", prop.description);
-          }
-          if (prop is BooleanProperty) {
-            return WorkflowSetting(step.name, step.id, prop.name,
-                prop.defaultValue.toString(), "boolean", prop.description);
-          }
-          if (prop is EnumeratedProperty) {
-            var kind = prop.isSingleSelection ? "ListSingle" : "ListMultiple";
-            return WorkflowSetting(step.name, step.id, prop.name,
-                prop.defaultValue, kind, prop.description,
-                isSingleSelection: prop.isSingleSelection,
-                opOptions: prop.values);
-          }
-
-          return WorkflowSetting(
-              step.name, step.id, prop.name, "", "string", prop.description);
-        }));
-      }
-    }
-
-    await loadModel();
-
-    saveTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
-      saveModel();
-    });
-
-    isInit = true;
-
+    //Those need to be in order
+    await checkMissingWorkflows();
+    await workflowService.loadWorkflowSettings();
     await loadModel();
 
     saveTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -150,18 +100,18 @@ class WebAppDataBase with ChangeNotifier {
       var projectId = app.projectId;
       var user = app.username;
 
-      var folder = await ProjectUtils()
+      var folder = await projectService
           .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
-      var viewFile = await ProjectUtils().getOrCreateFile(
+      var viewFile = await projectService.getOrCreateFile(
           projectId, user, "${user}_view_04",
           parentId: folder.id);
-      var navFile = await ProjectUtils().getOrCreateFile(
+      var navFile = await projectService.getOrCreateFile(
           projectId, user, "${user}_nav_04",
           parentId: folder.id);
 
-      _model.addAll(_jsonToIdElMap(ProjectUtils().getFileContent(viewFile)));
+      _model.addAll(_jsonToIdElMap(projectService.getFileContent(viewFile)));
       app.loadPersistentData(
-          _jsonToIdElMap(ProjectUtils().getFileContent(navFile)));
+          _jsonToIdElMap(projectService.getFileContent(navFile)));
     }
   }
 
@@ -169,19 +119,19 @@ class WebAppDataBase with ChangeNotifier {
     if (app.projectId != "") {
       var projectId = app.projectId;
       var user = app.username;
-      var folder = await ProjectUtils()
+      var folder = await projectService
           .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
-      var viewFile = await ProjectUtils().getOrCreateFile(
+      var viewFile = await projectService.getOrCreateFile(
           projectId, user, "${user}_view_04",
           parentId: folder.id);
-      var navFile = await ProjectUtils().getOrCreateFile(
+      var navFile = await projectService.getOrCreateFile(
           projectId, user, "${user}_nav_04",
           parentId: folder.id);
 
       await Future.wait([
-        ProjectUtils().updateFileContent(viewFile, _idElMapToJson(_model)),
-        ProjectUtils()
-            .updateFileContent(navFile, _idElMapToJson(app.getPersistentData()))
+        projectService.updateFileContent(viewFile, _idElMapToJson(_model)),
+        projectService.updateFileContent(
+            navFile, _idElMapToJson(app.getPersistentData()))
       ]);
     }
   }
@@ -260,13 +210,13 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   Future<void> projectFilesUpdated() async {
-    ProjectUtils()
+    projectService
         .loadFolderStructure(app.projectId)
         .then((value) => notifyListeners());
   }
 
   Future<void> reloadProjectFiles() async {
-    await ProjectUtils()
+    await projectService
         .loadFolderStructure(app.projectId)
         .then((value) => notifyListeners());
 
@@ -276,8 +226,7 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   List<Document> getProjectFiles() {
-    return ProjectUtils()
-        .folderTreeRoot
+    return projectService.folderTreeRoot
         .getDescendants(folders: true, documents: true)
         .map((e) => e.document)
         .toList();
@@ -306,5 +255,61 @@ class WebAppDataBase with ChangeNotifier {
     var wkf = await factory.workflowService.get(workflowEl.id);
     return workflowService.fetchWorkflowImages(wkf,
         contentTypes: ["text"], nameFilter: ["Summary"]);
+  }
+
+  Future<void> checkMissingWorkflows() async {
+    var requiredWorkflows = settingsService.requiredWorkflows;
+    var installedWorkflows = await workflowService
+        .readWorkflowsFromLib2(app.teamname, user: app.username);
+    List<RequiredTemplate> missing = [];
+
+    for (var reqWkf in requiredWorkflows) {
+      var workflow = installedWorkflows.firstWhere(
+        (wkf) => reqWkf.url == wkf.url.uri && reqWkf.version == wkf.version,
+        orElse: () => Workflow(),
+      );
+      if (workflow.id == "") {
+        missing.add(reqWkf);
+      } else {
+        workflowService.addWorkflow(reqWkf.iid, workflow);
+      }
+    }
+
+    if (missing.isNotEmpty) {
+      throw ServiceError(500, buildMissingTemplateErrorMessage(missing));
+    }
+  }
+
+  String buildMissingTemplateErrorMessage(List<RequiredTemplate> missingList) {
+    var errMessage = "The following required templates are not installed:\n";
+
+    for (var missing in missingList) {
+      errMessage = "${errMessage}\n";
+      errMessage = "${errMessage}*${missing.url} [${missing.version}]";
+    }
+
+    return errMessage;
+  }
+
+  Future<List<Workflow>> fetchProjectWorkflows(String projectId) async {
+    var projectFiles = projectService.getProjectFiles();
+    return workflowService.fetchProjectWorkflows(projectFiles);
+  }
+
+  Future<void> updateTextFile(String workflowId, String text,
+      {String lowerFileName = "readme"}) async {
+        
+    var document = projectService.getProjectFiles().firstWhere(
+        (e) =>
+            e.getMeta("WORKFLOW_ID") == workflowId &&
+            e.name.toLowerCase().contains(lowerFileName),
+        orElse: () => Document());
+
+    if (document.id == "") {
+      print(
+          "File name containing ${lowerFileName} not found for workflow id $workflowId");
+    } else {
+      workflowService.updateFile(document, text);
+    }
   }
 }

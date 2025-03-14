@@ -19,6 +19,7 @@ dependencies:
       path: sci_tercen_client
 
   json_string: ^3.0.1
+  
   webapp_model:
     path: ../webapp_model
 

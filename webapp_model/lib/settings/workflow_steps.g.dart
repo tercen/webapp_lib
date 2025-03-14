@@ -1,0 +1,19 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'workflow_steps.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+WorkflowSteps _$WorkflowStepsFromJson(Map<String, dynamic> json) =>
+    WorkflowSteps(
+      steps: (json['steps'] as List<dynamic>)
+          .map((e) => StepMap.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$WorkflowStepsToJson(WorkflowSteps instance) =>
+    <String, dynamic>{
+      'steps': instance.steps,
+    };

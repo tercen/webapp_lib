@@ -1,0 +1,17 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+StepMap _$StepMapFromJson(Map<String, dynamic> json) => StepMap(
+      workflowRef: json['workflowRef'] as String,
+      shortName: json['shortName'] as String,
+      stepName: json['stepName'] as String,
+      stepId: json['stepId'] as String,
+    );
+
+Map<String, dynamic> _$StepMapToJson(StepMap instance) => <String, dynamic>{
+      'workflowRef': instance.workflowRef,
+      'shortName': instance.shortName,
+      'stepName': instance.stepName,
+      'stepId': instance.stepId,
+    };

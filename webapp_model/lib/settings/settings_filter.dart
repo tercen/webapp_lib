@@ -15,7 +15,4 @@ class SettingsFilter {
   Map<String, dynamic> toJson() => _$SettingsFilterToJson(this);
 
 
-  bool hasFilter( String screenName ){
-    return filters.any((filter) => filter.screen == screenName);
-  }
 }
