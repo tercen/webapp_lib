@@ -31,10 +31,12 @@ class ViewState {
   void operator []=(String key, List<String> value) {
     var objList = objects.where((o) => o.key == key );
     if( objList.isEmpty ){
-      throw ServiceError(500, "View key does not exist", "View key $key does not exist");
+      objects.add(ViewObject(key: key, values: value));
+    }else{
+      objList.first.values = value;
     }
 
-    objList.first.values = value;
+    
   }
 
   bool hasKey(String key){

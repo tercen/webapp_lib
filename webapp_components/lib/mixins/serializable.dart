@@ -8,6 +8,11 @@ mixin Serializable {
   ValueNotifier updateTrack = ValueNotifier<int>(0);
   static const String LIST_BREAK = "|@|";
 
+
+  void initValue(String screenId, String key, List<String> values, {bool notify = true}) {
+    setValue(screenId, key, values, notify: false);
+  }
+
   void setValue(String screenId, String key, List<String> values, {bool notify = true}) {
     componentData.clear();
     componentData.add(ComponentData(id: screenId, key: key, values: values));
