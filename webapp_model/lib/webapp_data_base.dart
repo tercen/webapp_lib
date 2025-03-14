@@ -261,29 +261,40 @@ class WebAppDataBase with ChangeNotifier {
   Future<void> checkMissingWorkflows() async {
     var requiredWorkflows = settingsService.requiredWorkflows;
     Logger().log(level: Logger.INFO, message: "Reading workflows for ${app.teamname} / ${app.username}");
-    var installedWorkflows = await workflowService
-        .readWorkflowsFromLib2();
-
+    var installedWorkflowsDocuments = await workflowService
+        .readWorkflowsDocumentsFromLib();
+    
+    
     print("Found the following workflows:");
-    for( var w in installedWorkflows ){
+    for( var w in installedWorkflowsDocuments ){
       print("\t${w.name} :: ${w.version} :: ${w.url.uri}");
     }
     List<RequiredTemplate> missing = [];
 
+
+    List<Pair> workflowsToFetch = [];
     for (var reqWkf in requiredWorkflows) {
-      var workflow = installedWorkflows.firstWhere(
+      var workflow = installedWorkflowsDocuments.firstWhere(
         (wkf) => reqWkf.url == wkf.url.uri && reqWkf.version == wkf.version,
-        orElse: () => Workflow(),
+        orElse: () => Document(),
       );
       if (workflow.id == "") {
         missing.add(reqWkf);
       } else {
-        workflowService.addWorkflow(reqWkf.iid, workflow);
+        workflowsToFetch.add(Pair.from(reqWkf.iid, workflow.id));
       }
     }
 
     if (missing.isNotEmpty) {
       throw ServiceError(500, "Missing Template", buildMissingTemplateErrorMessage(missing));
+    }else{
+      var factory = tercen.ServiceFactory();
+      var workflows = await factory.workflowService.list( workflowsToFetch.map((wkfPair) => wkfPair.value).toList() );
+
+      for( var wkfPair in workflowsToFetch ){
+        var workflow = workflows.firstWhere((w) => w.id == wkfPair.key);
+        workflowService.addWorkflow(wkfPair.key, workflow);
+      }
     }
   }
 

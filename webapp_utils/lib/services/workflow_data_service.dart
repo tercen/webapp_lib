@@ -77,7 +77,7 @@ class WorkflowDataService with DataCache {
   }
 
 
-  Future<List<sci.Workflow>> readWorkflowsFromLib2({String? team, String? user}) async {
+  Future<List<sci.Document>> readWorkflowsDocumentsFromLib({String? team, String? user}) async {
 
     List<String> teamList = user == null || user.isEmpty? [] : [user];
     if(team != null && team.isNotEmpty){
@@ -90,9 +90,8 @@ class WorkflowDataService with DataCache {
     var libObjs = await factory.documentService
         .getLibrary('', [], ["Workflow"], [], 0, -1);
     
-    var workflows = await factory.workflowService.list(libObjs.map((o) => o.id).toList());
-
-    return workflows;
+    // var workflows = await factory.workflowService.list(libObjs.map((o) => o.id).toList());
+    return libObjs;
   }
 
   // Future<Map<String, Workflow>> readWorkflowsFromLib() async {
