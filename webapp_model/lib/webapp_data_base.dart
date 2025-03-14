@@ -8,6 +8,7 @@ import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_model/settings/required_template.dart';
 import 'package:webapp_ui_commons/webapp_base.dart';
+import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/services/file_data_service.dart';
 import 'package:webapp_utils/services/settings_data_service.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
@@ -259,6 +260,7 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> checkMissingWorkflows() async {
     var requiredWorkflows = settingsService.requiredWorkflows;
+    Logger().log(level: Logger.INFO, message: "Reading workflows for ${app.teamname} / ${app.username}");
     var installedWorkflows = await workflowService
         .readWorkflowsFromLib2(app.teamname, user: app.username);
     List<RequiredTemplate> missing = [];
@@ -298,7 +300,7 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> updateTextFile(String workflowId, String text,
       {String lowerFileName = "readme"}) async {
-        
+
     var document = projectService.getProjectFiles().firstWhere(
         (e) =>
             e.getMeta("WORKFLOW_ID") == workflowId &&
