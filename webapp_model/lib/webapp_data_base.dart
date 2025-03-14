@@ -54,12 +54,9 @@ class WebAppDataBase with ChangeNotifier {
     clear();
 
     await projectService.loadFolderStructure(projectId);
-    print("Done loading folder structure");
-    var allFiles = projectService.folderTreeRoot
-        .getDescendants(folders: true, documents: true).map((e) => e.document.name);
-    for( var f in allFiles ){
-      print("\t${f}.trim()");
-    }
+
+
+
     await Future.wait([
       // workflowService.init(reposJsonPath: reposJsonPath),
       settingsService.loadTemplateConfig(reposJsonPath),
