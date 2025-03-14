@@ -93,7 +93,7 @@ class ProjectDataService with DataCache {
 
   dynamic getFileContent(FileDocument fileDoc) {
     if (fileDoc.metadata.contentType == "application/json") {
-      return  json.decode(fileDoc.getMeta("file.content")!);
+      return    JsonString( fileDoc.getMeta("file.content")!).decodedValueAsMap ;
     } else {
       return fileDoc.getMeta("file.content")!;
     }
@@ -101,7 +101,7 @@ class ProjectDataService with DataCache {
 
   Future<void> updateFileContent(FileDocument fileDoc, Map content) async {
     var factory = tercen.ServiceFactory();
-    fileDoc = setFileContent(fileDoc,  jsonEncode( JsonString(content as String)  ) );
+    fileDoc = setFileContent(fileDoc,  jsonEncode( content ) );
     // ignore: invalid_return_type_for_catch_error
     await factory.fileService.update(fileDoc).catchError((e) => Logger()
         .log(level: Logger.INFO, message: "Unable to update model state file"));
