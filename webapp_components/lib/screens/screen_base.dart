@@ -137,7 +137,7 @@ mixin ScreenBase {
         var serComp = comp as Serializable;
         var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());  
 
-        serComp.setValue(comp.getId(), comp.getGroupId(), modelValue);
+        serComp.initValue(comp.getId(), comp.getGroupId(), modelValue);
       }
       // var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
 

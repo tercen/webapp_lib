@@ -60,7 +60,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
           for( var func in onChangeFunctions){
             func();
           }
-          setValue(id, getGroupId(),  [controller.text], notify: false);
+          setValue(id, getGroupId(),  [value], notify: false);
           notifyListeners();
         } ,
         onTapOutside: (event) {
