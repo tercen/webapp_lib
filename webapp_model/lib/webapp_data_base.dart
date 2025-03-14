@@ -53,7 +53,7 @@ class WebAppDataBase with ChangeNotifier {
     await Future.wait([
       // workflowService.init(reposJsonPath: reposJsonPath),
       projectService.loadFolderStructure(projectId),
-      settingsService.loadWorkflowStepMapper(stepMapperJsonFile),
+      settingsService.loadWorkflowStepMapper(reposJsonPath),
       settingsService.loadSettingsFilter(settingFilterFile),
       settingsService.loadTemplateConfig(stepMapperJsonFile)
     ]);
