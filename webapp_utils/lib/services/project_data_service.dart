@@ -92,7 +92,7 @@ class ProjectDataService with DataCache {
 
   dynamic getFileContent(FileDocument fileDoc) {
     if (fileDoc.metadata.contentType == "application/json") {
-      return json.decode(fileDoc.getMeta("file.content")!);
+      return jsonDecode(fileDoc.getMeta("file.content")!);
     } else {
       return fileDoc.getMeta("file.content")!;
     }
