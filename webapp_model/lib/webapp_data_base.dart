@@ -119,7 +119,8 @@ class WebAppDataBase with ChangeNotifier {
       print("File content");
       print(projectService.getFileContent(viewFile));
       var map =projectService.getFileContent(viewFile);
-      
+      print(map);
+      print(map.runtimeType);
       _model = ViewState.fromJson( map ); 
       // app.loadPersistentData(projectService.getFileContent(navFile));
     }
