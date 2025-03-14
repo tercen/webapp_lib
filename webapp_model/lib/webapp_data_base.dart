@@ -113,10 +113,8 @@ class WebAppDataBase with ChangeNotifier {
           projectId, user, "${user}_nav_05",
           parentId: folder.id);
 
-      print("View File Content");
-      print(projectService.getFileContent(viewFile));
 
-      _model = ViewState.fromJson((projectService.getFileContent(viewFile))); 
+      _model = ViewState.fromJson((projectService.getFileContent(viewFile)) as Map<String, List<String>>); 
       app.loadPersistentData(projectService.getFileContent(navFile));
     }
   }
