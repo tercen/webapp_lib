@@ -29,7 +29,7 @@ class SettingsDataService{
 
   List<RequiredTemplate> get requiredWorkflows => templateConfig.repos;
 
-  
+
 
 
   Future<void> loadTemplateConfig(String assetPath ) async {

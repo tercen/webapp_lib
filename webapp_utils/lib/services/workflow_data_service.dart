@@ -66,6 +66,9 @@ class WorkflowDataService with DataCache {
     _installedWorkflows[iid] = workflow;
   }
 
+  List<Workflow> getTemplates() {
+    return _installedWorkflows.values.toList();
+  }
   Workflow getWorkflow(String key) {
     if (!_installedWorkflows.containsKey(key)) {
       throw ServiceError(500, "Failed to find workflow with key '$key'");
