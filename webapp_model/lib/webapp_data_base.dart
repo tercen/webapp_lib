@@ -263,6 +263,11 @@ class WebAppDataBase with ChangeNotifier {
     Logger().log(level: Logger.INFO, message: "Reading workflows for ${app.teamname} / ${app.username}");
     var installedWorkflows = await workflowService
         .readWorkflowsFromLib2();
+
+    print("Found the following workflows:");
+    for( var w in installedWorkflows ){
+      print("\t${w.name} :: ${w.version} :: ${w.url.uri}");
+    }
     List<RequiredTemplate> missing = [];
 
     for (var reqWkf in requiredWorkflows) {
@@ -278,7 +283,7 @@ class WebAppDataBase with ChangeNotifier {
     }
 
     if (missing.isNotEmpty) {
-      throw ServiceError(500, buildMissingTemplateErrorMessage(missing));
+      throw ServiceError(500, "Missing Template", buildMissingTemplateErrorMessage(missing));
     }
   }
 
