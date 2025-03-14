@@ -14,7 +14,6 @@ mixin Serializable {
   }
 
   void setValue(String id, String screenId, List<String> values, {bool notify = false}) {
-    print("Setting component data value to $values");
     componentData.clear();
     componentData.add(ComponentData(id: id, key: screenId, values: values));
 
@@ -48,7 +47,7 @@ mixin Serializable {
   String getValuesAsString(String id, String screenId) {
     return componentData
         .firstWhere(
-          (data) => data.key == id && data.id == screenId,
+          (data) => data.id == id && data.key == screenId,
           orElse: () => ComponentData(id: screenId, key: id, values: []),
         )
         .values
