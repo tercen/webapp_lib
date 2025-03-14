@@ -114,7 +114,10 @@ class WebAppDataBase with ChangeNotifier {
           parentId: folder.id);
 
 
-      _model = ViewState.fromJson((projectService.getFileContent(viewFile)) as Map<String, List<String>>); 
+      var map = Map.from((projectService.getFileContent(viewFile)));
+      print(map);
+      print(map.runtimeType);
+      _model = ViewState.fromJson( map as Map<String, List<String>> ); 
       app.loadPersistentData(projectService.getFileContent(navFile));
     }
   }
