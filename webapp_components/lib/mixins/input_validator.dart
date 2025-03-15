@@ -15,20 +15,19 @@ mixin InputValidator {
     print("Validte of the mixin");
   }
 
-  void validateInputList( List<IdElement> els ) {
+  void validateInputList( List<String> values ) {
     results.clear();
-    for( var el in els ){
-      validateSingleInput(el, clearPrevious: false);
+    for( var value in values ){
+      validateSingleInput(value, clearPrevious: false);
     }
 
   }
 
-  void validateSingleInput( IdElement el, {clearPrevious = true} ) {
+  void validateSingleInput( String value, {clearPrevious = true} ) {
     if( clearPrevious ){
       results.clear();
     }
     
-    var value = el.label;
     results.addAll(
     validators.map((validator) {
       
