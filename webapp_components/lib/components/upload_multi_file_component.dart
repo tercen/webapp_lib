@@ -104,9 +104,12 @@ class UploadFileComponent
           uploadedFilenames.add(filePath);
           uploadedFileIds
               .add(optionDocs.firstWhere((doc) => doc.name == filePath).id);
-          filesToUpload.add(
-            UploadFile(filePath, true)
-          );
+
+          if (filesToUpload[0].filename == "Drag Files Here") {
+            filesToUpload.removeAt(0);
+          }
+
+          filesToUpload.add(UploadFile(filePath, true));
         }
         notifyListeners();
       },
@@ -247,41 +250,36 @@ class UploadFileComponent
       height: 10,
     );
 
-    List<Widget> uploadWidgets = [buildSingleFileWidget(context),
-        spacer];
-    if( fetchProjectFiles != null ){
-      uploadWidgets.addAll([
-        buildProjectFileWidget(context),
-        spacer
-      ]);
+    List<Widget> uploadWidgets = [buildSingleFileWidget(context), spacer];
+    if (fetchProjectFiles != null) {
+      uploadWidgets.addAll([buildProjectFileWidget(context), spacer]);
     }
 
     uploadWidgets.addAll([
-        buildDragNDropWidget(context),
-        spacer,
-      ]);
+      buildDragNDropWidget(context),
+      spacer,
+    ]);
 
-    if( showUploadButton ){
-      uploadWidgets.add(
-        buildUploadActionWidget(context)
-      );
+    if (showUploadButton) {
+      uploadWidgets.add(buildUploadActionWidget(context));
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: uploadWidgets,
     );
   }
+
   @override
   Widget buildContent(BuildContext context) {
-    if( fetchProjectFiles != null ){
-      return FutureBuilder(future: loadOptions(),
-       builder: (context, snapshot){
-        return buildWidget(context);
-       });
-    }else{
+    if (fetchProjectFiles != null) {
+      return FutureBuilder(
+          future: loadOptions(),
+          builder: (context, snapshot) {
+            return buildWidget(context);
+          });
+    } else {
       return buildWidget(context);
     }
-    
   }
 
   Future<void> doUpload(BuildContext context) async {
@@ -303,7 +301,7 @@ class UploadFileComponent
       var fileId = await fileService.uploadFile(
           file.name, projectId, fileOwner, bytes,
           folderId: folderId);
-      uploadedFileIds .add(fileId);
+      uploadedFileIds.add(fileId);
       uploadedFilenames.add(file.name);
     }
 
@@ -317,7 +315,7 @@ class UploadFileComponent
       var fileId = await fileService.uploadFile(
           file.name, projectId, fileOwner, bytes,
           folderId: folderId);
-      uploadedFileIds .add(fileId);
+      uploadedFileIds.add(fileId);
       uploadedFilenames.add(file.name);
     }
 
