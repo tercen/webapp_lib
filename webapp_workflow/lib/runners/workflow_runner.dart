@@ -612,7 +612,7 @@ class WorkflowRunner with ProgressDialog {
     log("Running ${stpName}", dialogTitle: runTitle);
 
     await for (var evt in taskStream) {
-      print(evt.toJson());
+      print(await factory.patchRecordService.findByChannelId(startKey: [workflowTask.channelId], endKey: [workflowTask.channelId]));
       if (evt is sci.TaskProgressEvent) {
         log("Running ${stpName}\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
@@ -690,6 +690,7 @@ class WorkflowRunner with ProgressDialog {
         log("$stepProgressMessage\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
       } else {
+        print(await factory.patchRecordService.findByChannelId(startKey: [workflowTask.channelId], endKey: [workflowTask.channelId]));
         // sci.PatchRecords <-- the event
         if ( evt is sci.PatchRecords ){
           
@@ -745,10 +746,10 @@ class WorkflowRunner with ProgressDialog {
     var factory = tercen.ServiceFactory();
     bool startTask = true;
     var task = await factory.taskService.get(taskId);
-    await factory.taskService.runTask(task.id);
+
     while (!task.state.isFinal) {
       var taskStream = factory.eventService
-          .listenTaskChannel(task.channelId, false)
+          .listenTaskChannel(task.channelId, startTask)
           .asBroadcastStream();
 
       startTask = false;
