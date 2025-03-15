@@ -106,7 +106,9 @@ class ProjectDataService with DataCache {
 
   Future<void> updateFileContent(FileDocument fileDoc, Map content) async {
     var factory = tercen.ServiceFactory();
-    fileDoc = setFileContent(fileDoc,  jsonEncode( content ) );
+    print("Updating model");
+    print(content);
+    fileDoc = setFileContent(fileDoc,   content  );
     // ignore: invalid_return_type_for_catch_error
     await factory.fileService.update(fileDoc).catchError((e) => Logger()
         .log(level: Logger.INFO, message: "Unable to update model state file"));
