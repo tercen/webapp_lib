@@ -106,8 +106,6 @@ class ProjectDataService with DataCache {
 
   Future<void> updateFileContent(FileDocument fileDoc, Map content) async {
     var factory = tercen.ServiceFactory();
-    print("Updating model");
-    print(content);
     fileDoc = setFileContent(fileDoc,   content  );
     // ignore: invalid_return_type_for_catch_error
     await factory.fileService.update(fileDoc).catchError((e) => Logger()

@@ -432,20 +432,20 @@ class WorkflowRunner with ProgressDialog {
 
   sci.DataStep updateFilterValues(sci.DataStep step){
     // var key = "$filterName|@|$factor";
-    print("Updating filter values");
+    // print("Updating filter values");
     for( var filter in step.model.filters.namedFilters ){
       var filters = filterValueUpdate.entries.where((e) => e.key.contains(filter.name) ).toList();
 
       if(  filters.isNotEmpty ){
-        print("\tWill update ${filters.length} filter on step ${step.name}");
+        // print("\tWill update ${filters.length} filter on step ${step.name}");
         for( var f in filter.filterExprs ){
           var fExpr = f as sci.FilterExpr;
-          print("\t\t${fExpr.factor.name}");
+          // print("\t\t${fExpr.factor.name}");
           var filterExprs = filters.where((e) => e.key.contains(f.factor.name) ).toList();
           if(filterExprs.isNotEmpty ){
-            print("\t\tUpdating");
+            // print("\t\tUpdating");
             for( var fe in filterExprs ){
-              print("updating filter ${filter.name} value of step ${step.name}");
+              // print("updating filter ${filter.name} value of step ${step.name}");
               fExpr.stringValue = fe.value;
             }
           }
@@ -612,6 +612,7 @@ class WorkflowRunner with ProgressDialog {
     log("Running ${stpName}", dialogTitle: runTitle);
 
     await for (var evt in taskStream) {
+      print(evt.toJson());
       if (evt is sci.TaskProgressEvent) {
         log("Running ${stpName}\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
