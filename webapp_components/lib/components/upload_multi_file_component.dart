@@ -239,8 +239,7 @@ class UploadFileComponent
     }
   }
 
-  @override
-  Widget buildContent(BuildContext context) {
+  Widget buildWidget(BuildContext context) {
     var spacer = const SizedBox(
       height: 10,
     );
@@ -268,6 +267,18 @@ class UploadFileComponent
       crossAxisAlignment: CrossAxisAlignment.start,
       children: uploadWidgets,
     );
+  }
+  @override
+  Widget buildContent(BuildContext context) {
+    if( fetchProjectFiles != null ){
+      return FutureBuilder(future: loadOptions(),
+       builder: (context, snapshot){
+        return buildWidget(context);
+       });
+    }else{
+      return buildWidget(context);
+    }
+    
   }
 
   Future<void> doUpload(BuildContext context) async {
