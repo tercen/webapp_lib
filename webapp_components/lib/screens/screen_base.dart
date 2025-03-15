@@ -133,8 +133,9 @@ mixin ScreenBase {
     this.modelLayer = modelLayer;
     for (var comp in components) {
       if( comp is SerializableComponent ){
-        // var serComp = comp as Serializable;
+        print("Loading value for ${comp.getId()}");
         var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());  
+        print("\tModel Value is: $modelValue");
         if( modelValue != null ){
           comp.setStateValue(modelValue );
         }

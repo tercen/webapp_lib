@@ -118,7 +118,7 @@ class WebAppDataBase with ChangeNotifier {
 
       
       var contentString = projectService.getFileContent(viewFile);
-
+      print("View content is $contentString");
       if( contentString != "" && contentString != "{}" ){
         _model = ViewState.fromJson( JsonString( contentString).decodedValueAsMap  ); 
       }
