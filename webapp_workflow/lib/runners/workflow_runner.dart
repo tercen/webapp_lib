@@ -612,7 +612,6 @@ class WorkflowRunner with ProgressDialog {
     log("Running ${stpName}", dialogTitle: runTitle);
 
     await for (var evt in taskStream) {
-      await factory.patchRecordService.findByChannelId(startKey: [workflowTask.channelId], endKey: [workflowTask.channelId]);
       if (evt is sci.TaskProgressEvent) {
         log("Running ${stpName}\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
@@ -690,24 +689,24 @@ class WorkflowRunner with ProgressDialog {
         log("$stepProgressMessage\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
       } else {
-        print(await factory.patchRecordService.findByChannelId(startKey: [workflowTask.channelId], endKey: [workflowTask.channelId]));
+        // print(await factory.patchRecordService.findByChannelId(startKey: [workflowTask.channelId], endKey: [workflowTask.channelId]));
         // sci.PatchRecords <-- the event
-        if ( evt is sci.PatchRecords ){
+        // if ( evt is sci.PatchRecords ){
           
-          (evt as sci.PatchRecords).apply(workflow);
-          updateStepProgress(workflow);
-          log("$stepProgressMessage\n\n \n ", dialogTitle: runTitle);
-        }
-        // if (evt is sci.TaskStateEvent) {
-        //   if (evt.state is sci.DoneState) {
-        //     // factory.patchRecordService.patch(sci.Patch)
-        //     // var runningWorkflow =
-        //     //     await factory.workflowService.get(workflow.id);
-            
-        //     updateStepProgress(workflow);
-        //     log("$stepProgressMessage\n\n \n ", dialogTitle: runTitle);
-        //   }
+          // (evt as sci.PatchRecords).apply(workflow);
+          // updateStepProgress(workflow);
+          // log("$stepProgressMessage\n\n \n ", dialogTitle: runTitle);
         // }
+        if (evt is sci.TaskStateEvent) {
+          if (evt.state is sci.DoneState) {
+            // factory.patchRecordService.patch(sci.Patch)
+            // var runningWorkflow =
+            //     await factory.workflowService.get(workflow.id);
+            // 
+            updateStepProgress(workflow);
+            log("$stepProgressMessage\n\n \n ", dialogTitle: runTitle);
+          }
+        }
       }
     }
 
