@@ -197,6 +197,7 @@ class WorkflowDataService with DataCache {
         var step = dataSteps[i];
         var op = operators[i];
         workflowSettings.addAll(op.properties.map((prop) {
+          print("PROPERTY: ${prop.name} -- ${prop.kind} -- ${prop.runtimeType}");
           if (prop is DoubleProperty) {
             return WorkflowSetting(step.name, step.id, prop.name,
                 prop.defaultValue.toString(), "double", prop.description);
