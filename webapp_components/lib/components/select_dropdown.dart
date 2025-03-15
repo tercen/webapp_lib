@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/serializable_component.dart';
 
-import 'package:webapp_components/abstract/single_value_component.dart';
+
 import 'package:webapp_components/definitions/component.dart';
-import 'package:webapp_model/id_element.dart';
+
 import 'package:webapp_components/mixins/component_base.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 class SelectDropDownComponent
     with ChangeNotifier, ComponentBase
     implements SerializableComponent {
-  final List<IdElement> options = [];
+  final List<String> options = [];
   String selected = "";
   final bool saveState;
   SelectDropDownComponent(id, groupId, componentLabel, {this.saveState = true}) {
@@ -26,11 +26,11 @@ class SelectDropDownComponent
         value: selected,
         icon: const Icon(Icons.arrow_downward),
         focusColor: Colors.transparent,
-        items: options.map<DropdownMenuItem>((IdElement value) {
+        items: options.map<DropdownMenuItem>((String value) {
           return DropdownMenuItem(
             value: value,
             child: Text(
-              value.label,
+              value,
               style: Styles()["text"],
             ),
           );
@@ -43,7 +43,7 @@ class SelectDropDownComponent
     return wdg;
   }
 
-  void setOptions(List<IdElement> optList) {
+  void setOptions(List<String> optList) {
     options.clear();
     options.addAll(optList);
   }
