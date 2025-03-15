@@ -612,6 +612,7 @@ class WorkflowRunner with ProgressDialog {
     log("Running ${stpName}", dialogTitle: runTitle);
 
     await for (var evt in taskStream) {
+      await factory.patchRecordService.findByChannelId(startKey: [workflowTask.channelId], endKey: [workflowTask.channelId]);
       if (evt is sci.TaskProgressEvent) {
         log("Running ${stpName}\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
@@ -748,7 +749,7 @@ class WorkflowRunner with ProgressDialog {
 
     while (!task.state.isFinal) {
       var taskStream = factory.eventService
-          .listenTaskChannel(task.channelId, startTask)
+          .listenTaskChannel(task.id, startTask)
           .asBroadcastStream();
 
       startTask = false;
