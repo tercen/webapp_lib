@@ -116,13 +116,13 @@ class WebAppDataBase with ChangeNotifier {
           projectId, user, "${user}_nav_05",
           parentId: folder.id);
 
-      print("File content");
-      print(projectService.getFileContent(viewFile));
-      var map =projectService.getFileContent(viewFile);
-      print(map);
-      print(map.runtimeType);
-      _model = ViewState.fromJson( map ); 
-      // app.loadPersistentData(projectService.getFileContent(navFile));
+      
+      var map = projectService.getFileContent(viewFile);
+      if( map.isNotEmpty ){
+        _model = ViewState.fromJson( map ); 
+      }
+      
+      app.loadPersistentData(projectService.getFileContent(navFile));
     }
   }
 
