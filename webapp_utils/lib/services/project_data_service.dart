@@ -91,12 +91,17 @@ class ProjectDataService with DataCache {
     return doc;
   }
 
-  dynamic getFileContent(FileDocument fileDoc) {
-    if (fileDoc.metadata.contentType == "application/json") {
-      return    JsonString( fileDoc.getMeta("file.content")!).decodedValueAsMap ;
-    } else {
+  String getFileContent(FileDocument fileDoc) {
+    // if (fileDoc.metadata.contentType == "application/json") {
+    //   return   JsonString( fileDoc.getMeta("file.content")!).decodedValueAsMap ;
+    // } else {
+    if( fileDoc.hasMeta("file.content")){
       return fileDoc.getMeta("file.content")!;
+    }else{
+      return "";
     }
+    
+    // }
   }
 
   Future<void> updateFileContent(FileDocument fileDoc, Map content) async {

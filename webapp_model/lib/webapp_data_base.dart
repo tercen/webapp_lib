@@ -15,7 +15,7 @@ import 'package:webapp_utils/services/settings_data_service.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
 import 'package:webapp_utils/services/user_data_service.dart';
 import 'package:webapp_utils/services/project_data_service.dart';
-
+import 'package:json_string/json_string.dart';
 class WebAppDataBase with ChangeNotifier {
   final WebAppBase app;
   WebAppDataBase(this.app);
@@ -83,24 +83,24 @@ class WebAppDataBase with ChangeNotifier {
     _model.clear();
   }
 
-  Map _idElMapToJson(Map idElMap) {
-    Map<String, List> jsonMap = {};
-    for (var entry in idElMap.entries) {
-      jsonMap[entry.key] = entry.value.map((e) => e.toString()).toList();
-    }
-    return jsonMap;
-  }
+  // Map _idElMapToJson(Map idElMap) {
+  //   Map<String, List> jsonMap = {};
+  //   for (var entry in idElMap.entries) {
+  //     jsonMap[entry.key] = entry.value.map((e) => e.toString()).toList();
+  //   }
+  //   return jsonMap;
+  // }
 
-  Map<String, List<IdElement>> _jsonToIdElMap(Map jsonMap) {
-    Map<String, List<IdElement>> idElMap = {};
-    for (var entry in jsonMap.entries) {
-      idElMap[entry.key] = entry.value
-          .map<IdElement>((e) =>
-              IdElement(e.split("IdElement").first, e.split("IdElement").last))
-          .toList();
-    }
-    return idElMap;
-  }
+  // Map<String, List<IdElement>> _jsonToIdElMap(Map jsonMap) {
+  //   Map<String, List<IdElement>> idElMap = {};
+  //   for (var entry in jsonMap.entries) {
+  //     idElMap[entry.key] = entry.value
+  //         .map<IdElement>((e) =>
+  //             IdElement(e.split("IdElement").first, e.split("IdElement").last))
+  //         .toList();
+  //   }
+  //   return idElMap;
+  // }
 
   Future<void> loadModel() async {
     if (app.projectId != "") {
@@ -117,12 +117,17 @@ class WebAppDataBase with ChangeNotifier {
           parentId: folder.id);
 
       
-      var map = projectService.getFileContent(viewFile);
-      if( map.isNotEmpty ){
-        _model = ViewState.fromJson( map ); 
+      var contentString = projectService.getFileContent(viewFile);
+
+      if( contentString != "" && contentString != "{}" ){
+        _model = ViewState.fromJson( JsonString( contentString).decodedValueAsMap  ); 
       }
       
-      app.loadPersistentData(projectService.getFileContent(navFile));
+      contentString = projectService.getFileContent(navFile);
+      if( contentString != "" && contentString != "{}" ){
+        app.loadPersistentData( JsonString( contentString).decodedValueAsMap);
+      }
+      
     }
   }
 
@@ -146,7 +151,7 @@ class WebAppDataBase with ChangeNotifier {
       await Future.wait([
         projectService.updateFileContent(viewFile,  _model.toJson()),
         projectService.updateFileContent(
-            navFile, _idElMapToJson(app.getPersistentData()))
+            navFile, app.getPersistentData())
       ]);
     }
   }
