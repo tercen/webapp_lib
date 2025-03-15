@@ -196,7 +196,7 @@ class UploadTableComponent extends UploadFileComponent {
 
 
     await for (var evt in stream) {
-      print(evt.toJson());
+      // print(evt.toJson());
     }
 
     csvTask =
