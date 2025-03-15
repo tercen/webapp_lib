@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
 
-import 'package:webapp_model/id_element.dart';
-import 'package:webapp_model/id_element_table.dart';
+// import 'package:webapp_model/id_element.dart';
+// import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_model/model/view_state.dart';
 import 'package:webapp_model/settings/required_template.dart';
 import 'package:webapp_ui_commons/webapp_base.dart';
@@ -40,9 +40,9 @@ class WebAppDataBase with ChangeNotifier {
 
   // String get gtToken => app.gtToken;
 
-  IdElement get project => IdElement(app.projectId, app.projectName);
-  IdElement get username => IdElement(app.username, app.username);
-  IdElement get teamname => IdElement(app.teamname, app.teamname);
+  // IdElement get project => IdElement(app.projectId, app.projectName);
+  // IdElement get username => IdElement(app.username, app.username);
+  // IdElement get teamname => IdElement(app.teamname, app.teamname);
 
   void printModel() {
     print(_model);
@@ -81,25 +81,6 @@ class WebAppDataBase with ChangeNotifier {
   void clear() {
     _model.clear();
   }
-
-  // Map _idElMapToJson(Map idElMap) {
-  //   Map<String, List> jsonMap = {};
-  //   for (var entry in idElMap.entries) {
-  //     jsonMap[entry.key] = entry.value.map((e) => e.toString()).toList();
-  //   }
-  //   return jsonMap;
-  // }
-
-  // Map<String, List<IdElement>> _jsonToIdElMap(Map jsonMap) {
-  //   Map<String, List<IdElement>> idElMap = {};
-  //   for (var entry in jsonMap.entries) {
-  //     idElMap[entry.key] = entry.value
-  //         .map<IdElement>((e) =>
-  //             IdElement(e.split("IdElement").first, e.split("IdElement").last))
-  //         .toList();
-  //   }
-  //   return idElMap;
-  // }
 
   Future<void> loadModel() async {
     if (app.projectId != "") {
@@ -229,8 +210,10 @@ class WebAppDataBase with ChangeNotifier {
     return await userService.fetchUserList(app.username);
   }
 
-  Future<void> createOrLoadProject(IdElement projectEl, String username) async {
-    var project = await projectService.doCreateProject(projectEl, username);
+  Future<void> createOrLoadProject(
+      String projectId, String projectName, String username) async {
+    var project =
+        await projectService.doCreateProject(projectId, projectName, username);
 
     app.projectId = project.id;
     app.projectName = project.name;
@@ -262,31 +245,31 @@ class WebAppDataBase with ChangeNotifier {
         .toList();
   }
 
-  Future<IdElementTable> fetchWorkflowImagesSummary(
-      List<String> parentKeys, String groupId) async {
-    // var workflowEl = getData(parentKeys.first, groupId).first;
+  // Future<IdElementTable> fetchWorkflowImagesSummary(
+  //     List<String> parentKeys, String groupId) async {
+  //   // var workflowEl = getData(parentKeys.first, groupId).first;
 
-    // var factory = tercen.ServiceFactory();
-    // var wkf = await factory.workflowService.get(workflowEl.id);
+  //   // var factory = tercen.ServiceFactory();
+  //   // var wkf = await factory.workflowService.get(workflowEl.id);
 
-    // return workflowService
-    //     .fetchWorkflowImages(wkf, contentTypes: ["image", "text"]);
-    return IdElementTable();
-  }
+  //   // return workflowService
+  //   //     .fetchWorkflowImages(wkf, contentTypes: ["image", "text"]);
+  //   return IdElementTable();
+  // }
 
-  Future<IdElementTable> fetchWorkflowImagesByWorkflow(Workflow workflow,
-      {List<String> contentTypes = const ["image"],
-      List<String> excludedFiles = const []}) async {
-    return workflowService.fetchWorkflowImages(workflow,
-        contentTypes: contentTypes, excludedFiles: excludedFiles);
-  }
+  // Future<IdElementTable> fetchWorkflowImagesByWorkflow(Workflow workflow,
+  //     {List<String> contentTypes = const ["image"],
+  //     List<String> excludedFiles = const []}) async {
+  //   return workflowService.fetchWorkflowImages(workflow,
+  //       contentTypes: contentTypes, excludedFiles: excludedFiles);
+  // }
 
-  Future<IdElementTable> fetchWorkflowSummary(IdElement workflowEl) async {
-    var factory = tercen.ServiceFactory();
-    var wkf = await factory.workflowService.get(workflowEl.id);
-    return workflowService.fetchWorkflowImages(wkf,
-        contentTypes: ["text"], nameFilter: ["Summary"]);
-  }
+  // Future<IdElementTable> fetchWorkflowSummary(IdElement workflowEl) async {
+  //   var factory = tercen.ServiceFactory();
+  //   var wkf = await factory.workflowService.get(workflowEl.id);
+  //   return workflowService.fetchWorkflowImages(wkf,
+  //       contentTypes: ["text"], nameFilter: ["Summary"]);
+  // }
 
   Future<void> checkMissingWorkflows() async {
     var requiredWorkflows = settingsService.requiredWorkflows;

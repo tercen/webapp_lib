@@ -231,23 +231,30 @@ class ProjectDataService with DataCache {
     return fileDoc;
   }
 
-  Future<Project> doCreateProject(IdElement projectEl, String team,
+  Future<Project> doCreateProject(String projectId, String projectName, String team,
       {String appName = "", String appVersion = ""}) async {
     var factory = tercen.ServiceFactory();
-    var projectName = projectEl.label;
-
-    var userProjects = await factory.projectService
-        .findByTeamAndIsPublicAndLastModifiedDate(
-            startKey: [team, true, '2100'], endKey: [team, false, '']);
-
-    for (var p in userProjects) {
-      if (p.name == projectName) {
-        return p;
-      }
-    }
 
     var project = Project();
 
+    try {
+      project = await factory.projectService.get(projectId);
+      return project;
+    } catch (e) {
+      //Ignore for now. Project not found, so must create one
+
+    }
+    
+
+    // var userProjects = await factory.projectService
+    //     .findByTeamAndIsPublicAndLastModifiedDate(
+    //         startKey: [team, true, '2100'], endKey: [team, false, '']);
+
+    // for (var p in userProjects) {
+    //   if (p.name == projectName) {
+    //     return p;
+    //   }
+    // }
     project.name = projectName;
     project.acl.owner = team;
 
