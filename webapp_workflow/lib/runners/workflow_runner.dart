@@ -32,6 +32,7 @@ class WorkflowRunner with ProgressDialog {
   
   final String projectId;
   final String teamName;
+  String? folderName;
   final sci.Workflow template;
   
   final List<String> initStepIds = [];
@@ -455,6 +456,10 @@ class WorkflowRunner with ProgressDialog {
     return step;
   }
 
+  void setFolderName(String name){
+    folderName = name;
+  }
+
   Future<void> setupRun(BuildContext context) async {
     if( !isInit ){
       if( template.id == ""){
@@ -544,7 +549,7 @@ class WorkflowRunner with ProgressDialog {
           // General workflow parameters
           //-----------------------------------------
           if (folderId == null) {
-            sci.FolderDocument folder = await createFolder(projectId, teamName);
+            sci.FolderDocument folder = await createFolder(projectId, teamName, folderName: folderName);
             workflow.folderId = folder.id;
           } else {
             workflow.folderId = folderId!;
