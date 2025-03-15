@@ -173,7 +173,7 @@ class UploadTableComponent extends UploadFileComponent {
     ..hasHeaders = true
     ..encoding = utf8.name;
     
-    var inputSchema = await _createFileSchema(file.id);
+    var inputSchema = await _createFileSchema(file.id, separator: getSeparator(contentType));
 
 
 
