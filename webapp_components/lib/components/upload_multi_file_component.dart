@@ -104,6 +104,9 @@ class UploadFileComponent
           uploadedFilenames.add(filePath);
           uploadedFileIds
               .add(optionDocs.firstWhere((doc) => doc.name == filePath).id);
+          filesToUpload.add(
+            UploadFile(filePath, true)
+          );
         }
         notifyListeners();
       },
