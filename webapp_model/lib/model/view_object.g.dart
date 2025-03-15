@@ -8,8 +8,7 @@ part of 'view_object.dart';
 
 ViewObject _$ViewObjectFromJson(Map<String, dynamic> json) => ViewObject(
       key: json['key'] as String,
-      values:
-          (json['values'] as List<dynamic>).map((e) => e as String).toList(),
+      values: json['values'] as String,
     );
 
 Map<String, dynamic> _$ViewObjectToJson(ViewObject instance) =>

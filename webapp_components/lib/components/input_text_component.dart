@@ -1,39 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:webapp_components/abstract/component.dart';
+import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/mixins/input_validator.dart';
-import 'package:webapp_components/mixins/serializable.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
-import 'package:webapp_components/abstract/single_value_component.dart';
-import 'package:webapp_model/id_element.dart';
+
 
 
 import '../mixins/component_base.dart';
 
-class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Serializable implements Component {
-  final Map<String, dynamic> valueMap = {};
+class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator implements SerializableComponent {
   final TextEditingController controller = TextEditingController();
 
   final List<void Function()> onChangeFunctions = [];
   final List<void Function()> onFocusLostFunctions = [];
 
+  final bool saveState;
   
-  InputTextComponent(id, groupId, componentLabel){
+  InputTextComponent(id, groupId, componentLabel, {this.saveState = true}){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
     // controller.addListener(updateValue);
-    updateTrack.addListener(modelUpdated);
+    // updateTrack.addListener(modelUpdated);
   }
 
-  void modelUpdated(){
-    var serValues = getValues(id, groupId);
-    if( serValues.isEmpty ){
-      controller.text = "";
-    }else{
-      controller.text = serValues.first;
-    }
-  }
+
 
   @override
   void validate(){
@@ -45,7 +36,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
     return Focus(
       onFocusChange: (hasFocus) {
         if( !hasFocus ){
-          setValue(id, getGroupId(),  [controller.text], notify: false);
+          // setValue(id, getGroupId(),  [controller.text], notify: false);
           for( var func in onFocusLostFunctions){
             func();
           }
@@ -60,11 +51,11 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
           for( var func in onChangeFunctions){
             func();
           }
-          setValue(id, getGroupId(),  [value], notify: false);
+          // setValue(id, getGroupId(),  [value], notify: false);
           notifyListeners();
         } ,
         onTapOutside: (event) {
-          setValue(id, getGroupId(),  [controller.text], notify: false);
+          // setValue(id, getGroupId(),  [controller.text], notify: false);
         },
         style: Styles()["text"],
         decoration: InputDecoration(
@@ -115,11 +106,21 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator, Ser
   @override
   void setComponentValue(value) {
     controller.text = value;
-    updateValue();
+    // updateValue();
   }
   
-  void updateValue(){
-    setValue(id, getGroupId(),  [controller.text], notify: false);
+  @override
+  String getStateValue() {
+    return controller.text;
   }
-
+  
+  @override
+  void setStateValue(String value) {
+    setComponentValue(value);
+  }
+  
+  @override
+  bool shouldSaveState() {
+    return saveState;
+  }
 }

@@ -5,7 +5,7 @@ part 'view_object.g.dart';
 @JsonSerializable()
 class ViewObject {
   String key;
-  List<String> values;
+  String values;
 
   ViewObject({required this.key, required this.values});
 

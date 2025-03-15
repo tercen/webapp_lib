@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
+import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/components/label_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 // import 'package:webapp_components/abstract/multi_value_component.dart';
@@ -9,7 +10,7 @@ import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/action_components/action_component.dart';
 import 'package:webapp_components/components/horizontal_bar.dart';
 import 'package:webapp_components/mixins/input_validator.dart';
-import 'package:webapp_components/mixins/serializable.dart';
+
 import 'package:webapp_model/webapp_data_base.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
@@ -87,8 +88,8 @@ mixin ScreenBase {
   void updateModel() {
     var comps = getAllComponents();
     for (var comp in comps) {
-      if( comp is Serializable ){
-        modelLayer.setData(comp.getId(), comp.getGroupId(), (comp as Serializable).getValuesAsString(comp.getId(), comp.getGroupId()));
+      if( comp is SerializableComponent ){
+        modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getStateValue() );
       }
       // if (comp.getGroupId() != LAYOUT_GROUP) {
       //   // Remove components like horizontal bar and spacing, which have no value
@@ -131,11 +132,12 @@ mixin ScreenBase {
     List<Component> components = getAllComponents();
     this.modelLayer = modelLayer;
     for (var comp in components) {
-      if( comp is Serializable ){
-        var serComp = comp as Serializable;
+      if( comp is SerializableComponent ){
+        // var serComp = comp as Serializable;
         var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());  
-
-        serComp.initValue(comp.getId(), comp.getGroupId(), modelValue);
+        if( modelValue != null ){
+          comp.setStateValue(modelValue );
+        }
       }
       // var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
 
@@ -150,9 +152,9 @@ mixin ScreenBase {
       // }
     }
 
-    // updateTimer = Timer.periodic(const Duration(seconds: 1), (timer){
-    //   updateModel();
-    // });
+    updateTimer = Timer.periodic(const Duration(seconds: 1), (timer){
+      updateModel();
+    });
   }
 
   List<Component> getAllComponents() {

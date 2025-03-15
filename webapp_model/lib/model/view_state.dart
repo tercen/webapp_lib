@@ -19,7 +19,7 @@ class ViewState {
     objects.clear();
   }
 
-  List<String> operator [](String key) {
+  String operator [](String key) {
     var objList = objects.where((o) => o.key == key );
     if( objList.isEmpty ){
       throw ServiceError(500, "View key does not exist", "View key $key does not exist");
@@ -28,15 +28,13 @@ class ViewState {
     return objList.first.values;
   }
 
-  void operator []=(String key, List<String> value) {
+  void operator []=(String key, String value) {
     var objList = objects.where((o) => o.key == key );
     if( objList.isEmpty ){
       objects.add(ViewObject(key: key, values: value));
     }else{
       objList.first.values = value;
     }
-
-    
   }
 
   bool hasKey(String key){

@@ -168,15 +168,14 @@ class WebAppDataBase with ChangeNotifier {
   //   return "";
   // }
 
-  List<String> getData(String key, String groupKey) {
+  String? getData(String key, String groupKey) {
     key = buildKey(key, groupKey);
-    List<String> result = [];
 
     if (_model.hasKey(key)) {
-      result = _model[key];
+      return _model[key];
     }
 
-    return result;
+    return null;
   }
 
   void clearData(String key, String groupKey) {
@@ -188,20 +187,20 @@ class WebAppDataBase with ChangeNotifier {
 
   void setData(String key, String groupKey, String value) {
     key = buildKey(key, groupKey);
-    _model[key] = [value];
+    _model[key] = value;
   }
 
-  void addData(String key, String groupKey, String value,
-      {bool multiple = false}) {
-    key = buildKey(key, groupKey);
+  // void addData(String key, String groupKey, String value,
+  //     {bool multiple = false}) {
+  //   key = buildKey(key, groupKey);
 
-    if( multiple && _model.hasKey(key)){
-      _model[key].add(value);
-    }else{
-      _model[key] = [value];
-    }
+  //   if( multiple && _model.hasKey(key)){
+  //     _model[key].add(value);
+  //   }else{
+  //     _model[key] = [value];
+  //   }
 
-  }
+  // }
   // void setData(String key, String groupKey, IdElement value,
   //     {bool multiple = false}) {
   //   key = buildKey(key, groupKey);
