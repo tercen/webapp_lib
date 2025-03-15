@@ -745,10 +745,10 @@ class WorkflowRunner with ProgressDialog {
     var factory = tercen.ServiceFactory();
     bool startTask = true;
     var task = await factory.taskService.get(taskId);
-
+    await factory.taskService.runTask(task.id);
     while (!task.state.isFinal) {
       var taskStream = factory.eventService
-          .listenTaskChannel(taskId, startTask)
+          .listenTaskChannel(task.channelId, false)
           .asBroadcastStream();
 
       startTask = false;
