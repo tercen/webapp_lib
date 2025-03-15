@@ -16,6 +16,7 @@ import 'package:webapp_utils/services/workflow_data_service.dart';
 import 'package:webapp_utils/services/user_data_service.dart';
 import 'package:webapp_utils/services/project_data_service.dart';
 import 'package:json_string/json_string.dart';
+
 class WebAppDataBase with ChangeNotifier {
   final WebAppBase app;
   WebAppDataBase(this.app);
@@ -55,13 +56,11 @@ class WebAppDataBase with ChangeNotifier {
 
     await projectService.loadFolderStructure(projectId);
 
-
-
     await Future.wait([
       // workflowService.init(reposJsonPath: reposJsonPath),
       settingsService.loadTemplateConfig(reposJsonPath),
       settingsService.loadSettingsFilter(settingFilterFile),
-      settingsService.loadWorkflowStepMapper(stepMapperJsonFile)      
+      settingsService.loadWorkflowStepMapper(stepMapperJsonFile)
     ]);
 
     //Those need to be in order
@@ -116,21 +115,19 @@ class WebAppDataBase with ChangeNotifier {
           projectId, user, "${user}_nav_05",
           parentId: folder.id);
 
-      
       var contentString = projectService.getFileContent(viewFile);
-      print("View content is $contentString");
-      if( contentString != "" && contentString != "{}" ){
-        _model = ViewState.fromJson( JsonString( contentString).decodedValueAsMap  ); 
+
+      if (contentString != "" && contentString != "{}") {
+        _model =
+            ViewState.fromJson(JsonString(contentString).decodedValueAsMap);
       }
-      
+
       contentString = projectService.getFileContent(navFile);
-      if( contentString != "" && contentString != "{}" ){
-        app.loadPersistentData( JsonString( contentString).decodedValueAsMap);
+      if (contentString != "" && contentString != "{}") {
+        app.loadPersistentData(JsonString(contentString).decodedValueAsMap);
       }
-      
     }
   }
-
 
   Future<void> saveModel() async {
     if (app.projectId != "") {
@@ -147,11 +144,9 @@ class WebAppDataBase with ChangeNotifier {
           projectId, user, "${user}_nav_05",
           parentId: folder.id);
 
-
       await Future.wait([
-        projectService.updateFileContent(viewFile,  _model.toJson()),
-        projectService.updateFileContent(
-            navFile, app.getPersistentData())
+        projectService.updateFileContent(viewFile, _model.toJson()),
+        projectService.updateFileContent(navFile, app.getPersistentData())
       ]);
     }
   }
@@ -295,17 +290,13 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> checkMissingWorkflows() async {
     var requiredWorkflows = settingsService.requiredWorkflows;
-    Logger().log(level: Logger.INFO, message: "Reading workflows for ${app.teamname} / ${app.username}");
-    var installedWorkflowsDocuments = await workflowService
-        .readWorkflowsDocumentsFromLib();
-    
-    
-    print("Found the following workflows:");
-    for( var w in installedWorkflowsDocuments ){
-      print("\t${w.name} :: ${w.version} :: ${w.url.uri}");
-    }
-    List<RequiredTemplate> missing = [];
+    Logger().log(
+        level: Logger.INFO,
+        message: "Reading workflows for ${app.teamname} / ${app.username}");
+    var installedWorkflowsDocuments =
+        await workflowService.readWorkflowsDocumentsFromLib();
 
+    List<RequiredTemplate> missing = [];
 
     List<Pair> workflowsToFetch = [];
     for (var reqWkf in requiredWorkflows) {
@@ -321,12 +312,14 @@ class WebAppDataBase with ChangeNotifier {
     }
 
     if (missing.isNotEmpty) {
-      throw ServiceError(500, "Missing Template", buildMissingTemplateErrorMessage(missing));
-    }else{
+      throw ServiceError(
+          500, "Missing Template", buildMissingTemplateErrorMessage(missing));
+    } else {
       var factory = tercen.ServiceFactory();
-      var workflows = await factory.workflowService.list( workflowsToFetch.map((wkfPair) => wkfPair.value).toList() );
+      var workflows = await factory.workflowService
+          .list(workflowsToFetch.map((wkfPair) => wkfPair.value).toList());
 
-      for( var wkfPair in workflowsToFetch ){
+      for (var wkfPair in workflowsToFetch) {
         var workflow = workflows.firstWhere((w) => w.id == wkfPair.value);
         workflowService.addWorkflow(wkfPair.key, workflow);
       }
@@ -351,7 +344,6 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> updateTextFile(String workflowId, String text,
       {String lowerFileName = "readme"}) async {
-
     var document = projectService.getProjectFiles().firstWhere(
         (e) =>
             e.getMeta("WORKFLOW_ID") == workflowId &&

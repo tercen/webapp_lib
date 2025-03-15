@@ -88,7 +88,7 @@ mixin ScreenBase {
   void updateModel() {
     var comps = getAllComponents();
     for (var comp in comps) {
-      if( comp is SerializableComponent ){
+      if( comp is SerializableComponent && comp.shouldSaveState()){
         modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getStateValue() );
       }
       // if (comp.getGroupId() != LAYOUT_GROUP) {
@@ -132,10 +132,8 @@ mixin ScreenBase {
     List<Component> components = getAllComponents();
     this.modelLayer = modelLayer;
     for (var comp in components) {
-      if( comp is SerializableComponent ){
-        print("Loading value for ${comp.getId()}");
+      if( comp is SerializableComponent && comp.shouldSaveState() ){
         var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());  
-        print("\tModel Value is: $modelValue");
         if( modelValue != null ){
           comp.setStateValue(modelValue );
         }
