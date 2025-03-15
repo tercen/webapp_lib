@@ -5,9 +5,10 @@ import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 
 import 'package:webapp_components/mixins/component_base.dart';
+import 'package:webapp_components/mixins/input_validator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
-class SelectFromListComponent with ChangeNotifier, ComponentBase implements SerializableComponent {
+class SelectFromListComponent with ChangeNotifier, ComponentBase, InputValidator implements SerializableComponent {
   final List<String> options = [];
   String selectedUser = "";
   final bool saveState;
@@ -55,7 +56,7 @@ class SelectFromListComponent with ChangeNotifier, ComponentBase implements Seri
 
   @override
   bool isFulfilled() {
-    return getComponentValue() != "";
+    return getComponentValue() != "" && isInputValid( getComponentValue() );
   }
 
   @override

@@ -28,7 +28,6 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
 
   @override
   void validate(){
-    
     validateSingleInput(getComponentValue());
   }
 
@@ -91,7 +90,7 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
 
   @override
   bool isFulfilled() {
-    return controller.text != "" && isInputValid(controller.text);
+    return controller.text != "" && isInputValid( getComponentValue() );
   }
   
   @override
