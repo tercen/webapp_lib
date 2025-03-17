@@ -27,6 +27,13 @@ class IdElementTable {
     }
   }
 
+  // int get nRows {
+  //   if( colNames.isEmpty){
+  //     return 0;
+  //   }
+  //   return columns[colNames[0]]!.length;
+  // }
+
   int nRows(){
     if( colNames.isEmpty){
       return 0;

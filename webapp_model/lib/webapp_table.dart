@@ -6,10 +6,36 @@ import 'package:webapp_utils/functions/list_utils.dart';
 
 
 class WebappTable {
-  final Map<String, List<IdElement>> columns = {};
+  final Map<String, List<String>> columns = {};
   final List<String> colNames = [];
+  int get nRows {
+    if( colNames.isEmpty){
+      return 0;
+    }
+    return columns[colNames[0]]!.length;
+  }
+  int get nCols => colNames.length;
 
-  void addColumn( String columnName, {List<IdElement>? data}){
+  WebappTable selectByHash( List<int> hashCodes ){
+    var outTbl = WebappTable();
+    List<List<String>> rows = [];
+    for( var row = 0; row < nRows; row++){
+      var rowHash = columns.values.map((e) => e[row]).join().hashCode;
+      if( hashCodes.contains(rowHash)){
+        rows.add(
+          columns.values.map((e) => e[row]).toList()
+        );
+      }
+    }
+    
+    for( var col = 0; col < nCols; col++){
+      outTbl.addColumn(colNames[col], data: rows.map((row) => row[col]).toList());
+    }
+
+    return outTbl;
+  }
+
+  void addColumn( String columnName, {List<String>? data}){
     columns[columnName] = [];
     colNames.add(columnName);
     if( data != null ){
@@ -27,12 +53,6 @@ class WebappTable {
     }
   }
 
-  int nRows(){
-    if( colNames.isEmpty){
-      return 0;
-    }
-    return columns[colNames[0]]!.length;
-  }
 
 
   WebappTable select(List<int> rows, {List<String>? cols}){
@@ -41,7 +61,7 @@ class WebappTable {
     var outTbl = WebappTable();
 
     for( var colName in cols ){
-      List<IdElement> rowValues = [];
+      List<String> rowValues = [];
       for( var row in rows ){
         rowValues.add( columns[colName]![row] );
       }
@@ -53,8 +73,8 @@ class WebappTable {
   }
 
 
-  List<IdElement> getValuesByRow(int row, {List<String>? cols}){
-    List<IdElement> rowValues = [];
+  List<String> getValuesByRow(int row, {List<String>? cols}){
+    List<String> rowValues = [];
 
     cols ??= colNames;
 
@@ -65,19 +85,19 @@ class WebappTable {
     return rowValues;
   }
 
-  List<IdElement>? getValuesByIndex(int colIndex){
+  List<String>? getValuesByIndex(int colIndex){
     return columns[colNames[colIndex]];
   }
 
-  List<IdElement>? getValuesByName(String colName){
+  List<String>? getValuesByName(String colName){
     return columns[colName];
   }
 
   WebappTable filterAndTable(  String column, List<String> filters ){
-    var idxList = ListUtils.indexWhereAllContains(this[column].map((e) => e.label.toLowerCase()).toList(), filters.first.toLowerCase());
+    var idxList = ListUtils.indexWhereAllContains(this[column].map((e) => e.toLowerCase()).toList(), filters.first.toLowerCase());
 
     for( var filter in filters ){
-      var newIdx = ListUtils.indexWhereAllContains(this[column].map((e) => e.label.toLowerCase()).toList(), filter.toLowerCase());
+      var newIdx = ListUtils.indexWhereAllContains(this[column].map((e) => e.toLowerCase()).toList(), filter.toLowerCase());
 
       idxList = idxList.toSet().intersection(newIdx.toSet()).toList();
 
@@ -97,7 +117,7 @@ class WebappTable {
     var idxList = [];
 
     for( var filter in filters ){
-      idxList.addAll(ListUtils.indexWhereAllContains(this[column].map((e) => e.label.toLowerCase()).toList(), filter.toLowerCase()));
+      idxList.addAll(ListUtils.indexWhereAllContains(this[column].map((e) => e.toLowerCase()).toList(), filter.toLowerCase()));
     }
 
     var idx = idxList.toSet().toList();
@@ -124,7 +144,7 @@ class WebappTable {
       int nRows = columns[colNames[0]]!.length;
       for( var i = 0; i < nRows; i ++ ){
         for( var colName in colNames ){
-          str += columns[colName]![i].label;
+          str += columns[colName]![i];
           str += ",";
         }
         str += "\n";
@@ -137,11 +157,11 @@ class WebappTable {
 
 
 
-  void operator []=(String column, List<IdElement> values){
+  void operator []=(String column, List<String> values){
     columns[column] = values;
   }
 
-  List<IdElement> operator [](String column){
+  List<String> operator [](String column){
     if( !columns.containsKey(column) ){
       return [];
     }else{
@@ -155,7 +175,7 @@ class WebappTable {
 
     for (var col in tercenTbl.columns) {
       var vals = (col.values as List)
-          .map((e) => IdElement(e.toString(), e.toString()))
+          .map((e) => e.toString() )
           .toList();
       uiTable.addColumn(col.name, data: vals);
     }
