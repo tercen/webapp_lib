@@ -30,6 +30,19 @@ class ProjectDataService with DataCache {
     }
   }
 
+  Future<FolderDocument?> getFolder(
+      String projectId, String owner, String name,
+      {String? parentId}) async {
+    var candidateFolders = _getDocuments(name, true, parentId: parentId);
+
+    if (candidateFolders.isNotEmpty) {
+      return candidateFolders.first as FolderDocument;
+    }else{
+      return null;
+    }
+  }
+
+
   Future<FolderDocument> getOrCreateFolder(
       String projectId, String owner, String name,
       {String? parentId}) async {
