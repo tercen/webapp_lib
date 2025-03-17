@@ -51,7 +51,8 @@ class WebAppDataBase with ChangeNotifier {
   Future<void> init(String projectId, String projectName, String username,
       {String reposJsonPath = "",
       String settingFilterFile = "",
-      String stepMapperJsonFile = ""}) async {
+      String stepMapperJsonFile = "",
+      bool storeNavigation = true}) async {
     clear();
 
     await projectService.loadFolderStructure(projectId);
@@ -66,10 +67,10 @@ class WebAppDataBase with ChangeNotifier {
     //Those need to be in order
     await checkMissingWorkflows();
     await workflowService.loadWorkflowSettings();
-    await loadModel();
+    await loadModel(loadNavigation: storeNavigation);
 
     saveTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
-      saveModel();
+      saveModel(saveNavigation: storeNavigation);
     });
 
     isInit = true;
@@ -82,7 +83,7 @@ class WebAppDataBase with ChangeNotifier {
     _model.clear();
   }
 
-  Future<void> loadModel() async {
+  Future<void> loadModel({bool loadNavigation = true}) async {
     if (app.projectId != "") {
       var projectId = app.projectId;
       var user = app.username;
@@ -103,32 +104,39 @@ class WebAppDataBase with ChangeNotifier {
             ViewState.fromJson(JsonString(contentString).decodedValueAsMap);
       }
 
-      contentString = projectService.getFileContent(navFile);
-      if (contentString != "" && contentString != "{}") {
-        app.loadPersistentData(JsonString(contentString).decodedValueAsMap);
+      if( loadNavigation == true ){
+        contentString = projectService.getFileContent(navFile);
+        if (contentString != "" && contentString != "{}") {
+          app.loadPersistentData(JsonString(contentString).decodedValueAsMap);
+        }
       }
+      
     }
   }
 
-  Future<void> saveModel() async {
+  Future<void> saveModel({bool saveNavigation = true}) async {
     if (app.projectId != "") {
       var projectId = app.projectId;
       var user = app.username;
       var folder = await projectService
           .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
 
+
+      
       var viewFile = await projectService.getOrCreateFile(
           projectId, user, "${user}_view_05",
           parentId: folder.id);
+      await projectService.updateFileContent(viewFile, _model.toJson());
 
-      var navFile = await projectService.getOrCreateFile(
+      
+
+      if(saveNavigation){
+        var navFile = await projectService.getOrCreateFile(
           projectId, user, "${user}_nav_05",
           parentId: folder.id);
+        await projectService.updateFileContent(navFile, app.getPersistentData());
+      }
 
-      await Future.wait([
-        projectService.updateFileContent(viewFile, _model.toJson()),
-        projectService.updateFileContent(navFile, app.getPersistentData())
-      ]);
     }
   }
 
