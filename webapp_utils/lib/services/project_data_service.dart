@@ -31,7 +31,7 @@ class ProjectDataService with DataCache {
   }
 
   Future<FolderDocument?> getFolder(
-      String projectId, String owner, String name,
+      String name,
       {String? parentId}) async {
     var candidateFolders = _getDocuments(name, true, parentId: parentId);
 
