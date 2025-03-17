@@ -612,12 +612,21 @@ class WorkflowRunner with ProgressDialog {
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
-    var taskStream = workflowStream(workflowTask.id);
+    var taskStream = factory.eventService.channel(workflowTask.channelId);
+
+    await factory.taskService.runTask(workflowTask.id);
+
+    // var taskStream = workflowStream(workflowTask.id);
 
     log("Running ${stpName}", dialogTitle: runTitle);
 
     await for (var evt in taskStream) {
       print(evt.toJson());
+      if (evt is sci.TaskStateEvent) {
+        if(evt.state.isFinal && evt.taskId == workflowTask.id){
+          break;
+        }
+      }
       if (evt is sci.TaskProgressEvent) {
         log("Running ${stpName}\n\nTask Log\n${evt.message}",
             dialogTitle: runTitle);
