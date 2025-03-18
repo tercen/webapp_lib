@@ -23,6 +23,8 @@ mixin class ComponentBase {
 
   final List<Component> ancestors = [];
 
+  ValueNotifier<int> uiUpdate = ValueNotifier(0);
+
   String getKey(){
     var key = "${getId()}_${getGroupId()}";
     for( var comp in ancestors ){
