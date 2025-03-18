@@ -58,6 +58,7 @@ class WorkflowRunner with ProgressDialog {
   String workflowSuffix = "";
   String stepProgressMessage = "";
 
+  var addTimestamp = true;
   var isInit = false;
   var workflow = sci.Workflow();
 
@@ -79,6 +80,10 @@ class WorkflowRunner with ProgressDialog {
 
   void addFolderMeta(String key, String value){
     folderMeta.add( sci.Pair.from(key, value ) );
+  }
+
+  void addTimestampToName(bool val){
+    addTimestamp = val;
   }
 
   /// Setting by name will search through the steps in a workflow looking for a matching name
@@ -411,7 +416,8 @@ class WorkflowRunner with ProgressDialog {
 
     var basename = workflowRename == "" ? workflow.name : workflowRename;
 
-    return "$basename$workflowIdentifier${formatter.format(DateTime.now())}$workflowSuffix";
+    var dateString = addTimestamp ? "_${formatter.format(DateTime.now())}" : "";
+    return "$basename${workflowIdentifier}$dateString$workflowSuffix";
   }
 
   void addPostRun(PostRunCallback callback) {
