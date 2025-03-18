@@ -36,6 +36,10 @@ mixin class ComponentBase {
     ancestors.add(parent);
   }
 
+  Future<void> init() async {
+    //Generally useful for components which fetch data
+  }
+
   String getId(){
     return id;
   }

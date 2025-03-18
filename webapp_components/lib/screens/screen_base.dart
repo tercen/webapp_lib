@@ -140,6 +140,10 @@ mixin ScreenBase {
           comp.setStateValue(modelValue );
         }
       }
+
+      if( comp is ComponentBase ){
+        (comp as ComponentBase).init();
+      }
       
       // var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
 
