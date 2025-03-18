@@ -294,7 +294,7 @@ class MultiSelectTableComponent
   
   @override
   getComponentValue() {
-    return dataTable.selectByHash(selected);
+    return dataTable.selectByKey(selected);
   }
   
   @override
