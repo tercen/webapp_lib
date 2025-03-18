@@ -115,9 +115,6 @@ mixin ScreenBase {
   void addComponent(String blockId, Component component,
       {ComponentBlockType blockType = ComponentBlockType.simple}) {
 
-    if( component is ComponentBase ){
-      (component as ComponentBase).fulfilled.addListener(refresh);
-    }
     component.addListener(refresh);
     component.addListener(updateModel);
 

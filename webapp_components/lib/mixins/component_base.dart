@@ -13,7 +13,7 @@ mixin class ComponentBase {
   late final String id;
   late final String groupId;
   late final String componentLabel;
-  ValueNotifier<bool> fulfilled = ValueNotifier(false);
+
   String description = "";
  
   final List<Pair> _metaList = [];
