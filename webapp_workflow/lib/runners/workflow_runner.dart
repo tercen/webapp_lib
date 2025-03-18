@@ -34,6 +34,7 @@ class WorkflowRunner with ProgressDialog {
   final sci.Workflow template;
 
   final List<String> initStepIds = [];
+  final List<sci.Pair> metaList = [];
   final Map<String, sci.NamedFilter> filterMap = {};
   final Map<String, sci.Relation> tableMap = {};
   final Map<String, String> tableDocumentMap = {};
@@ -68,6 +69,10 @@ class WorkflowRunner with ProgressDialog {
     // }else{
     //   template = sci.Workflow();
     // }
+  }
+
+  void addWorkflowMeta(String key, String value){
+    metaList.add( sci.Pair.from(key, value ) );
   }
 
   /// Setting by name will search through the steps in a workflow looking for a matching name
@@ -483,6 +488,10 @@ class WorkflowRunner with ProgressDialog {
 
       for (var stepToRemove in stepsToRemove) {
         workflow = removeStepFromWorkflow(stepToRemove, workflow);
+      }
+
+      for( var meta in metaList ){
+        workflow.addMeta(meta.key, meta.value);
       }
 
       //-----------------------------------------
