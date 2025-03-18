@@ -229,7 +229,7 @@ class WorkflowDataService with DataCache {
     return false;
   }
 
-  List<SimpleRelation> _getSimpleRelations(Relation relation) {
+  List<SimpleRelation> getSimpleRelations(Relation relation) {
     List<SimpleRelation> l = [];
 
     switch (relation.kind) {
@@ -239,14 +239,14 @@ class WorkflowDataService with DataCache {
       case "CompositeRelation":
         CompositeRelation cr = relation as CompositeRelation;
         List<JoinOperator> joList = cr.joinOperators;
-        l.addAll(_getSimpleRelations(cr.mainRelation));
+        l.addAll(getSimpleRelations(cr.mainRelation));
         for (var jo in joList) {
-          l.addAll(_getSimpleRelations(jo.rightRelation));
+          l.addAll(getSimpleRelations(jo.rightRelation));
         }
         break;
       case "RenameRelation":
         RenameRelation rr = relation as RenameRelation;
-        l.addAll(_getSimpleRelations(rr.relation));
+        l.addAll(getSimpleRelations(rr.relation));
         break;
 
       default:
@@ -285,7 +285,7 @@ class WorkflowDataService with DataCache {
           includeStepId.isEmpty || includeStepId.contains(stp.id);
       if (stp.kind == "DataStep" && shouldIncludeStep) {
         DataStep dStp = stp as DataStep;
-        var relList = _getSimpleRelations(dStp.computedRelation);
+        var relList = getSimpleRelations(dStp.computedRelation);
         rels.addAll(relList);
         stepRelationMap[dStp.id] = relList.map((e) => e.id).toList();
       }
