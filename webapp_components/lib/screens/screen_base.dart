@@ -116,8 +116,11 @@ mixin ScreenBase {
       {ComponentBlockType blockType = ComponentBlockType.simple}) {
 
     component.addListener(refresh);
-    component.addUiListener(refresh);
     component.addListener(updateModel);
+
+    if( component is ComponentBase ){
+      (component as ComponentBase).addUiListener(refresh);
+    }
 
     var entry = ComponentEntry(
         component, component.getId(), component.getComponentType());

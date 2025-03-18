@@ -319,8 +319,5 @@ class MultiSelectTableComponent
     return saveState;
   }
   
-  @override
-  void addUiListener(VoidCallback listener) {
-    // TODO: implement addUiListener
-  }
+  
 }

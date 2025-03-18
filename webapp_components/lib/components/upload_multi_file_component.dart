@@ -381,8 +381,5 @@ class UploadFileComponent
     // Not used
   }
   
-  @override
-  void addUiListener(VoidCallback listener) {
-    // TODO: implement addUiListener
-  }
+
 }

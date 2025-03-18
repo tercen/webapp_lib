@@ -124,8 +124,5 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
     return saveState;
   }
   
-  @override
-  void addUiListener(VoidCallback listener) {
-    // TODO: implement addUiListener
-  }
+
 }

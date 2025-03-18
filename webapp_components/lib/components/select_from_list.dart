@@ -91,7 +91,5 @@ class SelectFromListComponent with ChangeNotifier, ComponentBase, InputValidator
     return saveState;
   }
   
-  @override
-  void addUiListener(VoidCallback listener) {
-    // TODO: implement addUiListener
-  }}
+  
+  }

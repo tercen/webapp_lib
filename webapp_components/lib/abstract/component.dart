@@ -12,8 +12,6 @@ abstract class Component with ChangeNotifier {
   bool isActive();
   bool isFulfilled();
 
-  void addUiListener( VoidCallback listener );
-
   dynamic getComponentValue();
   void setComponentValue(dynamic value);
 

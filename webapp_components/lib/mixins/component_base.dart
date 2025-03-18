@@ -34,7 +34,9 @@ mixin class ComponentBase {
     return key;
   }
 
-
+  void addUiListener(VoidCallback listener) {
+    uiUpdate.addListener(listener);
+  }
 
   void addParent(Component parent) {
     parent.addListener((){
