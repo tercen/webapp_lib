@@ -9,10 +9,13 @@ import 'package:sci_tercen_client/sci_client.dart';
 import 'package:webapp_model/utils/key_utils.dart';
 
 
+enum ComponentState {init, loaded, loading}
+
 mixin class ComponentBase {
   late final String id;
   late final String groupId;
   late final String componentLabel;
+  ComponentState state = ComponentState.init;
 
   String description = "";
  
@@ -37,7 +40,12 @@ mixin class ComponentBase {
   }
 
   Future<void> init() async {
+    state = ComponentState.loading;
     //Generally useful for components which fetch data
+  }
+
+  void postInit(){
+    state = ComponentState.loaded;
   }
 
   String getId(){

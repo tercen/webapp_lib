@@ -142,7 +142,7 @@ mixin ScreenBase {
       }
 
       if( comp is ComponentBase ){
-        (comp as ComponentBase).init();
+        (comp as ComponentBase).init().then((val) => (comp as ComponentBase).postInit());
       }
       
       // var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
