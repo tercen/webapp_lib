@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
 import 'package:webapp_components/abstract/multi_value_component.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
@@ -12,6 +13,7 @@ mixin class ComponentBase {
   late final String id;
   late final String groupId;
   late final String componentLabel;
+  ValueNotifier<bool> fulfilled = ValueNotifier(false);
   String description = "";
  
   final List<Pair> _metaList = [];

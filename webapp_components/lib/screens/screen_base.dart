@@ -9,6 +9,7 @@ import 'package:webapp_components/definitions/component.dart';
 // import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_components/action_components/action_component.dart';
 import 'package:webapp_components/components/horizontal_bar.dart';
+import 'package:webapp_components/mixins/component_base.dart';
 import 'package:webapp_components/mixins/input_validator.dart';
 
 import 'package:webapp_model/webapp_data_base.dart';
@@ -113,6 +114,10 @@ mixin ScreenBase {
 
   void addComponent(String blockId, Component component,
       {ComponentBlockType blockType = ComponentBlockType.simple}) {
+
+    if( component is ComponentBase ){
+      (component as ComponentBase).fulfilled.addListener(refresh);
+    }
     component.addListener(refresh);
     component.addListener(updateModel);
 
@@ -138,6 +143,7 @@ mixin ScreenBase {
           comp.setStateValue(modelValue );
         }
       }
+      
       // var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
 
       // if (modelValue.isNotEmpty) {
