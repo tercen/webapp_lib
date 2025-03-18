@@ -1,6 +1,7 @@
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_model/id_element.dart';
+import 'package:webapp_model/utils/key_utils.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
 
 
@@ -16,12 +17,12 @@ class WebappTable {
   }
   int get nCols => colNames.length;
 
-  WebappTable selectByHash( List<int> hashCodes ){
+  WebappTable selectByKey( List<int> keys ){
     var outTbl = WebappTable();
     List<List<String>> rows = [];
     for( var row = 0; row < nRows; row++){
-      var rowHash = columns.values.map((e) => e[row]).join().hashCode;
-      if( hashCodes.contains(rowHash)){
+      var rowHash =  KeyUtils.listToKey( columns.values.map((e) => e[row]).toList() );
+      if( keys.contains(rowHash)){
         rows.add(
           columns.values.map((e) => e[row]).toList()
         );
