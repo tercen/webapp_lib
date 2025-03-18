@@ -32,6 +32,8 @@ mixin class ComponentBase {
     return key;
   }
 
+
+
   void addParent(Component parent) {
     parent.addListener((){
       reset();

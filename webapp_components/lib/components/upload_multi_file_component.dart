@@ -380,4 +380,9 @@ class UploadFileComponent
   void setComponentValue(value) {
     // Not used
   }
+  
+  @override
+  void addUiListener(VoidCallback listener) {
+    // TODO: implement addUiListener
+  }
 }
