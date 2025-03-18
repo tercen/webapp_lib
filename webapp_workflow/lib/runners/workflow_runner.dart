@@ -34,7 +34,9 @@ class WorkflowRunner with ProgressDialog {
   final sci.Workflow template;
 
   final List<String> initStepIds = [];
-  final List<sci.Pair> metaList = [];
+  final List<sci.Pair> workflowMeta = [];
+  
+  final List<sci.Pair> folderMeta = [];
   final Map<String, sci.NamedFilter> filterMap = {};
   final Map<String, sci.Relation> tableMap = {};
   final Map<String, String> tableDocumentMap = {};
@@ -72,7 +74,11 @@ class WorkflowRunner with ProgressDialog {
   }
 
   void addWorkflowMeta(String key, String value){
-    metaList.add( sci.Pair.from(key, value ) );
+    workflowMeta.add( sci.Pair.from(key, value ) );
+  }
+
+  void addFolderMeta(String key, String value){
+    folderMeta.add( sci.Pair.from(key, value ) );
   }
 
   /// Setting by name will search through the steps in a workflow looking for a matching name
@@ -390,6 +396,10 @@ class WorkflowRunner with ProgressDialog {
     folder.projectId = projectId;
     folder.folderId = parentFolderId;
 
+    for(var meta in folderMeta ){
+      folder.addMeta(meta.key, meta.value);
+    }
+
     return await factory.folderService.create(folder);
   }
 
@@ -490,7 +500,7 @@ class WorkflowRunner with ProgressDialog {
         workflow = removeStepFromWorkflow(stepToRemove, workflow);
       }
 
-      for( var meta in metaList ){
+      for( var meta in workflowMeta ){
         workflow.addMeta(meta.key, meta.value);
       }
 
