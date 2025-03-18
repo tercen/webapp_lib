@@ -9,6 +9,7 @@ import 'package:webapp_utils/functions/list_utils.dart';
 class WebappTable {
   final Map<String, List<String>> columns = {};
   final List<String> colNames = [];
+
   int get nRows {
     if( colNames.isEmpty){
       return 0;
@@ -42,6 +43,8 @@ class WebappTable {
     if( data != null ){
       columns[columnName]?.addAll(data);
     }
+
+
   }
 
 
