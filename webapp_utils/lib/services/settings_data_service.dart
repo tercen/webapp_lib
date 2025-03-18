@@ -66,4 +66,6 @@ class SettingsDataService {
 
     settingsFilters = SettingsFilter.fromJson(jsonString.decodedValueAsMap);
   }
+
+
 }
