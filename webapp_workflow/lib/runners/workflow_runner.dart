@@ -627,11 +627,11 @@ class WorkflowRunner with ProgressDialog {
       await f();
     }
 
-    for (var stp in workflow.steps) {
-      if (stepsToRestore.contains(stp.id)) {
-        stp.state.taskState = sci.InitState();
-      }
-    }
+    // for (var stp in workflow.steps) {
+    //   if (stepsToRestore.contains(stp.id)) {
+    //     stp.state.taskState = sci.InitState();
+    //   }
+    // }
 
     await factory.workflowService.update(workflow);
 
