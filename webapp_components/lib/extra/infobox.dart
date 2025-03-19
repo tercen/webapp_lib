@@ -10,9 +10,26 @@ class InfoBoxBuilder with ChangeNotifier {
 
   InfoBoxBuilder(this.builderCallback, {this.futureCallback});
 
+  Widget createDialog( Widget contentWdg, String title ){
+    return AlertDialog(
+      title: Text(
+        title,
+        style: Styles()["textH1"],
+      ),
+      content: Container(
+        constraints: const BoxConstraints(maxHeight: 700, maxWidth: 1200),
+        child: contentWdg,
+      ),
+    );
+  }
+
   Widget _buildDefault(BuildContext context, dynamic value,
       {String title = ""}) {
-    return DoubleScrollBar.create(builderCallback(value, notifier));
+    var contentWdg =  DoubleScrollBar.create(builderCallback(value, notifier));
+
+    var dialog = createDialog(contentWdg, title);
+
+    return dialog;
   }
 
   Widget _buildWithFuture(BuildContext context, dynamic value,
@@ -46,16 +63,7 @@ class InfoBoxBuilder with ChangeNotifier {
           }
         });
 
-    var dialog = AlertDialog(
-      title: Text(
-        title,
-        style: Styles()["textH1"],
-      ),
-      content: Container(
-        constraints: const BoxConstraints(maxHeight: 700, maxWidth: 1200),
-        child: contentWdg,
-      ),
-    );
+    var dialog = createDialog(contentWdg, title);
 
     return dialog;
   }
