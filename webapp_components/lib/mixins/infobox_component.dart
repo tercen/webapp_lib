@@ -5,7 +5,7 @@ import 'package:webapp_components/extra/infobox.dart';
 mixin class ComponentInfoBox {
   late InfoBoxBuilder? infoBoxBuilder;
 
-  Widget infoBoxIcon(dynamic value, BuildContext context, {String title = ""}) {
+  Widget infoBoxIcon(dynamic value, BuildContext context) {
     return IconButton(
         onPressed: () async {
           showDialog(
@@ -15,7 +15,7 @@ mixin class ComponentInfoBox {
                   infoBoxBuilder!.notifier.addListener(() {
                     stfSetState(() {});
                   });
-                  return infoBoxBuilder!.build(context, value, title: title);
+                  return infoBoxBuilder!.build(context, value);
                 });
               });
         },
@@ -27,7 +27,7 @@ mixin class ComponentInfoBox {
     Widget infoBoxWidget = Container();
     double infoBoxWidth = 5;
     if (infoBoxBuilder != null) {
-      infoBoxWidget = infoBoxIcon(value, context, title: title);
+      infoBoxWidget = infoBoxIcon(value, context);
       infoBoxWidth =iconCellWidth ;
     }
     return SizedBox(
