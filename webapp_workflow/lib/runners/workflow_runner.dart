@@ -687,7 +687,7 @@ class WorkflowRunner with ProgressDialog {
         }
       }
       if (evt is sci.TaskProgressEvent) {
-        if (stepName == "") {
+        if (stepName == null || stepName == "") {
           log("$stepProgressMessage\n\nTask Log\n${evt.message}",
               dialogTitle: runTitle);
         } else {
@@ -695,7 +695,7 @@ class WorkflowRunner with ProgressDialog {
               dialogTitle: runTitle);
         }
       } else if (evt is sci.TaskLogEvent) {
-        if (stepName == "") {
+        if (stepName == null || stepName == "") {
           log("$stepProgressMessage\n\nTask Log\n${evt.message}",
               dialogTitle: runTitle);
         } else {

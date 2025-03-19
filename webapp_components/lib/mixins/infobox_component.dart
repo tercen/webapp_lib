@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:webapp_model/id_element.dart';
 
 import 'package:webapp_components/extra/infobox.dart';
 
 mixin class ComponentInfoBox {
   late InfoBoxBuilder? infoBoxBuilder;
 
-  Widget infoBoxIcon(String id, String name, BuildContext context) {
+  Widget infoBoxIcon(dynamic value, BuildContext context, {String title = ""}) {
     return IconButton(
         onPressed: () async {
           showDialog(
@@ -16,18 +15,19 @@ mixin class ComponentInfoBox {
                   infoBoxBuilder!.notifier.addListener(() {
                     stfSetState(() {});
                   });
-                  return infoBoxBuilder!.build(context, IdElement(id, name));
+                  return infoBoxBuilder!.build(context, value, title: title);
                 });
               });
         },
         icon: const Icon(Icons.info_outline));
   }
 
-  Widget buildInfoBoxIcon(String id, String name, BuildContext context) {
+  Widget buildInfoBoxIcon(dynamic value, BuildContext context,
+      {String title = ""}) {
     Widget infoBoxWidget = Container();
     double infoBoxWidth = 5;
     if (infoBoxBuilder != null) {
-      infoBoxWidget = infoBoxIcon(id, name, context);
+      infoBoxWidget = infoBoxIcon(value, context, title: title);
       infoBoxWidth = 50;
     }
     return SizedBox(
