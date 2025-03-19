@@ -21,6 +21,19 @@ class WorkflowQueuRunner extends WorkflowRunner{
       throw Exception("Workflow not set in WorkflowRunner.");
     }
 
+    Fluttertoast.showToast(
+        msg: "Workflow ${workflow.name} started",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM_LEFT,
+        webPosition: "left",
+        webBgColor: "linear-gradient(to bottom, #aaaaff, #eeeeaff)",
+        timeInSecForIosWeb: 5,
+        backgroundColor: Colors.lightBlue[100],
+        textColor: Styles()["black"],
+        fontSize: 16.0
+    );
+
+
     var factory = tercen.ServiceFactory();
 
     await setupRun(context);
@@ -37,17 +50,6 @@ class WorkflowQueuRunner extends WorkflowRunner{
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
-    Fluttertoast.showToast(
-        msg: "Workflow ${workflow.name} started",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM_LEFT,
-        webPosition: "left",
-        webBgColor: "linear-gradient(to bottom, #aaaaff, #eeeeaff)",
-        timeInSecForIosWeb: 5,
-        backgroundColor: Colors.lightBlue[100],
-        textColor: Styles()["black"],
-        fontSize: 16.0
-    );
 
 
     workflow = await factory.workflowService.get(workflow.id);
