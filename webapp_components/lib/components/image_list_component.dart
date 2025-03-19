@@ -6,8 +6,8 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart' as pd;
-import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_components/components/list_component.dart';
+import 'package:webapp_model/webapp_table.dart';
 
 class ExportPageContent {
   final String title;
@@ -110,7 +110,7 @@ class ImageListComponent extends ListComponent {
   }
 
   @override
-  Widget createWidget(BuildContext context, IdElementTable table) {
+  Widget createWidget(BuildContext context, WebappTable table) {
     widgetExportContent.clear();
     expansionControllers.clear();
 
@@ -121,11 +121,11 @@ class ImageListComponent extends ListComponent {
 
     List<Widget> wdgList = [];
 
-    for (var ri = 0; ri < table.nRows(); ri++) {
-      var title = table.columns[titleColName]![ri].label;
+    for (var ri = 0; ri < table.nRows; ri++) {
+      var title = table.columns[titleColName]![ri];
       if (shouldIncludeEntry(title)) {
         var imgData =
-            Uint8List.fromList(table.columns[dataColName]![ri].label.codeUnits);
+            Uint8List.fromList(table.columns[dataColName]![ri].codeUnits);
         Widget wdg = createImageListEntry(title, imgData);
 
         widgetExportContent.add(ExportPageContent(title, imgData));

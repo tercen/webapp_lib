@@ -8,11 +8,11 @@ import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/definitions/functions.dart';
 import 'package:webapp_components/abstract/multi_value_component.dart';
 import 'package:webapp_components/abstract/single_value_component.dart';
-import 'package:webapp_model/id_element.dart';
-import 'package:webapp_model/id_element_table.dart';
+
 import 'package:webapp_components/mixins/component_base.dart';
 import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
+import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implements Component {
@@ -40,11 +40,11 @@ class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implement
   }
 
 
-  Widget createListEntry(IdElement value){
-    return Text(value.label);
+  Widget createListEntry(String value){
+    return Text(value);
   }
 
-  Widget createWidget(BuildContext context, IdElementTable table ){
+  Widget createWidget(BuildContext context, WebappTable table ){
     expansionControllers.clear();
     var colName = table.colNames.first;
     var data = table.columns[colName]!;
