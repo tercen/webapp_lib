@@ -665,6 +665,9 @@ class WorkflowRunner with ProgressDialog {
 
     await factory.taskService.runTask(workflowTask.id);
 
+    workflow.addMeta("workflow.task.id", workflowTask.id);
+    await factory.workflowService.update(workflow);
+
     if (stepName == null) {
       updateStepProgress(workflow);
       log(stepProgressMessage, dialogTitle: runTitle);
