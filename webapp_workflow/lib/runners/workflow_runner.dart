@@ -712,7 +712,10 @@ class WorkflowRunner with ProgressDialog {
     var doneWorkflow = await factory.workflowService.get(workflow.id);
 
     for (var stp in doneWorkflow.steps) {
-      stp.state.taskState.throwIfNotDone();
+      if( stp.state.taskState is! sci.InitState){
+        stp.state.taskState.throwIfNotDone();
+      }
+      
     }
     
     return doneWorkflow;
