@@ -666,6 +666,7 @@ class WorkflowRunner with ProgressDialog {
     await factory.taskService.runTask(workflowTask.id);
 
     workflow.addMeta("workflow.task.id", workflowTask.id);
+    workflow.addMeta("run.task.id", workflowTask.id);
     await factory.workflowService.update(workflow);
 
     if (stepName == null) {
@@ -708,7 +709,6 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
-    //FIXME Missing the last patch record, it seems
     var doneWorkflow = await factory.workflowService.get(workflow.id);
 
     for (var stp in doneWorkflow.steps) {

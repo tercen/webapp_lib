@@ -23,89 +23,7 @@ class WorkflowQueuRunner extends WorkflowRunner{
 
     var factory = tercen.ServiceFactory();
 
-    
-
-    for( var entry in tableDocumentMap.entries ){
-      tableMap[entry.key] = await loadDocumentInMemory(entry.value);
-    }
-
-    //-----------------------------------------
-    // Copy template into project
-    //-----------------------------------------
-    var workflow =
-        await factory.workflowService.copyApp(template.id, projectId);
-
-    for (var stepToRemove in stepsToRemove) {
-      workflow = removeStepFromWorkflow(stepToRemove, workflow);
-    }
-
-    //-----------------------------------------
-    // Step-specific setup
-    //-----------------------------------------
-    for (var stp in workflow.steps) {
-      if (stp.kind == "DataStep") {
-        stp = updateOperatorSettings(stp as sci.DataStep, settings);
-      }
-
-      if (shouldResetStep(stp)) {
-        stp.state.taskState = sci.InitState();
-        stp.state.taskId = "";
-      }
-
-      if (multiDsMap.containsKey(stp.id)) {
-        var tmpStp = stp as sci.DataStep;
-        tmpStp.parentDataStepId = multiDsMap[stp.id]!;
-      }
-
-      if (filterMap.containsKey(stp.id)) {
-        sci.DataStep dataStp = stp as sci.DataStep;
-        dataStp.model.filters.namedFilters.add(filterMap[stp.id]!);
-        // dataStp.model.filters = filterMap[stp.id]!;
-      }
-
-      if (tableMap.containsKey(stp.id)) {
-        sci.TableStep tmpStp = stp as sci.TableStep;
-        tmpStp.model.relation = tableMap[stp.id]!;
-        tmpStp.state.taskState = sci.DoneState();
-
-        if( tableNameMap.containsKey(stp.id)){
-          tmpStp.name = tableNameMap[stp.id]!;
-        }
-
-        stp = tmpStp;
-      }
-
-      if (gatherMap.containsKey(stp.id)) {
-        (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
-      }
-    }
-
-    //-----------------------------------------
-    // General workflow parameters
-    //-----------------------------------------
-    if (folderId == null) {
-      sci.FolderDocument folder = await createFolder(projectId, teamName);
-      workflow.folderId = folder.id;
-    } else {
-      workflow.folderId = folderId!;
-    }
-
-    workflow.name = getWorkflowName(workflow);
-
-    workflow.meta.add(sci.Pair.from("team.init", teamName ));
-    
-    
-    workflow.acl = sci.Acl()..owner = teamName;
-    workflow.id = "";
-    workflow.rev = "";
-
-    workflow.isHidden = false;
-    workflow.isDeleted = false;
-    
-    workflow = await factory.workflowService.create(workflow);
-    
-    workflowId = workflow.id;
-
+    await setupRun(context);
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
@@ -133,7 +51,8 @@ class WorkflowQueuRunner extends WorkflowRunner{
 
 
     workflow = await factory.workflowService.get(workflow.id);
-    workflow.meta.add(sci.Pair.from("run.task.id", workflowTask.id));
+    workflow.addMeta("workflow.task.id", workflowTask.id);
+    workflow.addMeta("run.task.id", workflowTask.id);
     await factory.workflowService.update(workflow);
     
     var taskStream = workflowStream(workflowTask.id);
