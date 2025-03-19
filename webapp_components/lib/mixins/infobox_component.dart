@@ -23,12 +23,12 @@ mixin class ComponentInfoBox {
   }
 
   Widget buildInfoBoxIcon(dynamic value, BuildContext context,
-      {String title = ""}) {
+      {String title = "", double iconCellWidth = 50}) {
     Widget infoBoxWidget = Container();
     double infoBoxWidth = 5;
     if (infoBoxBuilder != null) {
       infoBoxWidget = infoBoxIcon(value, context, title: title);
-      infoBoxWidth = 50;
+      infoBoxWidth =iconCellWidth ;
     }
     return SizedBox(
       width: infoBoxWidth,
