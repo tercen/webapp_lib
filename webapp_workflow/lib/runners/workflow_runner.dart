@@ -674,16 +674,16 @@ class WorkflowRunner with ProgressDialog {
 
     await for (var evt in taskStream) {
       // Task is Done
-      if (evt is sci.TaskStateEvent) {
-        if (evt.state.isFinal && evt.taskId == workflowTask.id) {
-          break;
-        }
-      }
       if (evt is sci.PatchRecords) {
         workflow = evt.apply(workflow);
         if (stepName == null) {
           updateStepProgress(workflow);
           log(stepProgressMessage, dialogTitle: runTitle);
+        }
+      }
+      if (evt is sci.TaskStateEvent) {
+        if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+          break;
         }
       }
       if (evt is sci.TaskProgressEvent) {
@@ -705,13 +705,14 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
-    // var doneWorkflow = await factory.workflowService.get(workflow.id);
+    //FIXME Missing the last patch record, it seems
+    var doneWorkflow = await factory.workflowService.get(workflow.id);
 
-    for (var stp in workflow.steps) {
+    for (var stp in doneWorkflow.steps) {
       stp.state.taskState.throwIfNotDone();
     }
     
-    return workflow;
+    return doneWorkflow;
   }
 
   Future<sci.Workflow> doRun(BuildContext context) async {
