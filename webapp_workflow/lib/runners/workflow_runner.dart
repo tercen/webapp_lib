@@ -627,11 +627,11 @@ class WorkflowRunner with ProgressDialog {
       await f();
     }
 
-    // for (var stp in workflow.steps) {
-    //   if (stepsToRestore.contains(stp.id)) {
-    //     stp.state.taskState = sci.InitState();
-    //   }
-    // }
+    for (var stp in workflow.steps) {
+      if (stepsToRestore.contains(stp.id)) {
+        stp.state.taskState = sci.InitState();
+      }
+    }
 
     await factory.workflowService.update(workflow);
 
@@ -709,16 +709,16 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
-    var doneWorkflow = await factory.workflowService.get(workflow.id);
+    // var doneWorkflow = await factory.workflowService.get(workflow.id);
 
-    for (var stp in doneWorkflow.steps) {
+    for (var stp in workflow.steps) {
       if( stp.state.taskState is! sci.InitState){
         stp.state.taskState.throwIfNotDone();
       }
       
     }
     
-    return doneWorkflow;
+    return workflow;
   }
 
   Future<sci.Workflow> doRun(BuildContext context) async {
