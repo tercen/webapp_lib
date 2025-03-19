@@ -21,17 +21,17 @@ class WorkflowQueuRunner extends WorkflowRunner{
       throw Exception("Workflow not set in WorkflowRunner.");
     }
 
-    Fluttertoast.showToast(
-        msg: "Workflow ${workflow.name} started",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM_LEFT,
-        webPosition: "left",
-        webBgColor: "linear-gradient(to bottom, #aaaaff, #eeeeaff)",
-        timeInSecForIosWeb: 5,
-        backgroundColor: Colors.lightBlue[100],
-        textColor: Styles()["black"],
-        fontSize: 16.0
-    );
+    // Fluttertoast.showToast(
+    //     msg: "Workflow is being prepared",
+    //     toastLength: Toast.LENGTH_LONG,
+    //     gravity: ToastGravity.BOTTOM_LEFT,
+    //     webPosition: "left",
+    //     webBgColor: "linear-gradient(to bottom, #aaaaff, #eeeeaff)",
+    //     timeInSecForIosWeb: 2,
+    //     backgroundColor: Colors.lightBlue[100],
+    //     textColor: Styles()["black"],
+    //     fontSize: 16.0
+    // );
 
 
     var factory = tercen.ServiceFactory();
@@ -58,6 +58,20 @@ class WorkflowQueuRunner extends WorkflowRunner{
     await factory.workflowService.update(workflow);
     
     var taskStream = workflowStream(workflowTask.id);
+
+    Fluttertoast.showToast(
+        msg: "Workflow ${workflow.name} sent to the queu",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM_LEFT,
+        webPosition: "left",
+        webBgColor: "linear-gradient(to bottom, #aaaaff, #eeeeaff)",
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.lightBlue[100],
+        textColor: Styles()["black"],
+        fontSize: 16.0
+    );
+
+
     await for (var evt in taskStream) {
       if (evt is sci.TaskProgressEvent) {
         
