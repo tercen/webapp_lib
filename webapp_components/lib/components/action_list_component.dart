@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:webapp_components/components/list_component.dart';
+import 'package:webapp_components/definitions/list_action.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
