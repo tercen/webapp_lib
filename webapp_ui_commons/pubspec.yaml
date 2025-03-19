@@ -15,7 +15,8 @@ dependencies:
 
   webapp_components:
     path: ../webapp_components
-  
+  webapp_model:
+    path: ../webapp_model
 
 
 dev_dependencies:
