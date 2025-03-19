@@ -8,6 +8,7 @@ import 'package:sci_tercen_client/sci_client.dart';
 // import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_model/model/view_state.dart';
 import 'package:webapp_model/settings/required_template.dart';
+import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/webapp_base.dart';
 import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/services/file_data_service.dart';
@@ -265,19 +266,19 @@ class WebAppDataBase with ChangeNotifier {
   //   return IdElementTable();
   // }
 
-  // Future<IdElementTable> fetchWorkflowImagesByWorkflow(Workflow workflow,
-  //     {List<String> contentTypes = const ["image"],
-  //     List<String> excludedFiles = const []}) async {
-  //   return workflowService.fetchWorkflowImages(workflow,
-  //       contentTypes: contentTypes, excludedFiles: excludedFiles);
-  // }
+  Future<WebappTable> fetchWorkflowImagesByWorkflow(Workflow workflow,
+      {List<String> contentTypes = const ["image"],
+      List<String> excludedFiles = const []}) async {
+    return workflowService.fetchWorkflowImages(workflow,
+        contentTypes: contentTypes, excludedFiles: excludedFiles);
+  }
 
-  // Future<IdElementTable> fetchWorkflowSummary(IdElement workflowEl) async {
-  //   var factory = tercen.ServiceFactory();
-  //   var wkf = await factory.workflowService.get(workflowEl.id);
-  //   return workflowService.fetchWorkflowImages(wkf,
-  //       contentTypes: ["text"], nameFilter: ["Summary"]);
-  // }
+  Future<WebappTable> fetchWorkflowSummary(String workflowId) async {
+    var factory = tercen.ServiceFactory();
+    var wkf = await factory.workflowService.get(workflowId);
+    return workflowService.fetchWorkflowImages(wkf,
+        contentTypes: ["text"], nameFilter: ["Summary"]);
+  }
 
   Future<void> checkMissingWorkflows() async {
     var requiredWorkflows = settingsService.requiredWorkflows;

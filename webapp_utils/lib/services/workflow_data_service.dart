@@ -9,6 +9,7 @@ import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_model/settings/required_template.dart';
 import 'package:webapp_model/settings/template_config.dart';
+import 'package:webapp_model/webapp_table.dart';
 
 import 'package:webapp_utils/functions/logger.dart';
 
@@ -255,7 +256,7 @@ class WorkflowDataService with DataCache {
     return l;
   }
 
-  Future<IdElementTable> fetchWorkflowImages(Workflow wkf,
+  Future<WebappTable> fetchWorkflowImages(Workflow wkf,
       {List<String> contentTypes = const ["image"],
       List<String> excludedFiles = const [],
       List<String> nameFilter = const [],
@@ -270,11 +271,11 @@ class WorkflowDataService with DataCache {
       return getCachedValue(key);
     }
 
-    List<IdElement> workflowNames = [];
-    List<IdElement> stepNames = [];
-    List<IdElement> filenames = [];
-    List<IdElement> bytes = [];
-    List<IdElement> contentTypeList = [];
+    List<String> workflowNames = [];
+    List<String> stepNames = [];
+    List<String> filenames = [];
+    List<String> bytes = [];
+    List<String> contentTypeList = [];
 
     var factory = tercen.ServiceFactory();
     //TODO Make a single API call to list by building the full id list
@@ -337,9 +338,9 @@ class WorkflowDataService with DataCache {
                 filterInclude &&
                 isCorrectType) {
               uniqueAddedNames.add(nameContent.key);
-              workflowNames.add(IdElement("", wkf.name));
-              stepNames.add(step);
-              filenames.add(IdElement("", nameContent.key));
+              workflowNames.add(wkf.name);
+              stepNames.add(step.get("name"));
+              filenames.add(nameContent.key);
 
               var bStr = "";
               for (var i = 0; i < tbl.nRows; i++) {
@@ -350,7 +351,7 @@ class WorkflowDataService with DataCache {
                   bStr = "$bStr$newBStr";
                 }
               }
-              bytes.add(IdElement("", bStr));
+              bytes.add( bStr);
             }
           }
         } else {
@@ -363,19 +364,19 @@ class WorkflowDataService with DataCache {
               if (!excludedFiles.contains(fname) && filterInclude) {
                 if (!uniqueAddedNames.contains(fname)) {
                   uniqueAddedNames.add(fname);
-                  workflowNames.add(IdElement("", wkf.name));
-                  stepNames.add(step);
-                  filenames.add(IdElement("", fname));
+                  workflowNames.add( wkf.name);
+                  stepNames.add(step.get("name"));
+                  filenames.add(fname);
                   var ct = tbl.columns[1].values[i];
 
-                  contentTypeList.add(IdElement("", ct));
+                  contentTypeList.add( ct);
 
                   var bytesStream = factory.tableSchemaService
                       .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
                   var imgBytes = await bytesStream.toList();
 
-                  bytes.add(IdElement("",
-                      String.fromCharCodes(Uint8List.fromList(imgBytes[0]))));
+                  bytes.add(
+                      String.fromCharCodes(Uint8List.fromList(imgBytes[0])));
                 }
               }
             }
@@ -384,7 +385,7 @@ class WorkflowDataService with DataCache {
       }
     }
 
-    IdElementTable tbl = IdElementTable()
+    var tbl = WebappTable()
       ..addColumn("workflowName", data: workflowNames)
       ..addColumn("filename", data: filenames)
       ..addColumn("step", data: stepNames)
@@ -395,7 +396,7 @@ class WorkflowDataService with DataCache {
     return tbl;
   }
 
-  IdElement _getRelationStep(
+  Step _getRelationStep(
       Workflow wkf, Map<String, List<String>> stepRelationMap, String schId) {
     String stepId = "";
     var entries =
@@ -407,25 +408,25 @@ class WorkflowDataService with DataCache {
     }
 
     if (stepId == "") {
-      return IdElement("", "");
+      return Step();
     }
 
     var stp = wkf.steps.firstWhere((e) => e.id == stepId);
 
-    return IdElement(stp.id, stp.name);
+    return stp;
   }
 
-  Future<IdElementTable> fetchImageData(
-      IdElementTable workflowImageTable) async {
+  Future<WebappTable> fetchImageData(
+      WebappTable workflowImageTable) async {
     assert(workflowImageTable.colNames.contains("workflow"));
     assert(workflowImageTable.colNames.contains("image"));
 
     var uniqueWorkflowIds =
-        workflowImageTable["workflow"].map((e) => e.id).toSet().toList();
+        workflowImageTable["workflow"].toSet().toList();
     var uniqueStepIds =
-        workflowImageTable["image"].map((e) => e.id).toSet().toList();
+        workflowImageTable["image"].toSet().toList();
 
-    var outTbl = IdElementTable();
+    var outTbl = WebappTable();
     var factory = tercen.ServiceFactory();
     var workflows = await factory.workflowService.list(uniqueWorkflowIds);
     for (var w in workflows) {
