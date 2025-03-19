@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:webapp_model/webapp_table.dart';
 
-typedef CheckActionCallback = bool Function( WebappTable row );
-typedef RowActionCallback = Future<void> Function( WebappTable row ) ;
+
+typedef CheckActionCallback = bool Function( List<String> row );
+typedef RowActionCallback = Future<void> Function( List<String> row ) ;
 
 class ListAction{
   Icon actionIcon;

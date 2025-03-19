@@ -18,20 +18,21 @@ class WebappTable {
   }
   int get nCols => colNames.length;
 
-  WebappTable selectByKey( List<int> keys ){
+  WebappTable selectByKey(List<int> keys) {
     var outTbl = WebappTable();
     List<List<String>> rows = [];
-    for( var row = 0; row < nRows; row++){
-      var rowHash =  KeyUtils.listToKey( columns.values.map((e) => e[row]).toList() );
-      if( keys.contains(rowHash)){
-        rows.add(
-          columns.values.map((e) => e[row]).toList()
-        );
+    for (var row = 0; row < nRows; row++) {
+
+      var rowHash =
+          KeyUtils.listToKey(columns.values.map((e) => e[row]).toList());
+      if (keys.contains(rowHash)) {
+        rows.add(columns.values.map((e) => e[row]).toList());
       }
     }
-    
-    for( var col = 0; col < nCols; col++){
-      outTbl.addColumn(colNames[col], data: rows.map((row) => row[col]).toList());
+
+    for (var col = 0; col < nCols; col++) {
+      outTbl.addColumn(colNames[col],
+          data: rows.map((row) => row[col]).toList());
     }
 
     return outTbl;
