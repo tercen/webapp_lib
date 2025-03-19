@@ -136,7 +136,7 @@ class UploadTableComponent extends UploadFileComponent {
   }
 
   String getSeparator(String contentType){
-    String sep = '"';
+    String sep = ',';
     if( contentType == "text/tsv"){
       sep = '\t';
     }
