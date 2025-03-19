@@ -6,11 +6,12 @@ import 'package:webapp_ui_commons/styles/styles.dart';
 class InfoBoxBuilder with ChangeNotifier {
   final Function? futureCallback;
   final Function builderCallback;
+  final String title;
   final ValueNotifier<int> notifier = ValueNotifier(0);
 
-  InfoBoxBuilder(this.builderCallback, {this.futureCallback});
+  InfoBoxBuilder( this.title, this.builderCallback, {this.futureCallback});
 
-  Widget createDialog( Widget contentWdg, String title ){
+  Widget createDialog( Widget contentWdg ){
     return AlertDialog(
       title: Text(
         title,
@@ -23,17 +24,15 @@ class InfoBoxBuilder with ChangeNotifier {
     );
   }
 
-  Widget _buildDefault(BuildContext context, dynamic value,
-      {String title = ""}) {
+  Widget _buildDefault(BuildContext context, dynamic value) {
     var contentWdg =  DoubleScrollBar.create(builderCallback(value, notifier));
 
-    var dialog = createDialog(contentWdg, title);
+    var dialog = createDialog(contentWdg);
 
     return dialog;
   }
 
-  Widget _buildWithFuture(BuildContext context, dynamic value,
-      {String title = ""}) {
+  Widget _buildWithFuture(BuildContext context, dynamic value) {
     var contentWdg = FutureBuilder(
         future: futureCallback!(value),
         builder: (context, snapshot) {
@@ -63,16 +62,16 @@ class InfoBoxBuilder with ChangeNotifier {
           }
         });
 
-    var dialog = createDialog(contentWdg, title);
+    var dialog = createDialog(contentWdg);
 
     return dialog;
   }
 
-  Widget build(BuildContext context, dynamic value, {String title = ""}) {
+  Widget build(BuildContext context, dynamic value) {
     if (futureCallback != null) {
-      return _buildWithFuture(context, value, title: title);
+      return _buildWithFuture(context, value);
     } else {
-      return _buildDefault(context, value, title: title);
+      return _buildDefault(context, value);
     }
   }
 }
