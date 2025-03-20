@@ -11,6 +11,7 @@ import 'package:webapp_model/id_element_table.dart';
 import 'package:webapp_model/settings/required_template.dart';
 import 'package:webapp_model/settings/template_config.dart';
 import 'package:webapp_model/webapp_table.dart';
+import 'package:webapp_utils/functions/formatter_utils.dart';
 
 import 'package:webapp_utils/functions/logger.dart';
 
@@ -600,5 +601,27 @@ class WorkflowDataService with DataCache {
   Future<void> cancelWorkflowTask(String id) async {
     var factory = tercen.ServiceFactory();
     await factory.taskService.cancelTask(id);
+  }
+
+
+  Future<WebappTable> fetchWorkflowTasks() async {
+    var res = WebappTable();
+
+    var factory = tercen.ServiceFactory();
+    var tasks = await factory.taskService.getTasks(["RunWorkflowTask"]);
+    var compTasks = tasks.whereType<sci.RunWorkflowTask>();
+    var workflowIds = compTasks.map((task) => task.workflowId).toList();
+    var workflows = await factory.workflowService.list(workflowIds);
+    
+
+    res.addColumn("Id", data: compTasks.map((w) => w.id).toList());
+    res.addColumn("Name", data: workflows.map((w) => w.name).toList());
+    res.addColumn("WorkflowIds", data: workflows.map((w) => w.id).toList());
+    res.addColumn("Last Update",
+        data: workflows
+            .map((w) => DateFormatter.formatShort(w.lastModifiedDate))
+            .toList());
+
+    return res;
   }
 }
