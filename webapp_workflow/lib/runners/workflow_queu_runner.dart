@@ -78,11 +78,11 @@ class WorkflowQueuRunner extends WorkflowRunner {
         fontSize: 16.0);
 
     try {
-      
+      var hasFailed = false;
       await for (var evt in taskStream) {
         if (evt is sci.PatchRecords) {
+          workflow = evt.apply(workflow);
           for( var pr in evt.rs ){
-            print("Decoding $pr");
             var prMap = jsonDecode(pr.d);
 
             if( prMap is Map && prMap.keys.contains("kind") && prMap["kind"] == "FailedState"){
@@ -91,13 +91,13 @@ class WorkflowQueuRunner extends WorkflowRunner {
                   .add(sci.Pair.from("run.error", prMap["error"] as String));
               workflow.meta
                   .add(sci.Pair.from("run.error.reason", prMap["error"] as String));
+              await factory.taskService.cancelTask(workflowTask.id);
               await factory.workflowService.update(workflow);
-              
-              break;
+              hasFailed = true;
             }
           }
-          print(evt.toJson());
-          workflow = evt.apply(workflow);
+
+          
         }
         if (evt is sci.TaskStateEvent) {
           if (evt.state.isFinal && evt.taskId == workflowTask.id) {
@@ -114,6 +114,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
               //TODO update number of steps finished
             }
           }
+        }
+
+        if( hasFailed ){
+          break;
         }
       }
       // var doneWorkflow = await factory.workflowService.get(workflow.id);
