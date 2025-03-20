@@ -53,11 +53,13 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
     var taskStream = factory.eventService.channel(workflowTask.channelId);
 
-    await factory.taskService.runTask(workflowTask.id);
-
     workflow.addMeta("workflow.task.id", workflowTask.id);
     workflow.addMeta("run.task.id", workflowTask.id);
     await factory.workflowService.update(workflow);
+
+    await factory.taskService.runTask(workflowTask.id);
+
+
 
     // workflow = await factory.workflowService.get(workflow.id);
     // workflow.addMeta("workflow.task.id", workflowTask.id);
@@ -84,7 +86,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
           workflow = evt.apply(workflow);
           for( var pr in evt.rs ){
             var prMap = jsonDecode(pr.d);
-
             if( prMap is Map && prMap.keys.contains("kind") && prMap["kind"] == "FailedState"){
               print(evt.toJson());
               print("Workflow failed ###");
@@ -97,11 +98,11 @@ class WorkflowQueuRunner extends WorkflowRunner {
               hasFailed = true;
             }
           }
-
-          
         }
         if (evt is sci.TaskStateEvent) {
           if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+            print("FINAL Event");
+            print(evt.toJson());
             break;
           }
         }
@@ -110,9 +111,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
         } else {
           if (evt is sci.TaskStateEvent) {
             if (evt.state is sci.DoneState) {
-              // var runningWorkflow =
-              // await factory.workflowService.get(workflow.id);
-              //TODO update number of steps finished
+
             }
           }
         }
@@ -120,11 +119,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
         if( hasFailed ){
           break;
         }
-      }
-      var workflow2 = await factory.workflowService.get(workflow.id);
-      print("Finished running workflow");
-      for( var i = 0; i < workflow.steps.length; i++ ){
-        print("\t${workflow.steps[i].name}: ${workflow.steps[i].state.taskState.kind}/${workflow2.steps[i].state.taskState.kind}");
       }
 
       await factory.workflowService.update(workflow);
