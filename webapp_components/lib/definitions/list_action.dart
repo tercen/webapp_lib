@@ -11,5 +11,11 @@ class ListAction{
   String? description;
   String? buttonLabel;
 
-  ListAction(this.actionIcon, this.callback, {this.enabledCallback, this.description, this.buttonLabel});
+  bool toggle = false;
+
+  Icon? toggleIcon;
+
+  ListAction(this.actionIcon, this.callback, {this.enabledCallback, this.description, this.buttonLabel, this.toggleIcon}){
+    toggle = toggleIcon != null;
+  }
 }
