@@ -38,10 +38,28 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "build",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/build-2.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "build_config",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/build_config-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
+    },
+    {
       "name": "characters",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/characters-1.3.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "checked_yaml",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/checked_yaml-2.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "chunked_stream",
@@ -84,6 +102,12 @@
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/crypto-3.0.6",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "dart_style",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/dart_style-2.3.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "ffi",
@@ -200,6 +224,18 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "json_annotation",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/json_annotation-4.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "json_serializable",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/json_serializable-6.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "json_string",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/json_string-3.0.1",
       "packageUri": "lib/",
@@ -308,6 +344,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "pubspec_parse",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/pubspec_parse-1.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "sci_base",
       "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_base",
       "packageUri": "lib/",
@@ -360,6 +402,18 @@
       "rootUri": "file:///usr/bin/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "source_gen",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/source_gen-1.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "source_helper",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/source_helper-1.3.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "source_map_stack_trace",
@@ -590,7 +644,7 @@
       "languageVersion": "3.4"
     }
   ],
-  "generated": "2025-03-13T15:00:38.628628Z",
+  "generated": "2025-03-20T18:05:25.657022Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///usr/bin/flutter",

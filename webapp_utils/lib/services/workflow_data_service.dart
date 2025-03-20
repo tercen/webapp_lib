@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:json_string/json_string.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
@@ -594,5 +595,10 @@ class WorkflowDataService with DataCache {
     Stream<List> dataStream =
         Stream.fromIterable(Iterable.castFrom([utf8.encode(readmeTxt)]));
     factory.fileService.upload(doc, dataStream);
+  }
+
+  Future<void> cancelWorkflowTask(String id) async {
+    var factory = tercen.ServiceFactory();
+    await factory.taskService.cancelTask(id);
   }
 }
