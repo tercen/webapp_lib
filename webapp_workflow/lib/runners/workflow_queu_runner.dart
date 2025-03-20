@@ -90,7 +90,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
               workflow.meta
                   .add(sci.Pair.from("run.error", prMap["error"] as String));
               workflow.meta
-                  .add(sci.Pair.from("run.error.reason", prMap["error"] as String));
+                  .add(sci.Pair.from("run.error.reason", prMap["reason"] as String));
               await factory.taskService.cancelTask(workflowTask.id);
               await factory.workflowService.update(workflow);
               hasFailed = true;
