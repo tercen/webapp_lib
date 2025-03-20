@@ -77,7 +77,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
         textColor: Styles()["black"],
         fontSize: 16.0);
 
-    try {
+    // try {
       var hasFailed = false;
       await for (var evt in taskStream) {
         if (evt is sci.PatchRecords) {
@@ -86,6 +86,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
             var prMap = jsonDecode(pr.d);
 
             if( prMap is Map && prMap.keys.contains("kind") && prMap["kind"] == "FailedState"){
+              print(evt.toJson());
               print("Workflow failed ###");
               workflow.meta
                   .add(sci.Pair.from("run.error", prMap["error"] as String));
@@ -121,20 +122,25 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
       }
 
+      print("Finished running workflow");
+      for( var step in workflow.steps ){
+        print("\t${step.name}: ${step.state.kind}");
+      }
+
       await factory.workflowService.update(workflow);
       workflow = await factory.workflowService.get(workflow.id);
       // if( !hasFailed )
       // for (var stp in workflow.steps) {
       //   stp.state.taskState.throwIfNotDone();
       // }
-    } catch (e) {
-      print("Workflow failed: $e");
-      workflow.meta
-          .add(sci.Pair.from("run.error", (e as sci.ServiceError).error));
-      workflow.meta.add(
-          sci.Pair.from("run.error.reason", (e as sci.ServiceError).reason));
-      await factory.workflowService.update(workflow);
-    }
+    // } catch (e) {
+    //   print("Workflow failed: $e");
+    //   workflow.meta
+    //       .add(sci.Pair.from("run.error", (e as sci.ServiceError).error));
+    //   workflow.meta.add(
+    //       sci.Pair.from("run.error.reason", (e as sci.ServiceError).reason));
+    //   await factory.workflowService.update(workflow);
+    // }
 
     for (var f in postRunCallbacks) {
       await f();
