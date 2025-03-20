@@ -59,8 +59,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
     await factory.taskService.runTask(workflowTask.id);
 
-
-
     // workflow = await factory.workflowService.get(workflow.id);
     // workflow.addMeta("workflow.task.id", workflowTask.id);
     // workflow.addMeta("run.task.id", workflowTask.id);
@@ -79,22 +77,24 @@ class WorkflowQueuRunner extends WorkflowRunner {
         textColor: Styles()["black"],
         fontSize: 16.0);
 
-    // try {
+    while (!taskStream.isEmpty) {
       var hasFailed = false;
       await for (var evt in taskStream) {
         if (evt is sci.PatchRecords) {
           workflow = evt.apply(workflow);
-          for( var pr in evt.rs ){
+          for (var pr in evt.rs) {
             var prMap = jsonDecode(pr.d);
-            if( prMap is Map && prMap.keys.contains("kind") && prMap["kind"] == "FailedState"){
+            if (prMap is Map &&
+                prMap.keys.contains("kind") &&
+                prMap["kind"] == "FailedState") {
               print(evt.toJson());
               print("Workflow failed ###");
               workflow.meta
                   .add(sci.Pair.from("run.error", prMap["error"] as String));
-              workflow.meta
-                  .add(sci.Pair.from("run.error.reason", prMap["reason"] as String));
+              workflow.meta.add(
+                  sci.Pair.from("run.error.reason", prMap["reason"] as String));
               await factory.taskService.cancelTask(workflowTask.id);
-              await factory.workflowService.update(workflow);
+              // await factory.workflowService.update(workflow);
               hasFailed = true;
             }
           }
@@ -110,23 +110,23 @@ class WorkflowQueuRunner extends WorkflowRunner {
         } else if (evt is sci.TaskLogEvent) {
         } else {
           if (evt is sci.TaskStateEvent) {
-            if (evt.state is sci.DoneState) {
-
-            }
+            if (evt.state is sci.DoneState) {}
           }
         }
 
-        if( hasFailed ){
+        if (hasFailed) {
           break;
         }
       }
+      taskStream = factory.eventService.channel(workflowTask.channelId);
+    }
 
-      await factory.workflowService.update(workflow);
-      workflow = await factory.workflowService.get(workflow.id);
-      // if( !hasFailed )
-      // for (var stp in workflow.steps) {
-      //   stp.state.taskState.throwIfNotDone();
-      // }
+    await factory.workflowService.update(workflow);
+    workflow = await factory.workflowService.get(workflow.id);
+    // if( !hasFailed )
+    // for (var stp in workflow.steps) {
+    //   stp.state.taskState.throwIfNotDone();
+    // }
     // } catch (e) {
     //   print("Workflow failed: $e");
     //   workflow.meta
