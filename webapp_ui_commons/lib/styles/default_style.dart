@@ -14,6 +14,10 @@ class DefaultStyle extends StyleBase {
     styleMap["linkBlue"] = Color.fromARGB(255, 55, 22, 163);
     styleMap["red"] = Color.fromARGB(255, 255, 37, 37);
 
+    styleMap["buttonBgLight"] = Color.fromARGB(255,103,153,178);
+
+    
+
     styleMap["selectedBg"] = Color.fromARGB(255, 101, 155, 255);
     styleMap["selectedMenuBg"] = Color.fromARGB(255, 103, 153, 178);
     styleMap["selectedMenuFg"] = Color.fromARGB(255, 240, 240, 230);
