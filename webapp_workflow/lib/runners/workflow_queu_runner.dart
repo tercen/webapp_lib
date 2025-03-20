@@ -78,20 +78,21 @@ class WorkflowQueuRunner extends WorkflowRunner {
         fontSize: 16.0);
 
     try {
-      var hasFailed = false;
+      
       await for (var evt in taskStream) {
         if (evt is sci.PatchRecords) {
           for( var pr in evt.rs ){
+            print("Decoding $pr");
             var prMap = jsonDecode(pr.d);
 
-            if( prMap["kind"] == "FailedState"){
+            if( prMap is Map && prMap.keys.contains("kind") && prMap["kind"] == "FailedState"){
               print("Workflow failed ###");
               workflow.meta
                   .add(sci.Pair.from("run.error", prMap["error"] as String));
               workflow.meta
                   .add(sci.Pair.from("run.error.reason", prMap["error"] as String));
               await factory.workflowService.update(workflow);
-              hasFailed = true;
+              
               break;
             }
           }
