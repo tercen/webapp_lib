@@ -77,9 +77,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
         textColor: Styles()["black"],
         fontSize: 16.0);
 
-    while (!taskStream.isEmpty) {
+    
       var hasFailed = false;
       await for (var evt in taskStream) {
+        print(evt.toJson());
         if (evt is sci.PatchRecords) {
           workflow = evt.apply(workflow);
           for (var pr in evt.rs) {
@@ -118,9 +119,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
           break;
         }
       }
-      taskStream = factory.eventService.channel(workflowTask.channelId);
-    }
-
+      
     await factory.workflowService.update(workflow);
     workflow = await factory.workflowService.get(workflow.id);
     // if( !hasFailed )
