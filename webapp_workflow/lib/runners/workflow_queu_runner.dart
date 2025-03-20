@@ -80,7 +80,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     
       var hasFailed = false;
       await for (var evt in taskStream) {
-        print(evt.toJson());
+        // print(evt.toJson());
         if (evt is sci.PatchRecords) {
           workflow = evt.apply(workflow);
           for (var pr in evt.rs) {
@@ -102,8 +102,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
         if (evt is sci.TaskStateEvent) {
           if (evt.state.isFinal && evt.taskId == workflowTask.id) {
-            print("FINAL Event");
-            print(evt.toJson());
             break;
           }
         }
@@ -122,18 +120,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
       
     await factory.workflowService.update(workflow);
     workflow = await factory.workflowService.get(workflow.id);
-    // if( !hasFailed )
-    // for (var stp in workflow.steps) {
-    //   stp.state.taskState.throwIfNotDone();
-    // }
-    // } catch (e) {
-    //   print("Workflow failed: $e");
-    //   workflow.meta
-    //       .add(sci.Pair.from("run.error", (e as sci.ServiceError).error));
-    //   workflow.meta.add(
-    //       sci.Pair.from("run.error.reason", (e as sci.ServiceError).reason));
-    //   await factory.workflowService.update(workflow);
-    // }
 
     for (var f in postRunCallbacks) {
       await f();
