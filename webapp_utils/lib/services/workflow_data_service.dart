@@ -176,6 +176,9 @@ class WorkflowDataService with DataCache {
   // }
 
   Future<void> loadWorkflowSettings() async {
+    if( workflowSettings.isNotEmpty ){
+      return;
+    }
     var factory = tercen.ServiceFactory();
 
     for (var template in _installedWorkflows.values) {
@@ -219,6 +222,7 @@ class WorkflowDataService with DataCache {
         }));
       }
     }
+    workflowSettings = workflowSettings.toSet().toList();
   }
 
   bool _isFileSchema(Schema sch) {

@@ -14,4 +14,12 @@ class WorkflowSetting {
     }
   }
 
+  @override
+  bool operator ==(Object other) {
+    if( other is! WorkflowSetting ){
+      return false;
+    }
+    return stepId == other.stepId && name == other.name;
+  }
+
 }
