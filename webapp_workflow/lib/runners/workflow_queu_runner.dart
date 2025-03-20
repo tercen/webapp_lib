@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
@@ -76,8 +78,23 @@ class WorkflowQueuRunner extends WorkflowRunner {
         fontSize: 16.0);
 
     try {
+      var hasFailed = false;
       await for (var evt in taskStream) {
         if (evt is sci.PatchRecords) {
+          for( var pr in evt.rs ){
+            var prMap = jsonDecode(pr.d);
+
+            if( prMap["kind"] == "FailedState"){
+              print("Workflow failed ###");
+              workflow.meta
+                  .add(sci.Pair.from("run.error", prMap["error"] as String));
+              workflow.meta
+                  .add(sci.Pair.from("run.error.reason", prMap["error"] as String));
+              await factory.workflowService.update(workflow);
+              hasFailed = true;
+              break;
+            }
+          }
           print(evt.toJson());
           workflow = evt.apply(workflow);
         }
@@ -99,10 +116,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
       }
       // var doneWorkflow = await factory.workflowService.get(workflow.id);
-
-      for (var stp in workflow.steps) {
-        stp.state.taskState.throwIfNotDone();
-      }
+      // if( !hasFailed )
+      // for (var stp in workflow.steps) {
+      //   stp.state.taskState.throwIfNotDone();
+      // }
     } catch (e) {
       print("Workflow failed: $e");
       workflow.meta

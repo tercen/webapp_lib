@@ -514,8 +514,9 @@ class WorkflowDataService with DataCache {
                 orElse: () => Pair.from("", ""))
             .value;
         if (meta.any((e) => e.key == "run.error.reason")) {
-          results["error"] =
-              meta.firstWhere((e) => e.key == "run.error.reason").value;
+          
+          var reason = meta.firstWhere((e) => e.key == "run.error.reason").value;
+          results["error"] = reason != "" ? reason : "No details provided";
         } else {
           results["error"] =
               "${results["error"]}\n\nNo Error Details were Provided.";
