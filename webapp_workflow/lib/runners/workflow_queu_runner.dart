@@ -78,6 +78,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     try {
       await for (var evt in taskStream) {
         if (evt is sci.PatchRecords) {
+          print(evt.toJson());
           workflow = evt.apply(workflow);
         }
         if (evt is sci.TaskStateEvent) {
