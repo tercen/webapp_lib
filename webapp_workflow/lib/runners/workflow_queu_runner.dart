@@ -120,6 +120,8 @@ class WorkflowQueuRunner extends WorkflowRunner {
           break;
         }
       }
+
+      await factory.workflowService.update(workflow);
       workflow = await factory.workflowService.get(workflow.id);
       // if( !hasFailed )
       // for (var stp in workflow.steps) {
