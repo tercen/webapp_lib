@@ -124,7 +124,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
       print("Finished running workflow");
       for( var step in workflow.steps ){
-        print("\t${step.name}: ${step.state.kind}");
+        print("\t${step.name}: ${step.state.taskState.kind}");
       }
 
       await factory.workflowService.update(workflow);
