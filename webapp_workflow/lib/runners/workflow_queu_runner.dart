@@ -6,18 +6,18 @@ import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
 typedef PostRunIdCallback = Future<void> Function(String workflowId);
-class WorkflowQueuRunner extends WorkflowRunner{
+
+class WorkflowQueuRunner extends WorkflowRunner {
   WorkflowQueuRunner(super.projectId, super.teamName, super.template);
   final List<PostRunIdCallback> postRunIdCallbacks = [];
 
-  void addIdPostRun(PostRunIdCallback callback ){
+  void addIdPostRun(PostRunIdCallback callback) {
     postRunIdCallbacks.add(callback);
-
   }
 
   @override
   Future<sci.Workflow> doRun(BuildContext context) async {
-    if( template.id == ""){
+    if (template.id == "") {
       throw Exception("Workflow not set in WorkflowRunner.");
     }
 
@@ -32,7 +32,6 @@ class WorkflowQueuRunner extends WorkflowRunner{
     //     textColor: Styles()["black"],
     //     fontSize: 16.0
     // );
-
 
     var factory = tercen.ServiceFactory();
 
@@ -50,14 +49,20 @@ class WorkflowQueuRunner extends WorkflowRunner{
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
+    var taskStream = factory.eventService.channel(workflowTask.channelId);
 
+    await factory.taskService.runTask(workflowTask.id);
 
-    workflow = await factory.workflowService.get(workflow.id);
     workflow.addMeta("workflow.task.id", workflowTask.id);
     workflow.addMeta("run.task.id", workflowTask.id);
     await factory.workflowService.update(workflow);
-    
-    var taskStream = workflowStream(workflowTask.id);
+
+    // workflow = await factory.workflowService.get(workflow.id);
+    // workflow.addMeta("workflow.task.id", workflowTask.id);
+    // workflow.addMeta("run.task.id", workflowTask.id);
+    // await factory.workflowService.update(workflow);
+
+    // var taskStream = workflowStream(workflowTask.id);
 
     Fluttertoast.showToast(
         msg: "Workflow ${workflow.name} sent to the queu",
@@ -68,49 +73,54 @@ class WorkflowQueuRunner extends WorkflowRunner{
         timeInSecForIosWeb: 2,
         backgroundColor: Colors.lightBlue[100],
         textColor: Styles()["black"],
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
 
-
-    await for (var evt in taskStream) {
-      if (evt is sci.TaskProgressEvent) {
-        
-      } else if (evt is sci.TaskLogEvent) {
-
-      } else {
+    try {
+      await for (var evt in taskStream) {
+        if (evt is sci.PatchRecords) {
+          workflow = evt.apply(workflow);
+        }
         if (evt is sci.TaskStateEvent) {
-          if (evt.state is sci.DoneState) {
-            // var runningWorkflow =
-                // await factory.workflowService.get(workflow.id);
-            //TODO update number of steps finished
+          if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+            break;
+          }
+        }
+        if (evt is sci.TaskProgressEvent) {
+        } else if (evt is sci.TaskLogEvent) {
+        } else {
+          if (evt is sci.TaskStateEvent) {
+            if (evt.state is sci.DoneState) {
+              // var runningWorkflow =
+              // await factory.workflowService.get(workflow.id);
+              //TODO update number of steps finished
+            }
           }
         }
       }
-    }
-    var doneWorkflow = await factory.workflowService.get(workflow.id);
+      // var doneWorkflow = await factory.workflowService.get(workflow.id);
 
-    try {
-      for (var stp in doneWorkflow.steps) {
+      for (var stp in workflow.steps) {
         stp.state.taskState.throwIfNotDone();
-      }  
+      }
     } catch (e) {
-      doneWorkflow.meta.add(sci.Pair.from("run.error", (e as sci.ServiceError).error));
-      doneWorkflow.meta.add(sci.Pair.from("run.error.reason", (e as sci.ServiceError).reason));
-      await factory.workflowService.update(doneWorkflow);
+      print("Workflow failed: $e");
+      workflow.meta
+          .add(sci.Pair.from("run.error", (e as sci.ServiceError).error));
+      workflow.meta.add(
+          sci.Pair.from("run.error.reason", (e as sci.ServiceError).reason));
+      await factory.workflowService.update(workflow);
     }
-    
 
     for (var f in postRunCallbacks) {
       await f();
     }
 
     for (var f in postRunIdCallbacks) {
-      await f(doneWorkflow.id);
+      await f(workflow.id);
     }
 
+    workflowId = workflow.id;
 
-    workflowId = doneWorkflow.id;
-
-    return doneWorkflow;
+    return workflow;
   }
 }
