@@ -178,7 +178,7 @@ class WorkflowDataService with DataCache {
   // }
 
   Future<void> loadWorkflowSettings() async {
-    if( workflowSettings.isNotEmpty ){
+    if (workflowSettings.isNotEmpty) {
       return;
     }
     var factory = tercen.ServiceFactory();
@@ -357,7 +357,7 @@ class WorkflowDataService with DataCache {
                   bStr = "$bStr$newBStr";
                 }
               }
-              bytes.add( bStr);
+              bytes.add(bStr);
             }
           }
         } else {
@@ -370,12 +370,12 @@ class WorkflowDataService with DataCache {
               if (!excludedFiles.contains(fname) && filterInclude) {
                 if (!uniqueAddedNames.contains(fname)) {
                   uniqueAddedNames.add(fname);
-                  workflowNames.add( wkf.name);
+                  workflowNames.add(wkf.name);
                   stepNames.add(step.get("name"));
                   filenames.add(fname);
                   var ct = tbl.columns[1].values[i];
 
-                  contentTypeList.add( ct);
+                  contentTypeList.add(ct);
 
                   var bytesStream = factory.tableSchemaService
                       .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
@@ -422,15 +422,12 @@ class WorkflowDataService with DataCache {
     return stp;
   }
 
-  Future<WebappTable> fetchImageData(
-      WebappTable workflowImageTable) async {
+  Future<WebappTable> fetchImageData(WebappTable workflowImageTable) async {
     assert(workflowImageTable.colNames.contains("workflow"));
     assert(workflowImageTable.colNames.contains("image"));
 
-    var uniqueWorkflowIds =
-        workflowImageTable["workflow"].toSet().toList();
-    var uniqueStepIds =
-        workflowImageTable["image"].toSet().toList();
+    var uniqueWorkflowIds = workflowImageTable["workflow"].toSet().toList();
+    var uniqueStepIds = workflowImageTable["image"].toSet().toList();
 
     var outTbl = WebappTable();
     var factory = tercen.ServiceFactory();
@@ -516,8 +513,8 @@ class WorkflowDataService with DataCache {
                 orElse: () => Pair.from("", ""))
             .value;
         if (meta.any((e) => e.key == "run.error.reason")) {
-          
-          var reason = meta.firstWhere((e) => e.key == "run.error.reason").value;
+          var reason =
+              meta.firstWhere((e) => e.key == "run.error.reason").value;
           results["error"] = reason != "" ? reason : "No details provided";
         } else {
           results["error"] =
@@ -598,15 +595,21 @@ class WorkflowDataService with DataCache {
     factory.fileService.upload(doc, dataStream);
   }
 
-  Future<void> cancelWorkflowTask(String taskId, {String? workflowId}) async {
+  Future<void> cancelWorkflowTask(String taskId,
+      {bool deleteWorkflow = false}) async {
     var factory = tercen.ServiceFactory();
+    if (deleteWorkflow) {
+      var task = await factory.taskService.get(taskId);
+      if (task is RunWorkflowTask) {
+        task.workflowId;
+      }
+    }
     await factory.taskService.cancelTask(taskId);
-    if( workflowId != null ){
+    if (deleteWorkflow) {
       var workflow = await factory.workflowService.get(workflowId);
       await factory.workflowService.delete(workflow.id, workflow.rev);
     }
   }
-
 
   Future<WebappTable> fetchWorkflowTasks() async {
     var res = WebappTable();
@@ -616,7 +619,6 @@ class WorkflowDataService with DataCache {
     var compTasks = tasks.whereType<sci.RunWorkflowTask>();
     var workflowIds = compTasks.map((task) => task.workflowId).toList();
     var workflows = await factory.workflowService.list(workflowIds);
-    
 
     res.addColumn("Id", data: compTasks.map((w) => w.id).toList());
     res.addColumn("Name", data: workflows.map((w) => w.name).toList());

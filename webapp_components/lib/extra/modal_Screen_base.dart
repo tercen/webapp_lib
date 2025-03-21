@@ -37,7 +37,7 @@ class ModalScreenBase with ChangeNotifier {
               notifyListeners();
             },
             style: Styles()["buttonEnabled"],
-            child: const Text("Save")),
+            child: const Text("Ok")),
         const SizedBox(
           width: 10,
         ),
