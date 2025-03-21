@@ -598,14 +598,15 @@ class WorkflowDataService with DataCache {
   Future<void> cancelWorkflowTask(String taskId,
       {bool deleteWorkflow = false}) async {
     var factory = tercen.ServiceFactory();
+    var workflowId = "";
     if (deleteWorkflow) {
       var task = await factory.taskService.get(taskId);
       if (task is RunWorkflowTask) {
-        task.workflowId;
+        workflowId = task.workflowId;
       }
     }
     await factory.taskService.cancelTask(taskId);
-    if (deleteWorkflow) {
+    if (deleteWorkflow && workflowId != "") {
       var workflow = await factory.workflowService.get(workflowId);
       await factory.workflowService.delete(workflow.id, workflow.rev);
     }
