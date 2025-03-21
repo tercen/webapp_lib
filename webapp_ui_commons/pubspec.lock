@@ -784,14 +784,14 @@ packages:
       path: "../webapp_components"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   webapp_model:
     dependency: "direct main"
     description:
       path: "../webapp_model"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   webapp_utils:
     dependency: transitive
     description:

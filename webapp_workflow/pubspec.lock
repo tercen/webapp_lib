@@ -784,28 +784,28 @@ packages:
       path: "../webapp_components"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   webapp_model:
     dependency: "direct main"
     description:
       path: "../webapp_model"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   webapp_ui_commons:
     dependency: "direct main"
     description:
       path: "../webapp_ui_commons"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   webapp_utils:
     dependency: "direct main"
     description:
       path: "../webapp_utils"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   webkit_inspection_protocol:
     dependency: transitive
     description:
