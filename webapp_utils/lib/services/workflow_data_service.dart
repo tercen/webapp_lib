@@ -476,88 +476,6 @@ class WorkflowDataService with DataCache {
     return await factory.workflowService.list(workflowIds);
   }
 
-  Future<Map<String, String>> getWorkflowStatus(Workflow workflow) async {
-    var meta = workflow.meta;
-    var results = {"status": "", "error": "", "finished": "true"};
-    results["status"] = "Unknown";
-
-    if (meta.any((e) => e.key == "run.task.id")) {
-      var factory = tercen.ServiceFactory();
-
-      List<String> currentOnQueuWorkflow = [];
-      List<String> currentOnQueuStep = [];
-      List<State> currentOnQueuStatus = [];
-      var compTasks =
-          await factory.taskService.getTasks(["RunComputationTask"]);
-      for (var ct in compTasks) {
-        if (ct is RunComputationTask) {
-          for (var p in ct.environment) {
-            if (p.key == "workflow.id") {
-              currentOnQueuWorkflow.add(p.value);
-            }
-            if (p.key == "step.id") {
-              currentOnQueuStep.add(p.value);
-              currentOnQueuStatus.add(ct.state);
-            }
-          }
-        }
-      }
-
-      var isRunning = currentOnQueuWorkflow.contains(workflow.id);
-      var isFail = workflow.steps.any((e) => e.state.taskState is FailedState);
-
-      if (isFail) {
-        results["status"] = "Failed";
-        results["error"] = meta
-            .firstWhere((e) => e.key.contains("run.error"),
-                orElse: () => Pair.from("", ""))
-            .value;
-        if (meta.any((e) => e.key == "run.error.reason")) {
-          var reason =
-              meta.firstWhere((e) => e.key == "run.error.reason").value;
-          results["error"] = reason != "" ? reason : "No details provided";
-        } else {
-          results["error"] =
-              "${results["error"]}\n\nNo Error Details were Provided.";
-        }
-        results["finished"] = isRunning ? "false" : "true";
-      } else {
-        var status = isRunning ? "Running" : "Pending";
-        var allInit = true;
-        var allDone = true;
-        results["finished"] = isRunning ? "false" : "true";
-        bool isAllPending = true;
-        for (var s in workflow.steps) {
-          for (var i = 0; i < currentOnQueuStep.length; i++) {
-            if (currentOnQueuStep[i] == s.id &&
-                currentOnQueuWorkflow[i] == workflow.id) {
-              if (currentOnQueuStatus[i] is! PendingState) {
-                isAllPending = false;
-              }
-              status = currentOnQueuStatus[i] is PendingState
-                  ? "Pending"
-                  : "Running";
-            }
-          }
-
-          if (status == "Pending" && !isAllPending) {
-            status = "Running";
-          }
-
-          allInit = allInit && (s.state.taskState is InitState);
-          allDone = allDone && (s.state.taskState is DoneState);
-        }
-        if (allInit) {
-          status = "Not Started";
-        }
-        if (allDone) {
-          status = "Done";
-        }
-        results["status"] = status;
-      }
-    }
-    return results;
-  }
 
   Future<Workflow> fetchWorkflow(String id) async {
     var factory = tercen.ServiceFactory();
@@ -630,5 +548,69 @@ class WorkflowDataService with DataCache {
             .toList());
 
     return res;
+  }
+
+  Future<Map<String, String>> getWorkflowStatus(sci.Workflow workflow) async {
+    var meta = workflow.meta;
+    var results = {"status": "", "error": "", "finished": "true"};
+    results["status"] = "Unknown";
+
+    if( workflow.steps.any((e) => e.state.taskState is sci.FailedState)){
+        results["status"] = "Failed";
+        results["error"] = meta
+            .firstWhere((e) => e.key.contains("run.error"),
+                orElse: () => sci.Pair.from("", ""))
+            .value;
+        if (meta.any((e) => e.key == "run.error.reason")) {
+          
+          var reason = meta.firstWhere((e) => e.key == "run.error.reason").value;
+          results["error"] = reason != "" ? reason : "No details provided";
+        } else {
+          results["error"] =
+              "${results["error"]}\n\nNo Error Details were Provided.";
+        }
+    }else if( !workflow.steps.whereType<sci.DataStep>().map((step) => step.state.taskState is sci.DoneState).any((state) => state == false) ) {
+      results["status"] = "Finished";
+    }else{
+      results["status"] = "Running";
+    }
+
+    return results;
+  }
+
+
+  Future<WebappTable> fetchWorkflowTable(String projectId) async {
+    var key = projectId;
+    if (hasCachedValue(key)) {
+      return getCachedValue(key);
+    } else {
+      var workflowService = WorkflowDataService();
+      var workflows = (await workflowService.fetchWorkflowsRemote(projectId))
+          .toList();
+
+      var res = WebappTable();
+
+      List<String> status = [];
+      List<String> error = [];
+
+      for (var w in workflows) {
+        // var sw = await workflowService.getWorkflowStatus(w);
+        var sw = await getWorkflowStatus(w);
+        
+        status.add(sw["status"]! );
+        error.add(sw["error"]!);
+      }
+
+      res.addColumn("Id", data: workflows.map((w) => w.id).toList());
+      res.addColumn("Name", data: workflows.map((w) => w.name).toList());
+      res.addColumn("Status", data: status);
+      // res.addColumn("Error", data: error);
+      res.addColumn("Last Update",
+          data: workflows
+              .map((w) => DateFormatter.formatShort(w.lastModifiedDate))
+              .toList());
+
+      return res;
+    }
   }
 }

@@ -1,16 +1,27 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:webapp_components/components/action_list_component.dart';
-import 'package:webapp_components/components/workflow_list_component.dart';
-import 'package:webapp_components/screens/screen_base.dart';
-import 'package:webapp_model/webapp_data_base.dart';
-import 'package:webapp_model/webapp_table.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
+
+
+import 'package:webapp_components/components/action_bar_component.dart';
+import 'package:webapp_components/components/action_table_component.dart';
+import 'package:webapp_components/components/workflow_task_component.dart';
+
+import 'package:webapp_components/definitions/list_action.dart';
+
+import 'package:webapp_components/screens/screen_base.dart';
+
+import 'package:webapp_components/widgets/wait_indicator.dart';
+import 'package:webapp_model/webapp_data_base.dart';
+
+import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/mixin/progress_log.dart';
 
+import 'package:webapp_ui_commons/styles/styles.dart';
+import 'package:webapp_utils/functions/formatter_utils.dart';
+
 import 'package:sci_tercen_model/sci_model.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
 class TaskManagerScreen extends StatefulWidget {
   final WebAppDataBase modelLayer;
@@ -22,12 +33,6 @@ class TaskManagerScreen extends StatefulWidget {
 
 class _TaskManagerScreenState extends State<TaskManagerScreen>
     with ScreenBase, ProgressDialog {
-
-  Timer? refreshTimer;
-  bool firstRefresh = true;
-  List<sci.Workflow> currentList = [];
-  List<String> currentStatus = [];
-
   @override
   String getScreenId() {
     return "TaskManagerScreen";
@@ -37,9 +42,6 @@ class _TaskManagerScreenState extends State<TaskManagerScreen>
   void dispose() {
     super.dispose();
     disposeScreen();
-    if( refreshTimer != null ){
-      refreshTimer!.cancel();
-    }
   }
 
   @override
@@ -47,88 +49,246 @@ class _TaskManagerScreenState extends State<TaskManagerScreen>
     setState(() {});
   }
 
+  bool showAllWorkflows = false;
+
   @override
   void initState() {
     super.initState();
-    
-    var workflowComponent = WorkflowListComponent("workflowList", getScreenId(), "Workflows", 
-          fetchWorkflows, ["name", "status", "date"],  widget.modelLayer.app.projectHref,
-          actions: [
-            ListAction(const Icon(Icons.cancel), widget.modelLayer.workflowService.cancelWorkflow, enabledCallback: widget.modelLayer.workflowService.canCancelWorkflow)
-          ],
-          emptyMessage: "Retrieving Tasks",
-          colWidths: [40, 10, 10],
-          detailColumn: "error");
-    addComponent("default", workflowComponent);
 
-    
+    var toolbar = ActionBarComponent("actionBar", getScreenId(), [
+      ListAction(Icon(Icons.refresh, color: Styles()["buttonBgLight"]), reload,
+          buttonLabel: "Refresh", description: "Reload list of workflows"),
+    ]);
 
-    initScreen(widget.modelLayer);
+    var workflowList = ActionTableComponent(
+        "workflows",
+        getScreenId(),
+        "Finished Workflows",
+        fetchWorkflows,
+        [
+          ListAction(Icon(Icons.info_outline, color: Styles()["buttonBgLight"]),
+              workflowInfoWithError),
+        ],
+        hideColumns: ["Id"],
+        useCache: false);
 
-    refreshTimer = Timer.periodic( const Duration(seconds: 1), (timer) async {
-      if( await refreshWorkflowList()){
-        refresh();
-      }
-    });
+    var taskList = WorkflowTaskComponent(
+        "tasks", getScreenId(), "Running Tasks", fetchTasks, [
+      ListAction(
+          Icon(Icons.stop_circle_rounded, color: Styles()["buttonBgLight"]),
+          cancelTask,
+          confirmationMessage: "Are you sure you want to cancel this task?"),
+    ], [
+      ListAction(
+          Icon(Icons.info_outline_rounded, color: Styles()["buttonBgLight"]),
+          workflowInfo)
+    ],
+        hideColumns: [
+          "Id"
+        ]);
+
+    addComponent("default", toolbar);
+    addComponent("default", workflowList);
+    addComponent("default", taskList);
+
+    initScreen(widget.modelLayer as WebAppDataBase);
   }
 
+  Future<void> reload(List<String> values) async {
+    var comp = getComponent("workflows") as ActionTableComponent;
+    comp.reset();
+    comp.init();
 
+    var taskComp = getComponent("tasks") as ActionTableComponent;
+    taskComp.reset();
+    taskComp.init();
 
-  Future<WebappTable> fetchWorkflows() async {
-    var workflows = List<sci.Workflow>.from( currentList );
-
-    List<String> nameCol = [];
-    List<String> statusCol = [];
-    List<String> dateCol = [];
-    List<String> errorCol = [];
-
-    final dateFormatter =  DateFormat('yyyy/MM/dd hh:mm');
-    
-    for( var w in workflows ){
-      var dt = DateTime.parse(w.lastModifiedDate.value);
-      var stMap =  await widget.modelLayer.workflowService.getWorkflowStatus(w);
-      nameCol.add(IdElement(w.id, w.name));
-      statusCol.add(IdElement(w.id, stMap["status"]!));
-      dateCol.add(IdElement(w.id, dateFormatter.format(dt)));
-      errorCol.add(IdElement(w.id, stMap["error"]!));
-
-    }
-    var tbl = IdElementTable()
-      ..addColumn("name", data: nameCol)
-      ..addColumn("status", data: statusCol)
-      ..addColumn("date", data: dateCol)
-      ..addColumn("error", data: errorCol);
-
-    return tbl;
+    refresh();
   }
 
+  Future<void> cancelTask(List<String> row) async {
+    Fluttertoast.showToast(
+        msg: "Cancelling task",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM_LEFT,
+        webPosition: "left",
+        webBgColor: "linear-gradient(to bottom, #aaaaff, #eeeeaff)",
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.lightBlue[100],
+        textColor: Styles()["black"],
+        fontSize: 16.0);
 
+    await widget.modelLayer.workflowService
+        .cancelWorkflowTask(row.first, deleteWorkflow: true);
+  }
 
-  Future<bool> refreshWorkflowList() async {
-    var workflowList = await widget.modelLayer.workflowService.fetchWorkflowsRemote(widget.modelLayer.project.id);
+  Future<Widget> workflowSettingsInfoBox(String workflowId,
+      {bool printError = false}) async {
+    var factory = tercen.ServiceFactory();
+    var workflow = await factory.workflowService.get(workflowId);
 
-    List<String> statusList = [];
+    Widget content = Container();
 
-    for( var w in workflowList ){
-      var stMap = await widget.modelLayer.workflowService.getWorkflowStatus(w);
-      statusList.add( stMap["status"]!);
-    }
-    
-    if( workflowList.length != currentList.length ){
-      currentList = workflowList;
-      currentStatus = statusList;
-      return true;  
-    }else{
-      for( var i = 0; i < workflowList.length; i++ ){
-        if( workflowList[i].id != currentList[i].id || currentStatus[i] != statusList[i] ){
-          currentList = workflowList;
-          currentStatus = statusList;
-          return true;  
+    var metaList = workflow.meta;
+
+    var markers = metaList
+        .firstWhere((p) => p.key == "selected.markers",
+            orElse: () => sci.Pair.from("", ""))
+        .value
+        .split("|@|");
+
+    var contentString = "Selected markers\n";
+    for (var i = 0; i < markers.length; i++) {
+      contentString += markers[i];
+
+      if (i < (markers.length - 1)) {
+        if (((i + 1) % 10) == 0) {
+          contentString += "\n";
+        } else {
+          contentString += ",";
         }
       }
     }
 
-    return false;
+    contentString += "\n\nGeneral Settings:\n";
+
+    for (var meta in metaList) {
+      if (meta.key.startsWith("setting")) {
+        contentString += meta.key.split(".").last;
+        contentString += ": ";
+        contentString += meta.value;
+        contentString += "\n";
+      }
+    }
+
+    if (printError) {
+      var status =
+          await widget.modelLayer.workflowService.getWorkflowStatus(workflow);
+      if (status["error"] != null && status["error"] != "") {
+        contentString += "\nERROR INFORMATION";
+        contentString += "\n\n";
+        contentString += status["error"]!;
+      }
+    }
+
+    content = Text(
+      contentString,
+      style: Styles()["text"],
+    );
+    return content;
+  }
+
+  Future<void> workflowInfoWithError(List<String> row) async {
+    showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return StatefulBuilder(builder: (stfCtx, stfSetState) {
+            return FutureBuilder(
+                future: workflowSettingsInfoBox(row.first, printError: true),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data != null) {
+                    return AlertDialog(
+                      title: Text(
+                        "Workflow Information",
+                        style: Styles()["textH2"],
+                      ),
+                      content: snapshot.data!,
+                    );
+                  } else {
+                    return TercenWaitIndicator()
+                        .waitingMessage(suffixMsg: "Loading information");
+                  }
+                });
+          });
+        });
+  }
+
+  Future<void> workflowInfo(List<String> row) async {
+    showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return StatefulBuilder(builder: (stfCtx, stfSetState) {
+            return FutureBuilder(
+                future: workflowSettingsInfoBox(row.first),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data != null) {
+                    return AlertDialog(
+                      title: Text(
+                        "Workflow Information",
+                        style: Styles()["textH2"],
+                      ),
+                      content: snapshot.data!,
+                    );
+                  } else {
+                    return TercenWaitIndicator()
+                        .waitingMessage(suffixMsg: "Loading information");
+                  }
+                });
+          });
+        });
+  }
+
+  Future<WebappTable> fetchWorkflows() async {
+    return await widget.modelLayer.workflowService
+        .fetchWorkflowTable(widget.modelLayer.app.projectId);
+  }
+
+
+  // Future<WebappTable> fetchImmunoWorkflows(String projectId) async {
+  //   var key = projectId;
+  //   if (hasCachedValue(key)) {
+  //     return getCachedValue(key);
+  //   } else {
+  //     var workflowService = WorkflowDataService();
+  //     var workflows = (await workflowService.fetchWorkflowsRemote(projectId))
+  //         .where((doc) => doc.hasMeta("immuno.workflow"))
+  //         .where((doc) => doc.getMeta("immuno.workflow")! == "true")
+  //         .toList();
+
+  //     var res = WebappTable();
+
+  //     List<String> status = [];
+  //     List<String> error = [];
+
+  //     for (var w in workflows) {
+  //       // var sw = await workflowService.getWorkflowStatus(w);
+  //       var sw = await getImmunoWorkflowStatus(w);
+        
+  //       status.add(sw["status"]! );
+  //       error.add(sw["error"]!);
+  //     }
+
+  //     res.addColumn("Id", data: workflows.map((w) => w.id).toList());
+  //     res.addColumn("Name", data: workflows.map((w) => w.name).toList());
+  //     res.addColumn("Status", data: status);
+  //     // res.addColumn("Error", data: error);
+  //     res.addColumn("Last Update",
+  //         data: workflows
+  //             .map((w) => DateFormatter.formatShort(w.lastModifiedDate))
+  //             .toList());
+
+  //     return res;
+  //   }
+  // }
+
+  Future<WebappTable> fetchTasks() async {
+    var res = WebappTable();
+
+    var factory = tercen.ServiceFactory();
+    var tasks = await factory.taskService.getTasks(["RunWorkflowTask"]);
+    var compTasks = tasks.whereType<sci.RunWorkflowTask>();
+    var workflowIds = compTasks.map((task) => task.workflowId).toList();
+    var workflows = await factory.workflowService.list(workflowIds);
+
+    res.addColumn("Id", data: compTasks.map((w) => w.id).toList());
+    res.addColumn("Name", data: workflows.map((w) => w.name).toList());
+    res.addColumn("WorkflowIds", data: workflows.map((w) => w.id).toList());
+    res.addColumn("Last Update",
+        data: workflows
+            .map((w) => DateFormatter.formatShort(w.lastModifiedDate))
+            .toList());
+
+    return res;
   }
 
   @override
