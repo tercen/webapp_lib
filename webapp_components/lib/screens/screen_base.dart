@@ -389,12 +389,15 @@ mixin ScreenBase {
       }
 
       if (isExpBlock) {
+        
         widgetRows.add(ExpansionTile(
+          controlAffinity: ListTileControlAffinity.leading,
           title: Text(
             blockOrder[bi],
             style: Styles()["textH2"],
           ),
           initiallyExpanded: blockType == ComponentBlockType.expanded,
+
           children: blockWidgets,
         ));
       } else {
