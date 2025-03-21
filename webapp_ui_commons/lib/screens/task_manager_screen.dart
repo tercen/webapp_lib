@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-
-
 import 'package:webapp_components/components/action_bar_component.dart';
 import 'package:webapp_components/components/action_table_component.dart';
 import 'package:webapp_components/components/workflow_task_component.dart';
@@ -51,16 +49,8 @@ class TaskManagerScreenState extends State<TaskManagerScreen>
 
   bool showAllWorkflows = false;
 
-  @override
-  void initState() {
-    super.initState();
-
-    var toolbar = ActionBarComponent("actionBar", getScreenId(), [
-      ListAction(Icon(Icons.refresh, color: Styles()["buttonBgLight"]), reload,
-          buttonLabel: "Refresh", description: "Reload list of workflows"),
-    ]);
-
-    var workflowList = ActionTableComponent(
+  ActionTableComponent createFinishedWorkflowComponent() {
+    return ActionTableComponent(
         "workflows",
         getScreenId(),
         "Finished Workflows",
@@ -71,8 +61,10 @@ class TaskManagerScreenState extends State<TaskManagerScreen>
         ],
         hideColumns: ["Id"],
         useCache: false);
+  }
 
-    var taskList = WorkflowTaskComponent(
+  ActionTableComponent createTasksComponent() {
+    return WorkflowTaskComponent(
         "tasks", getScreenId(), "Running Tasks", fetchTasks, [
       ListAction(
           Icon(Icons.stop_circle_rounded, color: Styles()["buttonBgLight"]),
@@ -86,12 +78,26 @@ class TaskManagerScreenState extends State<TaskManagerScreen>
         hideColumns: [
           "Id"
         ]);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    var toolbar = ActionBarComponent("actionBar", getScreenId(), [
+      ListAction(Icon(Icons.refresh, color: Styles()["buttonBgLight"]), reload,
+          buttonLabel: "Refresh", description: "Reload list of workflows"),
+    ]);
+
+    var workflowList = createFinishedWorkflowComponent();
+
+    var taskList = createTasksComponent();
 
     addComponent("default", toolbar);
     addComponent("default", workflowList);
     addComponent("default", taskList);
 
-    initScreen(widget.modelLayer as WebAppDataBase);
+    initScreen(widget.modelLayer);
   }
 
   Future<void> reload(List<String> values) async {
@@ -131,26 +137,7 @@ class TaskManagerScreenState extends State<TaskManagerScreen>
 
     var metaList = workflow.meta;
 
-    var markers = metaList
-        .firstWhere((p) => p.key == "selected.markers",
-            orElse: () => sci.Pair.from("", ""))
-        .value
-        .split("|@|");
-
-    var contentString = "Selected markers\n";
-    for (var i = 0; i < markers.length; i++) {
-      contentString += markers[i];
-
-      if (i < (markers.length - 1)) {
-        if (((i + 1) % 10) == 0) {
-          contentString += "\n";
-        } else {
-          contentString += ",";
-        }
-      }
-    }
-
-    contentString += "\n\nGeneral Settings:\n";
+    var contentString = "\n\nGeneral Settings:\n";
 
     for (var meta in metaList) {
       if (meta.key.startsWith("setting")) {
@@ -232,8 +219,6 @@ class TaskManagerScreenState extends State<TaskManagerScreen>
     return await widget.modelLayer.workflowService
         .fetchWorkflowTable(widget.modelLayer.app.projectId);
   }
-
-
 
   Future<WebappTable> fetchTasks() async {
     var res = WebappTable();
