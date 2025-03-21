@@ -5,17 +5,18 @@ typedef CheckActionCallback = bool Function( List<String> row );
 typedef RowActionCallback = Future<void> Function( List<String> row ) ;
 
 class ListAction{
-  Icon actionIcon;
-  CheckActionCallback? enabledCallback;
-  RowActionCallback callback;
-  String? description;
-  String? buttonLabel;
+  final Icon actionIcon;
+  final CheckActionCallback? enabledCallback;
+  final RowActionCallback callback;
+  final String? description;
+  final String? buttonLabel;
 
+  final bool requireConfirmation;
   bool toggle = false;
 
-  Icon? toggleIcon;
+  final Icon? toggleIcon;
 
-  ListAction(this.actionIcon, this.callback, {this.enabledCallback, this.description, this.buttonLabel, this.toggleIcon}){
+  ListAction(this.actionIcon, this.callback, {this.enabledCallback, this.description, this.buttonLabel, this.toggleIcon, this.requireConfirmation = false}){
     toggle = toggleIcon != null;
   }
 }
