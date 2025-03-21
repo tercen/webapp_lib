@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:webapp_components/components/label_component.dart';
+import 'package:webapp_components/extra/modal_Screen_base.dart';
+import 'package:webapp_ui_commons/styles/styles.dart';
 
 
 typedef CheckActionCallback = bool Function( List<String> row );
@@ -6,17 +9,60 @@ typedef RowActionCallback = Future<void> Function( List<String> row ) ;
 
 class ListAction{
   final Icon actionIcon;
+  
   final CheckActionCallback? enabledCallback;
   final RowActionCallback callback;
   final String? description;
   final String? buttonLabel;
 
-  final bool requireConfirmation;
+  final String confirmationMessage;
+
+  bool get requireConfirmation => confirmationMessage != "";
   bool toggle = false;
 
   final Icon? toggleIcon;
 
-  ListAction(this.actionIcon, this.callback, {this.enabledCallback, this.description, this.buttonLabel, this.toggleIcon, this.requireConfirmation = false}){
+  late Icon disabledIcon;
+
+  ListAction(this.actionIcon, this.callback, {this.enabledCallback, this.description, this.buttonLabel, this.toggleIcon, this.confirmationMessage = ""}){
     toggle = toggleIcon != null;
+    disabledIcon = Icon( actionIcon.icon, color: Styles()["gray"],);
+  }
+
+  Icon getIcon({List<String> params = const []}){
+    if( params.isEmpty || isEnabled(params)){
+      if( toggleIcon != null && toggle ){
+        return toggleIcon!;
+      }else{
+        return actionIcon;
+      }
+      
+    }else{
+      return disabledIcon;
+    }
+  }
+
+  bool isEnabled(List<String> params){
+    return this.enabledCallback == null || this.enabledCallback!( params );
+  }
+
+
+
+  Future<void> callAction(List<String> params, {BuildContext? context}) async {
+    if( isEnabled(params)){
+      if( requireConfirmation ){
+        assert( context != null );
+        var confScreen = ModalScreenBase("Confirmation", [LabelComponent(confirmationMessage)]);
+        confScreen.addListener(() {
+          callback(params);
+        });
+        confScreen.build(context!);
+      }else{
+        if( toggleIcon != null ){
+          toggle = !toggle;
+        }
+        callback(params);
+      }
+    }
   }
 }
