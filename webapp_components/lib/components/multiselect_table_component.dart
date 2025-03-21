@@ -2,16 +2,17 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+// import 'package:sci_tercen_client/sci_client.dart' as sci;
 
 import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/definitions/functions.dart';
 import 'package:webapp_components/extra/infobox.dart';
 
-
 import 'package:webapp_components/mixins/component_base.dart';
 import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/mixins/infobox_component.dart';
+import 'package:webapp_components/mixins/state_component.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_model/utils/key_utils.dart';
 import 'package:webapp_model/webapp_table.dart';
@@ -19,7 +20,12 @@ import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
 
 class MultiSelectTableComponent
-    with ChangeNotifier, ComponentBase, ComponentCache, ComponentInfoBox
+    with
+        ChangeNotifier,
+        ComponentBase,
+        ComponentCache,
+        ComponentInfoBox,
+        StateComponent
     implements SerializableComponent {
   final List<int> selected = [];
 
@@ -28,8 +34,6 @@ class MultiSelectTableComponent
   final List<String>? hideColumns;
   List<String> colNames = [];
   final String valueSeparator = "|@|";
-
-  
 
   String sortingCol = "";
   String sortDirection = "";
@@ -41,13 +45,17 @@ class MultiSelectTableComponent
   int currentRow = -1;
   WebappTable dataTable = WebappTable();
 
-  MultiSelectTableComponent(
-      id, groupId, componentLabel, this.dataFetchCallback,
-      {this.excludeColumns, this.saveState = true, this.hideColumns, InfoBoxBuilder? infoBoxBuilder}) {
+  MultiSelectTableComponent(id, groupId, componentLabel, this.dataFetchCallback,
+      {this.excludeColumns,
+      this.saveState = true,
+      this.hideColumns,
+      InfoBoxBuilder? infoBoxBuilder,
+      cache = true}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
+    useCache = cache;
   }
 
   void rotateSortingDirection() {
@@ -113,20 +121,18 @@ class MultiSelectTableComponent
 
   TableRow createTableHeader(List<String> colNames) {
     // var infoboxHeader = infoBoxBuilder == null ? createHeaderCell( "I" ): const SizedBox(width: 5,);
-    var infoboxHeader = TableCell(child:createHeaderCell(""));
+    var infoboxHeader = TableCell(child: createHeaderCell(""));
     var nameRows = colNames.map((el) {
       return TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: createHeaderCell(el));
     }).toList();
     TableRow row = TableRow(children: [
-      
       const SizedBox(
         width: 30,
       ),
       infoboxHeader,
       ...nameRows,
-      
     ]);
 
     return row;
@@ -147,14 +153,13 @@ class MultiSelectTableComponent
   Widget wrapSelectable(Widget contentWdg, List<String> selectionValues) {
     return InkWell(
       onHover: (value) {
-        
         if (!value) {
           currentRowKey = -1;
         } else {
           setSelectionRow(selectionValues);
         }
 
-        uiUpdate.value = Random().nextInt(1<<32-1);
+        uiUpdate.value = Random().nextInt(1 << 32 - 1);
 
         // notifyListeners();
       },
@@ -184,7 +189,8 @@ class MultiSelectTableComponent
     return selected.any((e) => e == rowKey);
   }
 
-  TableRow createTableRow(BuildContext context, List<String> rowEls,{int rowIndex = -1}) {
+  TableRow createTableRow(BuildContext context, List<String> rowEls,
+      {int rowIndex = -1}) {
     Widget selectedWidget = isSelected(KeyUtils.listToKey(rowEls))
         ? const SizedBox(
             width: 30,
@@ -210,7 +216,9 @@ class MultiSelectTableComponent
 
     List<Widget> dataRow = [];
 
-    dataRow.add(TableCell(verticalAlignment: TableCellVerticalAlignment.middle, child:  buildInfoBoxIcon(rowEls, context, iconCellWidth: 20))  );
+    dataRow.add(TableCell(
+        verticalAlignment: TableCellVerticalAlignment.middle,
+        child: buildInfoBoxIcon(rowEls, context, iconCellWidth: 20)));
     for (var ci = 0; ci < colNames.length; ci++) {
       if (shouldDisplayColumn(colNames[ci])) {
         dataRow.add(TableCell(
@@ -228,8 +236,7 @@ class MultiSelectTableComponent
         ));
       }
     }
-    // 
-    
+    //
 
     TableRow row = TableRow(
         decoration: rowDecoration, children: [selectedWidget, ...dataRow]);
@@ -267,7 +274,9 @@ class MultiSelectTableComponent
       rows.add(createTableRow(context, rowEls, rowIndex: si));
     }
 
-    Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null ? const {0: FixedColumnWidth(50)} :  {0: const FixedColumnWidth(50),1:const FixedColumnWidth(50) };
+    Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
+        ? const {0: FixedColumnWidth(50), 1: const FixedColumnWidth(10)}
+        : {0: const FixedColumnWidth(50), 1: const FixedColumnWidth(50)};
 
     var tableWidget = Table(
       columnWidths: colWidths,
@@ -290,87 +299,40 @@ class MultiSelectTableComponent
 
     notifyListeners();
   }
-  
-  
 
-  Future<bool> loadTable() async{
-    if( !isInit ){
+  Future<bool> loadTable() async {
+    if (!isInit) {
+      busy();
       var cacheKey = getCacheKey();
       if (hasCachedValue(cacheKey)) {
         dataTable = getCachedValue(cacheKey);
-      }else{
+      } else {
         dataTable = await dataFetchCallback();
         addToCache(cacheKey, dataTable);
       }
+      idle();
     }
     return true;
   }
 
   @override
   Widget buildContent(BuildContext context) {
-    if( dataTable.nRows == 0 ){
-                    return SizedBox(
-                  height: 100,
-                  child: TercenWaitIndicator()
-                      .waitingMessage(suffixMsg: "  Loading Table"));
-    }else{
-      return buildTable(dataTable, context);
-    }
-  }
-
-  // @override
-  // Widget buildContent(BuildContext context) {
-  //   print("BUILDING");
-  //   var cacheKey = getCacheKey();
-  //   if (hasCachedValue(cacheKey)) {
-  //     print("\tfrom Cache");
-  //     return buildTable(getCachedValue(cacheKey));
-  //   } else {
-  //     return FutureBuilder(
-  //         future: dataFetchCallback(),
-  //         builder: (context, snapshot) {
-  //           if (snapshot.data != null &&
-  //               snapshot.hasData &&
-  //               snapshot.connectionState != ConnectionState.waiting) {
-  //             print("\tdone Loading");
-
-  //             addToCache(cacheKey, snapshot.data);
-  //             return buildTable(snapshot.data!);
-  //           } else if (snapshot.hasError) {
-  //             throw sci.ServiceError(500, snapshot.error.toString());
-  //           } else {
-  //             return SizedBox(
-  //                 height: 100,
-  //                 child: TercenWaitIndicator()
-  //                     .waitingMessage(suffixMsg: "  Loading Table"));
-  //           }
-  //         });
-  //   }
-  // }
-
-  WebappTable selectByKey(WebappTable tbl, List<int> keys) {
-    var outTbl = WebappTable();
-    List<List<String>> rows = [];
-    for (var row = 0; row < tbl.nRows; row++) {
-
-      var rowHash =
-          KeyUtils.listToKey(tbl.columns.values.map((e) => e[row]).toList());
-      if (keys.contains(rowHash)) {
-        rows.add(tbl.columns.values.map((e) => e[row]).toList());
+    if (isBusy) {
+      return SizedBox(
+          height: 100,
+          child: TercenWaitIndicator()
+              .waitingMessage(suffixMsg: "  Loading Table"));
+    } else {
+      if (dataTable.nRows == 0) {
+        return Container();
+      } else {
+        return buildTable(dataTable, context);
       }
     }
-
-    for (var col = 0; col < tbl.nCols; col++) {
-      outTbl.addColumn(tbl.colNames[col],
-          data: rows.map((row) => row[col]).toList());
-    }
-
-    return outTbl;
   }
 
   WebappTable getValueAsTable() {
-    // print("dataTable.selectByKey(selected).nRows = ${dataTable.selectByKey(selected).nRows}");
-    return selectByKey(dataTable, selected); // dataTable.selectByKey(selected);
+    return dataTable.selectByKey(selected); // dataTable.selectByKey(selected);
   }
 
   @override
@@ -391,7 +353,7 @@ class MultiSelectTableComponent
 
   @override
   getComponentValue() {
-    return selectByKey(dataTable, selected);
+    return dataTable.selectByKey(selected);
   }
 
   @override
@@ -409,7 +371,7 @@ class MultiSelectTableComponent
   void setStateValue(String value) {
     if (value != "") {
       selected.clear();
-      
+
       selected.addAll(value.split("|").map((e) => int.parse(e)));
     }
   }
@@ -418,6 +380,4 @@ class MultiSelectTableComponent
   bool shouldSaveState() {
     return saveState;
   }
-  
-
 }
