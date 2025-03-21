@@ -28,7 +28,7 @@ class TaskManagerScreen extends StatefulWidget {
   const TaskManagerScreen(this.modelLayer, {super.key});
 
   @override
-  State<TaskManagerScreen> createState() => TaskManagerScreenState();
+  State createState() => TaskManagerScreenState();
 }
 
 class TaskManagerScreenState extends State<TaskManagerScreen>
