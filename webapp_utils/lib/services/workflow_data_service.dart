@@ -598,9 +598,13 @@ class WorkflowDataService with DataCache {
     factory.fileService.upload(doc, dataStream);
   }
 
-  Future<void> cancelWorkflowTask(String id) async {
+  Future<void> cancelWorkflowTask(String taskId, {String? workflowId}) async {
     var factory = tercen.ServiceFactory();
-    await factory.taskService.cancelTask(id);
+    await factory.taskService.cancelTask(taskId);
+    if( workflowId != null ){
+      var workflow = await factory.workflowService.get(workflowId);
+      await factory.workflowService.delete(workflow.id, workflow.rev);
+    }
   }
 
 
