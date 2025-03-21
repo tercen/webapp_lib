@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import 'package:json_string/json_string.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
-import 'package:webapp_model/id_element.dart';
 import 'package:webapp_utils/folder_node.dart';
 import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/mixin/data_cache.dart';
@@ -30,18 +28,15 @@ class ProjectDataService with DataCache {
     }
   }
 
-  FolderDocument? getFolder(
-      String name,
-      {String? parentId}) {
+  FolderDocument? getFolder(String name, {String? parentId}) {
     var candidateFolders = _getDocuments(name, true, parentId: parentId);
 
     if (candidateFolders.isNotEmpty) {
       return candidateFolders.first as FolderDocument;
-    }else{
+    } else {
       return null;
     }
   }
-
 
   Future<FolderDocument> getOrCreateFolder(
       String projectId, String owner, String name,
@@ -105,21 +100,16 @@ class ProjectDataService with DataCache {
   }
 
   String getFileContent(FileDocument fileDoc) {
-    // if (fileDoc.metadata.contentType == "application/json") {
-    //   return   JsonString( fileDoc.getMeta("file.content")!).decodedValueAsMap ;
-    // } else {
-    if( fileDoc.hasMeta("file.content")){
+    if (fileDoc.hasMeta("file.content")) {
       return fileDoc.getMeta("file.content")!;
-    }else{
+    } else {
       return "";
     }
-    
-    // }
   }
 
   Future<void> updateFileContent(FileDocument fileDoc, Map content) async {
     var factory = tercen.ServiceFactory();
-    fileDoc = setFileContent(fileDoc,   content  );
+    fileDoc = setFileContent(fileDoc, content);
     // ignore: invalid_return_type_for_catch_error
     await factory.fileService.update(fileDoc).catchError((e) => Logger()
         .log(level: Logger.INFO, message: "Unable to update model state file"));
@@ -209,13 +199,6 @@ class ProjectDataService with DataCache {
     var candidateFolderNodes = folderTreeRoot
         .getDescendants(folders: true, documents: true)
         .where((e) => e.document.name.trim() == name.trim());
-    // print("Found ${candidateFolderNodes.length} candidates");
-
-    // var allFiles = folderTreeRoot
-        // .getDescendants(folders: true, documents: true).map((e) => e.document.name);
-    // for( var f in allFiles ){
-      // print("\t${f}.trim()");
-    // }
 
     if (parentId != null && candidateFolderNodes.isNotEmpty) {
       if (isFolder) {
@@ -242,7 +225,8 @@ class ProjectDataService with DataCache {
     return fileDoc;
   }
 
-  Future<Project> doCreateProject(String projectId, String projectName, String team,
+  Future<Project> doCreateProject(
+      String projectId, String projectName, String team,
       {String appName = "", String appVersion = ""}) async {
     var factory = tercen.ServiceFactory();
 
@@ -253,19 +237,8 @@ class ProjectDataService with DataCache {
       return project;
     } catch (e) {
       //Ignore for now. Project not found, so must create one
-
     }
-    
 
-    // var userProjects = await factory.projectService
-    //     .findByTeamAndIsPublicAndLastModifiedDate(
-    //         startKey: [team, true, '2100'], endKey: [team, false, '']);
-
-    // for (var p in userProjects) {
-    //   if (p.name == projectName) {
-    //     return p;
-    //   }
-    // }
     project.name = projectName;
     project.acl.owner = team;
 
