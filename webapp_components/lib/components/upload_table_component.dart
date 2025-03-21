@@ -25,7 +25,7 @@ class UploadTableComponent extends UploadFileComponent {
   Future<void> doUpload(BuildContext context) async{
     openDialog(context);
     log("File upload in progress. Please wait.", dialogTitle: "File Uploading");
-    print("Uploading files. Owner is ${super.fileOwner}/$fileOwner");
+
     for( int i = 0; i < htmlFileList.length; i++ ){
       DropzoneFileInterface file = htmlFileList[i];
       
@@ -195,7 +195,7 @@ class UploadTableComponent extends UploadFileComponent {
     var stream = taskStream(csvTask.id);
 
 
-    await for (var evt in stream) {
+    await for (var _ in stream) {
       // print(evt.toJson());
     }
 
