@@ -28,10 +28,10 @@ class TaskManagerScreen extends StatefulWidget {
   const TaskManagerScreen(this.modelLayer, {super.key});
 
   @override
-  State<TaskManagerScreen> createState() => _TaskManagerScreenState();
+  State<TaskManagerScreen> createState() => TaskManagerScreenState();
 }
 
-class _TaskManagerScreenState extends State<TaskManagerScreen>
+class TaskManagerScreenState extends State<TaskManagerScreen>
     with ScreenBase, ProgressDialog {
   @override
   String getScreenId() {
@@ -234,42 +234,6 @@ class _TaskManagerScreenState extends State<TaskManagerScreen>
   }
 
 
-  // Future<WebappTable> fetchImmunoWorkflows(String projectId) async {
-  //   var key = projectId;
-  //   if (hasCachedValue(key)) {
-  //     return getCachedValue(key);
-  //   } else {
-  //     var workflowService = WorkflowDataService();
-  //     var workflows = (await workflowService.fetchWorkflowsRemote(projectId))
-  //         .where((doc) => doc.hasMeta("immuno.workflow"))
-  //         .where((doc) => doc.getMeta("immuno.workflow")! == "true")
-  //         .toList();
-
-  //     var res = WebappTable();
-
-  //     List<String> status = [];
-  //     List<String> error = [];
-
-  //     for (var w in workflows) {
-  //       // var sw = await workflowService.getWorkflowStatus(w);
-  //       var sw = await getImmunoWorkflowStatus(w);
-        
-  //       status.add(sw["status"]! );
-  //       error.add(sw["error"]!);
-  //     }
-
-  //     res.addColumn("Id", data: workflows.map((w) => w.id).toList());
-  //     res.addColumn("Name", data: workflows.map((w) => w.name).toList());
-  //     res.addColumn("Status", data: status);
-  //     // res.addColumn("Error", data: error);
-  //     res.addColumn("Last Update",
-  //         data: workflows
-  //             .map((w) => DateFormatter.formatShort(w.lastModifiedDate))
-  //             .toList());
-
-  //     return res;
-  //   }
-  // }
 
   Future<WebappTable> fetchTasks() async {
     var res = WebappTable();
