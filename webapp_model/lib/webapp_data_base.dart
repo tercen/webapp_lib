@@ -221,8 +221,13 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> createOrLoadProject(
       String projectId, String projectName, String username) async {
-    var project =
+    var project = await projectService.getProjectByName(projectName);
+
+    if( projectId == ""){
+      project =
         await projectService.doCreateProject(projectId, projectName, username);
+    }
+    
 
     app.projectId = project.id;
     app.projectName = project.name;

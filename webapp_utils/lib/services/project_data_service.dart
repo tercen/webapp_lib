@@ -225,6 +225,13 @@ class ProjectDataService with DataCache {
     return fileDoc;
   }
 
+
+  Future<Project> getProjectByName(String projectName) async{
+    var factory = tercen.ServiceFactory();
+    var projects = await factory.projectService.findByIsPublicAndLastModifiedDate(startKey: [true, "0000"], endKey: [true, "9999"]);
+    return projects.firstWhere((proj) => proj.name == projectName, orElse: () => Project());
+  }
+
   Future<Project> doCreateProject(
       String projectId, String projectName, String team,
       {String appName = "", String appVersion = ""}) async {
@@ -232,12 +239,12 @@ class ProjectDataService with DataCache {
 
     var project = Project();
 
-    try {
-      project = await factory.projectService.get(projectId);
-      return project;
-    } catch (e) {
-      //Ignore for now. Project not found, so must create one
-    }
+    // try {
+    //   project = await factory.projectService.get(projectId);
+    //   return project;
+    // } catch (e) {
+    //   //Ignore for now. Project not found, so must create one
+    // }
 
     project.name = projectName;
     project.acl.owner = team;
