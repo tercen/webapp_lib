@@ -233,7 +233,7 @@ class ProjectDataService with DataCache {
   }
 
   Future<Project> doCreateProject(
-      String projectId, String projectName, String team,
+      String projectName, String team,
       {String appName = "", String appVersion = ""}) async {
     var factory = tercen.ServiceFactory();
 
