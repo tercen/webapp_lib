@@ -196,7 +196,9 @@ class WorkflowDataService with DataCache {
               step.model.operatorSettings.operatorRef.operatorId != "")
           .toList();
       var opIds = dataSteps
-          .map((step) => step.model.operatorSettings.operatorRef.operatorId)
+          .map((step) => step.model.operatorSettings.operatorRef)
+          .where((opRef) => opRef.name != "File Downloader")
+          .map((opRef) => opRef.operatorId)
           .toList();
       
       var opRefs = dataSteps
@@ -206,7 +208,7 @@ class WorkflowDataService with DataCache {
       for(var opRef in opRefs){
         Logger().log(level: Logger.ALL, message: "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId}");
       }
-
+      
       var operators = await factory.operatorService.list(opIds);
 
       List<int>.generate(operators.length, (i) => i).map((i) {});
