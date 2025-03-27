@@ -280,7 +280,7 @@ class WebAppDataBase with ChangeNotifier {
   Future<void> checkMissingWorkflows() async {
     var requiredWorkflows = settingsService.requiredWorkflows;
     Logger().log(
-        level: Logger.INFO,
+        level: Logger.FINER,
         message: "Reading workflows for ${app.teamname} / ${app.username}");
     var installedWorkflowsDocuments =
         await workflowService.readWorkflowsDocumentsFromLib();

@@ -1,8 +1,9 @@
 class Logger {
   static const ALL = 0;
-  static const DEBUG = 50;
-  static const WARN = 100;
-  static const INFO = 200;
+  static const FINER = 50;
+  static const FINE = 100;
+  static const WARN = 200;
+
   
 
   int currenLevel = Logger.WARN;
@@ -17,11 +18,13 @@ class Logger {
 
   String levelString(int level){
     switch (level) {
-      case Logger.DEBUG:
-        return "[DEBUG] ";
+      case Logger.FINE:
+        return "[FINE] ";
+      case Logger.FINER:
+        return "[FINER] ";
       case Logger.WARN:
         return "[WARN] ";
-      case Logger.INFO:
+      case Logger.ALL:
         return "[INFO] ";
       default:
         return "";

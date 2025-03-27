@@ -89,6 +89,9 @@ class WorkflowDataService with DataCache {
     var libObjs = await factory.documentService
         .getLibrary('', [], ["Workflow"], [], 0, -1);
 
+    Logger().log(level: Logger.FINE, message: "Reading workflows from library");
+    Logger().log(level: Logger.FINER, message: "\tFound ${libObjs.length} workflows");
+
     // var workflows = await factory.workflowService.list(libObjs.map((o) => o.id).toList());
     return libObjs;
   }
@@ -178,12 +181,15 @@ class WorkflowDataService with DataCache {
   // }
 
   Future<void> loadWorkflowSettings() async {
+    Logger().log(level: Logger.FINE, message: "Loading workflow settings");
     if (workflowSettings.isNotEmpty) {
+      Logger().log(level: Logger.FINER, message: "Workflow settings already loaded");
       return;
     }
     var factory = tercen.ServiceFactory();
 
     for (var template in _installedWorkflows.values) {
+      Logger().log(level: Logger.FINER, message: "Loading settings for ${template.name}");
       var dataSteps = template.steps
           .whereType<DataStep>()
           .where((step) =>
@@ -192,6 +198,15 @@ class WorkflowDataService with DataCache {
       var opIds = dataSteps
           .map((step) => step.model.operatorSettings.operatorRef.operatorId)
           .toList();
+      
+      var opRefs = dataSteps
+          .map((step) => step.model.operatorSettings.operatorRef)
+          .toList();
+
+      for(var opRef in opRefs){
+        Logger().log(level: Logger.ALL, message: "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId}");
+      }
+
       var operators = await factory.operatorService.list(opIds);
 
       List<int>.generate(operators.length, (i) => i).map((i) {});

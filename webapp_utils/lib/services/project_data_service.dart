@@ -112,7 +112,7 @@ class ProjectDataService with DataCache {
     fileDoc = setFileContent(fileDoc, content);
     // ignore: invalid_return_type_for_catch_error
     await factory.fileService.update(fileDoc).catchError((e) => Logger()
-        .log(level: Logger.INFO, message: "Unable to update model state file"));
+        .log(level: Logger.WARN, message: "Unable to update model state file"));
     ;
   }
 

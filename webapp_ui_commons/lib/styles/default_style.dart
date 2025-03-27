@@ -6,7 +6,7 @@ import 'package:webapp_ui_commons/styles/style_base.dart';
 class DefaultStyle extends StyleBase {
   @override
   void init() {
-    styleMap["black"] = Color.fromARGB(255, 26, 26, 41);
+    styleMap["black"] = Color.fromARGB(255, 60, 60, 60);
     styleMap["lightBlack"] = Colors.black26;
     styleMap["gray"] = Color.fromARGB(255, 180, 180, 190);
     styleMap["darkGray"] = Color.fromARGB(255, 120, 120, 130);
@@ -27,6 +27,11 @@ class DefaultStyle extends StyleBase {
     styleMap["headerRow"] = Color.fromARGB(30, 80, 200, 255);
     styleMap["evenRow"] = Color.fromARGB(30, 255, 255, 255);
     styleMap["oddRow"] = Color.fromARGB(30, 120, 240, 255);
+
+
+    styleMap["paddingSmall"] = 5;
+    styleMap["paddingMedium"] = 15;
+    styleMap["paddingLarge"] = 25;
 
     styleMap["borderRounding"] = BorderRadius.circular(8.0);
     styleMap["textH1"] = TextStyle(
