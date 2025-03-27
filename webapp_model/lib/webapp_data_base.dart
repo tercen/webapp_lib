@@ -105,13 +105,12 @@ class WebAppDataBase with ChangeNotifier {
             ViewState.fromJson(JsonString(contentString).decodedValueAsMap);
       }
 
-      if( loadNavigation == true ){
+      if (loadNavigation == true) {
         contentString = projectService.getFileContent(navFile);
         if (contentString != "" && contentString != "{}") {
           app.loadPersistentData(JsonString(contentString).decodedValueAsMap);
         }
       }
-      
     }
   }
 
@@ -122,22 +121,18 @@ class WebAppDataBase with ChangeNotifier {
       var folder = await projectService
           .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
 
-
-      
       var viewFile = await projectService.getOrCreateFile(
           projectId, user, "${user}_view_05",
           parentId: folder.id);
       await projectService.updateFileContent(viewFile, _model.toJson());
 
-      
-
-      if(saveNavigation){
+      if (saveNavigation) {
         var navFile = await projectService.getOrCreateFile(
-          projectId, user, "${user}_nav_05",
-          parentId: folder.id);
-        await projectService.updateFileContent(navFile, app.getPersistentData());
+            projectId, user, "${user}_nav_05",
+            parentId: folder.id);
+        await projectService.updateFileContent(
+            navFile, app.getPersistentData());
       }
-
     }
   }
 
@@ -219,15 +214,12 @@ class WebAppDataBase with ChangeNotifier {
     return await userService.fetchUserList(app.username);
   }
 
-  Future<void> createOrLoadProject(
-      String projectId, String projectName, String username) async {
+  Future<void> createOrLoadProject(String projectName, String username) async {
     var project = await projectService.getProjectByName(projectName);
 
-    if( projectId == ""){
-      project =
-        await projectService.doCreateProject(projectId, projectName, username);
+    if (project.id == "") {
+      project = await projectService.doCreateProject(projectName, username);
     }
-    
 
     app.projectId = project.id;
     app.projectName = project.name;
