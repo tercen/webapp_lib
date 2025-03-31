@@ -18,7 +18,24 @@ class WebappTable {
   }
   int get nCols => colNames.length;
 
-  WebappTable selectByKey(List<int> keys) {
+  WebappTable selectByColValue(List<String> colNames, List<String> values) {
+    var outTbl = WebappTable();
+    List<List<String>> rows = [];
+    for (var row = 0; row < nRows; row++) {
+      if(!colNames.map((name) => values.contains( columns[name]![row]) ).any((test) => test == false)){
+        rows.add(columns.values.map((e) => e[row]).toList());
+      }
+    }
+
+    for (var col = 0; col < nCols; col++) {
+      outTbl.addColumn(colNames[col],
+          data: rows.map((row) => row[col]).toList());
+    }
+
+    return outTbl;
+  }
+
+  WebappTable selectByHash(List<int> keys) {
     var outTbl = WebappTable();
     List<List<String>> rows = [];
     for (var row = 0; row < nRows; row++) {
