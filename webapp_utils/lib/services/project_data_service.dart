@@ -7,6 +7,13 @@ import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/mixin/data_cache.dart';
 
 class ProjectDataService with DataCache {
+  static final ProjectDataService _singleton = ProjectDataService._internal();
+  
+  factory ProjectDataService() {
+    return _singleton;
+  }
+  
+  ProjectDataService._internal();
   bool structureLoaded = false;
   final FolderNode folderTreeRoot = FolderNode(FolderDocument(), true);
 
