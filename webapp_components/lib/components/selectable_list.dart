@@ -140,7 +140,7 @@ class SelectableListComponent
           width: 50,
           child: checkboxWidget,
         ),
-        buildInfoBoxIcon(id, context),
+        buildInfoBoxIcon(id, context, title: "${infoBoxBuilder?.title}: $name"),
         //Flexible allows text wrapping in the row
         Flexible(
             child: Text(

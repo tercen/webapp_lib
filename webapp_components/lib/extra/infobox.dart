@@ -11,10 +11,10 @@ class InfoBoxBuilder with ChangeNotifier {
 
   InfoBoxBuilder( this.title, this.builderCallback, {this.futureCallback});
 
-  Widget createDialog( Widget contentWdg ){
+  Widget createDialog( Widget contentWdg,{String? titleOverride} ){
     return AlertDialog(
       title: Text(
-        title,
+        titleOverride ?? title,
         style: Styles()["textH1"],
       ),
       content: Container(
@@ -24,15 +24,15 @@ class InfoBoxBuilder with ChangeNotifier {
     );
   }
 
-  Widget _buildDefault(BuildContext context, dynamic value) {
+  Widget _buildDefault(BuildContext context, dynamic value, {String? titleOverride}) {
     var contentWdg =  DoubleScrollBar.create(builderCallback(value, notifier));
 
-    var dialog = createDialog(contentWdg);
+    var dialog = createDialog(contentWdg, titleOverride: titleOverride);
 
     return dialog;
   }
 
-  Widget _buildWithFuture(BuildContext context, dynamic value) {
+  Widget _buildWithFuture(BuildContext context, dynamic value, {String? titleOverride}) {
     var contentWdg = FutureBuilder(
         future: futureCallback!(value),
         builder: (context, snapshot) {
@@ -62,16 +62,16 @@ class InfoBoxBuilder with ChangeNotifier {
           }
         });
 
-    var dialog = createDialog(contentWdg);
+    var dialog = createDialog(contentWdg, titleOverride: titleOverride);
 
     return dialog;
   }
 
-  Widget build(BuildContext context, dynamic value) {
+  Widget build(BuildContext context, dynamic value, {String? titleOverride}) {
     if (futureCallback != null) {
-      return _buildWithFuture(context, value);
+      return _buildWithFuture(context, value, titleOverride: titleOverride);
     } else {
-      return _buildDefault(context, value);
+      return _buildDefault(context, value, titleOverride: titleOverride);
     }
   }
 }
