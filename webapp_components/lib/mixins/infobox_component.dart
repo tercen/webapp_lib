@@ -15,7 +15,7 @@ mixin class ComponentInfoBox {
                   infoBoxBuilder!.notifier.addListener(() {
                     stfSetState(() {});
                   });
-                  return infoBoxBuilder!.build(context, value);
+                  return infoBoxBuilder!.build(context, value, titleOverride: title);
                 });
               });
         },
@@ -27,7 +27,7 @@ mixin class ComponentInfoBox {
     Widget infoBoxWidget = Container();
     double infoBoxWidth = 5;
     if (infoBoxBuilder != null) {
-      infoBoxWidget = infoBoxIcon(value, context);
+      infoBoxWidget = infoBoxIcon(value, context, title: title);
       infoBoxWidth =iconCellWidth ;
     }
     return SizedBox(
