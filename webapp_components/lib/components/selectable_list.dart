@@ -69,7 +69,9 @@ class SelectableListComponent
 
   String getCacheKey() {
     var key = "${getId()}${getGroupId()}";
-
+    for( var p in ancestors ){
+      key = "$key${p.getId()}";
+    }
     return key;
   }
 
