@@ -48,10 +48,6 @@ class SelectableListComponent
     return name;
   }
 
-  void setCacheKey(String key) {
-    cacheKey = key;
-  }
-
   Future<WebappTable> callCachedCallback(
       Map<String, dynamic> values) async {
     if (cacheKey == null) {
@@ -67,17 +63,10 @@ class SelectableListComponent
     }
   }
 
-  String getCacheKey() {
-    var key = "${getId()}${getGroupId()}";
-    for( var p in ancestors ){
-      key = "$key${p.getId()}";
-    }
-    return key;
-  }
 
   @override
   Widget buildContent(BuildContext context) {
-    var cacheKey = getCacheKey();
+    var cacheKey = getKey();
     if (hasCachedValue(cacheKey)) {
       return createTable(context, getCachedValue(cacheKey));
     } else {

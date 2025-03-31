@@ -38,6 +38,7 @@ mixin class ComponentBase {
 
   void addParent(Component parent) {
     parent.addListener((){
+      print("Parent has changed!");
       reset();
     });
     ancestors.add(parent);
