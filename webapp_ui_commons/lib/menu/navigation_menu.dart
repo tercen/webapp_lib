@@ -16,7 +16,7 @@ class NavigationMenu with ChangeNotifier {
   NavigationMenu();
 
   MenuItem getSelectedEntry() {
-    return _menuItems.firstWhere((e) => e.label == selectedScreen);
+    return _menuItems.firstWhere((e) => e.label == selectedScreen, orElse: () => _menuItems.first);
   }
 
   void selectScreen(String label){
