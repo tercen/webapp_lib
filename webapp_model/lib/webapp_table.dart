@@ -38,6 +38,10 @@ class WebappTable {
     return outTbl;
   }
 
+  bool hasColumn(String colName){
+    return colNames.contains(colName);
+  }
+
   void addColumn( String columnName, {List<String>? data}){
     columns[columnName] = [];
     colNames.add(columnName);
