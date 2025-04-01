@@ -266,7 +266,7 @@ class WebappTableIterator implements Iterator<List<String>>{
 
   @override
   bool moveNext() {
-    if( _currentRow < table.nRows ){
+    if( table.nRows > 0 && _currentRow < table.nRows ){
       _currentRow++;
       return true;
     }else{
