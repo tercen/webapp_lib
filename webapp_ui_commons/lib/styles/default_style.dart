@@ -11,6 +11,7 @@ class DefaultStyle extends StyleBase {
     styleMap["gray"] = Color.fromARGB(255, 180, 180, 190);
     styleMap["darkGray"] = Color.fromARGB(255, 120, 120, 130);
     styleMap["white"] = Color.fromARGB(255, 240, 240, 230);
+    styleMap["clear"] = Color.fromARGB(255, 255, 255, 255);
     styleMap["linkBlue"] = Color.fromARGB(255, 55, 22, 163);
     styleMap["red"] = Color.fromARGB(255, 255, 37, 37);
 

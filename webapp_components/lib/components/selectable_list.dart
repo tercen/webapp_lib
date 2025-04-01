@@ -13,7 +13,6 @@ import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
 
-
 class SelectableListComponent
     with ChangeNotifier, ComponentBase, ComponentInfoBox, ComponentCache
     implements SerializableComponent {
@@ -48,8 +47,7 @@ class SelectableListComponent
     return name;
   }
 
-  Future<WebappTable> callCachedCallback(
-      Map<String, dynamic> values) async {
+  Future<WebappTable> callCachedCallback(Map<String, dynamic> values) async {
     if (cacheKey == null) {
       return await dataFetchFunc();
     } else {
@@ -62,7 +60,6 @@ class SelectableListComponent
       }
     }
   }
-
 
   @override
   Widget buildContent(BuildContext context) {
@@ -88,22 +85,20 @@ class SelectableListComponent
 
   Widget createTable(BuildContext context, WebappTable dataTable) {
     List<Widget> tableRows = [];
-    assert( dataTable.hasColumn("label"));
-    assert( dataTable.hasColumn("id"));
+    assert(dataTable.hasColumn("label"));
+    assert(dataTable.hasColumn("id"));
 
     var labels = dataTable["label"];
     var ids = dataTable["id"];
 
     var indices = List<int>.generate(dataTable.nRows, (i) => i);
     if (sortByLabel) {
-      indices =
-          ListUtils.getSortedIndices(labels);
+      indices = ListUtils.getSortedIndices(labels);
     }
 
     for (var i in indices) {
       String lbl = labels[i];
-      lbl =
-          labelTransformCallback(labels[i], id: ids[i]);
+      lbl = labelTransformCallback(labels[i], id: ids[i]);
 
       tableRows.add(createRow(ids[i], lbl, i % 2 == 0, context));
     }
@@ -111,19 +106,25 @@ class SelectableListComponent
     return Column(children: tableRows);
   }
 
-  bool isSelected( String id ){
+  bool isSelected(String id) {
     return selected != "" && selected.contains(id);
   }
 
   Widget checkBox(String id, String name) {
-    return Checkbox(value: isSelected(id), onChanged: (value){
-      if( value == true){
-        selected = id;
-      }else{
-        selected = "";
-      }
-      notifyListeners();
-    });
+    return Checkbox(
+        value: isSelected(id),
+        fillColor:
+            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          return Styles()["clear"];
+        }),
+        onChanged: (value) {
+          if (value == true) {
+            selected = id;
+          } else {
+            selected = "";
+          }
+          notifyListeners();
+        });
     // return IconButton(
     //     onPressed: () {
     //       isSelected(id)
@@ -165,7 +166,6 @@ class SelectableListComponent
     );
   }
 
-
   @override
   bool isFulfilled() {
     return selected != "";
@@ -176,32 +176,31 @@ class SelectableListComponent
     return ComponentType.list;
   }
 
-
   @override
   void reset() {
     selected = "";
   }
-  
+
   @override
   getComponentValue() {
     return selected;
   }
-  
+
   @override
   String getStateValue() {
     return selected;
   }
-  
+
   @override
   void setComponentValue(value) {
     selected = value;
   }
-  
+
   @override
   void setStateValue(String value) {
     selected = value;
   }
-  
+
   @override
   bool shouldSaveState() {
     return shouldSave;
