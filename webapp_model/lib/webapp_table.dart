@@ -1,4 +1,6 @@
 
+import 'dart:collection';
+
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_model/id_element.dart';
 import 'package:webapp_model/utils/key_utils.dart';
@@ -6,7 +8,7 @@ import 'package:webapp_utils/functions/list_utils.dart';
 
 
 
-class WebappTable {
+class WebappTable extends IterableBase<WebappTable>{
   final Map<String, List<String>> columns = {};
   final List<String> colNames = [];
 
@@ -37,6 +39,7 @@ class WebappTable {
   
     return false;
   }
+
 
   WebappTable selectByColValue( List<String> cols, List<String> values) {
     try {
@@ -242,4 +245,25 @@ class WebappTable {
     }
     return uiTable;
   }
+  
+  @override
+  Iterator<WebappTable> get iterator => WebappTableIterator(this);
+
+}
+
+class WebappTableIterator implements Iterator<WebappTable>{
+  WebappTable table;
+  int _currentRow = 0;
+  
+  WebappTableIterator( this.table);
+
+  @override
+  WebappTable get current => table.select([_currentRow]).first;
+
+  @override
+  bool moveNext() {
+    _currentRow++;
+    return _currentRow < table.nRows;
+  }
+
 }
