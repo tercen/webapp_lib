@@ -79,7 +79,12 @@ class WebappTable {
     }
   }
 
-
+  void removeColumn( String colName ){
+    if( hasColumn(colName)){
+      columns.remove(colName);
+      colNames.remove(colName);
+    }
+  }
 
   WebappTable select(List<int> rows, {List<String>? cols}){
     cols ??= colNames;
