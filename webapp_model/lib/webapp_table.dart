@@ -235,7 +235,7 @@ class WebappTable extends IterableBase<List<String>>{
 
   static WebappTable fromColumns( List<String> colNames, List<List<String>> values ){
     try {
-      assert( colNames.length == values.length);
+      
       var tbl = WebappTable();
 
       for( var i = 0; i < colNames.length; i++){
