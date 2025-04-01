@@ -253,7 +253,7 @@ class WebappTable extends IterableBase<WebappTable>{
 
 class WebappTableIterator implements Iterator<WebappTable>{
   WebappTable table;
-  int _currentRow = 0;
+  int _currentRow = -1;
   
   WebappTableIterator( this.table);
 
