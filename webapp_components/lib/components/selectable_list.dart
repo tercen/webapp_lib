@@ -115,17 +115,25 @@ class SelectableListComponent
     return selected != "" && selected.contains(id);
   }
 
-  IconButton checkBox(String id, String name) {
-    return IconButton(
-        onPressed: () {
-          isSelected(id)
-              ? selected = ""
-              : selected = id;
-          notifyListeners();
-        },
-        icon: isSelected(id)
-            ? const Icon(Icons.check_box_outlined)
-            : const Icon(Icons.check_box_outline_blank));
+  Widget checkBox(String id, String name) {
+    return Checkbox(value: isSelected(id), onChanged: (value){
+      if( value == true){
+        selected = id;
+      }else{
+        selected = "";
+      }
+      notifyListeners();
+    });
+    // return IconButton(
+    //     onPressed: () {
+    //       isSelected(id)
+    //           ? selected = ""
+    //           : selected = id;
+    //       notifyListeners();
+    //     },
+    //     icon: isSelected(id)
+    //         ? const Icon(Icons.check_box_outlined)
+    //         : const Icon(Icons.check_box_outline_blank));
   }
 
   Widget createRow(String id, String name, bool isEven, BuildContext context) {

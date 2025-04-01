@@ -18,20 +18,51 @@ class WebappTable {
   }
   int get nCols => colNames.length;
 
-  WebappTable selectByColValue(List<String> colNames, List<String> values) {
+  bool rowContains( int rowNum, String value, String colName,{ bool isContains = false}){
+    if( rowNum >= nRows ){
+      return false;
+    }
+    var rowTbl = select([rowNum]);
+
+    
+    if( isContains ){
+      if( rowTbl[colName].first.contains(value) ){
+        return true;
+      }
+    }else{
+      if( rowTbl[colName].first == value ){
+        return true;
+      }
+    }
+  
+    return false;
+  }
+
+  WebappTable selectByColValue( List<String> cols, List<String> values) {
+    try {
+      assert( cols.length == values.length );  
+    } catch (e) {
+      sci.ServiceError( 500, "WebappTable: Column Names length must be equal to values length");
+    }
+    
     var outTbl = WebappTable();
     List<List<String>> rows = [];
+    var idxList = List<int>.generate( cols.length, (i) => i );
+
     for (var row = 0; row < nRows; row++) {
-      if(!colNames.map((name) => values.contains( columns[name]![row]) ).any((test) => test == false)){
-        rows.add(columns.values.map((e) => e[row]).toList());
+
+      var rowHasValue = !idxList.map((idx) => rowContains( row, values[idx], cols[idx])).any((test) => test == false);
+      if(rowHasValue){
+        rows.add(getValuesByRow(row));
       }
     }
 
+    
     for (var col = 0; col < nCols; col++) {
-      outTbl.addColumn(colNames[col],
+      outTbl.addColumn(cols[col],
           data: rows.map((row) => row[col]).toList());
     }
-
+    
     return outTbl;
   }
 
