@@ -50,14 +50,13 @@ class WebappTable {
     var idxList = List<int>.generate( cols.length, (i) => i );
 
     for (var row = 0; row < nRows; row++) {
-
       var rowHasValue = !idxList.map((idx) => rowContains( row, values[idx], cols[idx])).any((test) => test == false);
       if(rowHasValue){
         rows.add(getValuesByRow(row));
       }
     }
 
-    
+    print(rows);
     for (var col = 0; col < nCols; col++) {
       outTbl.addColumn(cols[col],
           data: rows.map((row) => row[col]).toList());
