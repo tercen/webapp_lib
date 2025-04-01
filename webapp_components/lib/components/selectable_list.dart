@@ -113,9 +113,13 @@ class SelectableListComponent
   Widget checkBox(String id, String name) {
     return Checkbox(
         value: isSelected(id),
+        side: WidgetStateBorderSide.resolveWith((states) => BorderSide(
+              color: Styles()["black"],
+              width: 1.5,
+            )),
         fillColor:
             WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
-          return Styles()["clear"];
+          return Color.fromARGB(255, 255, 255, 255);
         }),
         onChanged: (value) {
           if (value == true) {
