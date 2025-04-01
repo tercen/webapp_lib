@@ -56,9 +56,9 @@ class WebappTable {
       }
     }
 
-    print(rows);
+    
     for (var col = 0; col < nCols; col++) {
-      outTbl.addColumn(cols[col],
+      outTbl.addColumn(colNames[col],
           data: rows.map((row) => row[col]).toList());
     }
     
