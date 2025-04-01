@@ -262,8 +262,14 @@ class WebappTableIterator implements Iterator<WebappTable>{
 
   @override
   bool moveNext() {
-    _currentRow++;
-    return _currentRow < table.nRows;
+    if( _currentRow < table.nRows ){
+      _currentRow++;
+      return true;
+    }else{
+      return false;
+    }
+    
+    
   }
 
 }
