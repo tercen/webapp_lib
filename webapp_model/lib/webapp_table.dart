@@ -233,6 +233,20 @@ class WebappTable extends IterableBase<List<String>>{
     }
   }
 
+  static WebappTable fromColumns( List<String> colNames, List<List<String>> values ){
+    try {
+      assert( colNames.length == values.length);
+      var tbl = WebappTable();
+
+      for( var i = 0; i < colNames.length; i++){
+        tbl.addColumn(colNames[i], data: values[i]);
+      }
+      return tbl;
+
+    } catch (e) {
+      throw sci.ServiceError(500, "Invalid parameters creating WebappTable", "Names: $colNames\nValues:$values");
+    }
+  }
 
   static WebappTable fromTable(sci.Table tercenTbl){
     WebappTable uiTable = WebappTable();
