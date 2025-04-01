@@ -8,7 +8,7 @@ import 'package:webapp_utils/functions/list_utils.dart';
 
 
 
-class WebappTable extends IterableBase<WebappTable>{
+class WebappTable extends IterableBase<List<String>>{
   final Map<String, List<String>> columns = {};
   final List<String> colNames = [];
 
@@ -247,18 +247,22 @@ class WebappTable extends IterableBase<WebappTable>{
   }
   
   @override
-  Iterator<WebappTable> get iterator => WebappTableIterator(this);
+  Iterator<List<String>> get iterator => WebappTableIterator(this);
 
 }
 
-class WebappTableIterator implements Iterator<WebappTable>{
+class WebappTableIterator implements Iterator<List<String>>{
   WebappTable table;
   int _currentRow = -1;
   
   WebappTableIterator( this.table);
 
+  List<String> _rowToList(WebappTable row){
+    return row.colNames.map((colName) => row[colName].first).toList();
+  }
+
   @override
-  WebappTable get current => table.select([_currentRow]).first;
+  List<String> get current => _rowToList( table.select([_currentRow]) );
 
   @override
   bool moveNext() {
