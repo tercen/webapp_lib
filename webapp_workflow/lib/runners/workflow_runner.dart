@@ -51,6 +51,7 @@ class WorkflowRunner with ProgressDialog {
   // final Value status = ValueHolder<RunStatus>(RunStatus.init);
 
   String folderSuffix = "";
+  String folderPrefix = "";
   String? folderId;
   String? workflowId;
   String workflowRename = "";
@@ -112,6 +113,10 @@ class WorkflowRunner with ProgressDialog {
 
   void addFolderSuffix(String suf) {
     folderSuffix = "$folderSuffix$suf";
+  }
+
+  void addFolderPrefix(String pref) {
+    folderPrefix = "$folderPrefix$pref";
   }
 
   void addSettings(List<StepSetting> settings) {
@@ -396,7 +401,7 @@ class WorkflowRunner with ProgressDialog {
     }
 
     sci.FolderDocument folder = sci.FolderDocument();
-    folder.name = "$name$folderSuffix";
+    folder.name = "$folderPrefix$name$folderSuffix";
     folder.acl.owner = owner;
     folder.projectId = projectId;
     folder.folderId = parentFolderId;
