@@ -1,15 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:json_string/json_string.dart';
+
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
-import 'package:webapp_model/id_element.dart';
+
 import 'package:webapp_model/id_element_table.dart';
-import 'package:webapp_model/settings/required_template.dart';
-import 'package:webapp_model/settings/template_config.dart';
+
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_utils/functions/formatter_utils.dart';
 
@@ -17,10 +15,11 @@ import 'package:webapp_utils/functions/logger.dart';
 
 
 import 'package:webapp_utils/mixin/data_cache.dart';
-import 'package:webapp_utils/model/workflow_info.dart';
+
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_utils/model/workflow_setting.dart';
+import 'package:webapp_utils/services/project_data_service.dart';
 
 class WorkflowDataService with DataCache {
   static final WorkflowDataService _singleton = WorkflowDataService._internal();
@@ -628,6 +627,36 @@ class WorkflowDataService with DataCache {
               .toList());
 
       return res;
+    }
+  }
+
+
+  static Future<void> updateReadme( 
+       String workflowId, String text) async {
+    var factory = tercen.ServiceFactory();
+
+  
+    var readmeDocument =  ProjectDataService().getProjectFiles().firstWhere(
+        (e) => e.getMeta("WORKFLOW_ID") == workflowId,
+        orElse: () => sci.Document());
+
+    if (readmeDocument.id == "") {
+      print("Readme not found for workflow id $workflowId");
+    } else {
+      var downloadStream = factory.fileService.download(readmeDocument.id);
+      var fileBytes = await downloadStream.toList();
+
+      var readmeTxt = utf8.decode(fileBytes[0]);
+
+      var notes = text.split("\n").map((e) => "> $e").join("  \n");
+      notes += "  \n\n";
+      notes = "## Run Notes  \n$notes";
+      readmeTxt = notes + readmeTxt;
+
+      var doc = await factory.fileService.get(readmeDocument.id);
+      Stream<List> dataStream =
+          Stream.fromIterable(Iterable.castFrom([utf8.encode(readmeTxt)]));
+      factory.fileService.upload(doc, dataStream);
     }
   }
 }
