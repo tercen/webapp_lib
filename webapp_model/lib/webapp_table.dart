@@ -40,6 +40,9 @@ class WebappTable extends IterableBase<List<String>>{
     return false;
   }
 
+  int getColumnIndex(String column){
+    return column.indexOf(column);
+  }
 
   WebappTable selectByColValue( List<String> cols, List<String> values) {
     try {
