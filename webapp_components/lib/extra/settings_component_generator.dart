@@ -55,7 +55,7 @@ class SettingComponentGenerator {
 
           var include = true;
           for (var filter in filters) {
-            include = include && ( block == null || filter.block == block )
+            include = include && ( block == null || filter.block == block );
             if (filter.type == "include") {
               if (filter.settingNames != null) {
                 include = include && filter.settingNames!.contains(settingName);
