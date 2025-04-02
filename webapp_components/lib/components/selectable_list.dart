@@ -117,6 +117,7 @@ class SelectableListComponent
               color: Styles()["black"],
               width: 1.5,
             )),
+        checkColor: Styles()["black"],
         fillColor:
             WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
           return Color.fromARGB(255, 255, 255, 255);
