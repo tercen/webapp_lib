@@ -9,7 +9,7 @@ import 'package:webapp_utils/model/workflow_setting.dart';
 class SettingComponentGenerator {
   List<Component> getScreenSettings(
       String screenName, WebAppDataBase modelLayer,
-      {bool applyFilter = true}) {
+      {bool applyFilter = true, String? block}) {
     var comps = modelLayer.workflowService.workflowSettings
         .map((setting) {
           switch (setting.type) {
@@ -30,7 +30,7 @@ class SettingComponentGenerator {
         .whereType<Component>()
         .toList();
     if (applyFilter) {
-      comps = filterScreenComponents(comps, screenName, modelLayer);
+      comps = filterScreenComponents(comps, screenName, modelLayer, block: block);
     }
     return comps;
   }
@@ -40,7 +40,7 @@ class SettingComponentGenerator {
   }
 
   List<Component> filterScreenComponents(List<Component> components,
-      String screenName, WebAppDataBase modelLayer) {
+      String screenName, WebAppDataBase modelLayer, {String? block}) {
     if (modelLayer.settingsService.hasFilter(screenName)) {
       var filters = modelLayer.settingsService.settingsFilters.filters
           .where((filter) => filter.screen == screenName)
@@ -55,6 +55,7 @@ class SettingComponentGenerator {
 
           var include = true;
           for (var filter in filters) {
+            include = include && ( block == null || filter.block == block )
             if (filter.type == "include") {
               if (filter.settingNames != null) {
                 include = include && filter.settingNames!.contains(settingName);
