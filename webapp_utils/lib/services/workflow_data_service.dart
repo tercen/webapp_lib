@@ -631,7 +631,7 @@ class WorkflowDataService with DataCache {
   }
 
 
-  static Future<void> updateReadme( 
+  Future<void> updateReadme( 
        String workflowId, String text) async {
     var factory = tercen.ServiceFactory();
 
