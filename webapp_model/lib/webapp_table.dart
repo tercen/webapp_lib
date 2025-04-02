@@ -44,6 +44,14 @@ class WebappTable extends IterableBase<List<String>>{
     return column.indexOf(column);
   }
 
+  static WebappTable fromData( List<String> colNames, List<List<String>> rowData){
+    var outTbl = WebappTable();
+    for( var colIdx = 0; colIdx < rowData.length; colIdx ){
+      outTbl.addColumn(colNames[colIdx], data: rowData.map((row) => row[colIdx]).toList());
+    }
+    return outTbl;
+  }
+
   WebappTable selectByColValue( List<String> cols, List<String> values) {
     try {
       assert( cols.length == values.length );  
