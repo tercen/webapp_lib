@@ -25,6 +25,15 @@ class FetchComponent with
     cancelAllOperations();
   }
 
+  Future<void> init() async {
+    if (!isInit) {
+      super.init();
+      await loadTable();
+      isInit = true;
+    }
+  }
+
+
   @override
   void reset() {
     cancelAllOperations();
