@@ -6,12 +6,13 @@ part "settings_filter_expr.g.dart";
 class SettingsFilterExpr {
   final String screen;
   final String type;
+  final String? block;
   final String? stepId;
   final String? stepName;
   final String? settingNames;
 
   SettingsFilterExpr(
-      {required this.screen, required this.type, this.stepId, this.stepName, this.settingNames});
+      {required this.screen, required this.type, this.block,  this.stepId, this.stepName, this.settingNames});
 
   factory SettingsFilterExpr.fromJson(Map<String, dynamic> json) =>
       _$SettingsFilterExprFromJson(json);
