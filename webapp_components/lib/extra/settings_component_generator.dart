@@ -44,6 +44,7 @@ class SettingComponentGenerator {
     if (modelLayer.settingsService.hasFilter(screenName)) {
       var filters = modelLayer.settingsService.settingsFilters.filters
           .where((filter) => filter.screen == screenName)
+          .where((filter) => block == null || filter.block == block )
           .toList();
 
       var filteredComponents = components.where((comp) {
@@ -55,7 +56,6 @@ class SettingComponentGenerator {
 
           var include = true;
           for (var filter in filters) {
-            include = include && ( block == null || filter.block == block );
             if (filter.type == "include") {
               if (filter.settingNames != null) {
                 include = include && filter.settingNames!.contains(settingName);
