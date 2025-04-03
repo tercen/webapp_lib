@@ -215,7 +215,6 @@ class WorkflowTaskComponent extends ActionTableComponent {
   @override
   Future<bool> loadTable() async {
     if (!isInit) {
-
       runningTasks.clear();
       var factory = tercen.ServiceFactory();
 
@@ -224,11 +223,9 @@ class WorkflowTaskComponent extends ActionTableComponent {
       workflowTasks = initTable["Id"].where((e) => e != "").toList();
       await loadTaskTable();
       runningTasks.addAll(workflowTasks);
-      //Fetch run computation tasks as well here....
-      print("loading tasks");
+
       var tasks = await factory.taskService.list(workflowTasks);
 
-      print((tasks.first as sci.RunWorkflowTask).toJson());
       for (var task in tasks) {
         runningTasks.add(task.id);
         processTaskEvent(task.channelId);
