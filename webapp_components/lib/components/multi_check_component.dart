@@ -17,9 +17,6 @@ class MultiCheckComponent extends MultiCheckComponentFetch{
       super.saveState = true}) : super(id, groupId, componentLabel, () async {
         return WebappTable();
       }) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
     allSelected = selectAll;
   }
 
