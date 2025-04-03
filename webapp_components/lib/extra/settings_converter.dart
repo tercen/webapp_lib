@@ -12,7 +12,7 @@ class SettingsConverter {
         if( value is List<String> ){
           return StepSetting(bComp.getMeta("step.id")!.value, bComp.getMeta("setting.name")!.value, value.join(","));
         }else{
-          return StepSetting(bComp.getMeta("step.id")!.value, bComp.getMeta("setting.name")!.value, value);
+          return StepSetting(bComp.getMeta("step.id")!.value, bComp.getMeta("setting.name")!.value, value.toString());
         }
         
       }
