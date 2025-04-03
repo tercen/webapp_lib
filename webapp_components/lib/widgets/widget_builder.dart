@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 class CommonWidgets {
-    static Widget waitingIndicator({String prefixMsg = "", String suffixMsg = ""}) {
+  static Widget waitingIndicator(
+      {String prefixMsg = "", String suffixMsg = ""}) {
     Widget wdg = Center(
       child: Row(
         children: [
@@ -10,9 +11,18 @@ class CommonWidgets {
             prefixMsg,
             style: Styles()["text"],
           ),
-          prefixMsg != "" ? const SizedBox(width: 10,) : Container(),
-          const SizedBox(width: 25, height: 25, child: CircularProgressIndicator()),
-          suffixMsg != "" ? const SizedBox(width: 10,) : Container(),
+          prefixMsg != ""
+              ? const SizedBox(
+                  width: 10,
+                )
+              : Container(),
+          const SizedBox(
+              width: 25, height: 25, child: CircularProgressIndicator()),
+          suffixMsg != ""
+              ? const SizedBox(
+                  width: 10,
+                )
+              : Container(),
           Text(
             suffixMsg,
             style: Styles()["text"],
@@ -22,6 +32,23 @@ class CommonWidgets {
     );
 
     return wdg;
+  }
+
+  static Widget checkbox(bool isSelected, void Function(Map<String, dynamic>, bool) callback, Map<String, dynamic> paramMap) {
+    return Checkbox(
+        checkColor: Styles()["black"],
+        side: WidgetStateBorderSide.resolveWith((states) => BorderSide(
+              color: Styles()["black"],
+              width: 1.5,
+            )),
+        fillColor:
+            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          return Styles()["clear"];
+        }),
+        value: isSelected,
+        onChanged: (value) {
+          callback(paramMap, isSelected);
+        });
   }
 
   // static IconButton checkBox(ModelHandler model, ModelKey key, String id, String name, bool isSelected, {Function? onClick}) {
@@ -38,7 +65,6 @@ class CommonWidgets {
   //           ? const Icon(Icons.check_box_outlined)
   //           : const Icon(Icons.check_box_outline_blank));
   // }
-
 
   static Widget createUnboundedDoubleScrollbarContainer(Widget child) {
     ScrollController ctrl = ScrollController();

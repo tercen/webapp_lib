@@ -286,11 +286,7 @@ class MultiSelectTableComponent
     return tableWidget;
   }
 
-  String getCacheKey() {
-    var key = "${getId()}${getGroupId()}";
 
-    return key;
-  }
 
   @override
   Future<void> init() async {
@@ -303,7 +299,7 @@ class MultiSelectTableComponent
   Future<bool> loadTable() async {
     if (!isInit) {
       busy();
-      var cacheKey = getCacheKey();
+      var cacheKey = getKey();
       if (hasCachedValue(cacheKey)) {
         dataTable = getCachedValue(cacheKey);
       } else {
@@ -332,7 +328,7 @@ class MultiSelectTableComponent
   }
 
   WebappTable getValueAsTable() {
-    return dataTable.selectByKey(selected); // dataTable.selectByKey(selected);
+    return dataTable.selectByHash(selected); // dataTable.selectByKey(selected);
   }
 
   @override
@@ -353,7 +349,7 @@ class MultiSelectTableComponent
 
   @override
   getComponentValue() {
-    return dataTable.selectByKey(selected);
+    return dataTable.selectByHash(selected);
   }
 
   @override
