@@ -77,9 +77,9 @@ mixin ScreenBase {
     addComponent(blockId, horizBar);
   }
 
-  void addHeading( String blockId, String text, {Component? parent} ){
+  void addHeading(String blockId, String text, {Component? parent}) {
     var headingComp = LabelComponent(text);
-    if( parent != null ){
+    if (parent != null) {
       headingComp.addParent(parent);
     }
 
@@ -89,12 +89,13 @@ mixin ScreenBase {
   void updateModel() {
     var comps = getAllComponents();
     for (var comp in comps) {
-      if( comp is SerializableComponent && comp.shouldSaveState()){
-        modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getStateValue() );
+      if (comp is SerializableComponent && comp.shouldSaveState()) {
+        modelLayer.setData(
+            comp.getId(), comp.getGroupId(), comp.getStateValue());
       }
       // if (comp.getGroupId() != LAYOUT_GROUP) {
       //   // Remove components like horizontal bar and spacing, which have no value
-        
+
       //   if (comp is SingleValueComponent) {
       //     modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getValue());
       //   }
@@ -114,11 +115,10 @@ mixin ScreenBase {
 
   void addComponent(String blockId, Component component,
       {ComponentBlockType blockType = ComponentBlockType.simple}) {
-
     component.addListener(refresh);
     component.addListener(updateModel);
 
-    if( component is ComponentBase ){
+    if (component is ComponentBase) {
       (component as ComponentBase).addUiListener(refresh);
     }
 
@@ -138,17 +138,19 @@ mixin ScreenBase {
     List<Component> components = getAllComponents();
     this.modelLayer = modelLayer;
     for (var comp in components) {
-      if( comp is SerializableComponent && comp.shouldSaveState() ){
-        var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());  
-        if( modelValue != null ){
-          comp.setStateValue(modelValue );
+      if (comp is SerializableComponent && comp.shouldSaveState()) {
+        var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
+        if (modelValue != null) {
+          comp.setStateValue(modelValue);
         }
       }
 
-      if( comp is ComponentBase ){
-        (comp as ComponentBase).init().then((val) => (comp as ComponentBase).postInit());
+      if (comp is ComponentBase) {
+        (comp as ComponentBase)
+            .init()
+            .then((val) => (comp as ComponentBase).postInit());
       }
-      
+
       // var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
 
       // if (modelValue.isNotEmpty) {
@@ -162,7 +164,7 @@ mixin ScreenBase {
       // }
     }
 
-    updateTimer = Timer.periodic(const Duration(seconds: 1), (timer){
+    updateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       updateModel();
     });
   }
@@ -247,72 +249,80 @@ mixin ScreenBase {
   }
 
   Widget _buildLabel(Component comp) {
-    
     var style = Styles()["textH2"];
-    if( comp is InputValidator ){
+    if (comp is InputValidator) {
       var validateResults = (comp as InputValidator).results;
 
-      if(validateResults.any((t) => !t.isValid)){
+      if (validateResults.any((t) => !t.isValid)) {
         style = style.merge(TextStyle(color: Colors.red[400]));
 
-        return Row(children: [
-          Icon(Icons.error_outline, color: Colors.red[400],),
-          SizedBox(width: 10,),
-           Text(
-            comp.label(),
-            style: style,
-          )
-        ],);
+        return Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: Colors.red[400],
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text(
+              comp.label(),
+              style: style,
+            )
+          ],
+        );
       }
     }
-    return Text(
-      comp.label(),
-      style: Styles()["textH2"],
-    );
+    if (comp is ComponentBase) {
+      return Tooltip(
+        message: (comp as ComponentBase).getDescription(),
+        child: Text(
+          comp.label(),
+          style: Styles()["textH2"],
+        ),
+      );
+    } else {
+      return Text(
+        comp.label(),
+        style: Styles()["textH2"],
+      );
+    }
   }
 
-  Widget buildContent( Component comp, BuildContext context ){
+  Widget buildContent(Component comp, BuildContext context) {
     List<Widget> compMessages = [comp.buildContent(context)];
-    if( comp is InputValidator ){
+    if (comp is InputValidator) {
       var validateResults = (comp as InputValidator).results;
-      if(validateResults.any((t) => !t.isValid)){
-        
-
-        for( var vr in validateResults ){
-          if( !vr.isValid ){
-            compMessages.add(
-              Padding(padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+      if (validateResults.any((t) => !t.isValid)) {
+        for (var vr in validateResults) {
+          if (!vr.isValid) {
+            compMessages.add(Padding(
+              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
               child: Text(
-                vr.message, style: TextStyle(fontSize: 13, color: Colors.red[400]),
-              ) ,)
-              
-            );
+                vr.message,
+                style: TextStyle(fontSize: 13, color: Colors.red[400]),
+              ),
+            ));
           }
         }
-             
       }
-
-
     }
-     return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: compMessages,
-      );
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: compMessages,
+    );
   }
 
   Widget? _buildBlockRow(
       Component comp, ComponentType compType, BuildContext context,
       {bool addPadding = true}) {
-
     Widget paddingWdg = Container();
     if (addPadding) {
       paddingWdg = const SizedBox(
         width: 50,
       );
     }
-
-
 
     if (comp.isActive()) {
       if (compType == ComponentType.simple) {
@@ -322,8 +332,9 @@ mixin ScreenBase {
               constraints: const BoxConstraints(maxWidth: 250),
               child: _wrap(_buildLabel(comp))),
           Container(
-              constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width*0.6  ),
-              child: _wrap(buildContent(comp, context) )),
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.sizeOf(context).width * 0.6),
+              child: _wrap(buildContent(comp, context))),
         ]);
       }
 
@@ -339,7 +350,7 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                  child: _wrap(buildContent(comp, context) ),
+                  child: _wrap(buildContent(comp, context)),
                 )),
             paddingWdg,
           ],
@@ -374,7 +385,7 @@ mixin ScreenBase {
       for (var ci = 0; ci < componentList.length; ci++) {
         var comp = componentList[ci];
 
-        if( comp.component is InputValidator ){
+        if (comp.component is InputValidator) {
           (comp.component as InputValidator).validate();
         }
 
@@ -389,7 +400,6 @@ mixin ScreenBase {
       }
 
       if (isExpBlock) {
-        
         widgetRows.add(ExpansionTile(
           controlAffinity: ListTileControlAffinity.leading,
           title: Text(
@@ -397,7 +407,6 @@ mixin ScreenBase {
             style: Styles()["textH2"],
           ),
           initiallyExpanded: blockType == ComponentBlockType.expanded,
-
           children: blockWidgets,
         ));
       } else {

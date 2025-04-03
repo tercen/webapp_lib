@@ -59,6 +59,10 @@ mixin class ComponentBase {
     return groupId;
   }
 
+  String getDescription(){
+    return description;
+  }
+
   void reset(){
     throw Exception("Reset not implemented. [$id, $groupId, $componentLabel]");
   }
