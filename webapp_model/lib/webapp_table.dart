@@ -2,8 +2,6 @@
 import 'dart:collection';
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
-import 'package:webapp_model/id_element.dart';
-import 'package:webapp_model/utils/key_utils.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
 
 
@@ -85,7 +83,7 @@ class WebappTable extends IterableBase<List<String>>{
     for (var row = 0; row < nRows; row++) {
 
       var rowHash =
-          KeyUtils.listToKey(columns.values.map((e) => e[row]).toList());
+          columns.values.map((e) => e[row]).toList().hashCode;
       if (keys.contains(rowHash)) {
         rows.add(columns.values.map((e) => e[row]).toList());
       }

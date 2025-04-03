@@ -1,4 +1,5 @@
 import 'package:webapp_components/abstract/component.dart';
+import 'package:webapp_components/components/boolean_component.dart';
 import 'package:webapp_components/components/input_text_component.dart';
 import 'package:webapp_components/components/multi_check_component.dart';
 import 'package:webapp_components/components/select_dropdown.dart';
@@ -18,7 +19,7 @@ class SettingComponentGenerator {
             case "string":
               return createTextNumericComponent(setting, screenName);
             case "boolean":
-              break;
+              return createBooleanComponent(setting, screenName);
             case "ListSingle":
               return createSingleListComponent(setting, screenName);
             case "ListMultiple":
@@ -53,6 +54,7 @@ class SettingComponentGenerator {
               (comp as ComponentBase).getMeta("setting.name")!.value;
           var stepName = (comp as ComponentBase).getMeta("step.name")!.value;
           var stepId = (comp as ComponentBase).getMeta("step.id")!.value;
+
 
           var include = true;
           for (var filter in filters) {
@@ -106,8 +108,24 @@ class SettingComponentGenerator {
     return comp;
   }
 
+  Component createBooleanComponent(
+      WorkflowSetting setting, String groupId) {
+    var comp =
+        BooleanComponent(createComponentKey(setting), groupId, setting.name);
+    
+    comp.setComponentValue( bool.parse( setting.value) );
+    comp.description = setting.description;
+    comp.addMeta("setting.name", setting.name);
+    comp.addMeta("screen.name", groupId);
+    comp.addMeta("step.name", setting.stepName);
+    comp.addMeta("step.id", setting.stepId);
+
+    return comp;
+  }
+
   Component createMultipleListComponent(
       WorkflowSetting setting, String groupId) {
+    print("Creating Multi check componetn")    ;
     var comp = MultiCheckComponent(
         createComponentKey(setting), groupId, setting.name,
         columns: 5);
