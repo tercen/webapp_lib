@@ -46,7 +46,7 @@ class WebappTable extends IterableBase<List<String>>{
 
   static WebappTable fromData( List<String> colNames, List<List<String>> rowData){
     var outTbl = WebappTable();
-    for( var colIdx = 0; colIdx < rowData.length; colIdx++ ){
+    for( var colIdx = 0; colIdx < colNames.length; colIdx++ ){
       outTbl.addColumn(colNames[colIdx], data: rowData.map((row) => row[colIdx]).toList());
     }
     return outTbl;
