@@ -41,7 +41,7 @@ class WebappTable extends IterableBase<List<String>>{
   }
 
   int getColumnIndex(String column){
-    return column.indexOf(column);
+    return colNames.indexOf(column);
   }
 
   static WebappTable fromData( List<String> colNames, List<List<String>> rowData){
