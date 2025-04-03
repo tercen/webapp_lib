@@ -68,22 +68,22 @@ mixin ScreenBase {
   }
 
   void addHorizontalBar(String blockId,
-      {Component? parent, double thickness = 2}) {
-    // var horizBar = HorizontalBarComponent(thickness: thickness);
-    // if (parent != null) {
-    //   horizBar.addParent(parent);
-    // }
+      {Component? parent, double thickness = 1.5}) {
+    var horizBar = HorizontalBarComponent(thickness: thickness);
+    if (parent != null) {
+      horizBar.addParent(parent);
+    }
 
-    // addComponent(blockId, horizBar);
+    addComponent(blockId, horizBar);
   }
 
   void addHeading( String blockId, String text, {Component? parent} ){
-    // var headingComp = LabelComponent(text);
-    // if( parent != null ){
-    //   headingComp.addParent(parent);
-    // }
+    var headingComp = LabelComponent(text);
+    if( parent != null ){
+      headingComp.addParent(parent);
+    }
 
-    // addComponent(blockId, headingComp);
+    addComponent(blockId, headingComp);
   }
 
   void updateModel() {
