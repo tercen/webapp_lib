@@ -1,51 +1,39 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-
-// import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:uuid/uuid.dart';
 
 import 'package:webapp_components/abstract/serializable_component.dart';
+import 'package:webapp_components/components/fetch_component.dart';
 import 'package:webapp_components/definitions/component.dart';
-import 'package:webapp_components/definitions/functions.dart';
+
 import 'package:webapp_components/extra/infobox.dart';
 
-import 'package:webapp_components/mixins/component_base.dart';
-import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/mixins/infobox_component.dart';
-import 'package:webapp_components/mixins/state_component.dart';
-import 'package:webapp_components/widgets/wait_indicator.dart';
-import 'package:webapp_model/utils/key_utils.dart';
+
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
 
-class MultiSelectTableComponent
-    with
-        ChangeNotifier,
-        ComponentBase,
-        ComponentCache,
-        ComponentInfoBox,
-        StateComponent
+class MultiSelectTableComponent extends FetchComponent
+    with ComponentInfoBox
     implements SerializableComponent {
-  final List<int> selected = [];
+  final List<String> selected = [];
 
-  final DataFetchCallback dataFetchCallback;
   final List<String>? excludeColumns;
-  final List<String>? hideColumns;
+  List<String>? hideColumns;
   List<String> colNames = [];
   final String valueSeparator = "|@|";
 
   String sortingCol = "";
   String sortDirection = "";
   bool saveState;
-  bool isInit = false;
-  int currentRowKey = 0;
 
-  //Variables useful for cosmetic behavior
+  String currentRowKey = "";
   int currentRow = -1;
-  WebappTable dataTable = WebappTable();
 
-  MultiSelectTableComponent(id, groupId, componentLabel, this.dataFetchCallback,
+  MultiSelectTableComponent(
+      id, groupId, componentLabel, super.dataFetchCallback,
       {this.excludeColumns,
       this.saveState = true,
       this.hideColumns,
@@ -56,6 +44,20 @@ class MultiSelectTableComponent
     super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
     useCache = cache;
+  }
+
+  @override
+  WebappTable postLoad(WebappTable table) {
+    var idCol = List<int>.generate(table.nRows, (i) => i)
+        .map((row) => const Uuid().v4())
+        .toList();
+    table.addColumn(".key", data: idCol);
+    if (hideColumns == null) {
+      hideColumns = [".key"];
+    } else {
+      hideColumns!.add(".key");
+    }
+    return table;
   }
 
   void rotateSortingDirection() {
@@ -146,17 +148,18 @@ class MultiSelectTableComponent
     return excludeColumns == null || !excludeColumns!.contains(colName);
   }
 
-  void setSelectionRow(List<String> selectionValues) {
-    currentRowKey = KeyUtils.listToKey(selectionValues);
+  void setSelectionRow(String rowKey) {
+    currentRowKey = rowKey;
   }
 
-  Widget wrapSelectable(Widget contentWdg, List<String> selectionValues) {
+  Widget wrapSelectable(
+      Widget contentWdg, List<String> selectionValues, String rowKey) {
     return InkWell(
       onHover: (value) {
         if (!value) {
-          currentRowKey = -1;
+          currentRowKey = "";
         } else {
-          setSelectionRow(selectionValues);
+          setSelectionRow(rowKey);
         }
 
         uiUpdate.value = Random().nextInt(1 << 32 - 1);
@@ -164,11 +167,10 @@ class MultiSelectTableComponent
         // notifyListeners();
       },
       onTap: () {
-        var clickedEl = KeyUtils.listToKey(selectionValues);
-        if (isSelected(clickedEl)) {
-          deselect(clickedEl);
+        if (isSelected(rowKey)) {
+          deselect(rowKey);
         } else {
-          select(clickedEl);
+          select(rowKey);
         }
         notifyListeners();
       },
@@ -176,22 +178,23 @@ class MultiSelectTableComponent
     );
   }
 
-  void select(int el) {
-    selected.add(el);
+  void select(String rowKey) {
+    selected.add(rowKey);
   }
 
-  void deselect(int el) {
-    selected.remove(el);
+  void deselect(String rowKey) {
+    selected.remove(rowKey);
   }
 
-  bool isSelected(int rowKey) {
+  bool isSelected(String rowKey) {
     // print("Checking selection: $selected  vs. {$rowHash} ]");
     return selected.any((e) => e == rowKey);
   }
 
-  TableRow createTableRow(BuildContext context, List<String> rowEls,
+  TableRow createTableRow(
+      BuildContext context, List<String> rowEls, String rowKey,
       {int rowIndex = -1}) {
-    Widget selectedWidget = isSelected(KeyUtils.listToKey(rowEls))
+    Widget selectedWidget = isSelected(rowKey)
         ? const SizedBox(
             width: 30,
             height: 30,
@@ -201,11 +204,11 @@ class MultiSelectTableComponent
             width: 30,
             height: 30,
           );
-    selectedWidget = wrapSelectable(selectedWidget, rowEls);
+    selectedWidget = wrapSelectable(selectedWidget, rowEls, rowKey);
 
     var rowDecoration = BoxDecoration(color: Styles()["white"]);
     if (rowIndex > -1) {
-      if (KeyUtils.listToKey(rowEls) == currentRowKey) {
+      if (rowKey == currentRowKey) {
         rowDecoration = BoxDecoration(color: Styles()["hoverBg"]);
       } else {
         rowDecoration = rowIndex % 2 == 0
@@ -232,7 +235,8 @@ class MultiSelectTableComponent
                         rowEls[ci],
                         style: Styles()["text"],
                       ))),
-              rowEls),
+              rowEls,
+              rowKey),
         ));
       }
     }
@@ -244,8 +248,10 @@ class MultiSelectTableComponent
     return row;
   }
 
-  Widget buildTable(WebappTable table, BuildContext context) {
-    dataTable = table;
+  @override
+  Widget createWidget(BuildContext context) {
+    // dataTable = table;
+    var table = dataTable;
     var nRows = table.nRows;
 
     colNames = table.colNames
@@ -270,12 +276,13 @@ class MultiSelectTableComponent
 
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
+      var key = table.columns[".key"]![ri];
       var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
-      rows.add(createTableRow(context, rowEls, rowIndex: si));
+      rows.add(createTableRow(context, rowEls, key, rowIndex: si));
     }
 
     Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
-        ? const {0: FixedColumnWidth(50), 1: const FixedColumnWidth(10)}
+        ? const {0: FixedColumnWidth(50), 1: FixedColumnWidth(10)}
         : {0: const FixedColumnWidth(50), 1: const FixedColumnWidth(50)};
 
     var tableWidget = Table(
@@ -286,49 +293,42 @@ class MultiSelectTableComponent
     return tableWidget;
   }
 
-
-
-  @override
-  Future<void> init() async {
-    await super.init();
-    await loadTable();
-
-    notifyListeners();
-  }
-
-  Future<bool> loadTable() async {
-    if (!isInit) {
-      busy();
-      var cacheKey = getKey();
-      if (hasCachedValue(cacheKey)) {
-        dataTable = getCachedValue(cacheKey);
-      } else {
-        dataTable = await dataFetchCallback();
-        addToCache(cacheKey, dataTable);
-      }
-      idle();
-    }
-    return true;
-  }
+  // @override
+  // Future<void> init() async {
+  //   if (!isInit) {
+  //     super.init();
+  //   }
+  // }
+  // Future<bool> loadTable() async {
+  //   if (!isInit) {
+  //     busy();
+  //     var cacheKey = getCacheKey();
+  //     if (hasCachedValue(cacheKey)) {
+  //       dataTable = getCachedValue(cacheKey);
+  //     } else {
+  //       dataTable = await dataFetchCallback();
+  //       addToCache(cacheKey, dataTable);
+  //     }
+  //     idle();
+  //   }
+  //   return true;
+  // }
 
   @override
   Widget buildContent(BuildContext context) {
-    if (isBusy) {
-      return SizedBox(
-          height: 100,
-          child: TercenWaitIndicator()
-              .waitingMessage(suffixMsg: "  Loading Table"));
-    } else {
-      if (dataTable.nRows == 0) {
-        return Container();
-      } else {
-        return buildTable(dataTable, context);
-      }
-    }
-  }
-
-  WebappTable getValueAsTable() {
-    return dataTable.selectByHash(selected); // dataTable.selectByKey(selected);
+    return build(context);
+    // if (isBusy) {
+    //   return SizedBox(
+    //       height: 100,
+    //       child: TercenWaitIndicator()
+    //           .waitingMessage(suffixMsg: "  Loading Table"));
+    // } else {
+    //   if (dataTable.nRows == 0) {
+    //     return Container();
+    //   } else {
+    //     return buildTable(dataTable, context);
+    //   }
+    // }
   }
 
   @override
@@ -343,18 +343,23 @@ class MultiSelectTableComponent
 
   @override
   void reset() {
+    super.reset();
     selected.clear();
-    dataTable = WebappTable();
   }
 
   @override
   getComponentValue() {
-    return dataTable.selectByHash(selected);
+    var idx = dataTable.getColumnIndex(".key");
+    var rowData =
+        dataTable.where((row) => selected.contains(row[idx])).toList();
+    var outTbl = WebappTable.fromData(dataTable.colNames, rowData);
+    outTbl.removeColumn(".key");
+    return outTbl;
   }
 
   @override
   String getStateValue() {
-    return selected.map((e) => e.toString()).join("|");
+    return selected.join("|");
   }
 
   @override
@@ -368,7 +373,7 @@ class MultiSelectTableComponent
     if (value != "") {
       selected.clear();
 
-      selected.addAll(value.split("|").map((e) => int.parse(e)));
+      selected.addAll(value.split("|"));
     }
   }
 

@@ -1,52 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
-
+import 'package:webapp_components/components/fetch_component.dart';
 
 import 'package:webapp_components/definitions/component.dart';
-import 'package:webapp_components/definitions/functions.dart';
+
 import 'package:webapp_components/definitions/list_action.dart';
 import 'package:webapp_components/extra/infobox.dart';
 
-import 'package:webapp_components/mixins/state_component.dart';
-import 'package:webapp_components/mixins/component_base.dart';
-import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/mixins/infobox_component.dart';
-import 'package:webapp_components/widgets/wait_indicator.dart';
-import 'package:webapp_model/utils/key_utils.dart';
+
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
+
+import 'package:uuid/uuid.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
 
-
-class ActionTableComponent
-    with ChangeNotifier, ComponentBase, ComponentCache, ComponentInfoBox, StateComponent
+class ActionTableComponent extends FetchComponent
+    with ComponentInfoBox
     implements Component {
   final List<int> selected = [];
 
-  final DataFetchCallback dataFetchCallback;
   final List<String>? excludeColumns;
-  final List<String>? hideColumns;
+  List<String>? hideColumns;
   List<String> colNames = [];
   final List<ListAction> actions;
-
 
   final bool useCache;
   String sortingCol = "";
   String sortDirection = "";
 
-  bool isInit = false;
-  int currentRowKey = 0;
-
-  //Variables useful for cosmetic behavior
+  String currentRowKey = "";
   int currentRow = -1;
-  WebappTable dataTable = WebappTable();
+  bool shouldSave;
 
   ActionTableComponent(
-      id, groupId, componentLabel, this.dataFetchCallback, this.actions,
+      id, groupId, componentLabel, super.dataFetchCallback, this.actions,
       {this.excludeColumns,
       this.hideColumns,
       InfoBoxBuilder? infoBoxBuilder,
-      this.useCache = true}) {
+      this.useCache = true,
+      this.shouldSave = false}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -118,12 +111,26 @@ class ActionTableComponent
     return hideColumns == null || !hideColumns!.contains(colName);
   }
 
+  @override
+  WebappTable postLoad(WebappTable table) {
+    var idCol = List<int>.generate(table.nRows, (i) => i)
+        .map((row) => const Uuid().v4())
+        .toList();
+    table.addColumn(".key", data: idCol);
+    if (hideColumns == null) {
+      hideColumns = [".key"];
+    } else {
+      hideColumns!.add(".key");
+    }
+    return table;
+  }
+
   bool shouldIncludeColumn(String colName) {
     return excludeColumns == null || !excludeColumns!.contains(colName);
   }
 
-  void setSelectionRow(List<String> selectionValues) {
-    currentRowKey = KeyUtils.listToKey(selectionValues);
+  void setSelectionRow(String rowKey) {
+    currentRowKey = rowKey;
   }
 
   TableRow createTableHeader(List<String> colNames) {
@@ -143,12 +150,12 @@ class ActionTableComponent
     return row;
   }
 
-  TableRow createTableRow(
-      BuildContext context, List<String> rowEls, List<ListAction> rowActions,
+  TableRow createTableRow(BuildContext context, List<String> rowEls,  String rowKey,
+      List<ListAction> rowActions,
       {int rowIndex = -1}) {
     var rowDecoration = BoxDecoration(color: Styles()["white"]);
     if (rowIndex > -1) {
-      if (KeyUtils.listToKey(rowEls) == currentRowKey) {
+      if (rowKey == currentRowKey) {
         rowDecoration = BoxDecoration(color: Styles()["hoverBg"]);
       } else {
         rowDecoration = rowIndex % 2 == 0
@@ -198,8 +205,9 @@ class ActionTableComponent
     return row;
   }
 
-  Widget buildTable(WebappTable table, BuildContext context) {
-    dataTable = table;
+  @override
+  Widget createWidget(BuildContext context) {
+    var table = dataTable;
     var nRows = table.nRows;
 
     colNames = table.colNames
@@ -221,8 +229,9 @@ class ActionTableComponent
 
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
+      var key = table.columns[".key"]![ri];
       var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
-      rows.add(createTableRow(context, rowEls, actions, rowIndex: si));
+      rows.add(createTableRow(context, rowEls, key, actions, rowIndex: si));
     }
 
     Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
@@ -237,54 +246,47 @@ class ActionTableComponent
     return tableWidget;
   }
 
-  String getCacheKey() {
-    var key = "${getId()}${getGroupId()}";
+  // @override
+  // Future<void> init() async {
+  //   await super.init();
+  //   await loadTable();
 
-    return key;
-  }
+  //   // notifyListeners();
+  // }
 
-  @override
-  Future<void> init() async {
-    await super.init();
-    await loadTable();
+  // Future<bool> loadTable() async {
+  //   if (!isInit) {
+  //     busy();
 
-    // notifyListeners();
-  }
-
-
-
-  Future<bool> loadTable() async {
-    if (!isInit) {
-      busy();
-
-      var cacheKey = getCacheKey();
-      if (hasCachedValue(cacheKey) && useCache) {
-        dataTable = getCachedValue(cacheKey);
-      } else {
-        dataTable = await dataFetchCallback();
-        if (useCache) {
-          addToCache(cacheKey, dataTable);
-        }
-      }
-      idle();
-    }
-    return true;
-  }
+  //     var cacheKey = getCacheKey();
+  //     if (hasCachedValue(cacheKey) && useCache) {
+  //       dataTable = getCachedValue(cacheKey);
+  //     } else {
+  //       dataTable = await dataFetchCallback();
+  //       if (useCache) {
+  //         addToCache(cacheKey, dataTable);
+  //       }
+  //     }
+  //     idle();
+  //   }
+  //   return true;
+  // }
 
   @override
   Widget buildContent(BuildContext context) {
-    if (dataTable.nRows == 0) {
-      if (isIdle) {
-        return Container();
-      } else {
-        return SizedBox(
-            height: 100,
-            child: TercenWaitIndicator()
-                .waitingMessage(suffixMsg: "  Loading Table"));
-      }
-    } else {
-      return buildTable(dataTable, context);
-    }
+    return build(context);
+    // if (dataTable.nRows == 0) {
+    //   if (isIdle) {
+    //     return Container();
+    //   } else {
+    //     return SizedBox(
+    //         height: 100,
+    //         child: TercenWaitIndicator()
+    //             .waitingMessage(suffixMsg: "  Loading Table"));
+    //   }
+    // } else {
+    //   return buildTable(dataTable, context);
+    // }
   }
 
   @override
@@ -299,9 +301,8 @@ class ActionTableComponent
 
   @override
   void reset() {
-    isInit = false;
+    super.reset();
     selected.clear();
-    dataTable = WebappTable();
   }
 
   @override

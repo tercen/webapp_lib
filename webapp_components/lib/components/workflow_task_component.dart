@@ -25,7 +25,8 @@ class WorkflowTaskComponent extends ActionTableComponent {
       {super.excludeColumns, super.hideColumns});
 
   @override
-  Widget buildTable(WebappTable table, BuildContext context) {
+  Widget createWidget(BuildContext context) {
+    var table = dataTable;
     List<Widget> tableRows = [];
 
     for (var workflowTaskId in workflowTasks) {
@@ -96,9 +97,10 @@ class WorkflowTaskComponent extends ActionTableComponent {
 
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
+      var key = table.columns[".key"]![ri];
       var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
       // await
-      rows.add(createTableRow(context, rowEls, actions, rowIndex: si));
+      rows.add(createTableRow(context, rowEls, key, actions, rowIndex: si));
     }
 
     Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
@@ -135,7 +137,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
   Future<void> init() async {
     await super.init();
     await loadTable();
-    await loadTaskTable();
+    // await loadTaskTable();
 
     notifyListeners();
   }
@@ -213,19 +215,22 @@ class WorkflowTaskComponent extends ActionTableComponent {
   @override
   Future<bool> loadTable() async {
     if (!isInit) {
-      print("BUILDING TABLE");
+
       runningTasks.clear();
       var factory = tercen.ServiceFactory();
 
       initTable = await dataFetchCallback();
 
-      print("Data table loaded");
       workflowTasks = initTable["Id"].where((e) => e != "").toList();
       await loadTaskTable();
       runningTasks.addAll(workflowTasks);
+      //Fetch run computation tasks as well here....
+      print("loading tasks");
       var tasks = await factory.taskService.list(workflowTasks);
 
+      print((tasks.first as sci.RunWorkflowTask).toJson());
       for (var task in tasks) {
+        runningTasks.add(task.id);
         processTaskEvent(task.channelId);
       }
     }

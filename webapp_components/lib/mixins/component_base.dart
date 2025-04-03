@@ -2,11 +2,8 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
-import 'package:webapp_components/abstract/multi_value_component.dart';
-import 'package:webapp_components/abstract/single_value_component.dart';
 import 'package:webapp_model/id_element.dart';
 import 'package:sci_tercen_client/sci_client.dart';
-import 'package:webapp_model/utils/key_utils.dart';
 
 
 mixin class ComponentBase {
@@ -26,7 +23,7 @@ mixin class ComponentBase {
   String getKey(){
     var key = "${getId()}_${getGroupId()}";
     for( var comp in ancestors ){
-      key = "$key${ KeyUtils.valueToKey( comp.getComponentValue().toString() ).toString() }";
+      key = "$key${  comp.getComponentValue().hashCode.toString() }";
     }
 
     return key;

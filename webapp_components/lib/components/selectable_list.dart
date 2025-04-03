@@ -1,22 +1,17 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+
 import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/definitions/component.dart';
-import 'package:webapp_components/definitions/functions.dart';
-import 'package:webapp_components/mixins/async_manager.dart';
 
-import 'package:webapp_components/mixins/component_base.dart';
-import 'package:webapp_components/mixins/component_cache.dart';
+import 'package:webapp_components/components/fetch_component.dart';
+
 import 'package:webapp_components/mixins/infobox_component.dart';
-import 'package:webapp_components/mixins/state_component.dart';
-import 'package:webapp_components/widgets/wait_indicator.dart';
-import 'package:webapp_model/webapp_table.dart';
+
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
 
-class SelectableListComponent
-    with ChangeNotifier, ComponentBase, ComponentInfoBox, ComponentCache
+class SelectableListComponent extends FetchComponent
+    with ComponentInfoBox
     implements SerializableComponent {
   final bool sortByLabel;
   String selected = "";
@@ -26,9 +21,7 @@ class SelectableListComponent
   String? cacheKey;
   final bool shouldSave;
 
-  final DataFetchCallback dataFetchFunc;
-
-  SelectableListComponent(id, groupId, componentLabel, this.dataFetchFunc,
+  SelectableListComponent(id, groupId, componentLabel, super.dataFetchFunc,
       {infoBoxBuilder,
       String Function(String, {String id})? pathTransformCallback,
       this.sortByLabel = false,
@@ -49,43 +42,13 @@ class SelectableListComponent
     return name;
   }
 
-  Future<WebappTable> callCachedCallback(Map<String, dynamic> values) async {
-    if (cacheKey == null) {
-      return await dataFetchFunc();
-    } else {
-      if (hasCachedValue(selected)) {
-        return getCachedValue(selected) as WebappTable;
-      } else {
-        var cachedTable = await dataFetchFunc();
-        addToCache(selected, cachedTable);
-        return cachedTable;
-      }
-    }
+  @override
+  Widget buildContent(BuildContext context) {
+    return build(context);
   }
 
   @override
-  Widget buildContent(BuildContext context) {
-    var cacheKey = getKey();
-    if (hasCachedValue(cacheKey)) {
-      return createTable(context, getCachedValue(cacheKey));
-    } else {
-      return FutureBuilder(
-          future: callCachedCallback(getAncestorValues()) as Future<dynamic>?,
-          builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data != null) {
-              addToCache(cacheKey, snapshot.data);
-              return createTable(context, snapshot.data);
-            } else if (snapshot.hasError) {
-              throw Exception(snapshot.error);
-            } else {
-              return TercenWaitIndicator().waitingMessage(
-                  suffixMsg: "Loading Table..."); // Load message
-            }
-          });
-    }
-  }
-
-  Widget createTable(BuildContext context, WebappTable dataTable) {
+  Widget createWidget(BuildContext context) {
     List<Widget> tableRows = [];
     assert(dataTable.hasColumn("label"));
     assert(dataTable.hasColumn("id"));
@@ -132,16 +95,6 @@ class SelectableListComponent
           }
           notifyListeners();
         });
-    // return IconButton(
-    //     onPressed: () {
-    //       isSelected(id)
-    //           ? selected = ""
-    //           : selected = id;
-    //       notifyListeners();
-    //     },
-    //     icon: isSelected(id)
-    //         ? const Icon(Icons.check_box_outlined)
-    //         : const Icon(Icons.check_box_outline_blank));
   }
 
   Widget createRow(String id, String name, bool isEven, BuildContext context) {
@@ -186,6 +139,7 @@ class SelectableListComponent
   @override
   void reset() {
     selected = "";
+    super.reset();
   }
 
   @override

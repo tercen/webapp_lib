@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:webapp_components/components/multiselect_table_component.dart';
 
 
-import 'package:webapp_model/utils/key_utils.dart';
-
 
 class SingleSelectTableComponent extends MultiSelectTableComponent {
   SingleSelectTableComponent(
@@ -17,27 +15,26 @@ class SingleSelectTableComponent extends MultiSelectTableComponent {
       super.cache = true});
 
   @override
-  Widget wrapSelectable(Widget contentWdg, List<String> selectionValues) {
+  Widget wrapSelectable(Widget contentWdg, List<String> selectionValues, String rowKey) {
     return InkWell(
       onHover: (value) {
         if (!value) {
-          currentRowKey = -1;
+          currentRowKey = "";
         } else {
-          setSelectionRow(selectionValues);
+          setSelectionRow(rowKey);
         }
         uiUpdate.value = Random().nextInt(1 << 32 - 1);
 
         // notifyListeners();
       },
       onTap: () {
-        var clickedEl = KeyUtils.listToKey(selectionValues);
-        if (isSelected(clickedEl)) {
-          deselect(clickedEl);
+        if (isSelected(rowKey)) {
+          deselect(rowKey);
         } else {
           if (selected.isNotEmpty) {
             selected.clear();
           }
-          select(clickedEl);
+          select(rowKey);
         }
 
         notifyListeners();

@@ -158,13 +158,7 @@ class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implement
   }
 
 
-  String getCacheKey(){
-    var key = "${getId()}${getGroupId()}";
-    for( var a in ancestors ){
-      key = "$key${a.getComponentValue().toString()}";
-    }
-    return key;
-  }
+
 
   Widget waitingIndicator(){
     //153.5x125.5
@@ -184,8 +178,8 @@ class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implement
 
   @override
   Widget buildContent(BuildContext context) {
-    var cacheKey = getCacheKey();
-    print("Rebuilding with $cacheKey");
+    var cacheKey = getKey();
+
     if( hasCachedValue(cacheKey)){
       return createWidget(context, getCachedValue(cacheKey));
     }else{
