@@ -9,7 +9,9 @@ SettingsFilterExpr _$SettingsFilterExprFromJson(Map<String, dynamic> json) =>
       block: json['block'] as String?,
       stepId: json['stepId'] as String?,
       stepName: json['stepName'] as String?,
-      settingNames: json['settingNames'] as String?,
+      settingNames: (json['settingNames'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$SettingsFilterExprToJson(SettingsFilterExpr instance) =>

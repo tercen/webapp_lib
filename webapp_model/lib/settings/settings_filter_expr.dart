@@ -9,7 +9,7 @@ class SettingsFilterExpr {
   final String? block;
   final String? stepId;
   final String? stepName;
-  final String? settingNames;
+  final List<String>? settingNames;
 
   SettingsFilterExpr(
       {required this.screen, required this.type, this.block,  this.stepId, this.stepName, this.settingNames});
