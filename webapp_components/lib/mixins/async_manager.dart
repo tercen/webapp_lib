@@ -1,5 +1,6 @@
 import 'package:async/async.dart';
 import 'package:webapp_components/mixins/state_component.dart';
+import 'package:webapp_utils/functions/logger.dart';
 
 mixin AsyncManager on StateComponent {
   Map<String, CancelableOperation> operations = {};
@@ -10,7 +11,7 @@ mixin AsyncManager on StateComponent {
     }
 
     operations[id] = CancelableOperation.fromFuture(op,
-        onCancel: () => print("OP $id was cancelled"));
+        onCancel: () => Logger().log(level: Logger.FINER, message: "OP $id was cancelled")  );
   }
 
   Future<dynamic> waitResult(String id) async {
