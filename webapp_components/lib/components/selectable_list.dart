@@ -6,6 +6,7 @@ import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/components/fetch_component.dart';
 
 import 'package:webapp_components/mixins/infobox_component.dart';
+import 'package:webapp_components/widgets/widget_builder.dart';
 
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
@@ -75,30 +76,41 @@ class SelectableListComponent extends FetchComponent
     return selected != "" && selected.contains(id);
   }
 
-  Widget checkBox(String id, String name) {
-    return Checkbox(
-        value: isSelected(id),
-        side: WidgetStateBorderSide.resolveWith((states) => BorderSide(
-              color: Styles()["black"],
-              width: 1.5,
-            )),
-        checkColor: Styles()["black"],
-        fillColor:
-            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
-          return Color.fromARGB(255, 255, 255, 255);
-        }),
-        onChanged: (value) {
-          if (value == true) {
-            selected = id;
-          } else {
-            selected = "";
-          }
-          notifyListeners();
-        });
+  // Widget checkBox(String id, String name) {
+  //   return Checkbox(
+  //       value: isSelected(id),
+  //       side: WidgetStateBorderSide.resolveWith((states) => BorderSide(
+  //             color: Styles()["black"],
+  //             width: 1.5,
+  //           )),
+  //       checkColor: Styles()["black"],
+  //       fillColor:
+  //           WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+  //         return Color.fromARGB(255, 255, 255, 255);
+  //       }),
+  //       onChanged: (value) {
+  //         if (value == true) {
+  //           selected = id;
+  //         } else {
+  //           selected = "";
+  //         }
+  //         notifyListeners();
+  //       });
+  // }
+
+  Future<void> onClick(Map<String, dynamic> params, bool isSelected) async {
+    if (isSelected == true) {
+      selected = id;
+    } else {
+      selected = "";
+    }
+    notifyListeners();
   }
 
   Widget createRow(String id, String name, bool isEven, BuildContext context) {
-    var checkboxWidget = checkBox(id, name);
+    var checkboxWidget = CommonWidgets.checkbox(
+        isSelected(id), onClick, {"id": id, "name": name});
+    // checkBox(id, name);
 
     var rowWdg = Row(
       children: [
