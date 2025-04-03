@@ -23,6 +23,17 @@ class MultiCheckComponent extends MultiCheckComponentFetch{
   Future<WebappTable> optionLoadHolder() async {
     return WebappTable();
   }
+
+  @override
+  WebappTable postLoad(WebappTable table) {
+    //Does not clean options...
+    return super.postLoad(table);
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return createWidget(context);
+  }
   
   @override
   void setOptions(List<String> optList) {
@@ -36,6 +47,7 @@ class MultiCheckComponent extends MultiCheckComponentFetch{
       }
       selectAll = false;
     }
+
   }
 
 }
