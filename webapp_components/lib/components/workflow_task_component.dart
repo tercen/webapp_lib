@@ -135,6 +135,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
   Future<void> init() async {
     await super.init();
     await loadTable();
+    await loadTaskTable();
 
     notifyListeners();
   }
