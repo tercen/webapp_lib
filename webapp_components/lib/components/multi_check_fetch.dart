@@ -71,10 +71,11 @@ class MultiCheckComponentFetch
 
 
   void onCheckClicked(Map<String, dynamic> params , bool newCheckValue ){
+    print("OnCloick: $params $newCheckValue $selected");
     var name = params["name"]!;
     var onClick = params["onClick"];
 
-    newCheckValue ? select(name) : deselect(name);
+    newCheckValue == true ? select(name) : deselect(name);
 
     if (onClick != null) {
       onClick();

@@ -16,7 +16,7 @@ class BooleanComponent with ChangeNotifier, ComponentBase implements Serializabl
   }
 
   void onClick(Map<String, dynamic> params, bool newCheckValue ){
-    print("Boolean click: $params $newCheckValue");
+    
     selected = newCheckValue;
     notifyListeners();
   }
