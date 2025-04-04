@@ -70,12 +70,11 @@ class MultiCheckComponentFetch
   }
 
 
-  void onCheckClicked(Map<String, dynamic> params , bool isSelected ){
-    print("OnClick: $params $isSelected");
+  void onCheckClicked(Map<String, dynamic> params , bool newCheckValue ){
     var name = params["name"]!;
     var onClick = params["onClick"];
-    
-    isSelected ? deselect(name) : select(name);
+
+    newCheckValue ? select(name) : deselect(name);
 
     if (onClick != null) {
       onClick();
@@ -84,8 +83,8 @@ class MultiCheckComponentFetch
   }
 
   Widget checkBox(String name, bool isSelected, {Function? onClick}) {
-    bool isSelected = selected.contains(name);
-    var checkIcon = CommonWidgets.checkbox(isSelected, onCheckClicked, {"name":name, "onClick":onClick} );
+
+    var checkIcon = CommonWidgets.checkbox( isSelected, onCheckClicked, {"name":name, "onClick":onClick} );
 
     return Row(
       children: [
