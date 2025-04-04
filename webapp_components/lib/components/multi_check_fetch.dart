@@ -71,9 +71,12 @@ class MultiCheckComponentFetch
 
 
   void onCheckClicked(Map<String, dynamic> params , bool isSelected ){
+    print("OnClick: $params $isSelected");
     var name = params["name"]!;
     var onClick = params["onClick"];
+    
     isSelected ? deselect(name) : select(name);
+
     if (onClick != null) {
       onClick();
     }
