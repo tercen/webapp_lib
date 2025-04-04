@@ -221,8 +221,9 @@ class WorkflowTaskComponent extends ActionTableComponent {
       initTable = await dataFetchCallback();
 
       workflowTasks = initTable["Id"].where((e) => e != "").toList();
-      await loadTaskTable();
       runningTasks.addAll(workflowTasks);
+
+      await loadTaskTable();
 
       var tasks = await factory.taskService.list(workflowTasks);
 
