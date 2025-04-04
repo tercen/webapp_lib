@@ -98,7 +98,7 @@ class SelectableListComponent extends FetchComponent
   //       });
   // }
 
-  Future<void> onClick(Map<String, dynamic> params, bool isSelected) async {
+  void onClick(Map<String, dynamic> params, bool isSelected)  {
     if (isSelected == true) {
       selected = params["id"];
     } else {
