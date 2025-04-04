@@ -47,7 +47,7 @@ class CommonWidgets {
         }),
         value: isSelected,
         onChanged: (value) {
-          callback(paramMap, isSelected);
+          callback(paramMap, value ?? false);
         });
   }
 
