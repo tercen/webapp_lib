@@ -100,7 +100,7 @@ class SelectableListComponent extends FetchComponent
 
   Future<void> onClick(Map<String, dynamic> params, bool isSelected) async {
     if (isSelected == true) {
-      selected = id;
+      selected = params["id"];
     } else {
       selected = "";
     }
