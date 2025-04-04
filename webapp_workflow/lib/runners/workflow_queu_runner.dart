@@ -118,8 +118,8 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
       }
       
-    await factory.workflowService.update(workflow);
-    workflow = await factory.workflowService.get(workflow.id);
+    // await factory.workflowService.update(workflow);
+    // workflow = await factory.workflowService.get(workflow.id);
 
     for (var f in postRunCallbacks) {
       await f();

@@ -10,7 +10,9 @@ import 'package:webapp_utils/functions/list_utils.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_model/sci_model.dart' as sci;
+import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
+import 'package:async/async.dart';
 
 class WorkflowTaskComponent extends ActionTableComponent {
   List<String> runningTasks = [];
@@ -19,10 +21,16 @@ class WorkflowTaskComponent extends ActionTableComponent {
   WebappTable initTable = WebappTable();
 
   final List<ListAction> workflowActions;
+  List<CancelableOperation> futures = [];
 
   WorkflowTaskComponent(super.id, super.groupId, super.componentLabel,
       super.dataFetchCallback, super.actions, this.workflowActions,
       {super.excludeColumns, super.hideColumns});
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget createWidget(BuildContext context) {
@@ -229,7 +237,10 @@ class WorkflowTaskComponent extends ActionTableComponent {
 
       for (var task in tasks) {
         runningTasks.add(task.id);
-        processTaskEvent(task.channelId);
+        futures.add(CancelableOperation.fromFuture(
+            processTaskEvent(task.channelId),
+            onCancel: () => Logger().log(
+                level: Logger.FINER, message: "Process task was cancelled")));
       }
     }
     return true;
