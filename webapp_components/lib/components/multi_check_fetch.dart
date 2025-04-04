@@ -157,6 +157,10 @@ class MultiCheckComponentFetch
     return TableRow(children: rowWidgets);
   }
 
+  bool isSelected(String name){
+    return selected.contains(name);
+  }
+
   Widget buildCheckTable() {
     int nCols = options.length > columns ? columns : options.length;
     int nRows = (options.length / columns).ceil();
@@ -171,7 +175,7 @@ class MultiCheckComponentFetch
       List<Widget> rowWidgets = [];
       for (var ci = 0; ci < nCols; ci++) {
         if (idx < options.length) {
-          rowWidgets.add(checkBox(options[idx], true));
+          rowWidgets.add(checkBox(options[idx], isSelected(options[idx])));
           idx++;
         } else {
           rowWidgets.add(Container());
