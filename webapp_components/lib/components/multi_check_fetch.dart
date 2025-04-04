@@ -75,7 +75,12 @@ class MultiCheckComponentFetch
     var name = params["name"]!;
     var onClick = params["onClick"];
 
-    newCheckValue == true ? select(name) : deselect(name);
+    if( newCheckValue == true ){
+      select(name);
+    }else{
+      deselect(name);
+    }
+    
 
     if (onClick != null) {
       onClick();
