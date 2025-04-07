@@ -313,7 +313,7 @@ class WorkflowDataService with DataCache {
     List<String> contentTypeList = [];
 
     var factory = tercen.ServiceFactory();
-    //TODO Make a single API call to list by building the full id list
+
     List<Relation> rels = [];
     Map<String, List<String>> stepRelationMap = {};
     for (var stp in wkf.steps) {
@@ -329,6 +329,7 @@ class WorkflowDataService with DataCache {
 
     var schList =
         await factory.tableSchemaService.list(rels.map((e) => e.id).toList());
+
 
     for (var sch in schList) {
       var step = getRelationStep(wkf, stepRelationMap, sch.id);
@@ -376,9 +377,14 @@ class WorkflowDataService with DataCache {
               workflowNames.add(wkf.name);
               stepNames.add(step.get("name"));
               filenames.add(nameContent.key);
+              // var ct = tbl.columns[1].values[i];
+
+              contentTypeList.add(nameContent.value);
 
               var bStr = "";
+
               for (var i = 0; i < tbl.nRows; i++) {
+                
                 var tname = tbl.columns[0].values[i];
                 if (nameContent.key == tname) {
                   var newBStr = String.fromCharCodes(
@@ -388,7 +394,9 @@ class WorkflowDataService with DataCache {
               }
               bytes.add(bStr);
             }
+          
           }
+          
         } else {
           for (var i = 0; i < tbl.nRows; i++) {
             if (contentTypes.any((contentType) =>
@@ -419,6 +427,7 @@ class WorkflowDataService with DataCache {
         }
       }
     }
+
 
     var tbl = WebappTable()
       ..addColumn("workflowName", data: workflowNames)
