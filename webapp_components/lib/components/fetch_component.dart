@@ -28,8 +28,8 @@ class FetchComponent with
   Future<void> init() async {
     if (isActive() && !isInit) {
       super.init();
-      await loadTable();
-      isInit = true;
+      loadTable().then((onValue)=>isInit = true);
+      
     }
   }
 

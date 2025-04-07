@@ -20,7 +20,7 @@ class ListComponent
   final List<int> expandedRows = [];
 
   //ACTION Controls
-  bool isBusy = false; // Download can take a bit
+  
   final List<ExpansionTileController> expansionControllers = [];
   final TextEditingController filterController = TextEditingController();
   bool expandAll = false;
