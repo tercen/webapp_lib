@@ -79,19 +79,16 @@ class ImageListComponent extends ListComponent with ProgressDialog{
   Widget downloadActionWidget(BuildContext context) {
     return IconButton(
         onPressed: () async {
-          // openDialog(context);
-          // log("Preparing download. Please wait");
-          // isBusy = true;
-          // notifyListeners();
+          openDialog(context);
+          log("Preparing download. Please wait");
+
           var pdfDoc = pd.PdfDocument();
           for (var content in widgetExportContent) {
             pdfDoc = addEntryPage(pdfDoc, content);
           }
           await doDownload(pdfDoc);
-          // await Future.delayed(Duration(seconds: 3));
-          // isBusy = false;
-          // notifyListeners();
-          // closeLog();
+
+          closeLog();
         },
         icon: const Icon(Icons.picture_as_pdf));
   }
