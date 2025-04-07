@@ -26,7 +26,7 @@ class FetchComponent with
   }
 
   Future<void> init() async {
-    if (!isInit) {
+    if (isActive() && !isInit) {
       super.init();
       await loadTable();
       isInit = true;
