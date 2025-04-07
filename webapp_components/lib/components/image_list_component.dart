@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart' as pd;
 import 'package:webapp_components/components/list_component.dart';
 import 'package:webapp_model/webapp_table.dart';
+import 'package:webapp_ui_commons/mixin/progress_log.dart';
 
 class ExportPageContent {
   final String title;
@@ -17,12 +18,12 @@ class ExportPageContent {
   ExportPageContent(this.title, this.content, {this.contentType = "image"});
 }
 
-class ImageListComponent extends ListComponent {
+class ImageListComponent extends ListComponent with ProgressDialog{
   final List<dynamic> widgetExportContent = [];
 
   ImageListComponent(String super.id, String super.groupId,
       String super.componentLabel, super.dataFetchFunc,
-      {super.sortByLabel, super.collapsible});
+      {super.sortByLabel, super.collapsible, super.cache});
 
   Widget createImageListEntry(String title, Uint8List data) {
     return Image.memory(
@@ -62,6 +63,7 @@ class ImageListComponent extends ListComponent {
   }
 
   Future<void> doDownload(pd.PdfDocument pdfDoc) async {
+    
     List<int> saveBytes = List.from(await pdfDoc.save());
     pdfDoc.dispose();
     const mimetype = "application/octet-stream";
@@ -74,25 +76,28 @@ class ImageListComponent extends ListComponent {
       ..click();
   }
 
-  Widget downloadActionWidget() {
+  Widget downloadActionWidget(BuildContext context) {
     return IconButton(
         onPressed: () async {
-          isBusy = true;
-          notifyListeners();
+          openDialog(context);
+          log("Preparing download. Please wait");
+          // isBusy = true;
+          // notifyListeners();
           var pdfDoc = pd.PdfDocument();
           for (var content in widgetExportContent) {
             pdfDoc = addEntryPage(pdfDoc, content);
           }
           await doDownload(pdfDoc);
           // await Future.delayed(Duration(seconds: 3));
-          isBusy = false;
-          notifyListeners();
+          // isBusy = false;
+          // notifyListeners();
+          closeLog();
         },
         icon: const Icon(Icons.picture_as_pdf));
   }
 
   @override
-  Widget createToolbar() {
+  Widget createToolbar(BuildContext context) {
     var sep = const SizedBox(
       width: 15,
     );
@@ -102,7 +107,7 @@ class ImageListComponent extends ListComponent {
         sep,
         wrapActionWidget(collapseAllActionWidget()),
         sep,
-        wrapActionWidget(downloadActionWidget()),
+        wrapActionWidget(downloadActionWidget(context)),
         sep,
         wrapActionWidget(filterActionWidget(), width: 200),
       ],
@@ -110,22 +115,22 @@ class ImageListComponent extends ListComponent {
   }
 
   @override
-  Widget createWidget(BuildContext context, WebappTable table) {
+  Widget createWidget(BuildContext context) {
     widgetExportContent.clear();
     expansionControllers.clear();
 
-    String titleColName = table.colNames
+    String titleColName = dataTable.colNames
         .firstWhere((e) => e.contains("filename"), orElse: () => "");
     String dataColName =
-        table.colNames.firstWhere((e) => e.contains("data"), orElse: () => "");
+        dataTable.colNames.firstWhere((e) => e.contains("data"), orElse: () => "");
 
     List<Widget> wdgList = [];
 
-    for (var ri = 0; ri < table.nRows; ri++) {
-      var title = table.columns[titleColName]![ri];
+    for (var ri = 0; ri < dataTable.nRows; ri++) {
+      var title = dataTable.columns[titleColName]![ri];
       if (shouldIncludeEntry(title)) {
         var imgData =
-            Uint8List.fromList(table.columns[dataColName]![ri].codeUnits);
+            Uint8List.fromList(dataTable.columns[dataColName]![ri].codeUnits);
         Widget wdg = createImageListEntry(title, imgData);
 
         widgetExportContent.add(ExportPageContent(title, imgData));
@@ -139,7 +144,7 @@ class ImageListComponent extends ListComponent {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [createToolbar(), ...wdgList],
+      children: [createToolbar(context), ...wdgList],
     );
   }
 }
