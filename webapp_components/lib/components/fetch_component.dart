@@ -45,6 +45,7 @@ class FetchComponent with
   Future<bool> loadTable() async {
     if (!isInit) {
       busy();
+      notifyListeners();
       var cacheKey = getKey();
       if (hasCachedValue(cacheKey)) {
         dataTable = getCachedValue(cacheKey);
@@ -58,6 +59,7 @@ class FetchComponent with
         addToCache(cacheKey, dataTable);
       }
       idle();
+      notifyListeners();
     }
     return true;
   }
