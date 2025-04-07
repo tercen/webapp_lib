@@ -221,6 +221,10 @@ class MultiCheckComponentFetch
   @override
   void reset() {
     selected.clear();
+    isInit = false;
+    if( isActive() ){
+      init();
+    }
   }
 
   @override
