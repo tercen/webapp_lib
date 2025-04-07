@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:webapp_components/components/fetch_component.dart';
 import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/definitions/component.dart';
+import 'package:webapp_components/extra/infobox.dart';
 
 import 'package:webapp_components/mixins/infobox_component.dart';
 import 'package:webapp_model/webapp_table.dart';
@@ -71,11 +72,14 @@ class HierarchySelectableListComponent extends FetchComponent
       {cache = true,
       this.selectionBehavior = SelectionBehavior.none,
       this.columnHierarchy = const [],
+      InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
+    super.infoBoxBuilder = infoBoxBuilder;
     useCache = cache;
+
 
     maxLevel = columnHierarchy.length - 1;
 
