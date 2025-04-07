@@ -243,7 +243,7 @@ class WorkflowDataService with DataCache {
     workflowSettings = workflowSettings.toSet().toList();
   }
 
-  bool _isFileSchema(Schema sch) {
+  bool isFileSchema(Schema sch) {
     for (var col in sch.columns) {
       if (col.name.contains("mimetype")) {
         return true;
@@ -331,8 +331,8 @@ class WorkflowDataService with DataCache {
         await factory.tableSchemaService.list(rels.map((e) => e.id).toList());
 
     for (var sch in schList) {
-      var step = _getRelationStep(wkf, stepRelationMap, sch.id);
-      if (_isFileSchema(sch)) {
+      var step = getRelationStep(wkf, stepRelationMap, sch.id);
+      if (isFileSchema(sch)) {
         var mimetypeIdx =
             sch.columns.indexWhere((c) => c.name.contains("mimetype"));
 
@@ -431,7 +431,7 @@ class WorkflowDataService with DataCache {
     return tbl;
   }
 
-  Step _getRelationStep(
+  Step getRelationStep(
       Workflow wkf, Map<String, List<String>> stepRelationMap, String schId) {
     String stepId = "";
     var entries =
