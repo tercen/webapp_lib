@@ -79,6 +79,7 @@ class ImageListComponent extends ListComponent with ProgressDialog{
   Widget downloadActionWidget(BuildContext context) {
     return IconButton(
         onPressed: () async {
+          print("Running this");
           openDialog(context);
           log("Preparing download. Please wait");
           // isBusy = true;
