@@ -278,6 +278,19 @@ class WorkflowDataService with DataCache {
     return l;
   }
 
+    Future<WebappTable> fetchWorkflowImagesByWorkflowId(String workflowId,
+      {List<String> contentTypes = const ["image"],
+      List<String> excludedFiles = const [],
+      List<String> nameFilter = const [],
+      List<String> includeStepId = const [],
+      bool force = false}) async {
+        var factory = tercen.ServiceFactory();
+      var wkf = await factory.workflowService.get(workflowId);    
+        return fetchWorkflowImages(wkf, contentTypes: contentTypes, excludedFiles: excludedFiles, nameFilter: nameFilter, includeStepId: includeStepId, force: force);
+      }
+      
+
+
   Future<WebappTable> fetchWorkflowImages(Workflow wkf,
       {List<String> contentTypes = const ["image"],
       List<String> excludedFiles = const [],
@@ -630,6 +643,13 @@ class WorkflowDataService with DataCache {
     }
   }
 
+
+  Future<WebappTable> fetchWorkflowImagesSummary( String workflowId ) async {
+    var factory = tercen.ServiceFactory();
+    var wkf = await factory.workflowService.get(workflowId);    
+
+    return fetchWorkflowImages(wkf, contentTypes: ["image", "text"]);
+  }
 
   Future<void> updateReadme( 
        String workflowId, String text) async {
