@@ -10,7 +10,7 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 typedef PostRunIdCallback = Future<void> Function(String workflowId);
 
 class WorkflowQueuRunner extends WorkflowRunner {
-  WorkflowQueuRunner(super.projectId, super.teamName, super.template);
+  WorkflowQueuRunner(super.projectId, super.teamName, super.template, {super.timestampType = TimestampType.short });
   final List<PostRunIdCallback> postRunIdCallbacks = [];
 
   void addIdPostRun(PostRunIdCallback callback) {

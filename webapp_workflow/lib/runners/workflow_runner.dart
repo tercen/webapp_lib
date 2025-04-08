@@ -4,26 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:webapp_ui_commons/mixin/progress_log.dart';
 
-// import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
-// import 'package:kumo_analysis_app/model/model_holder.dart';
-// import 'package:kumo_analysis_app/model/data/settings.dart';
-
-// import 'package:kumo_analysis_app/util/mixins/progress_log.dart';
-// import 'package:kumo_analysis_app/util/util.dart';
-// import 'package:kumo_analysis_app/webapp.dart';
-// import 'package:kumo_analysis_app/webapp_data.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:tson/tson.dart' as tson;
 // import 'package:sci_base/value.dart';
 import 'package:uuid/uuid.dart';
+import 'package:webapp_utils/functions/formatter_utils.dart';
 import 'package:webapp_utils/functions/string_utils.dart';
 import 'package:webapp_utils/model/step_setting.dart';
 
-enum RunStatus { init, running, finished, fail }
+
+enum TimestampType { full, short }
 
 typedef PostRunCallback = Future<void> Function();
+
+
 
 class WorkflowRunner with ProgressDialog {
   StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
@@ -35,7 +30,7 @@ class WorkflowRunner with ProgressDialog {
 
   final List<String> initStepIds = [];
   final List<sci.Pair> workflowMeta = [];
-  
+
   final List<sci.Pair> folderMeta = [];
   final Map<String, sci.NamedFilter> filterMap = {};
   final Map<String, sci.Relation> tableMap = {};
@@ -48,6 +43,7 @@ class WorkflowRunner with ProgressDialog {
   final List<StepSetting> settings = [];
   final List<PostRunCallback> postRunCallbacks = [];
 
+
   // final Value status = ValueHolder<RunStatus>(RunStatus.init);
 
   String folderSuffix = "";
@@ -57,33 +53,41 @@ class WorkflowRunner with ProgressDialog {
   String workflowRename = "";
   String workflowIdentifier = "";
   String workflowSuffix = "";
+
+
   String stepProgressMessage = "";
 
   var addTimestamp = true;
+  var addTimestampToFolder = true;
+
   var isInit = false;
   var workflow = sci.Workflow();
 
   final List<String> stepsToRemove = [];
-
   final List<sci.Pair> settingsByName = [];
+  late final String timestamp;
 
-  WorkflowRunner(this.projectId, this.teamName, this.template) {
-    // if( templateKey != ""){
-    //   template = modelLayer.getWorkflow(key)  .installedWorkflows[templateKey]!;
-    // }else{
-    //   template = sci.Workflow();
-    // }
+  WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.short }) {
+    if( timestampType == TimestampType.short){
+      timestamp = DateFormat("yMd").format(DateTime.now());
+    }else{
+      timestamp = DateFormat("yMd_Hm").format(DateTime.now());
+    }
   }
 
-  void addWorkflowMeta(String key, String value){
-    workflowMeta.add( sci.Pair.from(key, value ) );
+  void addWorkflowMeta(String key, String value) {
+    workflowMeta.add(sci.Pair.from(key, value));
   }
 
-  void addFolderMeta(String key, String value){
-    folderMeta.add( sci.Pair.from(key, value ) );
+  void addFolderMeta(String key, String value) {
+    folderMeta.add(sci.Pair.from(key, value));
   }
 
-  void addTimestampToName(bool val){
+  void addTimestampToFolderName(bool val) {
+    addTimestampToFolder = val;
+  }
+
+  void addTimestampToName(bool val) {
     addTimestamp = val;
   }
 
@@ -406,7 +410,7 @@ class WorkflowRunner with ProgressDialog {
     folder.projectId = projectId;
     folder.folderId = parentFolderId;
 
-    for(var meta in folderMeta ){
+    for (var meta in folderMeta) {
       folder.addMeta(meta.key, meta.value);
     }
 
@@ -481,13 +485,21 @@ class WorkflowRunner with ProgressDialog {
     folderName = name;
   }
 
+  String getFolderName(){
+    if( folderName != null && folderName != ""){
+      return folderName!;
+    }
+    
+    var timeStr = addTimestampToFolder ? timestamp : "";
+    return "${folderPrefix}${timeStr}${folderSuffix}";
+  }
+
   Future<void> setupRun(BuildContext context) async {
     if (!isInit) {
       if (template.id == "") {
         throw Exception("Workflow not set in WorkflowRunner.");
       }
 
-      // status.value = RunStatus.running;
       var factory = tercen.ServiceFactory();
 
       var runTitle = getWorkflowName(template);
@@ -511,7 +523,7 @@ class WorkflowRunner with ProgressDialog {
         workflow = removeStepFromWorkflow(stepToRemove, workflow);
       }
 
-      for( var meta in workflowMeta ){
+      for (var meta in workflowMeta) {
         workflow.addMeta(meta.key, meta.value);
       }
 
@@ -541,12 +553,6 @@ class WorkflowRunner with ProgressDialog {
           tmpStp.parentDataStepId = multiDsMap[stp.id]!;
         }
 
-        // if (filterMap.containsKey(stp.id)) {
-
-        // dataStp.model.filters.namedFilters.add(filterMap[stp.id]!);
-        // dataStp.model.filters = filterMap[stp.id]!;
-        // }
-
         if (tableMap.containsKey(stp.id)) {
           sci.TableStep tmpStp = stp as sci.TableStep;
           tmpStp.model.relation = tableMap[stp.id]!;
@@ -569,7 +575,7 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       if (folderId == null) {
         sci.FolderDocument folder =
-            await createFolder(projectId, teamName, folderName: folderName);
+            await createFolder(projectId, teamName, folderName: getFolderName());
         workflow.folderId = folder.id;
       } else {
         workflow.folderId = folderId!;
@@ -622,11 +628,10 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
-    workflow = await runWorkflowTask(workflow, runTitle:runTitle, stepName: stpName);
+    workflow =
+        await runWorkflowTask(workflow, runTitle: runTitle, stepName: stpName);
 
-
-    log("Running $stpName\n\n \nRunning final updates",
-        dialogTitle: runTitle);
+    log("Running $stpName\n\n \nRunning final updates", dialogTitle: runTitle);
 
     for (var f in postRunCallbacks) {
       await f();
@@ -717,12 +722,11 @@ class WorkflowRunner with ProgressDialog {
     // var doneWorkflow = await factory.workflowService.get(workflow.id);
 
     for (var stp in workflow.steps) {
-      if( stp.state.taskState is! sci.InitState){
+      if (stp.state.taskState is! sci.InitState) {
         stp.state.taskState.throwIfNotDone();
       }
-      
     }
-    
+
     return workflow;
   }
 
@@ -735,7 +739,6 @@ class WorkflowRunner with ProgressDialog {
     // Task preparation and running
     //-----------------------------------------
     workflow = await runWorkflowTask(workflow);
-
 
     log("$stepProgressMessage\n\n \nRunning final updates",
         dialogTitle: runTitle);
