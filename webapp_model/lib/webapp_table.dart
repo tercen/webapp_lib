@@ -50,7 +50,7 @@ class WebappTable extends IterableBase<List<String>>{
     return outTbl;
   }
 
-  WebappTable selectBySingleColValues( String colName, List<String> values, {bool contains = false}) {
+  WebappTable selectBySingleColValues( String colName, List<String> values, {bool contains = false, bool caseSensitive = true}) {
     if( !hasColumn(colName)){
       throw sci.ServiceError(500, "invalid.column.select", "Column $colName not present in WebappTable");
     }
@@ -59,9 +59,9 @@ class WebappTable extends IterableBase<List<String>>{
     List<List<String>> rows = [];
     var colIdx = colNames.indexOf(colName);
     if( contains ){
-      rows = this.where((row) => values.any((val) => row[colIdx].contains(val))   ).toList();
+      rows = this.where((row) => values.any((val) => row[colIdx].contains( caseSensitive ? val : val.toLowerCase()))   ).toList();
     }else{
-      rows = this.where((row) => values.any((val) => row[colIdx] == val)   ).toList();
+      rows = this.where((row) => values.any((val) => row[colIdx] == (caseSensitive ? val : val.toLowerCase()))   ).toList();
     }
     
     for (var col = 0; col < nCols; col++) {
