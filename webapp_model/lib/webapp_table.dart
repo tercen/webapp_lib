@@ -56,6 +56,9 @@ class WebappTable extends IterableBase<List<String>>{
     }
 
     var outTbl = WebappTable();
+    if( nRows == 0 ){
+      return outTbl;
+    }
     List<List<String>> rows = [];
     var colIdx = colNames.indexOf(colName);
     if( contains ){
