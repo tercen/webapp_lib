@@ -26,6 +26,7 @@ class WorkflowRunner with ProgressDialog {
   final String projectId;
   final String teamName;
   String? folderName;
+  String? parentFolderId;
   final sci.Workflow template;
 
   final List<String> initStepIds = [];
@@ -67,7 +68,7 @@ class WorkflowRunner with ProgressDialog {
   final List<sci.Pair> settingsByName = [];
   late final String timestamp;
 
-  WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.short }) {
+  WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.short}) {
     if( timestampType == TimestampType.short){
       timestamp = DateFormat("yMd").format(DateTime.now());
     }else{
@@ -89,6 +90,10 @@ class WorkflowRunner with ProgressDialog {
 
   void addTimestampToName(bool val) {
     addTimestamp = val;
+  }
+
+  void setParentFolderId( String folderId ){
+    parentFolderId = folderId;
   }
 
   /// Setting by name will search through the steps in a workflow looking for a matching name
@@ -575,7 +580,7 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       if (folderId == null) {
         sci.FolderDocument folder =
-            await createFolder(projectId, teamName, folderName: getFolderName());
+            await createFolder(projectId, teamName, folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
         workflow.folderId = folder.id;
       } else {
         workflow.folderId = folderId!;
