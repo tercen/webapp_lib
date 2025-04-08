@@ -37,6 +37,7 @@ class FetchComponent with
   @override
   void reset() {
     cancelAllOperations();
+    dataTable = WebappTable();
     isInit = false;
     init();
   }
