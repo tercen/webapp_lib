@@ -50,6 +50,28 @@ class WebappTable extends IterableBase<List<String>>{
     return outTbl;
   }
 
+  WebappTable selectBySingleColValues( String colName, List<String> values, {bool contains = false}) {
+    if( !hasColumn(colName)){
+      throw sci.ServiceError(500, "invalid.column.select", "Column $colName not present in WebappTable");
+    }
+
+    var outTbl = WebappTable();
+    List<List<String>> rows = [];
+    var colIdx = colNames.indexOf(colName);
+    if( contains ){
+      rows = this.where((row) => values.any((val) => row[colIdx].contains(val))   ).toList();
+    }else{
+      rows = this.where((row) => values.any((val) => row[colIdx] == val)   ).toList();
+    }
+    
+    for (var col = 0; col < nCols; col++) {
+      outTbl.addColumn(colNames[col],
+          data: rows.map((row) => row[col]).toList());
+    }
+    
+    return outTbl;
+  }
+
   WebappTable selectByColValue( List<String> cols, List<String> values) {
     try {
       assert( cols.length == values.length );  
