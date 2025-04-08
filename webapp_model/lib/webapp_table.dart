@@ -59,9 +59,17 @@ class WebappTable extends IterableBase<List<String>>{
     List<List<String>> rows = [];
     var colIdx = colNames.indexOf(colName);
     if( contains ){
-      rows = this.where((row) => values.any((val) => row[colIdx].contains( caseSensitive ? val : val.toLowerCase()))   ).toList();
+      rows = this.where((row) => values.any((val) {
+        var rowVal = caseSensitive ? row[colIdx] : row[colIdx].toLowerCase();
+        val = caseSensitive ? val : val.toLowerCase();
+        return rowVal.contains( val );
+      } )   ).toList();
     }else{
-      rows = this.where((row) => values.any((val) => row[colIdx] == (caseSensitive ? val : val.toLowerCase()))   ).toList();
+      rows = this.where((row) => values.any((val) {
+        var rowVal = caseSensitive ? row[colIdx] : row[colIdx].toLowerCase();
+        val = caseSensitive ? val : val.toLowerCase();
+        return rowVal ==  val;
+      })   ).toList();
     }
     
     for (var col = 0; col < nCols; col++) {
