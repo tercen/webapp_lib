@@ -197,6 +197,7 @@ class WorkflowDataService with DataCache {
       var opIds = dataSteps
           .map((step) => step.model.operatorSettings.operatorRef)
           .where((opRef) => opRef.name != "File Downloader")
+          .where((opRef) => opRef.kind != "WebappOperator")
           .map((opRef) => opRef.operatorId)
           .toList();
       
