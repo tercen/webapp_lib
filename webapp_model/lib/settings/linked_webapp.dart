@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+part "linked_webapp.g.dart";
+
 @JsonSerializable()
 class LinkedWebapp {
 

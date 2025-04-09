@@ -1,0 +1,20 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'linked_webapp.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+LinkedWebapp _$LinkedWebappFromJson(Map<String, dynamic> json) => LinkedWebapp(
+      shortName: json['shortName'] as String,
+      url: json['url'] as String,
+      version: json['version'] as String?,
+    );
+
+Map<String, dynamic> _$LinkedWebappToJson(LinkedWebapp instance) =>
+    <String, dynamic>{
+      'shortName': instance.shortName,
+      'url': instance.url,
+      'version': instance.version,
+    };
