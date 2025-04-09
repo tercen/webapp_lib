@@ -206,7 +206,7 @@ class WorkflowDataService with DataCache {
           .toList();
 
       for(var opRef in opRefs){
-        Logger().log(level: Logger.ALL, message: "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId} :: ${opRef.kind}");
+        Logger().log(level: Logger.ALL, message: "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId} :: ${opRef.operatorKind} ");
       }
       
       var operators = await factory.operatorService.list(opIds);
