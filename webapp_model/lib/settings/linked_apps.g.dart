@@ -8,7 +8,7 @@ part of 'linked_apps.dart';
 
 LinkedApps _$LinkedAppsFromJson(Map<String, dynamic> json) => LinkedApps(
       webappOperators: (json['webappOperators'] as List<dynamic>)
-          .map((e) => LinkedApps.fromJson(e as Map<String, dynamic>))
+          .map((e) => LinkedWebapp.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
