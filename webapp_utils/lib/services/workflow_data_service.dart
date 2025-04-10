@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
-
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
 
@@ -13,9 +12,7 @@ import 'package:webapp_utils/functions/formatter_utils.dart';
 
 import 'package:webapp_utils/functions/logger.dart';
 
-
 import 'package:webapp_utils/mixin/data_cache.dart';
-
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_utils/model/workflow_setting.dart';
@@ -89,7 +86,8 @@ class WorkflowDataService with DataCache {
         .getLibrary('', [], ["Workflow"], [], 0, -1);
 
     Logger().log(level: Logger.FINE, message: "Reading workflows from library");
-    Logger().log(level: Logger.FINER, message: "\tFound ${libObjs.length} workflows");
+    Logger().log(
+        level: Logger.FINER, message: "\tFound ${libObjs.length} workflows");
 
     // var workflows = await factory.workflowService.list(libObjs.map((o) => o.id).toList());
     return libObjs;
@@ -182,13 +180,16 @@ class WorkflowDataService with DataCache {
   Future<void> loadWorkflowSettings() async {
     Logger().log(level: Logger.FINE, message: "Loading workflow settings");
     if (workflowSettings.isNotEmpty) {
-      Logger().log(level: Logger.FINER, message: "Workflow settings already loaded");
+      Logger().log(
+          level: Logger.FINER, message: "Workflow settings already loaded");
       return;
     }
     var factory = tercen.ServiceFactory();
 
     for (var template in _installedWorkflows.values) {
-      Logger().log(level: Logger.FINER, message: "Loading settings for ${template.name}");
+      Logger().log(
+          level: Logger.FINER,
+          message: "Loading settings for ${template.name}");
       var dataSteps = template.steps
           .whereType<DataStep>()
           .where((step) =>
@@ -201,15 +202,18 @@ class WorkflowDataService with DataCache {
           .where((opRef) => opRef.operatorKind != "Operator")
           .map((opRef) => opRef.operatorId)
           .toList();
-      
+
       var opRefs = dataSteps
           .map((step) => step.model.operatorSettings.operatorRef)
           .toList();
 
-      for(var opRef in opRefs){
-        Logger().log(level: Logger.ALL, message: "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId}  ");
+      for (var opRef in opRefs) {
+        Logger().log(
+            level: Logger.ALL,
+            message:
+                "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId}  ");
       }
-      
+
       var operators = await factory.operatorService.list(opIds);
 
       List<int>.generate(operators.length, (i) => i).map((i) {});
@@ -280,18 +284,21 @@ class WorkflowDataService with DataCache {
     return l;
   }
 
-    Future<WebappTable> fetchWorkflowImagesByWorkflowId(String workflowId,
+  Future<WebappTable> fetchWorkflowImagesByWorkflowId(String workflowId,
       {List<String> contentTypes = const ["image"],
       List<String> excludedFiles = const [],
       List<String> nameFilter = const [],
       List<String> includeStepId = const [],
       bool force = false}) async {
-        var factory = tercen.ServiceFactory();
-      var wkf = await factory.workflowService.get(workflowId);    
-        return fetchWorkflowImages(wkf, contentTypes: contentTypes, excludedFiles: excludedFiles, nameFilter: nameFilter, includeStepId: includeStepId, force: force);
-      }
-      
-
+    var factory = tercen.ServiceFactory();
+    var wkf = await factory.workflowService.get(workflowId);
+    return fetchWorkflowImages(wkf,
+        contentTypes: contentTypes,
+        excludedFiles: excludedFiles,
+        nameFilter: nameFilter,
+        includeStepId: includeStepId,
+        force: force);
+  }
 
   Future<WebappTable> fetchWorkflowImages(Workflow wkf,
       {List<String> contentTypes = const ["image"],
@@ -331,7 +338,6 @@ class WorkflowDataService with DataCache {
 
     var schList =
         await factory.tableSchemaService.list(rels.map((e) => e.id).toList());
-
 
     for (var sch in schList) {
       var step = getRelationStep(wkf, stepRelationMap, sch.id);
@@ -386,7 +392,6 @@ class WorkflowDataService with DataCache {
               var bStr = "";
 
               for (var i = 0; i < tbl.nRows; i++) {
-                
                 var tname = tbl.columns[0].values[i];
                 if (nameContent.key == tname) {
                   var newBStr = String.fromCharCodes(
@@ -396,9 +401,7 @@ class WorkflowDataService with DataCache {
               }
               bytes.add(bStr);
             }
-          
           }
-          
         } else {
           for (var i = 0; i < tbl.nRows; i++) {
             if (contentTypes.any((contentType) =>
@@ -429,7 +432,6 @@ class WorkflowDataService with DataCache {
         }
       }
     }
-
 
     var tbl = WebappTable()
       ..addColumn("workflowName", data: workflowNames)
@@ -516,7 +518,6 @@ class WorkflowDataService with DataCache {
     return await factory.workflowService.list(workflowIds);
   }
 
-
   Future<Workflow> fetchWorkflow(String id) async {
     var factory = tercen.ServiceFactory();
     return factory.workflowService.get(id);
@@ -591,33 +592,26 @@ class WorkflowDataService with DataCache {
   }
 
   Future<Map<String, String>> getWorkflowStatus(sci.Workflow workflow) async {
-    var meta = workflow.meta;
-    var results = {"status": "", "error": "", "finished": "true"};
+    var results = {"status": "Done", "error": "", "finished": "true"};
     results["status"] = "Unknown";
 
-    if( workflow.steps.any((e) => e.state.taskState is sci.FailedState)){
-        results["status"] = "Failed";
-        results["error"] = meta
-            .firstWhere((e) => e.key.contains("run.error"),
-                orElse: () => sci.Pair.from("", ""))
-            .value;
-        if (meta.any((e) => e.key == "run.error.reason")) {
-          
-          var reason = meta.firstWhere((e) => e.key == "run.error.reason").value;
-          results["error"] = reason != "" ? reason : "No details provided";
-        } else {
-          results["error"] =
-              "${results["error"]}\n\nNo Error Details were Provided.";
-        }
-    }else if( !workflow.steps.whereType<sci.DataStep>().map((step) => step.state.taskState is sci.DoneState).any((state) => state == false) ) {
-      results["status"] = "Finished";
-    }else{
+    if (workflow.steps.any((e) => e.state.taskState is sci.FailedState)) {
+      results["status"] = "Failed";
+      results["error"] =
+          workflow.getMeta("run.error") ?? "No error information provided";
+      results["error.reason"] =
+          workflow.getMeta("run.error.reason") ?? "No details provided";
+    } else if (!workflow.steps
+        .whereType<sci.DataStep>()
+        .map((step) => step.state.taskState is sci.DoneState)
+        .any((state) => state == false)) {
       results["status"] = "Running";
+    } else {
+      results["status"] = "Finished";
     }
 
     return results;
   }
-
 
   Future<WebappTable> fetchWorkflowTable(String projectId) async {
     var key = projectId;
@@ -625,8 +619,8 @@ class WorkflowDataService with DataCache {
       return getCachedValue(key);
     } else {
       var workflowService = WorkflowDataService();
-      var workflows = (await workflowService.fetchWorkflowsRemote(projectId))
-          .toList();
+      var workflows =
+          (await workflowService.fetchWorkflowsRemote(projectId)).toList();
 
       var res = WebappTable();
 
@@ -636,8 +630,8 @@ class WorkflowDataService with DataCache {
       for (var w in workflows) {
         // var sw = await workflowService.getWorkflowStatus(w);
         var sw = await getWorkflowStatus(w);
-        
-        status.add(sw["status"]! );
+
+        status.add(sw["status"]!);
         error.add(sw["error"]!);
       }
 
@@ -654,20 +648,17 @@ class WorkflowDataService with DataCache {
     }
   }
 
-
-  Future<WebappTable> fetchWorkflowImagesSummary( String workflowId ) async {
+  Future<WebappTable> fetchWorkflowImagesSummary(String workflowId) async {
     var factory = tercen.ServiceFactory();
-    var wkf = await factory.workflowService.get(workflowId);    
+    var wkf = await factory.workflowService.get(workflowId);
 
     return fetchWorkflowImages(wkf, contentTypes: ["image", "text"]);
   }
 
-  Future<void> updateReadme( 
-       String workflowId, String text) async {
+  Future<void> updateReadme(String workflowId, String text) async {
     var factory = tercen.ServiceFactory();
 
-  
-    var readmeDocument =  ProjectDataService().getProjectFiles().firstWhere(
+    var readmeDocument = ProjectDataService().getProjectFiles().firstWhere(
         (e) => e.getMeta("WORKFLOW_ID") == workflowId,
         orElse: () => sci.Document());
 
