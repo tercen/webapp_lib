@@ -68,7 +68,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
     
       var hasFailed = false;
       await for (var evt in taskStream) {
-        // print(evt.toJson());
         if (evt is sci.PatchRecords) {
           workflow = evt.apply(workflow);
           for (var pr in evt.rs) {
@@ -82,8 +81,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
                   .add(sci.Pair.from("run.error", prMap["error"] as String));
               workflow.meta.add(
                   sci.Pair.from("run.error.reason", prMap["reason"] as String));
-              await factory.taskService.cancelTask(workflowTask.id);
+
               
+              await factory.taskService.cancelTask(workflowTask.id);
+              print(workflow.toJson());
               hasFailed = true;
             }
           }
@@ -106,16 +107,20 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
       }
       
-    await factory.workflowService.update(workflow);
+    // await factory.workflowService.update(workflow);
     // workflow = await factory.workflowService.get(workflow.id);
 
-    for (var f in postRunCallbacks) {
-      await f();
+    if( !hasFailed ){
+      for (var f in postRunCallbacks) {
+        await f();
+      }
+
+      for (var f in postRunIdCallbacks) {
+        await f(workflow.id);
+      }
+
     }
 
-    for (var f in postRunIdCallbacks) {
-      await f(workflow.id);
-    }
 
     workflowId = workflow.id;
 
