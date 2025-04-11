@@ -74,6 +74,10 @@ class FetchComponent with
     return Container();
   }
 
+  Widget buildEmptyTable(){
+    return Container();
+  }
+
   Widget build(BuildContext context) {
     if (isBusy) {
       return SizedBox(
@@ -82,7 +86,7 @@ class FetchComponent with
               .waitingMessage(suffixMsg: "  Loading Component"));
     } else {
       if (dataTable.nRows == 0) {
-        return Container();
+        return buildEmptyTable();
       } else {
         return createWidget(context);
       }
