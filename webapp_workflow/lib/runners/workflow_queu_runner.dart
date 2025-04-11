@@ -10,7 +10,8 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 typedef PostRunIdCallback = Future<void> Function(String workflowId);
 
 class WorkflowQueuRunner extends WorkflowRunner {
-  WorkflowQueuRunner(super.projectId, super.teamName, super.template, {super.timestampType = TimestampType.short });
+  WorkflowQueuRunner(super.projectId, super.teamName, super.template,
+      {super.timestampType = TimestampType.short});
   final List<PostRunIdCallback> postRunIdCallbacks = [];
 
   void addIdPostRun(PostRunIdCallback callback) {
@@ -65,52 +66,49 @@ class WorkflowQueuRunner extends WorkflowRunner {
         textColor: Styles()["black"],
         fontSize: 16.0);
 
-    
-      var hasFailed = false;
-      await for (var evt in taskStream) {
-        if (evt is sci.PatchRecords) {
-          workflow = evt.apply(workflow);
-          for (var pr in evt.rs) {
-            var prMap = jsonDecode(pr.d);
-            if (prMap is Map &&
-                prMap.keys.contains("kind") &&
-                prMap["kind"] == "FailedState") {
-              print(evt.toJson());
-              print("Workflow failed ###");
-              workflow.meta
-                  .add(sci.Pair.from("run.error", prMap["error"] as String));
-              workflow.meta.add(
-                  sci.Pair.from("run.error.reason", prMap["reason"] as String));
+    var errorInformation = {"error": "", "reason": ""};
+    var hasFailed = false;
+    await for (var evt in taskStream) {
+      if (evt is sci.PatchRecords) {
+        workflow = evt.apply(workflow);
+        for (var pr in evt.rs) {
+          var prMap = jsonDecode(pr.d);
+          if (prMap is Map &&
+              prMap.keys.contains("kind") &&
+              prMap["kind"] == "FailedState") {
+            print(evt.toJson());
+            print("Workflow failed ###");
+            errorInformation["error"] = prMap["error"] as String;
+            errorInformation["errorreason"] = prMap["reason"] as String;
 
-              
-              await factory.taskService.cancelTask(workflowTask.id);
-              
-              hasFailed = true;
-            }
-          }
-        }
-        if (evt is sci.TaskStateEvent) {
-          if (evt.state.isFinal && evt.taskId == workflowTask.id) {
-            break;
-          }
-        }
-        if (evt is sci.TaskProgressEvent) {
-        } else if (evt is sci.TaskLogEvent) {
-        } else {
-          if (evt is sci.TaskStateEvent) {
-            if (evt.state is sci.DoneState) {}
-          }
-        }
+            await factory.taskService.cancelTask(workflowTask.id);
 
-        if (hasFailed) {
-          // break;
+            hasFailed = true;
+          }
         }
       }
-      
+      if (evt is sci.TaskStateEvent) {
+        if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+          break;
+        }
+      }
+      if (evt is sci.TaskProgressEvent) {
+      } else if (evt is sci.TaskLogEvent) {
+      } else {
+        if (evt is sci.TaskStateEvent) {
+          if (evt.state is sci.DoneState) {}
+        }
+      }
+
+      if (hasFailed) {
+        break;
+      }
+    }
+
     await factory.workflowService.update(workflow);
     // var currentWorkflow = await factory.workflowService.get(workflow.id);
 
-    if( !hasFailed ){
+    if (!hasFailed) {
       for (var f in postRunCallbacks) {
         await f();
       }
@@ -118,9 +116,14 @@ class WorkflowQueuRunner extends WorkflowRunner {
       for (var f in postRunIdCallbacks) {
         await f(workflow.id);
       }
-
+    } else {
+      //Update workflow with error info
+      var currentWorkflow = await factory.workflowService.get(workflow.id);
+      currentWorkflow.meta
+          .add(sci.Pair.from("run.error", errorInformation["error"] as String));
+      currentWorkflow.meta.add(sci.Pair.from(
+          "run.error.reason", errorInformation["reason"] as String));
     }
-
 
     workflowId = workflow.id;
 
