@@ -605,9 +605,9 @@ class WorkflowDataService with DataCache {
         .whereType<sci.DataStep>()
         .map((step) => step.state.taskState is sci.DoneState)
         .any((state) => state == false)) {
-      results["status"] = "Running";
-    } else {
       results["status"] = "Finished";
+    } else {
+      results["status"] = "Running";
     }
 
     return results;

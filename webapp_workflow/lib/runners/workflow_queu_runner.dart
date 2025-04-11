@@ -23,18 +23,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
       throw Exception("Workflow not set in WorkflowRunner.");
     }
 
-    // Fluttertoast.showToast(
-    //     msg: "Workflow is being prepared",
-    //     toastLength: Toast.LENGTH_LONG,
-    //     gravity: ToastGravity.BOTTOM_LEFT,
-    //     webPosition: "left",
-    //     webBgColor: "linear-gradient(to bottom, #aaaaff, #eeeeaff)",
-    //     timeInSecForIosWeb: 2,
-    //     backgroundColor: Colors.lightBlue[100],
-    //     textColor: Styles()["black"],
-    //     fontSize: 16.0
-    // );
-
     var factory = tercen.ServiceFactory();
 
     await setupRun(context);
@@ -95,7 +83,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
               workflow.meta.add(
                   sci.Pair.from("run.error.reason", prMap["reason"] as String));
               await factory.taskService.cancelTask(workflowTask.id);
-              // await factory.workflowService.update(workflow);
+              
               hasFailed = true;
             }
           }
@@ -118,7 +106,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
       }
       
-    // await factory.workflowService.update(workflow);
+    await factory.workflowService.update(workflow);
     // workflow = await factory.workflowService.get(workflow.id);
 
     for (var f in postRunCallbacks) {
