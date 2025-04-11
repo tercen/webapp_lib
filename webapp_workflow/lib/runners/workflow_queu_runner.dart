@@ -79,7 +79,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
             print(evt.toJson());
             print("Workflow failed ###");
             errorInformation["error"] = prMap["error"] as String;
-            errorInformation["errorreason"] = prMap["reason"] as String;
+            errorInformation["reason"] = prMap["reason"] as String;
 
             await factory.taskService.cancelTask(workflowTask.id);
 
