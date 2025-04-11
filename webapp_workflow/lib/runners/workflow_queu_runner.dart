@@ -11,7 +11,7 @@ typedef PostRunIdCallback = Future<void> Function(String workflowId);
 
 class WorkflowQueuRunner extends WorkflowRunner {
   WorkflowQueuRunner(super.projectId, super.teamName, super.template,
-      {super.timestampType = TimestampType.short});
+      {super.timestampType = TimestampType.full});
   final List<PostRunIdCallback> postRunIdCallbacks = [];
 
   void addIdPostRun(PostRunIdCallback callback) {
