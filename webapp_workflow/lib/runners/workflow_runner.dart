@@ -410,7 +410,7 @@ class WorkflowRunner with ProgressDialog {
     }
 
     sci.FolderDocument folder = sci.FolderDocument();
-    folder.name = "$folderPrefix$name$folderSuffix";
+    folder.name = getFolderName();
     folder.acl.owner = owner;
     folder.projectId = projectId;
     folder.folderId = parentFolderId;

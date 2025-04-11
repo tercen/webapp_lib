@@ -84,7 +84,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
               
               await factory.taskService.cancelTask(workflowTask.id);
-              print(workflow.toJson());
+              
               hasFailed = true;
             }
           }
@@ -103,12 +103,12 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
 
         if (hasFailed) {
-          break;
+          // break;
         }
       }
       
-    // await factory.workflowService.update(workflow);
-    // workflow = await factory.workflowService.get(workflow.id);
+    await factory.workflowService.update(workflow);
+    // var currentWorkflow = await factory.workflowService.get(workflow.id);
 
     if( !hasFailed ){
       for (var f in postRunCallbacks) {
