@@ -5,16 +5,18 @@ import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/mixins/state_component.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_model/webapp_table.dart';
+import 'package:webapp_utils/cache_object.dart';
 
 class FetchComponent with
         ChangeNotifier,
         ComponentBase,
-        ComponentCache,
+
         StateComponent,
         AsyncManager{
   WebappTable dataTable = WebappTable();
-  
+  final CacheObject cacheObj = CacheObject();
   bool isInit = false;
+  bool useCache = true;
   Future<WebappTable> Function() dataFetchCallback;
 
   FetchComponent( this.dataFetchCallback );
@@ -48,16 +50,18 @@ class FetchComponent with
       busy();
       // notifyListeners();
       var cacheKey = getKey();
-      if (hasCachedValue(cacheKey)) {
-        dataTable = getCachedValue(cacheKey);
+      if (useCache && cacheObj.hasCachedValue(cacheKey)) {
+        dataTable = cacheObj.getCachedValue(cacheKey);
       } else {
         startFuture("dataLoad", dataFetchCallback());
 
         dataTable = await waitResult("dataLoad"); //  await dataFetchCallback();
 
         dataTable = postLoad(dataTable);
-
-        addToCache(cacheKey, dataTable);
+        if( useCache ){
+          cacheObj.addToCache(cacheKey, dataTable);
+        }
+        
       }
       idle();
       // notifyListeners();

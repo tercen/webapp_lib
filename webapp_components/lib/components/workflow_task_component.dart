@@ -5,6 +5,7 @@ import 'package:webapp_components/components/action_table_component.dart';
 import 'package:webapp_components/definitions/list_action.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
+import 'package:webapp_utils/cache_object.dart';
 import 'package:webapp_utils/functions/formatter_utils.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
 
@@ -26,6 +27,8 @@ class WorkflowTaskComponent extends ActionTableComponent {
   WorkflowTaskComponent(super.id, super.groupId, super.componentLabel,
       super.dataFetchCallback, super.actions, this.workflowActions,
       {super.excludeColumns, super.hideColumns});
+
+  CacheObject workflowCache = CacheObject();
 
   @override
   void dispose() {
@@ -151,12 +154,12 @@ class WorkflowTaskComponent extends ActionTableComponent {
   }
 
   Future<sci.Workflow> getCachedWorkflow(String workflowId) async {
-    if (hasCachedValue(workflowId)) {
-      return getCachedValue(workflowId);
+    if (workflowCache.hasCachedValue(workflowId)) {
+      return workflowCache.getCachedValue(workflowId);
     } else {
       var workflowService = WorkflowDataService();
       var workflow = await workflowService.fetchWorkflow(workflowId);
-      addToCache(workflowId, workflow);
+      workflowCache.addToCache(workflowId, workflow);
       return workflow;
     }
   }

@@ -1,10 +1,10 @@
 import 'dart:async';
 
-mixin DataCache {
+class CacheObject {
   final Map<String, dynamic> _cacheMap = {};
   final Map<String, dynamic> _cacheTime = {};
 
-  void _initCollector(){
+  CacheObject(){
     Timer.periodic(const Duration(seconds: 10), (timer){
       //Avoid concurrent access exception
       var keys = List.from(_cacheTime.keys);
@@ -36,13 +36,13 @@ mixin DataCache {
   }
 
   void addToCache(String key, dynamic value){
-    if( _cacheMap.isEmpty ){
-      _initCollector();
-    }
-    print("Adding value to $key");
-
     _cacheMap[key] = value;
     _cacheTime[key] = DateTime.now();
+  }
+
+  void clearCache(){
+    _cacheMap.clear();
+    _cacheTime.clear();
   }
 
   List<String> get cacheKeys => _cacheMap.keys.toList();

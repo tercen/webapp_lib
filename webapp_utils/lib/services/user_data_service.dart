@@ -1,10 +1,20 @@
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
-import 'package:webapp_utils/mixin/data_cache.dart';
+import 'package:webapp_utils/cache_object.dart';
 
-class UserDataService with DataCache {
+
+class UserDataService  {
+  static final UserDataService _singleton = UserDataService._internal();
+  
+  factory UserDataService() {
+    return _singleton;
+  }
+  UserDataService._internal();
+
+  final CacheObject cache = CacheObject();
+
   Future<List<String>> fetchUserList(String username) async {
-    if (hasCachedValue(username)) {
-      return getCachedValue(username);
+    if (cache.hasCachedValue(username)) {
+      return cache.getCachedValue(username);
     } else {
       tercen.ServiceFactory factory = tercen.ServiceFactory();
 
@@ -17,7 +27,7 @@ class UserDataService with DataCache {
       teamNameList.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
 
       teamNameList.insert(0, username);
-      addToCache(username, teamNameList);
+      cache.addToCache(username, teamNameList);
       return teamNameList;
     }
   }

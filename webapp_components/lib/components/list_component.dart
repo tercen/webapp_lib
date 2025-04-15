@@ -32,7 +32,7 @@ class ListComponent
   // final DataFetchCallback dataFetchFunc;
 
   ListComponent(id, groupId, componentLabel, super.dataFetchFunc,
-      {this.sortByLabel = false, this.collapsible = true, bool cache = true}) {
+      {this.sortByLabel = false, this.collapsible = true, cache = true}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;

@@ -8,19 +8,19 @@ import 'package:sci_tercen_client/sci_client.dart';
 import 'package:webapp_model/id_element_table.dart';
 
 import 'package:webapp_model/webapp_table.dart';
+import 'package:webapp_utils/cache_object.dart';
 import 'package:webapp_utils/functions/formatter_utils.dart';
 
 import 'package:webapp_utils/functions/logger.dart';
 
-import 'package:webapp_utils/mixin/data_cache.dart';
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_utils/model/workflow_setting.dart';
 import 'package:webapp_utils/services/project_data_service.dart';
 
-class WorkflowDataService with DataCache {
+class WorkflowDataService  {
   static final WorkflowDataService _singleton = WorkflowDataService._internal();
-
+  final CacheObject cache = CacheObject();
   factory WorkflowDataService() {
     return _singleton;
   }
@@ -311,8 +311,8 @@ class WorkflowDataService with DataCache {
       key = "${key}_${excludedFiles.join("_")}";
     }
 
-    if (hasCachedValue(key) && !force) {
-      return getCachedValue(key);
+    if (cache.hasCachedValue(key) && !force) {
+      return cache.getCachedValue(key);
     }
 
     List<String> workflowNames = [];
@@ -439,7 +439,7 @@ class WorkflowDataService with DataCache {
       ..addColumn("step", data: stepNames)
       ..addColumn("data", data: bytes)
       ..addColumn("contentType", data: contentTypeList);
-    addToCache(key, tbl);
+    cache.addToCache(key, tbl);
 
     return tbl;
   }
@@ -615,8 +615,8 @@ class WorkflowDataService with DataCache {
 
   Future<WebappTable> fetchWorkflowTable(String projectId) async {
     var key = projectId;
-    if (hasCachedValue(key)) {
-      return getCachedValue(key);
+    if (cache.hasCachedValue(key)) {
+      return cache.getCachedValue(key);
     } else {
       var workflowService = WorkflowDataService();
       var workflows =

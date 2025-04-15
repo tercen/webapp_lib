@@ -68,9 +68,10 @@ class HierarchySelectableListComponent extends FetchComponent
   int maxLevel = 0;
   final bool shouldSave;
 
+
   HierarchySelectableListComponent(id, groupId, componentLabel, super.dataFetchCallback,
       {cache = true,
-      this.selectionBehavior = SelectionBehavior.none,
+      this.selectionBehavior = SelectionBehavior.none, 
       this.columnHierarchy = const [],
       InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false}) {
@@ -78,7 +79,8 @@ class HierarchySelectableListComponent extends FetchComponent
     super.groupId = groupId;
     super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
-    useCache = cache;
+    super.useCache = cache;
+
 
 
     maxLevel = columnHierarchy.length - 1;

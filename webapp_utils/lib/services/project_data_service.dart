@@ -2,13 +2,15 @@ import 'dart:convert';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
+import 'package:webapp_utils/cache_object.dart';
 import 'package:webapp_utils/folder_node.dart';
 import 'package:webapp_utils/functions/logger.dart';
-import 'package:webapp_utils/mixin/data_cache.dart';
 
-class ProjectDataService with DataCache {
+
+class ProjectDataService {
+
   static final ProjectDataService _singleton = ProjectDataService._internal();
-  
+  final CacheObject cache = CacheObject();
   factory ProjectDataService() {
     return _singleton;
   }

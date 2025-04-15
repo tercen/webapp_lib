@@ -43,7 +43,7 @@ class MultiSelectTableComponent extends FetchComponent
     super.groupId = groupId;
     super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
-    useCache = cache;
+    super.useCache = cache;
   }
 
   @override
