@@ -46,14 +46,12 @@ class FetchComponent with
 
   Future<bool> loadTable() async {
     if (!isInit) {
-      print("Load table init");
       isInit = true;
       busy();
       var cacheKey = getKey();
       if (useCache && cacheObj.hasCachedValue(cacheKey)) {
         dataTable = cacheObj.getCachedValue(cacheKey);
       } else {
-        print("\tCalling data fetch");
         startFuture("dataLoad", dataFetchCallback());
 
         dataTable = await waitResult("dataLoad"); //  await dataFetchCallback();
