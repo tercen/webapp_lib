@@ -43,4 +43,6 @@ mixin DataCache {
     _cacheTime[key] = DateTime.now();
   }
 
+  List<String> get cacheKeys => _cacheMap.keys.toList();
+
 }
