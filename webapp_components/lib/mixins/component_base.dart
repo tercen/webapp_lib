@@ -15,8 +15,9 @@ mixin class ComponentBase {
   String description = "";
  
   final List<Pair> _metaList = [];
-
   final List<Component> ancestors = [];
+
+  bool active = false;
 
   ValueNotifier<int> uiUpdate = ValueNotifier(0);
 
@@ -38,6 +39,10 @@ mixin class ComponentBase {
       reset();
     });
     ancestors.add(parent);
+  }
+
+  void setActive(){
+    active = true;
   }
 
   Future<void> init() async {
@@ -69,7 +74,7 @@ mixin class ComponentBase {
     for( var parent in ancestors ){
       parentsActive = parentsActive && (parent.isActive() && parent.isFulfilled());
     }
-    return true && parentsActive;
+    return active && parentsActive;
   }
 
 

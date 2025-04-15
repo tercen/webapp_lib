@@ -132,6 +132,7 @@ mixin ScreenBase {
       blockTypes.add(blockType);
       componentBlocks[blockId] = [entry];
     }
+    
   }
 
   void initScreen(WebAppDataBase modelLayer) {
@@ -146,6 +147,7 @@ mixin ScreenBase {
       }
 
       if (comp is ComponentBase) {
+        (comp as ComponentBase).setActive();
         (comp as ComponentBase)
             .init()
             .then((val) => (comp as ComponentBase).postInit());
