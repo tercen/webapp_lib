@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webapp_components/mixins/async_manager.dart';
 import 'package:webapp_components/mixins/component_base.dart';
-import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/mixins/state_component.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_model/webapp_table.dart';
@@ -30,7 +29,7 @@ class FetchComponent with
   Future<void> init() async {
     if (isActive() && !isInit) {
       super.init();
-      loadTable().then((onValue)=>isInit = true);
+      loadTable();
       
     }
   }
@@ -47,8 +46,8 @@ class FetchComponent with
 
   Future<bool> loadTable() async {
     if (!isInit) {
+      isInit = true;
       busy();
-      // notifyListeners();
       var cacheKey = getKey();
       if (useCache && cacheObj.hasCachedValue(cacheKey)) {
         dataTable = cacheObj.getCachedValue(cacheKey);
@@ -64,7 +63,7 @@ class FetchComponent with
         
       }
       idle();
-      // notifyListeners();
+
     }
     return true;
   }
