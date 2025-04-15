@@ -39,6 +39,8 @@ mixin DataCache {
     if( _cacheMap.isEmpty ){
       _initCollector();
     }
+    print("Adding value to $key");
+
     _cacheMap[key] = value;
     _cacheTime[key] = DateTime.now();
   }
