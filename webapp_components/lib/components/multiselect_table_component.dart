@@ -23,7 +23,7 @@ class MultiSelectTableComponent extends FetchComponent
   final List<String>? excludeColumns;
   List<String>? hideColumns;
   List<String> colNames = [];
-  List<String> columnOrder = [];
+  List<String>? columnOrder;
   final String valueSeparator = "|@|";
 
   String sortingCol = "";
@@ -39,7 +39,7 @@ class MultiSelectTableComponent extends FetchComponent
       this.saveState = true,
       this.hideColumns,
       InfoBoxBuilder? infoBoxBuilder,
-      List<String>? colOrder,
+      this.columnOrder,
       cache = true}) {
     super.id = id;
     super.groupId = groupId;
@@ -56,7 +56,7 @@ class MultiSelectTableComponent extends FetchComponent
         .map((row) => const Uuid().v4())
         .toList();
     table.addColumn(".key", data: idCol);
-    if( columnOrder.isEmpty ){
+    if( columnOrder == null || columnOrder!.isEmpty ){
       columnOrder = table.colNames;
     }
 
@@ -262,7 +262,7 @@ class MultiSelectTableComponent extends FetchComponent
     var table = dataTable;
     var nRows = table.nRows;
 
-    colNames = columnOrder
+    colNames = columnOrder!
         .where((colName) => shouldIncludeColumn(colName))
         .toList();
     // if (excludeColumns != null) {
