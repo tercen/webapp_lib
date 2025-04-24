@@ -224,15 +224,21 @@ class WorkflowDataService with DataCache {
           contentTable = await factory.tableSchemaService.select(sch.id, [sch.columns[nameIdx].name,  ".content"], 0, sch.nRows);
 
           List<Pair> uniqueNameType = [];
+          List<String> uniqueCt = [];
           for (var i = 0; i < tbl.nRows; i++){
             var name = tbl.columns[0].values[i];
             var cType = tbl.columns[1].values[i];
 
             if(!uniqueNameType.any((e) => e.key == name)){
               uniqueNameType.add(Pair.from(name, cType));
+              uniqueCt.add(cType);
             }
+            
           }
-
+          for( var ct in uniqueCt ){
+            contentTypeList.add(IdElement("", ct));
+          }
+          
           
 
           for( var nameContent in uniqueNameType ){
