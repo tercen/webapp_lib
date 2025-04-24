@@ -19,6 +19,7 @@ class MultiSelectTableComponent
   final List<String>? excludeColumns;
   List<String> colNames = [];
   final String valueSeparator = "|@|";
+  List<int> indices = [];
 
   String sortingCol = "";
   String sortDirection = "";
@@ -138,7 +139,8 @@ class MultiSelectTableComponent
   void setSelectionRow(List<IdElement> selectionValues) {
     var nRows = dataTable.nRows();
     currentRow = -1;
-    for (var ri = 0; ri < nRows; ri++) {
+    for (var rio = 0; rio < nRows; rio++) {
+      var ri = indices.isEmpty ? rio : indices[rio];
       List<IdElement> rowEls =
           colNames.map((col) => dataTable.columns[col]![ri]).toList();
       var lineEl = lineToIdElement(rowEls);
@@ -242,7 +244,7 @@ class MultiSelectTableComponent
     List<TableRow> rows = [];
     rows.add(createTableHeader(colNames));
 
-    var indices = List<int>.generate(nRows, (i) => i);
+    indices = List<int>.generate(nRows, (i) => i);
     if (sortDirection != "" && sortingCol != "") {
       indices = ListUtils.getSortedIndices(
           table.columns[sortingCol]!.map((e) => e.label).toList());
