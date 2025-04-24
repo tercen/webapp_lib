@@ -145,7 +145,7 @@ class MultiSelectTableComponent
           colNames.map((col) => dataTable.columns[col]![ri]).toList();
       var lineEl = lineToIdElement(rowEls);
       if (lineEl.id == lineToIdElement(selectionValues).id) {
-        currentRow = ri;
+        currentRow = rio;
       }
     }
   }
