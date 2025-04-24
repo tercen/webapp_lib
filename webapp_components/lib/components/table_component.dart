@@ -18,6 +18,7 @@ class MultiSelectTableComponent
   final DataFetchCallback dataFetchCallback;
   final List<String>? excludeColumns;
   List<String> colNames = [];
+  List<String> origColNames = [];
   final String valueSeparator = "|@|";
   List<int> indices = [];
 
@@ -139,6 +140,7 @@ class MultiSelectTableComponent
   void setSelectionRow(List<IdElement> selectionValues) {
     var nRows = dataTable.nRows();
     currentRow = -1;
+
     for (var rio = 0; rio < nRows; rio++) {
       var ri = indices.isEmpty ? rio : indices[rio];
       List<IdElement> rowEls =
@@ -237,6 +239,7 @@ class MultiSelectTableComponent
     var nRows = table.nRows();
 
     colNames = table.colNames;
+    origColNames = List.from( colNames );
     if (excludeColumns != null) {
       colNames = colNames.where((e) => !excludeColumns!.contains(e)).toList();
     }
@@ -253,7 +256,7 @@ class MultiSelectTableComponent
         indices = indices.reversed.toList();
       }
     }
-
+    
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
       List<IdElement> rowEls =
@@ -308,14 +311,15 @@ class MultiSelectTableComponent
   IdElementTable getValueAsTable() {
     IdElementTable tbl = IdElementTable();
 
-    for (var colName in colNames) {
+    for (var colName in origColNames) {
       tbl.addColumn(colName);
     }
-
+    
     for (var row in selected) {
       var els = idElementToLine(row);
+
       for (var ci = 0; ci < els.length; ci++) {
-        tbl.columns[colNames[ci]]!.add(els[ci]);
+        tbl.columns[origColNames[ci]]!.add(els[ci]);
       }
     }
 
