@@ -310,19 +310,22 @@ class MultiSelectTableComponent
 
   IdElementTable getValueAsTable() {
     IdElementTable tbl = IdElementTable();
-
-    for (var colName in origColNames) {
+    var names = colNames.where((col) => !excludeColumns!.contains(col)).toList();
+    for (var colName in names) {
       tbl.addColumn(colName);
     }
     
+    int ri = 0;
     for (var row in selected) {
       var els = idElementToLine(row);
-
+      
       for (var ci = 0; ci < els.length; ci++) {
-        tbl.columns[origColNames[ci]]!.add(els[ci]);
+        tbl.columns[names[ci]]!.add(els[ci]);
       }
+      ri = ri + 1;
     }
 
+    
     return tbl;
   }
 
