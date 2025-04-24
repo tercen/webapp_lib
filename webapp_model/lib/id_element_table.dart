@@ -124,8 +124,14 @@ class IdElementTable {
       int nRows = columns[colNames[0]]!.length;
       for( var i = 0; i < nRows; i ++ ){
         for( var colName in colNames ){
-          str += columns[colName]![i].label;
+          if( i >=  (columns[colName]!).length ){
+            str += "_";
           str += ",";
+          }else{
+            str += columns[colName]![i].label;
+            str += ",";
+          }
+          
         }
         str += "\n";
       }
