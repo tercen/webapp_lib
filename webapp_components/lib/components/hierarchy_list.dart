@@ -146,6 +146,7 @@ class HierarchyList extends ComponentInfoBox {
           wdg.add(createTabulatedEntry(
               level,
               ExpansionTile(
+                controlAffinity: ListTileControlAffinity.leading,
                 initiallyExpanded: expandedLevels.contains(levelColumn),
                 title: nonLeafCallback(context, idEl.id, idEl.label, ri, level,
                     isEven: ri % 2 == 0),
