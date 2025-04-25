@@ -360,6 +360,7 @@ mixin ScreenBase {
             blockOrder[bi],
             style: Styles.textH2,
           ),
+          controlAffinity: ListTileControlAffinity.leading,
           initiallyExpanded: blockType == ComponentBlockType.expanded,
           children: blockWidgets,
         ));

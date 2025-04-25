@@ -268,7 +268,7 @@ class ActionListComponent extends ListComponent {
         dense: true,
         expandedAlignment: Alignment.topLeft,
         enabled: errorMessage != "",
-
+        controlAffinity: ListTileControlAffinity.leading,
         controller: expansionControllers.last,
         initiallyExpanded: expandedRows.contains(i),
         onExpansionChanged: (isExpanded) {

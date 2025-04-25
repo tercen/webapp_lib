@@ -68,6 +68,7 @@ class ListComponent with ChangeNotifier, ComponentBase, ComponentCache implement
     var expTile = ExpansionTile(
       key: GlobalKey(),
       title: Text(title, style: Styles.textH2,),
+      controlAffinity: ListTileControlAffinity.leading,
       controller: expansionControllers.last,
       children: [wdg],
     );
