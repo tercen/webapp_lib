@@ -11,24 +11,29 @@ typedef TableFetchCallback = Future<sci.Table> Function(
 
 class IdOperatorRunner with ProgressDialog {
   final String opUrl;
+  final String? opVersion;
 
   int latestTicket = 0;
 
   final Map<String, dynamic> cache = {};
   //   String projectId = widget.handler.getModelValue(ModelKey.project).id;
   //   String teamName = widget.handler.getModelValue(ModelKey.selectedTeam);
-  IdOperatorRunner(this.opUrl);
+  IdOperatorRunner(this.opUrl, {this.opVersion});
   Future<sci.Document> _getLatestOperatorVersion(String url,
       {bool tagged = true}) async {
     var factory = tercen.ServiceFactory();
     var ops = await factory.documentService.findOperatorByUrlAndVersion(
         startKey: [url, "\uff00"], endKey: [url, ""], limit: 1000);
 
-    sci.Document operator = sci.Document();
+    var operator = sci.Document();
 
     var latestVersion = DateTime.parse('1974-03-20 00:00:00.000');
     for (var op in ops) {
-      if (tagged == false || op.version.contains(".")) {
+      if( opVersion != null && op.version == opVersion){
+        operator = op;
+        break;
+      }
+      if (opVersion == null && (tagged == false || op.version.contains("."))) {
         var opVersion = DateTime.parse(op.lastModifiedDate.value);
 
         if (opVersion.compareTo(latestVersion) > 0) {
@@ -36,6 +41,10 @@ class IdOperatorRunner with ProgressDialog {
           operator = op;
         }
       }
+    }
+
+    if( operator.id == ""){
+      throw sci.ServiceError(500, "operator.not.found", "Operator with URL $url $opVersion has not been found in the library");
     }
 
     return operator;
