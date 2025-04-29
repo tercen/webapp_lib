@@ -1,5 +1,6 @@
 import 'package:sci_tercen_client/sci_client.dart';
 import 'package:webapp_utils/functions/string_utils.dart';
+import 'package:collection/collection.dart';
 
 class TercenUtils {
   static Table joinTables( Table tbl1, Table tbl2, List<String> onl, List<String> onr, {List<String> excludeColumns = const []}){
@@ -11,7 +12,7 @@ class TercenUtils {
     var tbl1Cols = tbl1.columns.where((col) => onl.any((onk) => col.name.contains(onk)) );
     var tbl2Cols = tbl2.columns.where((col) => onr.any((onk) => col.name.contains(onk)) );
     var tbl1AllCols = tbl1.columns.where((col) => !excludeColumns.contains(col.name) );
-    var tbl2AllCols = tbl2.columns.where((col) => !excludeColumns.contains(col.name) );
+    var tbl2AllCols = tbl2.columns.where((col) => !excludeColumns.contains(col.name) ).where((col) => !tbl1AllCols.any((col1) => col1.name == col.name) );
 
     final tbl2Index = <String, List<int>>{};
     for( var ri2 = 0; ri2 < tbl2.nRows; ri2++){
@@ -42,31 +43,36 @@ class TercenUtils {
 
     var newTable = Table();
     newTable.nRows = tbl1.nRows;
-    var ci = 0;
-    for( var col in tbl1.columns){
-      if( !excludeColumns.contains(col.name)){
-        var newCol = Column();
-        newCol.copyFrom(col);
-        newCol.name = StringUtils.removeNamespace(newCol.name);
-        newCol.id = StringUtils.removeNamespace(newCol.id);
-        newCol.values = newColumnValues[ci];
-        newCol.type = col.type;
-        newTable.columns.add(newCol);
-        ci++;
-      }
+    // var ci = 0;
+    var columnList = tbl1AllCols.toList();
+    columnList.addAll(tbl2AllCols);
+
+    // var includedNames = [];
+    for( var colValuePair in IterableZip<dynamic>([columnList, newColumnValues])){
+    // for( var col in incColumnList){
+      var column = colValuePair[0];
+      var colName = StringUtils.removeNamespace(column.name);
+      var newCol = Column();
+      newCol.copyFrom(column);
+      newCol.name = colName;
+      newCol.id = colName;
+      newCol.values = colValuePair[1];
+      newCol.type = column.type;
+      newTable.columns.add(newCol);
+      // ci++;
     }
-    for( var col in tbl2.columns){
-      if( !excludeColumns.contains(col.name)){
-        var newCol = Column();
-        newCol.copyFrom(col);
-        newCol.name = StringUtils.removeNamespace(newCol.name);
-        newCol.id = StringUtils.removeNamespace(newCol.id);
-        newCol.values = newColumnValues[ci];
-        newCol.type = col.type;
-        newTable.columns.add(newCol);
-        ci++;
-      }
-    }
+    // for( var col in tbl2.columns){
+    //   if( !excludeColumns.contains(col.name)){
+    //     var newCol = Column();
+    //     newCol.copyFrom(col);
+    //     newCol.name = StringUtils.removeNamespace(newCol.name);
+    //     newCol.id = StringUtils.removeNamespace(newCol.id);
+    //     newCol.values = newColumnValues[ci];
+    //     newCol.type = col.type;
+    //     newTable.columns.add(newCol);
+    //     ci++;
+    //   }
+    // }
 
     return newTable;
   }
