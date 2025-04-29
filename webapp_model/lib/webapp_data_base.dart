@@ -239,6 +239,11 @@ class WebAppDataBase with ChangeNotifier {
         .loadFolderStructure(app.projectId)
         .then((value) => notifyListeners());
 
+
+    workflowService.cache.clearCache();
+    projectService.cache.clearCache();
+
+
     app.navMenu.project = app.projectName;
     app.navMenu.user = app.username;
     app.navMenu.team = app.teamname;
