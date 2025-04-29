@@ -326,10 +326,6 @@ class WebAppDataBase with ChangeNotifier {
     return errMessage;
   }
 
-  Future<List<Workflow>> fetchProjectWorkflows(String projectId) async {
-    var projectFiles = projectService.getProjectFiles();
-    return workflowService.fetchProjectWorkflows(projectFiles);
-  }
 
   Future<void> updateTextFile(String workflowId, String text,
       {String lowerFileName = "readme"}) async {

@@ -13,12 +13,11 @@ import 'package:webapp_utils/functions/formatter_utils.dart';
 
 import 'package:webapp_utils/functions/logger.dart';
 
-
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_utils/model/workflow_setting.dart';
 import 'package:webapp_utils/services/project_data_service.dart';
 
-class WorkflowDataService  {
+class WorkflowDataService {
   static final WorkflowDataService _singleton = WorkflowDataService._internal();
   final CacheObject cache = CacheObject();
   factory WorkflowDataService() {
@@ -93,89 +92,68 @@ class WorkflowDataService  {
     return libObjs;
   }
 
-  // Future<Map<String, Workflow>> readWorkflowsFromLib() async {
+  Future<List<Workflow>> getProjectWorkflowList(String projectId,
+      {bool fetchOnServer = false, bool useCache = true}) async {
+    var factory = tercen.ServiceFactory();
+    var cacheKey = "${projectId}_workflowList";
+    if(useCache && cache.hasCachedValue(cacheKey)){
+      return cache.getCachedValue(cacheKey);
+    }
+    List<Workflow> workflowList = [];
+    if (fetchOnServer) {
+      var projObjs = await factory.projectDocumentService
+          .findProjectObjectsByLastModifiedDate(
+              startKey: [projectId, '0000'], endKey: [projectId, '9999']);
+      var workflowIds = projObjs
+          .where((e) => e.subKind == "Workflow")
+          .map((e) => e.id)
+          .toList();
 
-  //   if (installedWorkflows.isNotEmpty) {
-  //     return installedWorkflows;
-  //   }
+      workflowList =  await factory.workflowService.list(workflowIds);
+    } else {
+      var workflowIds = ProjectDataService()
+          .folderTreeRoot
+          .getDescendants(folders: false, documents: true)
+          .map((node) => node.document)
+          .where((doc) => doc.subKind == "Workflow")
+          .map((doc) => doc.id)
+          .toList();
+      workflowList = await factory.workflowService.list(workflowIds);
+    }
+    if( useCache ){
+      cache.addToCache(cacheKey, workflowList);
+    }
 
-  //   if (!infoLoaded) {
-  //     await init();
-  //   }
-  //   var factory = tercen.ServiceFactory();
+    return workflowList;
+  }
 
-  //   var libObjs = await factory.documentService
-  //       .getLibrary('', [], ["Workflow"], [], 0, -1);
+  bool workflowHasMetas( Workflow workflow, List<Pair> metas ){
+    return metas.every((meta) => workflow.getMeta(meta.key) == meta.value);
+  }
 
-  //   var reqWkfs = _getRequiredWorkflowsIds(libObjs);
+  Future<List<Workflow>> findWorkflowByMetas(String projectId, List<Pair> metas,
+      {bool fetchOnServer = false, bool useCache = true})  async {
+    
+    var workflowList = await getProjectWorkflowList(projectId, fetchOnServer: fetchOnServer, useCache: useCache);
 
-  //   var workflows = await factory.workflowService.list(reqWkfs[0]);
+    workflowList = workflowList.where((wkf) => workflowHasMetas(wkf, metas)).toList();
+    return workflowList;
+  }
 
-  //   for (var i = 0; i < workflows.length; i++) {
-  //     Logger().log(
-  //         level: Logger.INFO,
-  //         message: " Adding ${workflows[i].name} to ${reqWkfs[1][i]} ");
-  //     installedWorkflows[reqWkfs[1][i]] = workflows[i];
-  //   }
+  Future<Workflow> findWorkflowById(String id, {bool useCache = true}) async {
+    if( useCache && cache.hasCachedValue(id)){
+      return cache.getCachedValue(id);
+    }else{
+      var factory = tercen.ServiceFactory();
+      var workflow = factory.workflowService.get(id);
 
-  //   return installedWorkflows;
-  // }
+      if( useCache ){
+        cache.addToCache(id, workflow);
+      }
 
-  // String _isInRepoFile(Document libObj) {
-  //   for (var info in _requiredWorkflows) {
-
-  //     var isCorrectVersion = info.version == "NONE" || info.version == libObj.version;
-  //     // print("${info.url == libObj.url.uri} :::: $isCorrectVersion");
-  //     if (info.url == libObj.url.uri && isCorrectVersion) {
-  //       return info.iid;
-  //     }
-  //   }
-
-  //   return "";
-  // }
-
-  // bool _allWorkflowsInstalled(List<String> iids) {
-  //   for (var wi in _requiredWorkflows) {
-  //     if (!iids.contains(wi.iid)) {
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // }
-
-  // List<List<String>> _getRequiredWorkflowsIds(List<Document> libObjs) {
-  //   List<String> ids = [];
-  //   List<String> iids = [];
-  //   print("Checking library for required workflows");
-  //   for (var obj in libObjs) {
-  //     print("\tChecking ${obj.url.uri}");
-  //     var iid = _isInRepoFile(obj);
-  //     // print("IID: $iid");
-
-  //     if (iid != "") {
-  //       print("\tFound");
-  //       ids.add(obj.id);
-  //       iids.add(iid);
-  //     }
-  //   }
-
-  //   if (!_allWorkflowsInstalled(iids)) {
-  //     print("Did not find all needed workflows");
-  //     throw  sci.ServiceError(1, "Missing Required Templates", missingTemplateErrorMessage(iids));
-  //   }
-  //   return [ids, iids];
-  // }
-
-  // String missingTemplateErrorMessage(List<String> foundIids){
-  //   var err = "The following templates or versions were not found in any of your library teams:\n";
-
-  //   for( var info in _requiredWorkflows ){
-  //     if( !foundIids.contains( info.iid)){
-  //       err = "$err\n* ${info.url} (version ${info.version})";
-  //     }
-  //   }
-  //   return err;
-  // }
+      return workflow;
+    }
+  }
 
   Future<void> loadWorkflowSettings() async {
     Logger().log(level: Logger.FINE, message: "Loading workflow settings");
@@ -505,36 +483,36 @@ class WorkflowDataService  {
     await factory.workflowService.delete(workflow.id, workflow.rev);
   }
 
-  Future<List<Workflow>> fetchWorkflowsRemote(String projectId) async {
-    var factory = tercen.ServiceFactory();
-    var projObjs = await factory.projectDocumentService
-        .findProjectObjectsByLastModifiedDate(
-            startKey: [projectId, '0000'], endKey: [projectId, '9999']);
-    var workflowIds = projObjs
-        .where((e) => e.subKind == "Workflow")
-        .map((e) => e.id)
-        .toList();
+  // Future<List<Workflow>> fetchWorkflowsRemote(String projectId) async {
+  //   var factory = tercen.ServiceFactory();
+  //   var projObjs = await factory.projectDocumentService
+  //       .findProjectObjectsByLastModifiedDate(
+  //           startKey: [projectId, '0000'], endKey: [projectId, '9999']);
+  //   var workflowIds = projObjs
+  //       .where((e) => e.subKind == "Workflow")
+  //       .map((e) => e.id)
+  //       .toList();
 
-    return await factory.workflowService.list(workflowIds);
-  }
+  //   return await factory.workflowService.list(workflowIds);
+  // }
 
-  Future<Workflow> fetchWorkflow(String id) async {
-    var factory = tercen.ServiceFactory();
-    return factory.workflowService.get(id);
-  }
+  // Future<Workflow> fetchWorkflow(String id) async {
+  //   var factory = tercen.ServiceFactory();
+  //   return factory.workflowService.get(id);
+  // }
 
-  Future<List<Workflow>> fetchProjectWorkflows(
-      List<Document> projectFiles) async {
-    var workflowIds = projectFiles
-        .where((e) => e.subKind == "Workflow")
-        .map((e) => e.id)
-        .toList();
-    var factory = tercen.ServiceFactory();
+  // Future<List<Workflow>> fetchProjectWorkflows(
+  //     List<Document> projectFiles) async {
+  //   var workflowIds = projectFiles
+  //       .where((e) => e.subKind == "Workflow")
+  //       .map((e) => e.id)
+  //       .toList();
+  //   var factory = tercen.ServiceFactory();
 
-    return workflowIds.isEmpty
-        ? []
-        : await factory.workflowService.list(workflowIds);
-  }
+  //   return workflowIds.isEmpty
+  //       ? []
+  //       : await factory.workflowService.list(workflowIds);
+  // }
 
   Future<void> updateFile(Document document, String text) async {
     var factory = tercen.ServiceFactory();
@@ -618,9 +596,9 @@ class WorkflowDataService  {
     if (cache.hasCachedValue(key)) {
       return cache.getCachedValue(key);
     } else {
-      var workflowService = WorkflowDataService();
-      var workflows =
-          (await workflowService.fetchWorkflowsRemote(projectId)).toList();
+
+      var workflows = await getProjectWorkflowList(projectId, fetchOnServer: true);
+
 
       var res = WebappTable();
 

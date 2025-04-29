@@ -153,16 +153,6 @@ class WorkflowTaskComponent extends ActionTableComponent {
     notifyListeners();
   }
 
-  Future<sci.Workflow> getCachedWorkflow(String workflowId) async {
-    if (workflowCache.hasCachedValue(workflowId)) {
-      return workflowCache.getCachedValue(workflowId);
-    } else {
-      var workflowService = WorkflowDataService();
-      var workflow = await workflowService.fetchWorkflow(workflowId);
-      workflowCache.addToCache(workflowId, workflow);
-      return workflow;
-    }
-  }
 
   String getStepName(String taskId, List<sci.Workflow> workflowList) {
     var stepName = "";
@@ -195,10 +185,12 @@ class WorkflowTaskComponent extends ActionTableComponent {
       var nonWorkflowTasks =
           tasks.where((task) => task is! sci.RunWorkflowTask);
 
+      
+
       List<sci.Workflow> workflows = [];
       for (var ct in workflowTasks) {
         var workflowId = ct.workflowId;
-        workflows.add(await getCachedWorkflow(workflowId));
+        workflows.add(await WorkflowDataService().findWorkflowById(workflowId));
         taskStep.add("");
         taskId.add(ct.id);
         taskType.add(ct.kind);
