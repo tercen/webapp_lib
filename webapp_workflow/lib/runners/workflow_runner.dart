@@ -203,6 +203,16 @@ class WorkflowRunner with ProgressDialog {
     rr.id = "rename_${rel.id}";
     return rr;
   }
+  
+  void addTableFromRelationId(String stepId, String relationId, {String? name}) {
+    var rel = sci.SimpleRelation()
+      ..id = relationId;
+    tableMap[stepId] = rel;
+
+    if (name != null && name != "") {
+      tableNameMap[stepId] = name;
+    }
+  }
 
   void addTable(String stepId, sci.Table table, {String? name}) {
     var uuid = const Uuid();
