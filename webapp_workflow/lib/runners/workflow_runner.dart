@@ -62,13 +62,14 @@ class WorkflowRunner with ProgressDialog {
   var addTimestampToFolder = true;
 
   var isInit = false;
+  final bool keepTemplate;
   var workflow = sci.Workflow();
 
   final List<String> stepsToRemove = [];
   final List<sci.Pair> settingsByName = [];
   late final String timestamp;
 
-  WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.full}) {
+  WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.full, this.keepTemplate = true}) {
     if( timestampType == TimestampType.short){
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
     }else{
@@ -528,7 +529,7 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       workflow = await factory.workflowService.copyApp(template.id, projectId);
 
-      if (template.projectId == workflow.projectId) {
+      if (!keepTemplate && template.projectId == workflow.projectId) {
         await factory.workflowService.delete(template.id, template.rev);
       }
 
