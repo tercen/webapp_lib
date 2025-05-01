@@ -359,9 +359,13 @@ class WorkflowRunner with ProgressDialog {
   }
 
   void addAndFilter(String filterName, String stepId, List<String> keys,
-      List<dynamic> values) {
+      List<dynamic> values, {bool removeIfExists = false}) {
     var factors = convertToStepFactors(keys, getFactorNames(stepId));
     var filterKey = "$stepId$filterName";
+
+    if( removeIfExists && filterMap.containsKey(filterKey)){
+      filterMap.removeWhere((key, value) => key == filterKey);
+    }
 
     sci.Filter andFilter = sci.Filter()
       ..logical = "and"
