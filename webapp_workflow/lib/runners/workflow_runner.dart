@@ -623,10 +623,10 @@ class WorkflowRunner with ProgressDialog {
       workflow.isDeleted = false;
 
       // if (workflow.id == "" || workflow.rev == "") {
-        workflow.id = "";
-        workflow.rev = "";
+      workflow.id = "";
+      workflow.rev = "";
 
-        workflow = await factory.workflowService.create(workflow);
+      workflow = await factory.workflowService.create(workflow);
       // } else {
         // await factory.workflowService.update(workflow);
         // workflow = await factory.workflowService.get(workflow.id);
@@ -707,13 +707,15 @@ class WorkflowRunner with ProgressDialog {
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
+    workflow.addMeta("workflow.task.id", workflowTask.id);
+    workflow.addMeta("run.task.id", workflowTask.id);
+    await factory.workflowService.update(workflow);
+
     var taskStream = factory.eventService.channel(workflowTask.channelId);
 
     await factory.taskService.runTask(workflowTask.id);
 
-    workflow.addMeta("workflow.task.id", workflowTask.id);
-    workflow.addMeta("run.task.id", workflowTask.id);
-    await factory.workflowService.update(workflow);
+
 
     if (stepName == null) {
       updateStepProgress(workflow);
