@@ -566,7 +566,10 @@ class WorkflowRunner with ProgressDialog {
 
           if( removeFilters.containsKey(stp.id)){
             for( var filterName in removeFilters[stp.id]!){
-              stp.model.filters.namedFilters.removeWhere((filter) => filter.name == filterName);
+              var namedFilter = List.from(  stp.model.filters.namedFilters );
+              namedFilter.removeWhere((filter) => filter.name == filterName);
+              stp.model.filters = sci.Filters.json({"namedFilters":namedFilter});
+              
 
             }
           }
