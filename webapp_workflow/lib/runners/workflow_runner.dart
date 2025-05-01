@@ -707,11 +707,11 @@ class WorkflowRunner with ProgressDialog {
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
-    // workflow.addMeta("workflow.task.id", workflowTask.id);
-    // workflow.addMeta("run.task.id", workflowTask.id);
-    // await factory.workflowService.update(workflow);
-
     var taskStream = factory.eventService.channel(workflowTask.channelId);
+
+    workflow.addMeta("workflow.task.id", workflowTask.id);
+    workflow.addMeta("run.task.id", workflowTask.id);
+    await factory.workflowService.update(workflow);
 
     await factory.taskService.runTask(workflowTask.id);
 
