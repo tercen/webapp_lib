@@ -69,7 +69,7 @@ class WorkflowRunner with ProgressDialog {
   final List<sci.Pair> settingsByName = [];
   late final String timestamp;
 
-  WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.full, this.keepTemplate = true}) {
+  WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.full, this.keepTemplate = false}) {
     if( timestampType == TimestampType.short){
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
     }else{
