@@ -74,19 +74,25 @@ class WorkflowQueuRunner extends WorkflowRunner {
       if (evt is sci.PatchRecords) {
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
-          var prMap = jsonDecode(pr.d);
-          if (prMap is Map &&
-              prMap.keys.contains("kind") &&
-              prMap["kind"] == "FailedState") {
-            print(evt.toJson());
-            print("Workflow failed ###");
-            errorInformation["error"] = prMap["error"] as String;
-            errorInformation["reason"] = prMap["reason"] as String;
+          try {
+            var prMap = jsonDecode(pr.d);
+            if (prMap is Map &&
+                prMap.keys.contains("kind") &&
+                prMap["kind"] == "FailedState") {
+              print(evt.toJson());
+              print("Workflow failed ###");
+              errorInformation["error"] = prMap["error"] as String;
+              errorInformation["reason"] = prMap["reason"] as String;
 
-            await factory.taskService.cancelTask(workflowTask.id);
+              await factory.taskService.cancelTask(workflowTask.id);
 
-            hasFailed = true;
+              hasFailed = true;
+            }
+            
+          } catch (e) {
+            print(e.toString());
           }
+
         }
       }
       if (evt is sci.TaskStateEvent) {
