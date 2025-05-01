@@ -68,6 +68,7 @@ class WorkflowRunner with ProgressDialog {
   final List<String> stepsToRemove = [];
   final List<sci.Pair> settingsByName = [];
   late final String timestamp;
+  final Map<String, List<String>> removeFilters = {};
 
   WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.full, this.keepTemplate = false}) {
     if( timestampType == TimestampType.short){
@@ -75,6 +76,15 @@ class WorkflowRunner with ProgressDialog {
     }else{
       timestamp = DateFormat("yyyy.MM.dd_HH:mm").format(DateTime.now());
     }
+  }
+
+  void removedNamedFilter(String name, String stepId){
+    if( removeFilters.containsKey(stepId)){
+      removeFilters[stepId]!.add(name);
+    }else{
+      removeFilters[stepId] = [name];
+    }
+    
   }
 
   void addWorkflowMeta(String key, String value) {
@@ -359,13 +369,13 @@ class WorkflowRunner with ProgressDialog {
   }
 
   void addAndFilter(String filterName, String stepId, List<String> keys,
-      List<dynamic> values, {bool removeIfExists = false}) {
+      List<dynamic> values) {
     var factors = convertToStepFactors(keys, getFactorNames(stepId));
     var filterKey = "$stepId$filterName";
 
-    if( removeIfExists && filterMap.containsKey(filterKey)){
-      filterMap.removeWhere((key, value) => key == filterKey);
-    }
+    // if( removeIfExists && filterMap.containsKey(filterKey)){
+    //   filterMap.removeWhere((key, value) => key == filterKey);
+    // }
 
     sci.Filter andFilter = sci.Filter()
       ..logical = "and"
@@ -553,6 +563,13 @@ class WorkflowRunner with ProgressDialog {
           stp = updateFilterValues(stp as sci.DataStep);
           stp = updateOperatorSettings(stp, settings);
           stp = updateOperatorSettingsByName(stp, settingsByName);
+
+          if( removeFilters.containsKey(stp.id)){
+            for( var filterName in removeFilters[stp.id]!){
+              stp.model.filters.namedFilters.removeWhere((filter) => filter.name == filterName);
+
+            }
+          }
 
           for (var mapEntry in filterMap.entries) {
             if (mapEntry.key.contains(stp.id)) {
