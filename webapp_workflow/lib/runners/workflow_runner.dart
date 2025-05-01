@@ -622,15 +622,15 @@ class WorkflowRunner with ProgressDialog {
       workflow.isHidden = false;
       workflow.isDeleted = false;
 
-      if (workflow.id == "" || workflow.rev == "") {
+      // if (workflow.id == "" || workflow.rev == "") {
         workflow.id = "";
         workflow.rev = "";
 
         workflow = await factory.workflowService.create(workflow);
-      } else {
-        await factory.workflowService.update(workflow);
-        workflow = await factory.workflowService.get(workflow.id);
-      }
+      // } else {
+        // await factory.workflowService.update(workflow);
+        // workflow = await factory.workflowService.get(workflow.id);
+      // }
       workflowId = workflow.id;
       isInit = true;
     }
