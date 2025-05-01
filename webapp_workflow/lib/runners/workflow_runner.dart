@@ -204,10 +204,8 @@ class WorkflowRunner with ProgressDialog {
     return rr;
   }
   
-  void addTableFromRelationId(String stepId, String relationId, {String? name}) {
-    var rel = sci.SimpleRelation()
-      ..id = relationId;
-    tableMap[stepId] = rel;
+  void addTableFromRelation(String stepId, sci.Relation relation, {String? name}) {
+    tableMap[stepId] = relation;
 
     if (name != null && name != "") {
       tableNameMap[stepId] = name;
