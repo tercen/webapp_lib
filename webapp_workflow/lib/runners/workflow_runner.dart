@@ -543,8 +543,10 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       workflow = await factory.workflowService.copyApp(template.id, projectId);
 
-      if (!keepTemplate && template.projectId == workflow.projectId) {
-        await factory.workflowService.delete(template.id, template.rev);
+      if ( template.projectId == workflow.projectId) {
+        await factory.workflowService.delete(workflow.id, workflow.rev);
+        workflow.id = "";
+        workflow.rev = "";
       }
 
       for (var stepToRemove in stepsToRemove) {
