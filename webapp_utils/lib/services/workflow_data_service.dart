@@ -295,6 +295,7 @@ class WorkflowDataService {
 
     List<String> workflowNames = [];
     List<String> stepNames = [];
+    List<String> stepIds = [];
     List<String> filenames = [];
     List<String> bytes = [];
     List<String> contentTypeList = [];
@@ -362,6 +363,7 @@ class WorkflowDataService {
               uniqueAddedNames.add(nameContent.key);
               workflowNames.add(wkf.name);
               stepNames.add(step.get("name"));
+              stepIds.add(step.get("id"));
               filenames.add(nameContent.key);
               // var ct = tbl.columns[1].values[i];
 
@@ -392,6 +394,7 @@ class WorkflowDataService {
                   uniqueAddedNames.add(fname);
                   workflowNames.add(wkf.name);
                   stepNames.add(step.get("name"));
+                  stepIds.add(step.get("id"));
                   filenames.add(fname);
                   var ct = tbl.columns[1].values[i];
 
@@ -415,6 +418,7 @@ class WorkflowDataService {
       ..addColumn("workflowName", data: workflowNames)
       ..addColumn("filename", data: filenames)
       ..addColumn("step", data: stepNames)
+      ..addColumn("stepId", data: stepIds)
       ..addColumn("data", data: bytes)
       ..addColumn("contentType", data: contentTypeList);
     cache.addToCache(key, tbl);
