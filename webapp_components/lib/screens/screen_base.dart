@@ -139,31 +139,19 @@ mixin ScreenBase {
     List<Component> components = getAllComponents();
     this.modelLayer = modelLayer;
     for (var comp in components) {
-      if (comp is SerializableComponent && comp.shouldSaveState()) {
-        var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
-        if (modelValue != null) {
-          comp.setStateValue(modelValue);
-        }
-      }
-
       if (comp is ComponentBase) {
         (comp as ComponentBase).setActive();
         (comp as ComponentBase)
             .init()
             .then((val) => (comp as ComponentBase).postInit());
       }
-
-      // var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
-
-      // if (modelValue.isNotEmpty) {
-      //   if (comp is SingleValueComponent) {
-      //     comp.setValue(modelValue.first);
-      //   }
-
-      //   if (comp is MultiValueComponent) {
-      //     comp.setValue(modelValue);
-      //   }
-      // }
+      
+      if (comp is SerializableComponent && comp.shouldSaveState()) {
+        var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
+        if (modelValue != null) {
+          comp.setStateValue(modelValue);
+        }
+      }
     }
 
     updateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
