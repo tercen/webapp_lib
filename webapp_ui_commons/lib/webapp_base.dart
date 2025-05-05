@@ -28,7 +28,7 @@ class WebAppBase with ChangeNotifier {
   String teamname = "";
   String appName = "";
   String appVersion = "";
-  
+  bool isMenuCollapsed = false;
 
   // String selectedScreen = "";
   final List<MenuItem> menuItems = [];
@@ -204,8 +204,82 @@ class WebAppBase with ChangeNotifier {
     return screen.screen;
   }
 
+  
+
+  Widget buildMenu(Widget banner) {
+    if (isMenuCollapsed) {
+      return SizedBox(
+        width: 10,
+        child: Container(
+          color: Styles()["clear"],
+        ),
+      );
+    } else {
+      return Container(
+        color: Colors.white,
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Padding(padding: const EdgeInsets.fromLTRB(20, 0, 0, 0), child: navMenu.buildMenuWidget(banner: banner),) ,
+        ),
+      );
+    }
+  }
+
+  Widget buildMenuSeparator() {
+    var arrow = Icon(
+      Icons.arrow_back_ios_rounded,
+      color: Styles()["gray"],
+      size: 20,
+    );
+    if (isMenuCollapsed) {
+      arrow = Icon(
+        Icons.arrow_forward_ios_rounded,
+        color: Styles()["gray"],
+        size: 20,
+      );
+    }
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox(
+          width: 1.5,
+          child: Container(
+            color: Styles()["gray"],
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            isMenuCollapsed = !isMenuCollapsed;
+            navMenu.selectScreen(navMenu.selectedScreen);
+            // notifyListeners();
+          },
+          child: Stack(alignment: Alignment.center, children: [
+            Icon(
+              Icons.circle,
+              color: Styles()["clear"],
+              size: 40,
+            ),
+            Icon(Icons.circle_outlined, color: Styles()["gray"], size: 40),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+              child: arrow,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+              child: arrow,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: arrow,
+            ),
+          ]),
+        )
+      ],
+    );
+  }
+
+  
   Scaffold buildScaffoldPage() {
-    print("Building scaffold page with screen ${getSelectedScreen()}");
     Widget banner = Container(
       color: Colors.white,
       child: Wrap(
@@ -214,18 +288,16 @@ class WebAppBase with ChangeNotifier {
     );
 
     Widget leftPanelWidget = Flexible(
-      flex: 1,
+      flex: isMenuCollapsed ? 0 : 1,
       child: Container(
         color: Colors.white,
-        child: Align(
-            alignment: Alignment.topLeft, child: navMenu.buildMenuWidget(banner: banner)
-          ),
+        child: buildMenu(banner),
       ),
       // ),
     );
 
     Widget contentPanelWidget = Flexible(
-      flex: 5,
+      flex: isMenuCollapsed ? 12 : 5,
 
       child: Container(
         color: Colors.white,
@@ -237,26 +309,33 @@ class WebAppBase with ChangeNotifier {
     Widget wdg = Row(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
-        children: [leftPanelWidget, 
-        SizedBox(width: 4, child: Container(color: Colors.white,),),
-          SizedBox(width: 1, child: Container(color: Styles()["gray"],),),
-        SizedBox(width: 4, child: Container(color: Colors.white,),),
-         contentPanelWidget]);
+        children: [
+          leftPanelWidget,
+          SizedBox(
+            width: 4,
+            child: Container(
+              color: Colors.white,
+            ),
+          ),
+          buildMenuSeparator(),
+          SizedBox(
+            width: 4,
+            child: Container(
+              color: Colors.white,
+            ),
+          ),
+          contentPanelWidget
+        ]);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   toolbarHeight: 125,
-      //   titleSpacing: 0,
-      //   title: banner,
-      // ),
       body: SafeArea(
         right: false,
         child: CustomScrollView(
           clipBehavior: Clip.none,
           slivers: [
             SliverFillRemaining(
-              hasScrollBody: false,
+              hasScrollBody: true,
               child: wdg,
             )
           ],

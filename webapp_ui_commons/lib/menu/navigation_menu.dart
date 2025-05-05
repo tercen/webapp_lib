@@ -11,25 +11,27 @@ class NavigationMenu with ChangeNotifier {
   String user = "";
   String team = "";
   String webApp = "";
-  
 
   NavigationMenu();
 
   MenuItem getSelectedEntry() {
-    return _menuItems.firstWhere((e) => e.label == selectedScreen, orElse: () => _menuItems.first);
+    return _menuItems.firstWhere((e) => e.label == selectedScreen,
+        orElse: () => _menuItems.first);
   }
 
-  void selectScreen(String label){
-                selectedScreen = label;
-            notifyListeners();
-
+  void selectScreen(String label) {
+    selectedScreen = label;
+    notifyListeners();
   }
+
   Widget _createMenuEntry(MenuItem item) {
     bool isSelected = item.label == selectedScreen;
 
-    var bgColor =
-        item.isEnabled() && isSelected ? Styles()["selectedMenuBg"] : Colors.white;
-    var textStyle = isSelected ? Styles()["menuTextSelected"] : Styles()["menuText"];
+    var bgColor = item.isEnabled() && isSelected
+        ? Styles()["selectedMenuBg"]
+        : Colors.white;
+    var textStyle =
+        isSelected ? Styles()["menuTextSelected"] : Styles()["menuText"];
 
     var padding = const EdgeInsets.symmetric(vertical: 5, horizontal: 5);
     if (!item.isEnabled()) {
@@ -125,7 +127,7 @@ class NavigationMenu with ChangeNotifier {
 
   Widget buildMenuWidget({Widget? banner}) {
     List<Widget> entries = [];
-    if( banner != null ){
+    if (banner != null) {
       entries.add(banner);
     }
     for (var i = 0; i < _menuItems.length; i++) {
@@ -145,58 +147,57 @@ class NavigationMenu with ChangeNotifier {
       entries.add(_createExitButton(entry.key, entry.value));
     }
 
-    
-
     Widget entriesWdg = SizedBox.expand(
       child: SingleChildScrollView(child: Column(children: entries)),
     );
-  
+
     var infoEntries = createInfoWidgets();
 
-
-
-    return  Column(
-      children: [
-        Expanded(child: Container( child: entriesWdg )),
-        infoEntries
-      ],
+    return Column(
+      children: [Expanded(child: Container(child: entriesWdg)), infoEntries],
     );
-    
   }
 
-  Widget createInfoWidgets(){
-   List<Widget> infoEntries = [];
-    if( project != "" ){
-      infoEntries.add(
-        Text("Project: $project", style: Styles()["textGray"],)
-      );
-    }else{
-      infoEntries.add(
-        Text("No project loaded", style: Styles()["textGray"],)
-      );
+  Widget createInfoWidgets() {
+    List<Widget> infoEntries = [];
+    if (project != "") {
+      infoEntries.add(Text(
+        "Project: $project",
+        style: Styles()["textGray"],
+      ));
+    } else {
+      infoEntries.add(Text(
+        "No project loaded",
+        style: Styles()["textGray"],
+      ));
     }
 
-    if( team != ""){
-      infoEntries.add(
-        Text("$team($user)", style: Styles()["textGray"],)
-      );
-    }else{
-      infoEntries.add(
-        Text("$user", style: Styles()["textGray"],)
-      );
+    if (team != "") {
+      infoEntries.add(Text(
+        "$team($user)",
+        style: Styles()["textGray"],
+      ));
+    } else {
+      infoEntries.add(Text(
+        "$user",
+        style: Styles()["textGray"],
+      ));
     }
 
-    if( webApp != ""){
-      infoEntries.add(
-        Text("App: $webApp", style: Styles()["textGray"],)
-      );
+    if (webApp != "") {
+      infoEntries.add(Text(
+        "App: $webApp",
+        style: Styles()["textGray"],
+      ));
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: infoEntries,
-    );
+    return Align(
+        alignment: Alignment.centerLeft,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: infoEntries,
+        ));
   }
 
   void toggle(int index) {
