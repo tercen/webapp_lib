@@ -73,6 +73,9 @@ class WorkflowQueuRunner extends WorkflowRunner {
       if (evt is sci.PatchRecords) {
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
+          if(  pr.d.isEmpty){
+            continue;
+          }
           try {
             var prMap = jsonDecode(pr.d);
             if (prMap is Map &&
