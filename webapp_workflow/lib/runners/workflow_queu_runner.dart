@@ -89,7 +89,9 @@ class WorkflowQueuRunner extends WorkflowRunner {
             }
             
           } catch (e) {
+            print(evt.toJson());
             print(e.toString());
+            
           }
 
         }
