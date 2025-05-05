@@ -250,8 +250,7 @@ class WebAppBase with ChangeNotifier {
         InkWell(
           onTap: () {
             isMenuCollapsed = !isMenuCollapsed;
-            navMenu.selectScreen(navMenu.selectedScreen);
-            // notifyListeners();
+            navMenu.selectScreen(navMenu.selectedScreen); //Reload
           },
           child: Stack(alignment: Alignment.center, children: [
             Icon(
