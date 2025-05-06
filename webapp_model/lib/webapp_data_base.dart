@@ -296,9 +296,10 @@ class WebAppDataBase with ChangeNotifier {
     for (var reqWkf in requiredWorkflows) {
       print("Checking required workflow: ${reqWkf.url} [${reqWkf.version}]");
       var workflow = installedWorkflowsDocuments.firstWhere(
-        (wkf) => reqWkf.url == wkf.url.uri && (reqWkf.version == "" || reqWkf.version == wkf.version),
+        (wkf) => reqWkf.url == wkf.url.uri && (reqWkf.version == "" || (reqWkf.version == wkf.version)),
         orElse: () => Document(),
       );
+      print("\tFound: ${workflow.url} [${workflow.version}]");
       if (workflow.id == "") {
         missing.add(reqWkf);
       } else {
