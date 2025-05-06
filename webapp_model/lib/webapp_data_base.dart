@@ -289,7 +289,9 @@ class WebAppDataBase with ChangeNotifier {
         message: "Reading workflows for ${app.teamname} / ${app.username}");
     var installedWorkflowsDocuments =
         await workflowService.readWorkflowsDocumentsFromLib();
-
+    for( var w in installedWorkflowsDocuments ){
+      print("${w.url.uri} [${w.version}]");
+    }
     List<RequiredTemplate> missing = [];
 
     List<Pair> workflowsToFetch = [];
@@ -299,7 +301,7 @@ class WebAppDataBase with ChangeNotifier {
         (wkf) => reqWkf.url == wkf.url.uri && (reqWkf.version == "" || (reqWkf.version == wkf.version)),
         orElse: () => Document(),
       );
-      print("\tFound: ${workflow.url} [${workflow.version}]");
+      print("\tFound: ${workflow.url.uri} [${workflow.version}]");
       if (workflow.id == "") {
         missing.add(reqWkf);
       } else {
