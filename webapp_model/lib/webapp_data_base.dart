@@ -295,7 +295,7 @@ class WebAppDataBase with ChangeNotifier {
     List<Pair> workflowsToFetch = [];
     for (var reqWkf in requiredWorkflows) {
       var workflow = installedWorkflowsDocuments.firstWhere(
-        (wkf) => reqWkf.url == wkf.url.uri && reqWkf.version == wkf.version,
+        (wkf) => reqWkf.url == wkf.url.uri && (reqWkf.version != "" && reqWkf.version == wkf.version),
         orElse: () => Document(),
       );
       if (workflow.id == "") {
