@@ -780,9 +780,17 @@ class WorkflowRunner with ProgressDialog {
     return workflow;
   }
 
-  Future<sci.Workflow> doRun(BuildContext context) async {
-    openDialog(context);
-    await setupRun(context);
+  Future<sci.Workflow> doRun(BuildContext? context, {bool setup = true}) async {
+    if( context!=null){
+      openDialog(context);
+    }
+    
+    if( setup == true ){
+      await setupRun(context);
+    }else{
+      workflow = template;
+    }
+    
     var runTitle = getWorkflowName(template);
 
     //-----------------------------------------
@@ -802,10 +810,12 @@ class WorkflowRunner with ProgressDialog {
     // handler.sendProjectFileUpdateNotification(notificationKey!);
     // }
 
-    await Future.delayed(const Duration(milliseconds: 1000), () {
-      // status.value = RunStatus.finished;
-      closeLog();
-    });
+    if( context!=null){
+      await Future.delayed(const Duration(milliseconds: 1000), () {
+        // status.value = RunStatus.finished;
+        closeLog();
+      });
+    }
 
     workflowId = workflow.id;
     // workflow = doneWorkflow;

@@ -19,14 +19,18 @@ class WorkflowQueuRunner extends WorkflowRunner {
   }
 
   @override
-  Future<sci.Workflow> doRun(BuildContext context) async {
+  Future<sci.Workflow> doRun(BuildContext? context, {bool setup = true}) async {
     if (template.id == "") {
       throw Exception("Workflow not set in WorkflowRunner.");
     }
 
     var factory = tercen.ServiceFactory();
-
-    await setupRun(context);
+   
+    if( setup == true ){
+      await setupRun(context);
+    }else{
+      workflow = template;
+    }
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
