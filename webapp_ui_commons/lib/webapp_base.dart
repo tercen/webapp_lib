@@ -24,6 +24,7 @@ class WebAppBase with ChangeNotifier {
   String projectId = "";
   String projectName = "";
   String projectHref = "";
+  String serviceBase = "";
   String username = "";
   String teamname = "";
   String appName = "";
@@ -106,7 +107,7 @@ class WebAppBase with ChangeNotifier {
         var parentPort =
             html.document.referrer.split(":").last.split("/").first;
         href = "$href:$parentPort";
-
+        serviceBase = href;
         href = "$href/$username";
         href = "$href/p/$projectId";
         projectHref = href;
@@ -124,6 +125,7 @@ class WebAppBase with ChangeNotifier {
         if (Uri.base.hasPort) {
           href = "$href:${Uri.base.port}";
         }
+        serviceBase = href;
 
         href = "$href/$username";
         if( projectId != ""){
