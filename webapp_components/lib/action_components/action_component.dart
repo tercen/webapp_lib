@@ -9,5 +9,7 @@ abstract class ActionComponent {
 
   bool isEnabled();
   String label();
+  String getId();
+  
   
 }

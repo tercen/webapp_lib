@@ -185,6 +185,12 @@ mixin ScreenBase {
     return "";
   }
 
+  ActionComponent? getActionComponent(String name) {
+    return _actionComponents.whereType<ActionComponent>()
+      .where((comp) => comp.getId() == name ).firstOrNull;
+  }
+
+
   Component? getComponent(String name, {String? groupId}) {
     Component? comp;
 

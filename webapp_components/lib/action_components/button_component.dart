@@ -67,5 +67,11 @@ class ButtonActionComponent implements ActionComponent {
   String label() {
     return componentLabel;
   }
+  
+  
+  @override
+  String getId() {
+    return id;
+  }
 
 }
