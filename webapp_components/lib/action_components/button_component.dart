@@ -12,9 +12,10 @@ class ButtonActionComponent implements ActionComponent {
   final List<Component>? parents;
   
   final bool blocking;
+  bool enabled;
 
 
-  ButtonActionComponent(this.id, this.componentLabel, this.action, { this.parents, this.blocking = false});
+  ButtonActionComponent(this.id, this.componentLabel, this.action, { this.parents, this.blocking = false, this.enabled = true});
 
 
   @override
@@ -43,10 +44,16 @@ class ButtonActionComponent implements ActionComponent {
   }
 
 
+  void enable(){
+    enabled = true;
+  }
+
+  void disable(){
+    enabled = false;
+  }
+
   @override
   bool isEnabled() {
-    bool enabled = true;
-
     if( parents != null){
       for( var p in parents! ){
         enabled = enabled && p.isFulfilled();
