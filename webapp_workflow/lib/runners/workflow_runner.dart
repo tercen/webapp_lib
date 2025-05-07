@@ -641,10 +641,13 @@ class WorkflowRunner with ProgressDialog {
     }
   }
 
-  Future<sci.Workflow> doRunStep(BuildContext context, String stepId) async {
+  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId) async {
     var factory = tercen.ServiceFactory();
 
-    openDialog(context);
+    if( context != null ){
+      openDialog(context);
+    }
+    
     await setupRun(context);
     var runTitle = getWorkflowName(template);
 
@@ -672,7 +675,9 @@ class WorkflowRunner with ProgressDialog {
     workflow =
         await runWorkflowTask(workflow, runTitle: runTitle, stepName: stpName);
 
-    log("Running $stpName\n\n \nRunning final updates", dialogTitle: runTitle);
+    if( context != null ){
+      log("Running $stpName\n\n \nRunning final updates", dialogTitle: runTitle);
+    }
 
     for (var f in postRunCallbacks) {
       await f();
@@ -686,9 +691,11 @@ class WorkflowRunner with ProgressDialog {
 
     await factory.workflowService.update(workflow);
 
-    await Future.delayed(const Duration(milliseconds: 1000), () {
-      closeLog();
-    });
+    if( context != null ){
+      await Future.delayed(const Duration(milliseconds: 1000), () {
+        closeLog();
+      });
+    }
 
     workflowId = workflow.id;
     workflow = workflow;
