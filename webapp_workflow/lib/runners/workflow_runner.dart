@@ -522,7 +522,7 @@ class WorkflowRunner with ProgressDialog {
     return "${folderPrefix}${timeStr}${folderSuffix}";
   }
 
-  Future<void> setupRun(BuildContext context) async {
+  Future<void> setupRun(BuildContext? context) async {
     if (!isInit) {
       if (template.id == "") {
         throw Exception("Workflow not set in WorkflowRunner.");
@@ -531,8 +531,11 @@ class WorkflowRunner with ProgressDialog {
       var factory = tercen.ServiceFactory();
 
       var runTitle = getWorkflowName(template);
-
-      log("Set up", dialogTitle: runTitle);
+      
+      if( context != null){
+        log("Set up", dialogTitle: runTitle);
+      }
+      
 
       for (var entry in tableDocumentMap.entries) {
         tableMap[entry.key] = await loadDocumentInMemory(entry.value);
