@@ -7,6 +7,7 @@ mixin class ComponentInfoBox {
 
   Widget infoBoxIcon(dynamic value, BuildContext context, {String? title}) {
     return IconButton(
+      alignment: Alignment.center,
         onPressed: () async {
           showDialog(
               context: context,
