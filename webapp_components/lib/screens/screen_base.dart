@@ -132,27 +132,25 @@ mixin ScreenBase {
       blockTypes.add(blockType);
       componentBlocks[blockId] = [entry];
     }
-    
   }
 
   void initScreen(WebAppDataBase modelLayer) {
     List<Component> components = getAllComponents();
     this.modelLayer = modelLayer;
     for (var comp in components) {
-            if (comp is SerializableComponent && comp.shouldSaveState()) {
-        var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
-        if (modelValue != null) {
-          comp.setStateValue(modelValue);
-        }
-      }
       if (comp is ComponentBase) {
         (comp as ComponentBase).setActive();
         (comp as ComponentBase)
             .init()
             .then((val) => (comp as ComponentBase).postInit());
       }
-      
 
+      if (comp is SerializableComponent && comp.shouldSaveState()) {
+        var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
+        if (modelValue != null) {
+          comp.setStateValue(modelValue);
+        }
+      }
     }
 
     updateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -187,10 +185,11 @@ mixin ScreenBase {
   }
 
   ActionComponent? getActionComponent(String name) {
-    return _actionComponents.whereType<ActionComponent>()
-      .where((comp) => comp.getId() == name ).firstOrNull;
+    return _actionComponents
+        .whereType<ActionComponent>()
+        .where((comp) => comp.getId() == name)
+        .firstOrNull;
   }
-
 
   Component? getComponent(String name, {String? groupId}) {
     Component? comp;
@@ -272,21 +271,34 @@ mixin ScreenBase {
     }
     if (comp is ComponentBase) {
       var msg = (comp as ComponentBase).getDescription();
-      
+
       final questionIcon = Stack(
         children: [
-          Icon(Icons.circle, color: Styles()["tooltipBg"],),
-          Icon(Icons.question_mark, color: Styles()["white"],)
+          Icon(
+            Icons.circle,
+            color: Styles()["tooltipBg"],
+            size: 18,
+          ),
+          Icon(
+            Icons.question_mark,
+            color: Styles()["white"],
+            size: 12,
+          )
         ],
       );
       return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          msg.isEmpty ? Container() : Tooltip(message:msg, child: questionIcon,),
           Text(
-          comp.label(),
-          style: Styles()["textH2"],
-        )
+            comp.label(),
+            style: Styles()["textH2"],
+          ),
+          msg.isEmpty
+              ? Container()
+              : Tooltip(
+                  message: msg,
+                  child: questionIcon,
+                ),
         ],
       );
 

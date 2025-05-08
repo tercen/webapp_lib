@@ -20,7 +20,7 @@ class FetchComponent with
 
   FetchComponent( this.dataFetchCallback );
 
-    @override
+  @override
   void dispose() {
     super.dispose();
     cancelAllOperations();
