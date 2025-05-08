@@ -273,16 +273,17 @@ mixin ScreenBase {
       var msg = (comp as ComponentBase).getDescription();
 
       final questionIcon = Stack(
+        alignment: Alignment.center,
         children: [
           Icon(
             Icons.circle,
             color: Styles()["tooltipBg"],
-            size: 18,
+            size: 15,
           ),
           Icon(
             Icons.question_mark,
             color: Styles()["white"],
-            size: 12,
+            size: 10,
           )
         ],
       );
@@ -295,10 +296,12 @@ mixin ScreenBase {
           ),
           msg.isEmpty
               ? Container()
-              : Tooltip(
-                  message: msg,
-                  child: questionIcon,
-                ),
+              : Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  child: Tooltip(
+                    message: msg,
+                    child: questionIcon,
+                  )),
         ],
       );
 
