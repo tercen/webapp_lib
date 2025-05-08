@@ -270,13 +270,32 @@ mixin ScreenBase {
       }
     }
     if (comp is ComponentBase) {
-      return Tooltip(
-        message: (comp as ComponentBase).getDescription(),
-        child: Text(
+      var msg = (comp as ComponentBase).getDescription();
+      
+      final questionIcon = Stack(
+        children: [
+          Icon(Icons.circle, color: Styles()["tooltipBg"],),
+          Icon(Icons.question_mark, color: Styles()["white"],)
+        ],
+      );
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          msg.isEmpty ? Container() : Tooltip(message:msg, child: questionIcon,),
+          Text(
           comp.label(),
           style: Styles()["textH2"],
-        ),
+        )
+        ],
       );
+
+      // return Tooltip(
+      //   message: (comp as ComponentBase).getDescription(),
+      //   child: Text(
+      //     comp.label(),
+      //     style: Styles()["textH2"],
+      //   ),
+      // );
     } else {
       return Text(
         comp.label(),
