@@ -117,8 +117,9 @@ class WebAppBase with ChangeNotifier {
         session = sci.UserSession.json(auth);
         // widget.handler.userSession = session;
 
-        username = session.user
-            .name; //widget.handler.getModelValue(ModelKey.selectedTeam, emptyVal: session.user.name);
+        username = teamname;
+        // session.user
+            // .name; //widget.handler.getModelValue(ModelKey.selectedTeam, emptyVal: session.user.name);
 
         var href = "${Uri.base.scheme}://";
         href = "$href${Uri.base.host}";
