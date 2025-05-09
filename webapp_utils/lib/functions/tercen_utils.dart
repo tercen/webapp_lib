@@ -12,14 +12,10 @@ class TercenUtils {
     for (var i = 0; i < numCols; i++) {
       newColumnValues.add([]);
     }
-    var tbl1Cols =
-        tbl1.columns.where((col) => onl.any((onk) => col.name.contains(onk)));
-    var tbl2Cols =
-        tbl2.columns.where((col) => onr.any((onk) => col.name.contains(onk)));
-    var tbl1AllCols =
-        tbl1.columns.where((col) => !excludeColumns.contains(col.name));
-    var tbl2AllCols = tbl2.columns
-        .where((col) => !excludeColumns.contains(col.name))
+    var tbl1Cols = tbl1.columns.where((col) => onl.any((onk) => col.name.contains(onk)));
+    var tbl2Cols = tbl2.columns.where((col) => onr.any((onk) => col.name.contains(onk)));
+    var tbl1AllCols = tbl1.columns.where((col) => !excludeColumns.contains(col.name));
+    var tbl2AllCols = tbl2.columns.where((col) => !excludeColumns.contains(col.name))
         .where((col) => !tbl1AllCols.any((col1) =>
             StringUtils.removeNamespace(col1.name) ==
             StringUtils.removeNamespace(col.name)));
@@ -35,7 +31,8 @@ class TercenUtils {
       final tbl2RowIndices = tbl2Index[lKeyVals];
 
       if (tbl2RowIndices != null) {
-        for (var ri2 in tbl2RowIndices) {
+        var ri2 = tbl2RowIndices[0];
+        // for (var ri2 in tbl2RowIndices) {
           var combinedValues = <dynamic>[];
           for (var col in tbl1AllCols) {
             combinedValues.add(col.values[ri]);
@@ -47,7 +44,7 @@ class TercenUtils {
           for (var i = 0; i < combinedValues.length; i++) {
             newColumnValues[i].add(combinedValues[i]);
           }
-        }
+        // }
       }
     }
 
