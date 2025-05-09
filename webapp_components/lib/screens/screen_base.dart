@@ -245,7 +245,7 @@ mixin ScreenBase {
   }
 
   String breakLabel(String label){
-    var lblLen = modelLayer.app.isMenuCollapsed ? 35 : 25;
+    var lblLen = modelLayer.app.isMenuCollapsed ? 35 : 22;
     if( label.length <= lblLen ){
       return label;
     }
@@ -367,7 +367,7 @@ mixin ScreenBase {
         width: 50,
       );
     }
-
+    print(modelLayer.app.isMenuCollapsed);
     if (comp.isActive()) {
       if (compType == ComponentType.simple) {
         return Row(children: [
@@ -389,7 +389,6 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-
                     constraints: BoxConstraints(maxWidth: modelLayer.app.isMenuCollapsed ? 350 : 250),
                     child: _wrap(_buildLabel(comp)))),
             Align(
