@@ -320,7 +320,7 @@ mixin ScreenBase {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            breakLabel( comp.label() ),
+            shouldBreakLabel ? breakLabel( comp.label() ) : comp.label(),
             style: Styles()["textH2"],
           ),
           msg.isEmpty
@@ -336,7 +336,7 @@ mixin ScreenBase {
 
     } else {
       return Text(
-        breakLabel( comp.label() ),
+        shouldBreakLabel ? breakLabel( comp.label() ) : comp.label(),
         style: Styles()["textH2"],
       );
     }
