@@ -245,7 +245,7 @@ mixin ScreenBase {
   }
 
   String breakLabel(String label){
-    if( label.length < 30 ){
+    if( label.length <= 20 ){
       return label;
     }
     var chars = label.split('');
@@ -253,7 +253,7 @@ mixin ScreenBase {
 
     var origLen = chars.length;
     var off = 0;
-    for( var i = 29; i < origLen; i = i + 29){
+    for( var i = 20; i < origLen; i = i + 20){
       chars.insert(i+off, '\n');
       off = off + 1;
     }
