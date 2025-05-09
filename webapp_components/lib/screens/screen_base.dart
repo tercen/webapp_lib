@@ -244,7 +244,23 @@ mixin ScreenBase {
     );
   }
 
-  // String breakLabel
+  String breakLabel(String label){
+    if( label.length < 30 ){
+      return label;
+    }
+    var chars = label.split('');
+
+
+    var origLen = chars.length;
+    var off = 0;
+    for( var i = 29; i < origLen; i = i + 29){
+      chars.insert(i+off, '\n');
+      off = off + 1;
+    }
+
+    return chars.join('');
+
+  }
 
   Widget _buildLabel(Component comp) {
     var style = Styles()["textH2"];
@@ -264,7 +280,7 @@ mixin ScreenBase {
               width: 10,
             ),
             Text(
-              comp.label(),
+              breakLabel( comp.label() ),
               style: style,
               softWrap: true,
             )
@@ -356,11 +372,11 @@ mixin ScreenBase {
         return Row(children: [
           paddingWdg,
           ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.3),
+              constraints: BoxConstraints(maxWidth: 250),
               child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(
-                  maxWidth: MediaQuery.sizeOf(context).width * 0.6),
+                  maxWidth: MediaQuery.sizeOf(context).width * 0.63),
               child: _wrap(buildContent(comp, context))),
         ]);
       }
