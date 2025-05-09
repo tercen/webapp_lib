@@ -244,6 +244,8 @@ mixin ScreenBase {
     );
   }
 
+  // String breakLabel
+
   Widget _buildLabel(Component comp) {
     var style = Styles()["textH2"];
     if (comp is InputValidator) {
@@ -354,7 +356,7 @@ mixin ScreenBase {
         return Row(children: [
           paddingWdg,
           ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 250),
+              constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.3),
               child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(
