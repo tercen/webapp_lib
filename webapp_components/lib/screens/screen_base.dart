@@ -137,6 +137,7 @@ mixin ScreenBase {
   void checkMenuCollapse(){
     isMenuCollapsed = modelLayer.app.isMenuCollapsed;
     print("Checking menu collapse: $isMenuCollapsed");
+    refresh();
     
   }
 
@@ -252,7 +253,7 @@ mixin ScreenBase {
   }
 
   String breakLabel(String label){
-    var lblLen =  isMenuCollapsed ? 35 : 22;
+    var lblLen =  isMenuCollapsed ? 35 : 24;
     
     if( label.length <= lblLen ){
       return label;
