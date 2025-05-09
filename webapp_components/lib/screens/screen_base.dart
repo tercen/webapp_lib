@@ -305,13 +305,6 @@ mixin ScreenBase {
         ],
       );
 
-      // return Tooltip(
-      //   message: (comp as ComponentBase).getDescription(),
-      //   child: Text(
-      //     comp.label(),
-      //     style: Styles()["textH2"],
-      //   ),
-      // );
     } else {
       return Text(
         comp.label(),
@@ -360,7 +353,7 @@ mixin ScreenBase {
         return Row(children: [
           paddingWdg,
           Container(
-              constraints: const BoxConstraints(maxWidth: 250),
+              constraints: const BoxConstraints(maxWidth: 450),
               child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(
@@ -376,7 +369,7 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                    constraints: const BoxConstraints(maxWidth: 250),
+                    constraints: const BoxConstraints(maxWidth: 450),
                     child: _wrap(_buildLabel(comp)))),
             Align(
                 alignment: Alignment.topLeft,
