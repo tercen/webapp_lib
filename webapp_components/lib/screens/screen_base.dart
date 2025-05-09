@@ -57,7 +57,7 @@ mixin ScreenBase {
   final Map<String, List<ComponentEntry>> componentBlocks = {};
   late final WebAppDataBase modelLayer;
   Timer? updateTimer;
-
+  bool isMenuCollapsed = false;
   void addActionComponent(ActionComponent component) {
     _actionComponents.add(component);
   }
@@ -134,9 +134,15 @@ mixin ScreenBase {
     }
   }
 
+  void checkMenuCollapse(){
+    print("Checking menu collapse");
+    isMenuCollapsed = modelLayer.app.isMenuCollapsed;
+  }
+
   void initScreen(WebAppDataBase modelLayer) {
     List<Component> components = getAllComponents();
     this.modelLayer = modelLayer;
+    modelLayer.app.addListener(checkMenuCollapse);
     for (var comp in components) {
       if (comp is ComponentBase) {
         (comp as ComponentBase).setActive();
@@ -245,13 +251,8 @@ mixin ScreenBase {
   }
 
   String breakLabel(String label){
-    var lblLen = 22;
-     
-    try {
-      lblLen = modelLayer.app.isMenuCollapsed ? 35 : 22;
-    } catch (e) {
-      
-    }
+    var lblLen =  isMenuCollapsed ? 35 : 22;
+    
     if( label.length <= lblLen ){
       return label;
     }
@@ -373,13 +374,8 @@ mixin ScreenBase {
         width: 50,
       );
     }
-    var width = 350.0;
-    try {
-      print(modelLayer.app.isMenuCollapsed);  
-      width = modelLayer.app.isMenuCollapsed ? 350 : 250;
-    } catch (e) {
-      
-    }
+    var width = isMenuCollapsed ? 350.0 : 250.0;
+    
     
     if (comp.isActive()) {
       if (compType == ComponentType.simple) {
