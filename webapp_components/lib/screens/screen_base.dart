@@ -245,7 +245,8 @@ mixin ScreenBase {
   }
 
   String breakLabel(String label){
-    if( label.length <= 20 ){
+    var lblLen = modelLayer.app.isMenuCollapsed ? 35 : 25;
+    if( label.length <= lblLen ){
       return label;
     }
     var chars = label.split('');
@@ -253,7 +254,7 @@ mixin ScreenBase {
 
     var origLen = chars.length;
     var off = 0;
-    for( var i = 20; i < origLen; i = i + 20){
+    for( var i = lblLen; i < origLen; i = i + lblLen){
       chars.insert(i+off, '\n');
       off = off + 1;
     }
@@ -372,11 +373,11 @@ mixin ScreenBase {
         return Row(children: [
           paddingWdg,
           ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 250),
+              constraints: BoxConstraints(maxWidth: modelLayer.app.isMenuCollapsed ? 350 : 250),
               child: _wrap(_buildLabel(comp))),
           Container(
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.sizeOf(context).width * 0.63),
+              // constraints: BoxConstraints(
+                  // maxWidth: MediaQuery.sizeOf(context).width * 0.63),
               child: _wrap(buildContent(comp, context))),
         ]);
       }
@@ -389,7 +390,7 @@ mixin ScreenBase {
                 alignment: Alignment.topLeft,
                 child: Container(
 
-                    constraints: const BoxConstraints(maxWidth: 250),
+                    constraints: BoxConstraints(maxWidth: modelLayer.app.isMenuCollapsed ? 350 : 250),
                     child: _wrap(_buildLabel(comp)))),
             Align(
                 alignment: Alignment.topLeft,
