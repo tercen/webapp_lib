@@ -376,8 +376,8 @@ mixin ScreenBase {
               constraints: BoxConstraints(maxWidth: modelLayer.app.isMenuCollapsed ? 350 : 250),
               child: _wrap(_buildLabel(comp))),
           Container(
-              // constraints: BoxConstraints(
-                  // maxWidth: MediaQuery.sizeOf(context).width * 0.63),
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.sizeOf(context).width * 0.63),
               child: _wrap(buildContent(comp, context))),
         ]);
       }
