@@ -253,7 +253,6 @@ mixin ScreenBase {
   }
 
   String breakLabel(String label){
-    //FIXME Base this off block
     var lblLen =  isMenuCollapsed ? 36 : 26;
     
     if( label.length <= lblLen ){
@@ -273,7 +272,7 @@ mixin ScreenBase {
 
   }
 
-  Widget _buildLabel(Component comp) {
+  Widget _buildLabel(Component comp, {bool shouldBreakLabel = false}) {
     var style = Styles()["textH2"];
     if (comp is InputValidator) {
       var validateResults = (comp as InputValidator).results;
@@ -291,7 +290,7 @@ mixin ScreenBase {
               width: 10,
             ),
             Text(
-              breakLabel( comp.label() ),
+              shouldBreakLabel ? breakLabel( comp.label() ) : comp.label(),
               style: style,
               softWrap: true,
             )
@@ -388,7 +387,7 @@ mixin ScreenBase {
           paddingWdg,
           ConstrainedBox(
               constraints: BoxConstraints(maxWidth: width),
-              child: _wrap(_buildLabel(comp))),
+              child: _wrap(_buildLabel(comp, shouldBreakLabel: true))),
           Container(
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.sizeOf(context).width * 0.63),
