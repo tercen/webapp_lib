@@ -135,8 +135,9 @@ mixin ScreenBase {
   }
 
   void checkMenuCollapse(){
-    print("Checking menu collapse");
     isMenuCollapsed = modelLayer.app.isMenuCollapsed;
+    print("Checking menu collapse: $isMenuCollapsed");
+    
   }
 
   void initScreen(WebAppDataBase modelLayer) {
