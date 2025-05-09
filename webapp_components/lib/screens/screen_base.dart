@@ -264,6 +264,7 @@ mixin ScreenBase {
             Text(
               comp.label(),
               style: style,
+              softWrap: true,
             )
           ],
         );
@@ -352,8 +353,8 @@ mixin ScreenBase {
       if (compType == ComponentType.simple) {
         return Row(children: [
           paddingWdg,
-          Container(
-              constraints: const BoxConstraints(maxWidth: 450),
+          ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 250),
               child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(
@@ -369,7 +370,8 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                    constraints: const BoxConstraints(maxWidth: 450),
+
+                    constraints: const BoxConstraints(maxWidth: 250),
                     child: _wrap(_buildLabel(comp)))),
             Align(
                 alignment: Alignment.topLeft,
