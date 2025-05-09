@@ -252,8 +252,12 @@ mixin ScreenBase {
     );
   }
 
-  String breakLabel(String label){
+  String breakLabel(String label, bool tabbed){
+    //FIXME Base this off block
     var lblLen =  isMenuCollapsed ? 35 : 24;
+    if( tabbed ){
+      lblLen = lblLen + 10;
+    }
     
     if( label.length <= lblLen ){
       return label;
@@ -272,7 +276,7 @@ mixin ScreenBase {
 
   }
 
-  Widget _buildLabel(Component comp) {
+  Widget _buildLabel(Component comp, bool tabbed ) {
     var style = Styles()["textH2"];
     if (comp is InputValidator) {
       var validateResults = (comp as InputValidator).results;
@@ -290,7 +294,7 @@ mixin ScreenBase {
               width: 10,
             ),
             Text(
-              breakLabel( comp.label() ),
+              breakLabel( comp.label(), tabbed ),
               style: style,
               softWrap: true,
             )
@@ -320,7 +324,7 @@ mixin ScreenBase {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            breakLabel( comp.label() ),
+            breakLabel( comp.label(), tabbed ),
             style: Styles()["textH2"],
           ),
           msg.isEmpty
@@ -336,7 +340,7 @@ mixin ScreenBase {
 
     } else {
       return Text(
-        breakLabel( comp.label() ),
+        breakLabel( comp.label(), tabbed ),
         style: Styles()["textH2"],
       );
     }
@@ -385,7 +389,7 @@ mixin ScreenBase {
           paddingWdg,
           ConstrainedBox(
               constraints: BoxConstraints(maxWidth: width),
-              child: _wrap(_buildLabel(comp))),
+              child: _wrap(_buildLabel(comp, addPadding))),
           Container(
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.sizeOf(context).width * 0.63),
@@ -401,7 +405,7 @@ mixin ScreenBase {
                 alignment: Alignment.topLeft,
                 child: Container(
                     constraints: BoxConstraints(maxWidth: modelLayer.app.isMenuCollapsed ? 350 : 250),
-                    child: _wrap(_buildLabel(comp)))),
+                    child: _wrap(_buildLabel(comp, addPadding)))),
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
