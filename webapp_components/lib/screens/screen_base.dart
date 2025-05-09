@@ -252,12 +252,9 @@ mixin ScreenBase {
     );
   }
 
-  String breakLabel(String label, bool tabbed){
+  String breakLabel(String label){
     //FIXME Base this off block
     var lblLen =  isMenuCollapsed ? 35 : 24;
-    if( tabbed ){
-      lblLen = lblLen + 10;
-    }
     
     if( label.length <= lblLen ){
       return label;
@@ -276,7 +273,7 @@ mixin ScreenBase {
 
   }
 
-  Widget _buildLabel(Component comp, bool tabbed ) {
+  Widget _buildLabel(Component comp) {
     var style = Styles()["textH2"];
     if (comp is InputValidator) {
       var validateResults = (comp as InputValidator).results;
@@ -294,7 +291,7 @@ mixin ScreenBase {
               width: 10,
             ),
             Text(
-              breakLabel( comp.label(), tabbed ),
+              breakLabel( comp.label() ),
               style: style,
               softWrap: true,
             )
@@ -324,7 +321,7 @@ mixin ScreenBase {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            breakLabel( comp.label(), tabbed ),
+            breakLabel( comp.label() ),
             style: Styles()["textH2"],
           ),
           msg.isEmpty
@@ -340,7 +337,7 @@ mixin ScreenBase {
 
     } else {
       return Text(
-        breakLabel( comp.label(), tabbed ),
+        breakLabel( comp.label() ),
         style: Styles()["textH2"],
       );
     }
@@ -375,21 +372,23 @@ mixin ScreenBase {
       Component comp, ComponentType compType, BuildContext context,
       {bool addPadding = true}) {
     Widget paddingWdg = Container();
+    var width = isMenuCollapsed ? 350.0 : 250.0;
     if (addPadding) {
       paddingWdg = const SizedBox(
         width: 50,
       );
+      width = width + 50;
     }
-    var width = isMenuCollapsed ? 350.0 : 250.0;
     
     
+
     if (comp.isActive()) {
       if (compType == ComponentType.simple) {
         return Row(children: [
           paddingWdg,
           ConstrainedBox(
               constraints: BoxConstraints(maxWidth: width),
-              child: _wrap(_buildLabel(comp, addPadding))),
+              child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.sizeOf(context).width * 0.63),
@@ -405,7 +404,7 @@ mixin ScreenBase {
                 alignment: Alignment.topLeft,
                 child: Container(
                     constraints: BoxConstraints(maxWidth: modelLayer.app.isMenuCollapsed ? 350 : 250),
-                    child: _wrap(_buildLabel(comp, addPadding)))),
+                    child: _wrap(_buildLabel(comp)))),
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
