@@ -245,7 +245,13 @@ mixin ScreenBase {
   }
 
   String breakLabel(String label){
-    var lblLen = modelLayer.app.isMenuCollapsed ? 35 : 22;
+    var lblLen = 22;
+     
+    try {
+      lblLen = modelLayer.app.isMenuCollapsed ? 35 : 22;
+    } catch (e) {
+      
+    }
     if( label.length <= lblLen ){
       return label;
     }
@@ -367,13 +373,20 @@ mixin ScreenBase {
         width: 50,
       );
     }
-    print(modelLayer.app.isMenuCollapsed);
+    var width = 350.0;
+    try {
+      print(modelLayer.app.isMenuCollapsed);  
+      width = modelLayer.app.isMenuCollapsed ? 350 : 250;
+    } catch (e) {
+      
+    }
+    
     if (comp.isActive()) {
       if (compType == ComponentType.simple) {
         return Row(children: [
           paddingWdg,
           ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: modelLayer.app.isMenuCollapsed ? 350 : 250),
+              constraints: BoxConstraints(maxWidth: width),
               child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(
