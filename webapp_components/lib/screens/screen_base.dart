@@ -254,7 +254,7 @@ mixin ScreenBase {
 
   String breakLabel(String label){
     //FIXME Base this off block
-    var lblLen =  isMenuCollapsed ? 35 : 24;
+    var lblLen =  isMenuCollapsed ? 36 : 26;
     
     if( label.length <= lblLen ){
       return label;
