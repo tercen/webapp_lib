@@ -355,8 +355,8 @@ mixin ScreenBase {
       if (compType == ComponentType.simple) {
         return Row(children: [
           paddingWdg,
-          Container(
-              // constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.3),
+          ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.3),
               child: _wrap(_buildLabel(comp))),
           Container(
               constraints: BoxConstraints(
