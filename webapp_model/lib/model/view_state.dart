@@ -26,7 +26,7 @@ class ViewState {
     if( objList.isEmpty ){
       throw ServiceError(500, "View key does not exist", "View key $key does not exist");
     }
-    print("Retrieving key $key [${objList}]");
+    print("Retrieving key $key [${objList.first.key} : ${objList.first.values}]");
     return objList.first.values;
   }
 

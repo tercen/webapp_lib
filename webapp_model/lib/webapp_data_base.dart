@@ -161,6 +161,7 @@ class WebAppDataBase with ChangeNotifier {
     key = buildKey(key, groupKey);
 
     if (_model.hasKey(key)) {
+      print("In get data: ${_model[key]}");
       return _model[key];
     }
 
