@@ -90,7 +90,7 @@ mixin ScreenBase {
   void updateModel() {
     var comps = getAllComponents();
     for (var comp in comps) {
-      if (comp is SerializableComponent && comp.shouldSaveState() && finishedCompInit) {
+      if (comp is SerializableComponent && comp.shouldSaveState() && finishedCompInit && comp.isActive() ) {
         modelLayer.setData(
             comp.getId(), comp.getGroupId(), comp.getStateValue());
       }
