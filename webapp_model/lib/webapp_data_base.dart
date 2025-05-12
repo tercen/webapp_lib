@@ -103,6 +103,7 @@ class WebAppDataBase with ChangeNotifier {
       if (contentString != "" && contentString != "{}") {
         _model =
             ViewState.fromJson(JsonString(contentString).decodedValueAsMap);
+        print("Loaded model:\n\t${_model.toJson()}");
       }
 
       if (loadNavigation == true) {
