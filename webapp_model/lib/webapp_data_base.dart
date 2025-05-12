@@ -107,6 +107,7 @@ class WebAppDataBase with ChangeNotifier {
         for( var vo in _model.objects ){
           print("\t${vo.key}: ${vo.values}");
         }
+        notifyListeners();
       }
 
       if (loadNavigation == true) {
