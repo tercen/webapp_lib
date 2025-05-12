@@ -103,10 +103,10 @@ class WebAppDataBase with ChangeNotifier {
       if (contentString != "" && contentString != "{}") {
         _model =
             ViewState.fromJson(JsonString(contentString).decodedValueAsMap);
-        // print("Loaded model:\n");
-        // for( var vo in _model.objects ){
-        //   print("\t${vo.key}: ${vo.values}");
-        // }
+        print("Loaded model:\n");
+        for( var vo in _model.objects ){
+          print("\t${vo.key}: ${vo.values}");
+        }
       }
 
       if (loadNavigation == true) {
@@ -159,6 +159,12 @@ class WebAppDataBase with ChangeNotifier {
 
   String? getData(String key, String groupKey) {
     key = buildKey(key, groupKey);
+
+    for( var vo in _model.objects ){
+          if( key == vo.key){
+            print("VO: ${vo.values}");
+          }
+    }
 
     if (_model.hasKey(key)) {
       print("In get data: ${_model[key]}");
