@@ -103,9 +103,9 @@ class WebAppDataBase with ChangeNotifier {
       if (contentString != "" && contentString != "{}") {
         _model =
             ViewState.fromJson(JsonString(contentString).decodedValueAsMap);
-        print("Loaded model:\n");
+        Logger().log(level: Logger.ALL, message: "Loading View Model");
         for( var vo in _model.objects ){
-          print("\t${vo.key}: ${vo.values}");
+          Logger().log(level: Logger.ALL, message: "${vo.key}: ${vo.values}");
         }
         notifyListeners();
       }
@@ -161,14 +161,7 @@ class WebAppDataBase with ChangeNotifier {
   String? getData(String key, String groupKey) {
     key = buildKey(key, groupKey);
 
-    for( var vo in _model.objects ){
-          if( key == vo.key){
-            print("VO: ${vo.values}");
-          }
-    }
-
     if (_model.hasKey(key)) {
-      print("In get data: ${_model[key]}");
       return _model[key];
     }
 
@@ -302,18 +295,19 @@ class WebAppDataBase with ChangeNotifier {
     var installedWorkflowsDocuments =
         await workflowService.readWorkflowsDocumentsFromLib();
     for( var w in installedWorkflowsDocuments ){
-      print("${w.url.uri} [${w.version}]");
+      Logger().log(
+        level: Logger.FINER,
+        message: "${w.url.uri} [${w.version}]");
+      
     }
     List<RequiredTemplate> missing = [];
 
     List<Pair> workflowsToFetch = [];
     for (var reqWkf in requiredWorkflows) {
-      print("Checking required workflow: ${reqWkf.url} [${reqWkf.version}]");
       var workflow = installedWorkflowsDocuments.firstWhere(
         (wkf) => reqWkf.url == wkf.url.uri && (reqWkf.version == "" || (reqWkf.version == wkf.version)),
         orElse: () => Document(),
       );
-      print("\tFound: ${workflow.url.uri} [${workflow.version}]");
       if (workflow.id == "") {
         missing.add(reqWkf);
       } else {
@@ -357,8 +351,8 @@ class WebAppDataBase with ChangeNotifier {
         orElse: () => Document());
 
     if (document.id == "") {
-      print(
-          "File name containing ${lowerFileName} not found for workflow id $workflowId");
+      // print(
+          // "File name containing ${lowerFileName} not found for workflow id $workflowId");
     } else {
       workflowService.updateFile(document, text);
     }

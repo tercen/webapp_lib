@@ -14,6 +14,7 @@ import 'package:webapp_components/mixins/input_validator.dart';
 
 import 'package:webapp_model/webapp_data_base.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
+import 'package:webapp_utils/functions/logger.dart';
 
 class Action {
   final String actionName;
@@ -94,23 +95,6 @@ mixin ScreenBase {
         modelLayer.setData(
             comp.getId(), comp.getGroupId(), comp.getStateValue());
       }
-      // if (comp.getGroupId() != LAYOUT_GROUP) {
-      //   // Remove components like horizontal bar and spacing, which have no value
-
-      //   if (comp is SingleValueComponent) {
-      //     modelLayer.setData(comp.getId(), comp.getGroupId(), comp.getValue());
-      //   }
-
-      //   if (comp is MultiValueComponent) {
-      //     var values = comp.getValue();
-      //     modelLayer.clearData(comp.getId(), comp.getGroupId());
-
-      //     for (var v in values) {
-      //       modelLayer.setData(comp.getId(), comp.getGroupId(), v,
-      //           multiple: true);
-      //     }
-      //   }
-      // }
     }
   }
 
@@ -137,13 +121,11 @@ mixin ScreenBase {
 
   void checkMenuCollapse(){
     isMenuCollapsed = modelLayer.app.isMenuCollapsed;
-    print("Checking menu collapse: $isMenuCollapsed");
     refresh();
-    
   }
 
   void initScreen(WebAppDataBase modelLayer) {
-    List<Component> components = getAllComponents();
+    final components = getAllComponents();
     this.modelLayer = modelLayer;
     modelLayer.app.addListener(checkMenuCollapse);
     for (var comp in components) {
@@ -157,7 +139,11 @@ mixin ScreenBase {
       if (comp is SerializableComponent && comp.shouldSaveState()) {
         var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
         if (modelValue != null) {
-          print("Setting state value for ${comp.getId()}: $modelValue");
+          Logger().log(
+            level: Logger.FINER,
+            message: "Initializing ${comp.getId()} with $modelValue"
+          );
+          
           comp.setStateValue(modelValue);
         }
       }
