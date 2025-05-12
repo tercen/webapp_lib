@@ -156,7 +156,7 @@ mixin ScreenBase {
       if (comp is SerializableComponent && comp.shouldSaveState()) {
         var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
         if (modelValue != null) {
-          print("Setting state value for ${comp.getId(): $modelValue}");
+          print("Setting state value for ${comp.getId()}: $modelValue");
           comp.setStateValue(modelValue);
         }
       }
