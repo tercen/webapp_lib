@@ -56,6 +56,7 @@ mixin ScreenBase {
   final List<ComponentBlockType> blockTypes = [];
   final Map<String, List<ComponentEntry>> componentBlocks = {};
   late final WebAppDataBase modelLayer;
+  bool finishedCompInit = false;
   Timer? updateTimer;
   bool isMenuCollapsed = false;
   void addActionComponent(ActionComponent component) {
@@ -89,7 +90,7 @@ mixin ScreenBase {
   void updateModel() {
     var comps = getAllComponents();
     for (var comp in comps) {
-      if (comp is SerializableComponent && comp.shouldSaveState()) {
+      if (comp is SerializableComponent && comp.shouldSaveState() && finishedCompInit) {
         modelLayer.setData(
             comp.getId(), comp.getGroupId(), comp.getStateValue());
       }
@@ -165,6 +166,7 @@ mixin ScreenBase {
     updateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       updateModel();
     });
+    finishedCompInit = true;
   }
 
   List<Component> getAllComponents() {
