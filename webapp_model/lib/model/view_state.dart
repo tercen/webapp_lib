@@ -20,7 +20,9 @@ class ViewState {
   }
 
   String operator [](String key) {
+    
     var objList = objects.where((o) => o.key == key );
+    print("Retrieving key $key [${objList.length}]");
     if( objList.isEmpty ){
       throw ServiceError(500, "View key does not exist", "View key $key does not exist");
     }

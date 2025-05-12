@@ -103,10 +103,10 @@ class WebAppDataBase with ChangeNotifier {
       if (contentString != "" && contentString != "{}") {
         _model =
             ViewState.fromJson(JsonString(contentString).decodedValueAsMap);
-        print("Loaded model:\n");
-        for( var vo in _model.objects ){
-          print("\t${vo.key}: ${vo.values}");
-        }
+        // print("Loaded model:\n");
+        // for( var vo in _model.objects ){
+        //   print("\t${vo.key}: ${vo.values}");
+        // }
       }
 
       if (loadNavigation == true) {
