@@ -369,7 +369,7 @@ class WorkflowRunner with ProgressDialog {
   }
 
   void addAndFilter(String filterName, String stepId, List<String> keys,
-      List<dynamic> values) {
+      List<dynamic> values, {List<sci.Pair> metas = const []}) {
     var factors = convertToStepFactors(keys, getFactorNames(stepId));
     var filterKey = "$stepId$filterName";
 
@@ -394,6 +394,10 @@ class WorkflowRunner with ProgressDialog {
         ..not = false
         ..name = filterName;
       namedFilter.filterExprs.add(andFilter);
+
+      for( var meta in metas ){
+        namedFilter.meta.add(meta);
+      }
 
       sci.Filters filters = sci.Filters()..removeNaN = true;
       filters.namedFilters.add(namedFilter);
