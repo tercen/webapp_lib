@@ -117,7 +117,7 @@ class AppUser {
     var parentPort = html.document.referrer.split(":").last.split("/").first;
     href = "$href:$parentPort";
     serviceBase = href;
-    href = "$href/$username";
+    href = "$href/${_getTeam()}";
     href = "$href/p/$_projectId";
     return href;
   }
@@ -131,11 +131,8 @@ class AppUser {
 
     serviceBase = href;
 
-    if( _teamname != ""){
-      href = "$href/$_teamname";
-    }else{
-      href = "$href/$_username";
-    }
+    href = "$href/${_getTeam()}";
+
     
     if (_projectId != "") {
       href = "$href/p/$_projectId";
