@@ -3,6 +3,7 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:tson/tson.dart' as tson;
 import 'package:uuid/uuid.dart';
 import 'package:webapp_ui_commons/mixin/progress_log.dart';
+import 'package:webapp_utils/services/app_user.dart';
 // Run an operator which requires a documentId as input
 //FINISH this runner
 
@@ -51,7 +52,7 @@ class IdOperatorRunner with ProgressDialog {
   }
 
   Future<sci.RunComputationTask> _setupRun(
-      String documentId, String projectId, String teamName) async {
+      String documentId) async {
     sci.Document op = await _getLatestOperatorVersion(opUrl);
 
     // Prepare the computation task
@@ -103,14 +104,14 @@ class IdOperatorRunner with ProgressDialog {
 
     sci.RunComputationTask compTask = sci.RunComputationTask()
       ..state = sci.InitState()
-      ..owner = teamName
+      ..owner = AppUser().teamname
       ..query = query
-      ..projectId = projectId;
+      ..projectId = AppUser().projectId;
 
     return compTask;
   }
 
-  Future<sci.Table> run(String projectId, String teamName, String documentId,
+  Future<sci.Table> run(String documentId,
       TableFetchCallback? tableFetchCallback) async {
     // addToQueue(documentId);
     latestTicket += 1;
@@ -118,7 +119,7 @@ class IdOperatorRunner with ProgressDialog {
     sci.Table result = sci.Table();
     var factory = tercen.ServiceFactory();
 
-    var task = await _setupRun(documentId, projectId, teamName);
+    var task = await _setupRun(documentId);
 
     if (cache.containsKey(documentId)) {
       print("Returning cached result");
