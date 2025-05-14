@@ -41,29 +41,36 @@ class AppUser {
   Future init() async {
     _projectId = _readProjectId();
     await setProject(_projectId);
-
   }
 
   Future setProject(String projectId) async {
     final factory = tercen.ServiceFactory();
-    if( projectId != ""){
+    if (projectId != "") {
       final project = await factory.projectService.get(projectId);
+      _projectId = projectId;
       _teamname = project.acl.owner;
-      
       _projectName = project.name;
-      var userService = factory.userService as sci.UserService;
-      final session = userService.session;
-     _username = session != null ? session.user.name : "";
-    }else{
-      var tok = Uri.base.queryParameters["token"] ?? '';
-      Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
-      _username = decodedToken['data']['u'];
-      _teamname = ""; 
-      _username = "";
+     
+      _username = _getUser();
+    } else {
+      _username = _getUser();
+      _teamname = "";
       _projectName = "No project loaded";
     }
-    
-    
+  }
+
+  String _getUser() {
+    if (isDev) {
+      var tok = Uri.base.queryParameters["token"] ?? '';
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
+      return decodedToken['data']['u'];
+    } else {
+      final factory = tercen.ServiceFactory();
+      var userService = factory.userService as sci.UserService;
+
+      final session = userService.session;
+      return session!.user.name;
+    }
   }
 
   String get teamname => _teamname == "" ? _username : _teamname;
@@ -79,10 +86,10 @@ class AppUser {
     }
   }
 
-  String _readProjectId(){
-    if(isDev){
+  String _readProjectId() {
+    if (isDev) {
       return const String.fromEnvironment("PROJECT_ID");
-    }else{
+    } else {
       return Uri.base.queryParameters["projectId"] ?? '';
     }
   }
@@ -122,6 +129,4 @@ class AppUser {
 
     return href;
   }
-
-
 }
