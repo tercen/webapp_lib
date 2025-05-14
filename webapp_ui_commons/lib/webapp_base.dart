@@ -13,6 +13,7 @@ import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
 import 'package:webapp_components/widgets/wait_indicator.dart';
+import 'package:webapp_model/model/app_user.dart';
 import 'package:webapp_ui_commons/menu/menu_item.dart';
 import 'package:webapp_ui_commons/menu/navigation_menu.dart';
 
@@ -21,12 +22,12 @@ import 'package:webapp_ui_commons/styles/styles.dart';
 
 class WebAppBase with ChangeNotifier {
   bool isInitialized = false;
-  String projectId = "";
-  String projectName = "";
-  String projectHref = "";
-  String serviceBase = "";
-  String username = "";
-  String teamname = "";
+  // String projectId = "";
+  // String projectName = "";
+  // String projectHref = "";
+  // String serviceBase = "";
+  // String username = "";
+  // String teamname = "";
   String appName = "";
   String appVersion = "";
   bool isMenuCollapsed = false;
@@ -51,25 +52,6 @@ class WebAppBase with ChangeNotifier {
   set leftPanel(Widget leftPanel) => navPanelContent = leftPanel;
   set rightPanel(Widget rightPanel) => contentPanelContent = rightPanel;
 
-  void buildProjectUrl(){
-    
-    username = teamname;
-
-    var href = "${Uri.base.scheme}://";
-    href = "$href${Uri.base.host}";
-    if (Uri.base.hasPort) {
-      href = "$href:${Uri.base.port}";
-    }
-    serviceBase = href;
-
-    href = "$href/$username";
-    if( projectId != ""){
-      href = "$href/p/$projectId";
-    }
-    
-    projectHref = href;
-
-  }
 
   Future<bool> initFactory(String token) async {
     if (token.isEmpty) {
@@ -99,7 +81,7 @@ class WebAppBase with ChangeNotifier {
   }
 
   Future<void> postInit() async {
-    html.window.history.pushState({}, '', projectHref);
+    html.window.history.pushState({}, '', AppUser().projectUrl);
     isInitialized = true;
   }
 
@@ -108,37 +90,42 @@ class WebAppBase with ChangeNotifier {
       await TercenWaitIndicator().init();
 
       http_api.HttpClient.setCurrent(io_http.HttpBrowserClient());
-      projectId = Uri.base.queryParameters["projectId"] ?? '';
+      
       late sci.UserSession session;
-      String devProjectId = const String.fromEnvironment("PROJECT_ID");
 
-      if (devProjectId != "") {
-        print("Running in DEV mode");
+
+      if (isDev) {
         var tok = Uri.base.queryParameters["token"] ?? '';
-        Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
-        username = decodedToken['data']['u'];
-        projectId = devProjectId;
+        var decodedToken = JwtDecoder.decode(tok);
         session = sci.UserSession()
-          ..user = (sci.User()..id = decodedToken['data']['u'])
-          ..token = (sci.Token()..token = tok);
+      ..user = (sci.User()..id = decodedToken['data']['u'])
+      ..token = (sci.Token()..token = tok);
+        // print("Running in DEV mode");
+        // var tok = Uri.base.queryParameters["token"] ?? '';
+        // Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
+        // username = decodedToken['data']['u'];
+        // projectId = devProjectId;
+        // session = sci.UserSession()
+        //   ..user = (sci.User()..id = decodedToken['data']['u'])
+        //   ..token = (sci.Token()..token = tok);
 
-        var href = "${Uri.base.scheme}://";
-        href = "$href${Uri.base.host}";
-        var parentPort =
-            html.document.referrer.split(":").last.split("/").first;
-        href = "$href:$parentPort";
-        serviceBase = href;
-        href = "$href/$username";
-        href = "$href/p/$projectId";
-        projectHref = href;
+        // var href = "${Uri.base.scheme}://";
+        // href = "$href${Uri.base.host}";
+        // var parentPort =
+        //     html.document.referrer.split(":").last.split("/").first;
+        // href = "$href:$parentPort";
+        // serviceBase = href;
+        // href = "$href/$username";
+        // href = "$href/p/$projectId";
+        // projectHref = href;
       } else {
         var auth = json.decode(html.window.localStorage['authorization'] ?? "");
 
         session = sci.UserSession.json(auth);
-        buildProjectUrl();
+
       }
 
-      navMenu.addLink("Exit App", projectHref);
+      navMenu.addLink("Exit App", AppUser().projectUrl);
 
       await initFactory(session.token.token);
       var factory = tercen.ServiceFactory();
@@ -146,13 +133,6 @@ class WebAppBase with ChangeNotifier {
 
       await userService.setSession(session);
 
-    
-
-      if (projectId != "") {
-        var project = await factory.projectService.get(projectId);
-        projectName = project.name;
-        teamname = project.acl.owner;
-      }
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webapp_model/model/app_user.dart';
 import 'package:webapp_ui_commons/menu/menu_item.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
@@ -7,9 +8,6 @@ class NavigationMenu with ChangeNotifier {
   String selectedScreen = "";
   final List<MenuItem> _menuItems = [];
   final Map<String, String> _menuLinks = {};
-  String project = "";
-  String user = "";
-  String team = "";
   String webApp = "";
 
   NavigationMenu();
@@ -160,9 +158,9 @@ class NavigationMenu with ChangeNotifier {
 
   Widget createInfoWidgets() {
     List<Widget> infoEntries = [];
-    if (project != "") {
+    if ( AppUser().projectName != "") {
       infoEntries.add(Text(
-        "Project: $project",
+        "Project: ${AppUser().projectName}",
         style: Styles()["textGray"],
       ));
     } else {
@@ -172,14 +170,14 @@ class NavigationMenu with ChangeNotifier {
       ));
     }
 
-    if (team != "") {
+    if (AppUser().teamname != "") {
       infoEntries.add(Text(
-        "$team($user)",
+        "${AppUser().teamname}(${AppUser().username})",
         style: Styles()["textGray"],
       ));
     } else {
       infoEntries.add(Text(
-        "$user",
+        "${AppUser().teamname}",
         style: Styles()["textGray"],
       ));
     }

@@ -10,6 +10,7 @@ import 'package:webapp_components/definitions/list_action.dart';
 import 'package:webapp_components/screens/screen_base.dart';
 
 import 'package:webapp_components/widgets/wait_indicator.dart';
+import 'package:webapp_model/model/app_user.dart';
 import 'package:webapp_model/webapp_data_base.dart';
 
 import 'package:webapp_model/webapp_table.dart';
@@ -217,7 +218,7 @@ class TaskManagerScreenState extends State<TaskManagerScreen>
 
   Future<WebappTable> fetchWorkflows() async {
     return await widget.modelLayer.workflowService
-        .fetchWorkflowTable(widget.modelLayer.app.projectId);
+        .fetchWorkflowTable(AppUser().projectId);
   }
 
   Future<WebappTable> fetchTasks() async {

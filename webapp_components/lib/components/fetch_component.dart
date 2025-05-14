@@ -6,10 +6,12 @@ import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_utils/cache_object.dart';
 
+
+
+
 class FetchComponent with
         ChangeNotifier,
         ComponentBase,
-
         StateComponent,
         AsyncManager{
   WebappTable dataTable = WebappTable();

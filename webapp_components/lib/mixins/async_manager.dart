@@ -2,7 +2,7 @@ import 'package:async/async.dart';
 import 'package:webapp_components/mixins/state_component.dart';
 import 'package:webapp_utils/functions/logger.dart';
 
-mixin AsyncManager on StateComponent {
+mixin AsyncManager  {
   Map<String, CancelableOperation> operations = {};
 
   void startFuture(String id, Future op) {

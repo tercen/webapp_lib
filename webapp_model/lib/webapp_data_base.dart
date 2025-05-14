@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
+import 'package:webapp_model/model/app_user.dart';
 
 // import 'package:webapp_model/id_element.dart';
 // import 'package:webapp_model/id_element_table.dart';
@@ -49,7 +50,7 @@ class WebAppDataBase with ChangeNotifier {
     print(_model);
   }
 
-  Future<void> init(String projectId, String projectName, String username,
+  Future<void> init(String projectId,  String username,
       {String reposJsonPath = "",
       String settingFilterFile = "",
       String stepMapperJsonFile = "",
@@ -85,9 +86,9 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   Future<void> loadModel({bool loadNavigation = true}) async {
-    if (app.projectId != "") {
-      var projectId = app.projectId;
-      var user = app.username;
+    if (AppUser().projectId != "") {
+      var projectId = AppUser().projectId;
+      var user = AppUser().username;
 
       var folder = await projectService
           .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
@@ -120,9 +121,9 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   Future<void> saveModel({bool saveNavigation = true}) async {
-    if (app.projectId != "") {
-      var projectId = app.projectId;
-      var user = app.username;
+    if (AppUser().projectId != "") {
+      var projectId = AppUser().projectId;
+      var user = AppUser().username;
       var folder = await projectService
           .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
 
@@ -208,7 +209,7 @@ class WebAppDataBase with ChangeNotifier {
   // Project File State Check
   //==================================================
   bool hasProject() {
-    return app.projectId != "";
+    return AppUser().projectId != "";
   }
 
   //-------------------------------------------------------------
@@ -216,7 +217,7 @@ class WebAppDataBase with ChangeNotifier {
   //-------------------------------------------------------------
 
   Future<List<String>> fetchUserList() async {
-    return await userService.fetchUserList(app.username);
+    return await userService.fetchUserList(AppUser().username);
   }
 
   Future<void> createOrLoadProject(String projectName, String username) async {
@@ -226,22 +227,26 @@ class WebAppDataBase with ChangeNotifier {
       project = await projectService.doCreateProject(projectName, username);
     }
 
-    app.projectId = project.id;
-    app.projectName = project.name;
-    app.username = username;
-    app.teamname = project.acl.owner;
-    await init(app.projectId, app.projectName, username);
+    // app.projectId = project.id;
+    // app.projectName = project.name;
+    // app.username = username;
+    // app.teamname = project.acl.owner;
+    await Future.wait([
+       init(project.id, username),
+       AppUser().setProject(project.id)
+    ]);
+    
   }
 
   Future<void> projectFilesUpdated() async {
     projectService
-        .loadFolderStructure(app.projectId)
+        .loadFolderStructure(AppUser().projectId)
         .then((value) => notifyListeners());
   }
 
-  Future<void> reloadProjectFiles({String? newTeam}) async {
+  Future<void> reloadProjectFiles() async {
     await projectService
-        .loadFolderStructure(app.projectId)
+        .loadFolderStructure(AppUser().projectId)
         .then((value) => notifyListeners());
 
 
@@ -249,10 +254,10 @@ class WebAppDataBase with ChangeNotifier {
     projectService.cache.clearCache();
 
 
-    app.navMenu.project = app.projectName;
-    app.navMenu.user = app.username;
-    app.navMenu.team = newTeam ?? app.teamname;
-    app.buildProjectUrl();
+    // app.navMenu.project = app.projectName;
+    // app.navMenu.user = app.username;
+    // app.navMenu.team = newTeam ?? app.teamname;
+    // app.buildProjectUrl();
   }
 
   List<Document> getProjectFiles() {
@@ -292,7 +297,7 @@ class WebAppDataBase with ChangeNotifier {
     var requiredWorkflows = settingsService.requiredWorkflows;
     Logger().log(
         level: Logger.FINER,
-        message: "Reading workflows for ${app.teamname} / ${app.username}");
+        message: "Reading workflows for ${AppUser().teamname} / ${AppUser().username}");
     var installedWorkflowsDocuments =
         await workflowService.readWorkflowsDocumentsFromLib();
     for( var w in installedWorkflowsDocuments ){
