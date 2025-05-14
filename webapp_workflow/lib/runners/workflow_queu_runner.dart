@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
+import 'package:webapp_utils/services/app_user.dart';
 import 'package:webapp_workflow/runners/workflow_runner.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
@@ -10,7 +11,7 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 typedef PostRunIdCallback = Future<void> Function(String workflowId);
 
 class WorkflowQueuRunner extends WorkflowRunner {
-  WorkflowQueuRunner(super.projectId, super.teamName, super.template,
+  WorkflowQueuRunner( super.template,
       {super.timestampType = TimestampType.full, super.keepTemplate = false});
   final List<PostRunIdCallback> postRunIdCallbacks = [];
 
@@ -36,8 +37,8 @@ class WorkflowQueuRunner extends WorkflowRunner {
     //-----------------------------------------
     sci.RunWorkflowTask workflowTask = sci.RunWorkflowTask()
       ..state = sci.InitState()
-      ..owner = teamName
-      ..projectId = projectId
+      ..owner = AppUser().teamname
+      ..projectId = AppUser().projectId
       ..workflowId = workflow.id
       ..workflowRev = workflow.rev;
 

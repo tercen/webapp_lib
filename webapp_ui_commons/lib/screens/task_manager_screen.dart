@@ -218,7 +218,7 @@ class TaskManagerScreenState extends State<TaskManagerScreen>
 
   Future<WebappTable> fetchWorkflows() async {
     return await widget.modelLayer.workflowService
-        .fetchWorkflowTable(AppUser().projectId);
+        .fetchWorkflowTable();
   }
 
   Future<WebappTable> fetchTasks() async {

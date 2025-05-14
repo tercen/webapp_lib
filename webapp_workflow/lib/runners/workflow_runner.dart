@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 import 'package:webapp_utils/functions/formatter_utils.dart';
 import 'package:webapp_utils/functions/string_utils.dart';
 import 'package:webapp_utils/model/step_setting.dart';
+import 'package:webapp_utils/services/app_user.dart';
 
 
 enum TimestampType { full, short }
@@ -23,8 +24,6 @@ typedef PostRunCallback = Future<void> Function();
 class WorkflowRunner with ProgressDialog {
   StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
 
-  final String projectId;
-  final String teamName;
   String? folderName;
   String? parentFolderId;
   final sci.Workflow template;
@@ -70,7 +69,8 @@ class WorkflowRunner with ProgressDialog {
   late final String timestamp;
   final Map<String, List<String>> removeFilters = {};
 
-  WorkflowRunner(this.projectId, this.teamName, this.template, {var timestampType = TimestampType.full, this.keepTemplate = false}) {
+  WorkflowRunner(this.template, {var timestampType = TimestampType.full, this.keepTemplate = false}) {
+    
     if( timestampType == TimestampType.short){
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
     }else{
@@ -417,7 +417,7 @@ class WorkflowRunner with ProgressDialog {
     }
   }
 
-  Future<sci.FolderDocument> createFolder(String projectId, String owner,
+  Future<sci.FolderDocument> createFolder(
       {String? namePrefix,
       String? folderName,
       String parentFolderId = "",
@@ -438,8 +438,8 @@ class WorkflowRunner with ProgressDialog {
 
     sci.FolderDocument folder = sci.FolderDocument();
     folder.name = getFolderName();
-    folder.acl.owner = owner;
-    folder.projectId = projectId;
+    folder.acl.owner = AppUser().teamname;
+    folder.projectId = AppUser().projectId;
     folder.folderId = parentFolderId;
 
     for (var meta in folderMeta) {
@@ -548,7 +548,7 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       // Copy template into project
       //-----------------------------------------
-      workflow = await factory.workflowService.copyApp(template.id, projectId);
+      workflow = await factory.workflowService.copyApp(template.id, AppUser().projectId);
 
       if ( template.projectId == workflow.projectId) {
         // await factory.workflowService.delete(template.id, template.rev);
@@ -620,14 +620,14 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       if (folderId == null) {
         sci.FolderDocument folder =
-            await createFolder(projectId, teamName, folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
+            await createFolder( folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
         workflow.folderId = folder.id;
       } else {
         workflow.folderId = folderId!;
       }
 
       workflow.name = getWorkflowName(workflow);
-      workflow.acl = sci.Acl()..owner = teamName;
+      workflow.acl = sci.Acl()..owner = AppUser().teamname;
       workflow.isHidden = false;
       workflow.isDeleted = false;
 
@@ -715,8 +715,8 @@ class WorkflowRunner with ProgressDialog {
 
     sci.RunWorkflowTask workflowTask = sci.RunWorkflowTask()
       ..state = sci.InitState()
-      ..owner = teamName
-      ..projectId = projectId
+      ..owner = AppUser().teamname
+      ..projectId = AppUser().projectId
       ..workflowId = workflow.id
       ..workflowRev = workflow.rev;
 
