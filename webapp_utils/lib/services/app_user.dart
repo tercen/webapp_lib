@@ -48,14 +48,23 @@ class AppUser {
     if (projectId != "") {
       final project = await factory.projectService.get(projectId);
       _projectId = projectId;
-      _teamname = project.acl.owner;
+      _teamname = _getTeam();
       _projectName = project.name;
      
       _username = _getUser();
     } else {
       _username = _getUser();
-      _teamname = "";
+      _teamname = _getTeam();
       _projectName = "No project loaded";
+    }
+  }
+
+  String _getTeam() {
+    var team = Uri.base.queryParameters["teamId"] ?? '';
+    if( team == '' ){
+      return _getUser();
+    }else{
+      return team;
     }
   }
 
@@ -73,7 +82,7 @@ class AppUser {
     }
   }
 
-  String get teamname => _teamname == "" ? _username : _teamname;
+  String get teamname => _teamname;
   String get username => _username;
   String get projectName => _projectName;
   String get projectId => _projectId;
@@ -122,7 +131,12 @@ class AppUser {
 
     serviceBase = href;
 
-    href = "$href/$_username";
+    if( _teamname != ""){
+      href = "$href/$_teamname";
+    }else{
+      href = "$href/$_username";
+    }
+    
     if (_projectId != "") {
       href = "$href/p/$_projectId";
     }
