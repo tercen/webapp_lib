@@ -38,6 +38,12 @@ class AppUser {
 
   AppUser._internal();
 
+  Future init() async {
+    _projectId = _readProjectId();
+    await setProject(_projectId);
+
+  }
+
   Future setProject(String projectId) async {
     final factory = tercen.ServiceFactory();
     final project = await factory.projectService.get(projectId);
@@ -57,6 +63,14 @@ class AppUser {
       return _buildDevProjectHref();
     } else {
       return _buildProjectHref();
+    }
+  }
+
+  String _readProjectId(){
+    if(isDev){
+      return const String.fromEnvironment("PROJECT_ID")
+    }else{
+      return Uri.base.queryParameters["projectId"] ?? '';
     }
   }
 
