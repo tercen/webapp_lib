@@ -217,6 +217,7 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<WebappTable> fetchUserList() async {
     var tbl = WebappTable();
+    print("FETCHING USERS For ${AppUser().username}");
     final userList = await userService.fetchUserList(AppUser().username);
     tbl.addColumn("label", data: userList);
     return tbl;
