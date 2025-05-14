@@ -5,6 +5,7 @@ import 'package:sci_tercen_client/sci_client.dart';
 import 'package:webapp_utils/cache_object.dart';
 import 'package:webapp_utils/folder_node.dart';
 import 'package:webapp_utils/functions/logger.dart';
+import 'package:webapp_utils/services/app_user.dart';
 
 
 class ProjectDataService {
@@ -19,11 +20,11 @@ class ProjectDataService {
   bool structureLoaded = false;
   final FolderNode folderTreeRoot = FolderNode(FolderDocument(), true);
 
-  Future<void> loadFolderStructure(String projectId) async {
-    if (projectId != "") {
+  Future<void> loadFolderStructure() async {
+    if (AppUser().projectId != "") {
       List<dynamic> results = await Future.wait([
-        _fetchRemoteFolderDocuments("", projectId, recursive: true),
-        _fetchRemoteFolders("", projectId, recursive: true)
+        _fetchRemoteFolderDocuments("", recursive: true),
+        _fetchRemoteFolders("",  recursive: true)
       ]);
       List<ProjectDocument> allDocs = results[0];
       List<FolderDocument> allFolders = results[1];
@@ -48,7 +49,7 @@ class ProjectDataService {
   }
 
   Future<FolderDocument> getOrCreateFolder(
-      String projectId, String owner, String name,
+       String name,
       {String? parentId}) async {
     var candidateFolders = _getDocuments(name, true, parentId: parentId);
 
@@ -60,18 +61,18 @@ class ProjectDataService {
     var folder = FolderDocument();
     folder.name = name;
     folder.isHidden = false;
-    folder.projectId = projectId;
+    folder.projectId = AppUser().projectId;
     folder.folderId = parentId ?? "";
-    folder.acl = Acl()..owner = owner;
+    folder.acl = Acl()..owner = AppUser().teamname != "" ? AppUser().teamname : AppUser().username;
 
     folder = await factory.folderService.create(folder);
 
-    await loadFolderStructure(projectId);
+    await loadFolderStructure();
 
     return folder;
   }
 
-  List<ProjectDocument> getFolderDocuments(String folderId, String projectId,
+  List<ProjectDocument> getFolderDocuments(String folderId, 
       {bool recursive = false}) {
     List<ProjectDocument> docs = [];
 
@@ -81,7 +82,7 @@ class ProjectDataService {
   }
 
   Future<FileDocument> getOrCreateFile(
-      String projectId, String owner, String name,
+      String name,
       {String? parentId, String contentType = "application/json"}) async {
     var factory = tercen.ServiceFactory();
     var candidateFolders = _getDocuments(name, false, parentId: parentId);
@@ -96,14 +97,14 @@ class ProjectDataService {
     doc.name = name;
     doc.isHidden = false;
     doc.folderId = parentId ?? "";
-    doc.projectId = projectId;
-    doc.acl = Acl()..owner = owner;
+    doc.projectId = AppUser().projectId;
+    doc.acl = Acl()..owner = AppUser().teamname;
     doc.metadata.contentType = "application/json";
     doc.dataUri = "";
     doc = setFileContent(doc, {});
     doc = await factory.fileService.create(doc);
 
-    await loadFolderStructure(projectId);
+    await loadFolderStructure();
 
     return doc;
   }
@@ -137,18 +138,18 @@ class ProjectDataService {
   }
 
   Future<List<ProjectDocument>> _fetchRemoteFolderDocuments(
-      String folderId, String projectId,
+      String folderId, 
       {bool recursive = false}) async {
     List<ProjectDocument> docs = [];
     var factory = tercen.ServiceFactory();
     var folderObjects = await factory.projectDocumentService
         .findProjectObjectsByFolderAndName(
-            startKey: [projectId, folderId, "\ufff0"],
-            endKey: [projectId, folderId, ""]);
+            startKey: [AppUser().projectId, folderId, "\ufff0"],
+            endKey: [AppUser().projectId, folderId, ""]);
     for (var obj in folderObjects) {
       if (obj.subKind == "FolderDocument") {
         if (recursive == true) {
-          docs.addAll(await _fetchRemoteFolderDocuments(obj.id, projectId,
+          docs.addAll(await _fetchRemoteFolderDocuments(obj.id, 
               recursive: recursive));
         }
       } else {
@@ -183,20 +184,20 @@ class ProjectDataService {
   }
 
   Future<List<FolderDocument>> _fetchRemoteFolders(
-      String folderId, String projectId,
+      String folderId, 
       {bool recursive = false}) async {
     List<FolderDocument> docs = [];
     var factory = tercen.ServiceFactory();
     var folderObjects = await factory.folderService
         .findFolderByParentFolderAndName(
-            startKey: [projectId, folderId, "\ufff0"],
-            endKey: [projectId, folderId, ""]);
+            startKey: [AppUser().projectId, folderId, "\ufff0"],
+            endKey: [AppUser().projectId, folderId, ""]);
 
     for (var obj in folderObjects) {
       docs.add(obj);
       if (recursive == true) {
         docs.addAll(
-            await _fetchRemoteFolders(obj.id, projectId, recursive: recursive));
+            await _fetchRemoteFolders(obj.id, recursive: recursive));
       }
     }
 

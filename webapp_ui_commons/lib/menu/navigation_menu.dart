@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webapp_model/model/app_user.dart';
+
 import 'package:webapp_ui_commons/menu/menu_item.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
+import 'package:webapp_utils/services/app_user.dart';
 
 class NavigationMenu with ChangeNotifier {
   String selectedScreen = "";

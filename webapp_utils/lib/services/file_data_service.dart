@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
+import 'package:webapp_utils/services/app_user.dart';
 
 class FileDataService{
   static final FileDataService _singleton = FileDataService._internal();
@@ -12,12 +13,12 @@ class FileDataService{
   
   FileDataService._internal();
 
-  Future<String> uploadFile(String filename, String projectId, String owner, Uint8List data, {String folderId = ""} ) async {
+  Future<String> uploadFile(String filename, String owner, Uint8List data, {String folderId = ""} ) async {
     var factory = tercen.ServiceFactory();
 
     FileDocument docToUpload = FileDocument()
         ..name = filename
-        ..projectId = projectId
+        ..projectId = AppUser().projectId
         ..folderId = folderId
         ..acl.owner = owner;
 
@@ -40,13 +41,13 @@ class FileDataService{
     return lines;
   }
 
-  Future<String> uploadFileAsTable(String filename, String projectId, String owner, Uint8List data, {String folderId = ""}) async{
+  Future<String> uploadFileAsTable(String filename,  String owner, Uint8List data, {String folderId = ""}) async{
     var factory = tercen.ServiceFactory();
-    var fileId = await uploadFile(filename, projectId, owner, data, folderId: folderId);
+    var fileId = await uploadFile(filename, owner, data, folderId: folderId);
     var csvTask = CSVTask()
       ..state = InitState()
       ..owner = owner
-      ..projectId = projectId
+      ..projectId = AppUser().projectId
       ..fileDocumentId = fileId;
 
     csvTask = await factory.taskService.create(csvTask) as CSVTask;

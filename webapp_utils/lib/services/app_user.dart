@@ -46,11 +46,20 @@ class AppUser {
 
   Future setProject(String projectId) async {
     final factory = tercen.ServiceFactory();
-    final project = await factory.projectService.get(projectId);
-
-    _teamname = project.acl.owner;
-    _username = _teamname;
-    _projectName = project.name;
+    if( projectId != ""){
+      final project = await factory.projectService.get(projectId);
+      _teamname = project.acl.owner;
+      
+      _projectName = project.name;
+    }else{
+      _teamname = "";
+      _username = "";
+      _projectName = "No project loaded";
+    }
+    var userService = factory.userService as sci.UserService;
+     final session = userService.session;
+    _username = session != null ? session.user.name : "";
+    
   }
 
   String get teamname => _teamname;
@@ -68,7 +77,7 @@ class AppUser {
 
   String _readProjectId(){
     if(isDev){
-      return const String.fromEnvironment("PROJECT_ID")
+      return const String.fromEnvironment("PROJECT_ID");
     }else{
       return Uri.base.queryParameters["projectId"] ?? '';
     }

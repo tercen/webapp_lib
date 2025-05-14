@@ -19,7 +19,8 @@ dependencies:
     path: ../webapp_components
   webapp_model:
     path: ../webapp_model
-
+  webapp_utils:
+    path: ../webapp_utils
 
 dev_dependencies:
   test:

@@ -10,7 +10,6 @@ import 'package:webapp_components/definitions/list_action.dart';
 import 'package:webapp_components/screens/screen_base.dart';
 
 import 'package:webapp_components/widgets/wait_indicator.dart';
-import 'package:webapp_model/model/app_user.dart';
 import 'package:webapp_model/webapp_data_base.dart';
 
 import 'package:webapp_model/webapp_table.dart';
@@ -21,6 +20,7 @@ import 'package:webapp_utils/functions/formatter_utils.dart';
 
 import 'package:sci_tercen_model/sci_model.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+import 'package:webapp_utils/services/app_user.dart';
 
 class TaskManagerScreen extends StatefulWidget {
   final WebAppDataBase modelLayer;

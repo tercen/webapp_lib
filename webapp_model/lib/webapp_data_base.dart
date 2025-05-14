@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
-import 'package:webapp_model/model/app_user.dart';
+import 'package:webapp_utils/services/app_user.dart';
 
 // import 'package:webapp_model/id_element.dart';
 // import 'package:webapp_model/id_element_table.dart';
@@ -50,14 +50,14 @@ class WebAppDataBase with ChangeNotifier {
     print(_model);
   }
 
-  Future<void> init(String projectId,  String username,
+  Future<void> init(
       {String reposJsonPath = "",
       String settingFilterFile = "",
       String stepMapperJsonFile = "",
       bool storeNavigation = true}) async {
     clear();
 
-    await projectService.loadFolderStructure(projectId);
+    await projectService.loadFolderStructure();
 
     await Future.wait([
       // workflowService.init(reposJsonPath: reposJsonPath),
@@ -87,16 +87,15 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> loadModel({bool loadNavigation = true}) async {
     if (AppUser().projectId != "") {
-      var projectId = AppUser().projectId;
       var user = AppUser().username;
 
       var folder = await projectService
-          .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
+          .getOrCreateFolder(".tercen", parentId: "");
       var viewFile = await projectService.getOrCreateFile(
-          projectId, user, "${user}_view_05",
+          "${user}_view_05",
           parentId: folder.id);
       var navFile = await projectService.getOrCreateFile(
-          projectId, user, "${user}_nav_05",
+          "${user}_nav_05",
           parentId: folder.id);
 
       var contentString = projectService.getFileContent(viewFile);
@@ -122,19 +121,19 @@ class WebAppDataBase with ChangeNotifier {
 
   Future<void> saveModel({bool saveNavigation = true}) async {
     if (AppUser().projectId != "") {
-      var projectId = AppUser().projectId;
+
       var user = AppUser().username;
       var folder = await projectService
-          .getOrCreateFolder(projectId, user, ".tercen", parentId: "");
+          .getOrCreateFolder(".tercen", parentId: "");
 
       var viewFile = await projectService.getOrCreateFile(
-          projectId, user, "${user}_view_05",
+           "${user}_view_05",
           parentId: folder.id);
       await projectService.updateFileContent(viewFile, _model.toJson());
 
       if (saveNavigation) {
         var navFile = await projectService.getOrCreateFile(
-            projectId, user, "${user}_nav_05",
+             "${user}_nav_05",
             parentId: folder.id);
         await projectService.updateFileContent(
             navFile, app.getPersistentData());
@@ -231,22 +230,20 @@ class WebAppDataBase with ChangeNotifier {
     // app.projectName = project.name;
     // app.username = username;
     // app.teamname = project.acl.owner;
-    await Future.wait([
-       init(project.id, username),
-       AppUser().setProject(project.id)
-    ]);
+    await AppUser().setProject(project.id);
+    await init();
     
   }
 
   Future<void> projectFilesUpdated() async {
     projectService
-        .loadFolderStructure(AppUser().projectId)
+        .loadFolderStructure()
         .then((value) => notifyListeners());
   }
 
   Future<void> reloadProjectFiles() async {
     await projectService
-        .loadFolderStructure(AppUser().projectId)
+        .loadFolderStructure()
         .then((value) => notifyListeners());
 
 

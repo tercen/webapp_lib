@@ -50,7 +50,7 @@ class UploadFileTeamComponent extends UploadFileComponent {
       var bytes = await dvController.getFileData(file);
 
       var fileId = await fileService.uploadFile(
-          file.name, projectIdCallback(), fileOwnerCallback(), bytes,
+          file.name,  fileOwnerCallback(), bytes,
           folderId: folderId);
 
       uploadedFileIds.add(fileId);
@@ -65,7 +65,7 @@ class UploadFileTeamComponent extends UploadFileComponent {
       }
 
       var fileId = await fileService.uploadFile(
-          file.name, projectIdCallback(), fileOwnerCallback(), bytes,
+          file.name, fileOwnerCallback(), bytes,
           folderId: folderId);
       uploadedFileIds.add(fileId);
       uploadedFilenames.add(file.name);

@@ -15,6 +15,7 @@ import 'package:webapp_utils/functions/logger.dart';
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_utils/model/workflow_setting.dart';
+import 'package:webapp_utils/services/app_user.dart';
 import 'package:webapp_utils/services/project_data_service.dart';
 
 class WorkflowDataService {
@@ -92,10 +93,10 @@ class WorkflowDataService {
     return libObjs;
   }
 
-  Future<List<Workflow>> getProjectWorkflowList(String projectId,
+  Future<List<Workflow>> getProjectWorkflowList(
       {bool fetchOnServer = false, bool useCache = true}) async {
     var factory = tercen.ServiceFactory();
-    var cacheKey = "${projectId}_workflowList";
+    var cacheKey = "${AppUser().projectId}_workflowList";
     if(useCache && cache.hasCachedValue(cacheKey)){
       return cache.getCachedValue(cacheKey);
     }
@@ -103,7 +104,7 @@ class WorkflowDataService {
     if (fetchOnServer) {
       var projObjs = await factory.projectDocumentService
           .findProjectObjectsByLastModifiedDate(
-              startKey: [projectId, '0000'], endKey: [projectId, '9999']);
+              startKey: [AppUser().projectId, '0000'], endKey: [AppUser().projectId, '9999']);
       var workflowIds = projObjs
           .where((e) => e.subKind == "Workflow")
           .map((e) => e.id)
@@ -131,10 +132,10 @@ class WorkflowDataService {
     return metas.every((meta) => workflow.getMeta(meta.key) == meta.value);
   }
 
-  Future<List<Workflow>> findWorkflowByMetas(String projectId, List<Pair> metas,
+  Future<List<Workflow>> findWorkflowByMetas( List<Pair> metas,
       {bool fetchOnServer = false, bool useCache = true})  async {
     
-    var workflowList = await getProjectWorkflowList(projectId, fetchOnServer: fetchOnServer, useCache: useCache);
+    var workflowList = await getProjectWorkflowList( fetchOnServer: fetchOnServer, useCache: useCache);
 
     workflowList = workflowList.where((wkf) => workflowHasMetas(wkf, metas)).toList();
     return workflowList;
@@ -595,13 +596,13 @@ class WorkflowDataService {
     return results;
   }
 
-  Future<WebappTable> fetchWorkflowTable(String projectId) async {
-    var key = projectId;
+  Future<WebappTable> fetchWorkflowTable() async {
+    var key = AppUser().projectId;
     if (cache.hasCachedValue(key)) {
       return cache.getCachedValue(key);
     } else {
 
-      var workflows = await getProjectWorkflowList(projectId, fetchOnServer: true);
+      var workflows = await getProjectWorkflowList(fetchOnServer: true);
 
 
       var res = WebappTable();

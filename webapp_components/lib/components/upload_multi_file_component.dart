@@ -299,7 +299,7 @@ class UploadFileComponent
       }
       var bytes = await dvController.getFileData(file);
       var fileId = await fileService.uploadFile(
-          file.name, projectId, fileOwner, bytes,
+          file.name, fileOwner, bytes,
           folderId: folderId);
       uploadedFileIds.add(fileId);
       uploadedFilenames.add(file.name);
@@ -313,7 +313,7 @@ class UploadFileComponent
       }
 
       var fileId = await fileService.uploadFile(
-          file.name, projectId, fileOwner, bytes,
+          file.name, fileOwner, bytes,
           folderId: folderId);
       uploadedFileIds.add(fileId);
       uploadedFilenames.add(file.name);
