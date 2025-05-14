@@ -51,18 +51,22 @@ class AppUser {
       _teamname = project.acl.owner;
       
       _projectName = project.name;
+      var userService = factory.userService as sci.UserService;
+      final session = userService.session;
+     _username = session != null ? session.user.name : "";
     }else{
-      _teamname = "";
+      var tok = Uri.base.queryParameters["token"] ?? '';
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
+      _username = decodedToken['data']['u'];
+      _teamname = ""; 
       _username = "";
       _projectName = "No project loaded";
     }
-    var userService = factory.userService as sci.UserService;
-     final session = userService.session;
-    _username = session != null ? session.user.name : "";
+    
     
   }
 
-  String get teamname => _teamname;
+  String get teamname => _teamname == "" ? _username : _teamname;
   String get username => _username;
   String get projectName => _projectName;
   String get projectId => _projectId;
