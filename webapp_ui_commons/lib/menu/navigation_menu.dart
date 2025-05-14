@@ -83,11 +83,12 @@ class NavigationMenu with ChangeNotifier {
   }
 
   Widget _createExitButton(String label, String href) {
-    final Uri url = Uri.parse(href);
+    
 
     Widget btn = InkWell(
         onTap: () {
           //  launchUrl(url, webOnlyWindowName: "_self");
+          final Uri url = Uri.parse(AppUser().projectUrl);
           launchUrl(url, webOnlyWindowName: "_blank");
         },
         child: Row(
