@@ -215,8 +215,11 @@ class WebAppDataBase with ChangeNotifier {
   //DATA FETCH Functions
   //-------------------------------------------------------------
 
-  Future<List<String>> fetchUserList() async {
-    return await userService.fetchUserList(AppUser().username);
+  Future<WebappTable> fetchUserList() async {
+    var tbl = WebappTable();
+    final userList = await userService.fetchUserList(AppUser().username);
+    tbl.addColumn("label", data: userList);
+    return tbl;
   }
 
   Future<void> createOrLoadProject(String projectName, String username) async {
