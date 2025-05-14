@@ -51,6 +51,26 @@ class WebAppBase with ChangeNotifier {
   set leftPanel(Widget leftPanel) => navPanelContent = leftPanel;
   set rightPanel(Widget rightPanel) => contentPanelContent = rightPanel;
 
+  void buildProjectUrl(){
+    
+    username = teamname;
+
+    var href = "${Uri.base.scheme}://";
+    href = "$href${Uri.base.host}";
+    if (Uri.base.hasPort) {
+      href = "$href:${Uri.base.port}";
+    }
+    serviceBase = href;
+
+    href = "$href/$username";
+    if( projectId != ""){
+      href = "$href/p/$projectId";
+    }
+    
+    projectHref = href;
+
+  }
+
   Future<bool> initFactory(String token) async {
     if (token.isEmpty) {
       throw "A token is required";
@@ -115,39 +135,7 @@ class WebAppBase with ChangeNotifier {
         var auth = json.decode(html.window.localStorage['authorization'] ?? "");
 
         session = sci.UserSession.json(auth);
-        // widget.handler.userSession = session;
-
-        username = teamname;
-        // session.user
-            // .name; //widget.handler.getModelValue(ModelKey.selectedTeam, emptyVal: session.user.name);
-
-        var href = "${Uri.base.scheme}://";
-        href = "$href${Uri.base.host}";
-        if (Uri.base.hasPort) {
-          href = "$href:${Uri.base.port}";
-        }
-        serviceBase = href;
-
-        href = "$href/$username";
-        if( projectId != ""){
-          href = "$href/p/$projectId";
-        }
-        
-        projectHref = href;
-
-        // var queryMap = Uri.base.queryParameters;
-        // //teamId -- projectId, set it here
-        // var newUri = Uri.base.replace(queryParameters: {"teamId":username, "projectId":projectId});
-        // String newQueryAddress = '';
-        // var remList = ['stepId', 'workflowId', 'token', 'gt', 'taskId'];
-        // for (var entry in queryMap.entries) {
-        //   if (!remList.contains(entry.key)) {
-        //     newQueryAddress = "$newQueryAddress&${entry.key}=${entry.value}";
-        //   }
-        // }
-        // print(newUri.toString());
-
-        // html.window.history.pushState({}, '', projectHref);
+        buildProjectUrl();
       }
 
       navMenu.addLink("Exit App", projectHref);

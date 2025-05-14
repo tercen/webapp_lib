@@ -239,7 +239,7 @@ class WebAppDataBase with ChangeNotifier {
         .then((value) => notifyListeners());
   }
 
-  Future<void> reloadProjectFiles() async {
+  Future<void> reloadProjectFiles({String? newTeam}) async {
     await projectService
         .loadFolderStructure(app.projectId)
         .then((value) => notifyListeners());
@@ -251,7 +251,8 @@ class WebAppDataBase with ChangeNotifier {
 
     app.navMenu.project = app.projectName;
     app.navMenu.user = app.username;
-    app.navMenu.team = app.teamname;
+    app.navMenu.team = newTeam ?? app.teamname;
+    app.buildProjectUrl();
   }
 
   List<Document> getProjectFiles() {
