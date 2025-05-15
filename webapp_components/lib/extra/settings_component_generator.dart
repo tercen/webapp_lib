@@ -125,7 +125,7 @@ class SettingComponentGenerator {
 
   Component createMultipleListComponent(
       WorkflowSetting setting, String groupId) {
-    print("Creating Multi check componetn")    ;
+
     var comp = MultiCheckComponent(
         createComponentKey(setting), groupId, setting.name,
         columns: 5);

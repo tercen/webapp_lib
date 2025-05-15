@@ -199,7 +199,8 @@ class WorkflowDataService {
       for (var i = 0; i < operators.length; i++) {
         var step = dataSteps[i];
         var op = operators[i];
-        workflowSettings.addAll(op.properties.map((prop) {
+
+        final props = op.properties.map((prop) {
           if (prop is EnumeratedProperty) {
             var kind = prop.isSingleSelection ? "ListSingle" : "ListMultiple";
             return WorkflowSetting(step.name, step.id, prop.name,
@@ -222,7 +223,12 @@ class WorkflowDataService {
 
           return WorkflowSetting(
               step.name, step.id, prop.name, "", "string", prop.description);
-        }));
+        });
+        Logger().log(
+            level: Logger.ALL,
+            message:
+                "\tAdded ${props.length} properties for step ${step.id} ${step.name}");
+        workflowSettings.addAll(props);
       }
     }
     workflowSettings = workflowSettings.toSet().toList();
