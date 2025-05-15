@@ -702,11 +702,8 @@ class WorkflowRunner with ProgressDialog {
           stp.state.taskState = sci.InitState();
           stpName = stp.name;
         } else {
-          if(doNotRunList.contains(stp.id) ){
-            stp.state.taskState = sci.DoneState();
-            stepsToRestore.add(stp.id);
-          }
-          
+          stp.state.taskState = sci.DoneState();
+          stepsToRestore.add(stp.id);
         }
       }
     }
@@ -728,7 +725,8 @@ class WorkflowRunner with ProgressDialog {
     }
 
     for (var stp in workflow.steps) {
-      if (stepsToRestore.contains(stp.id)) {
+      
+      if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id) ) {
         stp.state.taskState = sci.InitState();
       }
     }
