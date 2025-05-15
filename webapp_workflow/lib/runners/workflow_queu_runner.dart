@@ -8,16 +8,11 @@ import 'package:webapp_workflow/runners/workflow_runner.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
-typedef PostRunIdCallback = Future<void> Function(String workflowId);
+
 
 class WorkflowQueuRunner extends WorkflowRunner {
   WorkflowQueuRunner( super.template,
       {super.timestampType = TimestampType.full, super.keepTemplate = false});
-  final List<PostRunIdCallback> postRunIdCallbacks = [];
-
-  void addIdPostRun(PostRunIdCallback callback) {
-    postRunIdCallbacks.add(callback);
-  }
 
   @override
   Future<sci.Workflow> doRun(BuildContext? context, {bool setup = true}) async {

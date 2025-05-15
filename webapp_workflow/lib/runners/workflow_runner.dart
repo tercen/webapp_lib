@@ -18,7 +18,7 @@ import 'package:webapp_utils/services/app_user.dart';
 enum TimestampType { full, short }
 
 typedef PostRunCallback = Future<void> Function();
-
+typedef PostRunIdCallback = Future<void> Function(String workflowId);
 
 
 class WorkflowRunner with ProgressDialog {
@@ -86,6 +86,13 @@ class WorkflowRunner with ProgressDialog {
     }
     
   }
+
+  final List<PostRunIdCallback> postRunIdCallbacks = [];
+
+  void addIdPostRun(PostRunIdCallback callback) {
+    postRunIdCallbacks.add(callback);
+  }
+
 
   void addWorkflowMeta(String key, String value) {
     workflowMeta.add(sci.Pair.from(key, value));
@@ -804,9 +811,17 @@ class WorkflowRunner with ProgressDialog {
 
     log("$stepProgressMessage\n\n \nRunning final updates",
         dialogTitle: runTitle);
-    for (var f in postRunCallbacks) {
-      await f();
+
+    final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) => step.state.taskState.kind != "DoneState" && step.state.taskState.kind != "InitState");
+    if( !hasFailed ){
+      for (var f in postRunCallbacks) {
+        await f();
+      }
+      for (var f in postRunIdCallbacks) {
+        await f(workflow.id);
+      }
     }
+
 
     // await handler.reloadProjectFiles();
 
