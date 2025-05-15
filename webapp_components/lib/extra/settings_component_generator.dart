@@ -37,7 +37,7 @@ class SettingComponentGenerator {
   }
 
   String createComponentKey(WorkflowSetting setting) {
-    return "${setting.stepName}_${setting.name}";
+    return "${setting.stepName}_${setting.name}_${setting.stepId}";
   }
 
   List<Component> filterScreenComponents(List<Component> components,
