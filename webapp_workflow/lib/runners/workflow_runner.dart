@@ -702,8 +702,11 @@ class WorkflowRunner with ProgressDialog {
           stp.state.taskState = sci.InitState();
           stpName = stp.name;
         } else {
-          stp.state.taskState = sci.DoneState();
-          stepsToRestore.add(stp.id);
+          if(doNotRunList.contains(stp.id) ){
+            stp.state.taskState = sci.DoneState();
+            stepsToRestore.add(stp.id);
+          }
+          
         }
       }
     }
