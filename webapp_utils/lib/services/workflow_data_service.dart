@@ -177,6 +177,7 @@ class WorkflowDataService {
       var opIds = dataSteps
           .map((step) => step.model.operatorSettings.operatorRef)
           .where((opRef) => opRef.name != "File Downloader")
+          .where((opRef) => opRef.name != "Gating")
           .where((opRef) => opRef.operatorKind != "WebappOperator")
           .where((opRef) => opRef.operatorKind != "Operator")
           .map((opRef) => opRef.operatorId)
