@@ -227,7 +227,7 @@ class WorkflowDataService {
         Logger().log(
             level: Logger.ALL,
             message:
-                "\tAdded ${props.length} properties for step ${step.id} ${step.name}");
+                "\tAdded ${props.length}/${op.properties} properties for step ${step.id} ${step.name}");
         workflowSettings.addAll(props);
       }
     }
