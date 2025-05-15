@@ -391,7 +391,7 @@ mixin ScreenBase {
             Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                    constraints: BoxConstraints(maxWidth: modelLayer.app.isMenuCollapsed ? 350 : 250),
+                    constraints: BoxConstraints(maxWidth: width+200),
                     child: _wrap(_buildLabel(comp)))),
             Align(
                 alignment: Alignment.topLeft,
