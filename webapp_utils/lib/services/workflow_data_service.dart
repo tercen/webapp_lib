@@ -186,12 +186,12 @@ class WorkflowDataService {
           .map((step) => step.model.operatorSettings.operatorRef)
           .toList();
 
-      for (var opRef in opRefs) {
-        Logger().log(
-            level: Logger.ALL,
-            message:
-                "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId}  ");
-      }
+      // for (var opRef in opRefs) {
+      //   Logger().log(
+      //       level: Logger.ALL,
+      //       message:
+      //           "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId} ");
+      // }
 
       var operators = await factory.operatorService.list(opIds);
 
@@ -199,6 +199,11 @@ class WorkflowDataService {
       for (var i = 0; i < operators.length; i++) {
         var step = dataSteps[i];
         var op = operators[i];
+
+        Logger().log(
+            level: Logger.ALL,
+            message:
+                "\tOperator: ${op.name} (${op.version}) :: ${op.properties.length} [${step.name}]");
 
         final props = op.properties.map((prop) {
           if (prop is EnumeratedProperty) {
@@ -224,10 +229,10 @@ class WorkflowDataService {
           return WorkflowSetting(
               step.name, step.id, prop.name, "", "string", prop.description);
         });
-        Logger().log(
-            level: Logger.ALL,
-            message:
-                "\tAdded ${props.length}/${op.properties.length} properties for step ${step.id} ${step.name}");
+        // Logger().log(
+            // level: Logger.ALL,
+            // message:
+                // "\tAdded ${props.length}/${op.properties.length} properties for step ${step.id} ${step.name}");
         workflowSettings.addAll(props);
       }
     }
