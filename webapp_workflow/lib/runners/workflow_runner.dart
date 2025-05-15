@@ -13,6 +13,7 @@ import 'package:webapp_utils/functions/formatter_utils.dart';
 import 'package:webapp_utils/functions/string_utils.dart';
 import 'package:webapp_utils/model/step_setting.dart';
 import 'package:webapp_utils/services/app_user.dart';
+import 'package:webapp_utils/services/workflow_data_service.dart';
 
 
 enum TimestampType { full, short }
@@ -43,6 +44,9 @@ class WorkflowRunner with ProgressDialog {
   final List<StepSetting> settings = [];
   final List<PostRunCallback> postRunCallbacks = [];
 
+  final List<String> doNotRunList = [];
+
+  
 
   // final Value status = ValueHolder<RunStatus>(RunStatus.init);
 
@@ -112,6 +116,26 @@ class WorkflowRunner with ProgressDialog {
 
   void setParentFolderId( String folderId ){
     parentFolderId = folderId;
+  }
+
+  void doNotRun(String stepId){
+    doNotRunList.add(stepId);
+  }
+  
+    Future<void> reEnableSteps(String workflowId) async {
+    if( doNotRunList.isNotEmpty ){
+      var wkf = await WorkflowDataService().findWorkflowById(workflowId);
+      for( var stepId in doNotRunList ){
+        final stp = wkf.steps.whereType<sci.DataStep>().firstWhere((step) => step.id == stepId, orElse: () => sci.DataStep());
+        if( stp.id != ""){
+          stp.state.taskState = sci.InitState();
+        }
+      }
+
+      final factory = tercen.ServiceFactory();
+      await factory.workflowService.update(wkf);
+    }
+
   }
 
   /// Setting by name will search through the steps in a workflow looking for a matching name
@@ -570,7 +594,7 @@ class WorkflowRunner with ProgressDialog {
       for (var meta in workflowMeta) {
         workflow.addMeta(meta.key, meta.value);
       }
-
+      addIdPostRun(reEnableSteps);
       //-----------------------------------------
       // Step-specific setup
       //-----------------------------------------
@@ -599,6 +623,10 @@ class WorkflowRunner with ProgressDialog {
           stp.state.taskState = sci.InitState();
           stp.state.taskId = "";
         }
+        if( doNotRunList.contains(stp.id)){
+          stp.state.taskState = sci.DoneState();
+        }
+
 
         if (multiDsMap.containsKey(stp.id)) {
           var tmpStp = stp as sci.DataStep;
