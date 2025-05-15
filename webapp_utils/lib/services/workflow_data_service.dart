@@ -173,13 +173,17 @@ class WorkflowDataService {
           .whereType<DataStep>()
           .where((step) =>
               step.model.operatorSettings.operatorRef.operatorId != "")
+          .where((step) => step.model.operatorSettings.operatorRef.name != "File Downloader")
+          .where((step) => step.model.operatorSettings.operatorRef.name != "Gating")
+          .where((step) => step.model.operatorSettings.operatorRef.operatorKind != "WebappOperator")
+          .where((step) => step.model.operatorSettings.operatorRef.operatorKind != "Operator")
           .toList();
       var opIds = dataSteps
           .map((step) => step.model.operatorSettings.operatorRef)
-          .where((opRef) => opRef.name != "File Downloader")
-          .where((opRef) => opRef.name != "Gating")
-          .where((opRef) => opRef.operatorKind != "WebappOperator")
-          .where((opRef) => opRef.operatorKind != "Operator")
+          // .where((opRef) => opRef.name != "File Downloader")
+          // .where((opRef) => opRef.name != "Gating")
+          // .where((opRef) => opRef.operatorKind != "WebappOperator")
+          // .where((opRef) => opRef.operatorKind != "Operator")
           .map((opRef) => opRef.operatorId)
           .toList();
 
