@@ -182,6 +182,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       await setupRun(context, inPlace: inPlace);
     }else{
       workflow = template;
+      return workflow;
     }
     //-----------------------------------------
     // Task preparation and running
@@ -227,10 +228,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
     
     await for (var evt in taskStream) {
       if (evt is sci.PatchRecords) {
-        var newWkf = await factory.workflowService.get(workflow.id);
-        if( newWkf.rev != workflow.rev ){
-          workflow = newWkf;
-        }
+        // var newWkf = await factory.workflowService.get(workflow.id);
+        // if( newWkf.rev != workflow.rev ){
+          // workflow = newWkf;
+        // }
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
           if(  pr.d.isEmpty){
