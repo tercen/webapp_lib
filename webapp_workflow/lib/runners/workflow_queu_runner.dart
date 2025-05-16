@@ -271,14 +271,16 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
 
       if(workflow.steps.every((stp) => stp.state.taskState.isFinal)){
+        
         break;
       }
     }
 
 
     print("Workflow run done $hasFailed");
-    // workflow = await factory.workflowService.get(workflow.id);
-    // await factory.workflowService.update(workflow);
+    //
+    await factory.workflowService.update(workflow);
+    workflow = await factory.workflowService.get(workflow.id);
 
     if (!hasFailed) {
       for (var f in postRunCallbacks) {
