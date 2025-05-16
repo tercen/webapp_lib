@@ -833,7 +833,9 @@ class WorkflowRunner with ProgressDialog {
         stp.state.taskState.throwIfNotDone();
       }
     }
-
+    await factory.workflowService.update(workflow);
+    workflowId = workflow.id;
+    workflow = await factory.workflowService.get(workflow.id);
     return workflow;
   }
 

@@ -143,7 +143,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
     }
 
-    await factory.workflowService.update(workflow);
+    
     if(!hasFailed){
       for (var f in postRunCallbacks) {
         await f();
@@ -153,18 +153,16 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
     }else {
       //Update workflow with error info
-      
       var currentWorkflow = await factory.workflowService.get(workflow.id);
       currentWorkflow.meta
           .add(sci.Pair.from("run.error", errorInformation["error"] as String));
       currentWorkflow.meta.add(sci.Pair.from(
           "run.error.reason", errorInformation["reason"] as String));
-      await factory.workflowService.update(currentWorkflow);
     }
 
-
+    await factory.workflowService.update(workflow);
     workflowId = workflow.id;
-    workflow = workflow;
+    workflow = await factory.workflowService.get(workflow.id);
 
     return workflow;
   }
