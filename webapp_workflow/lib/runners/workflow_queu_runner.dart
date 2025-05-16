@@ -118,6 +118,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+          print("FINISHED WORKFLOW ${workflow.name}");
           break;
         }
       }
@@ -255,6 +256,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+          print("FINISHED WORKFLOW ${workflow.name}");
           break;
         }
       }
