@@ -224,6 +224,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     var hasFailed = false;
     print("Start reading stream");
     await for (var evt in taskStream) {
+      print(evt.toJson());
       if (evt is sci.PatchRecords) {
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
