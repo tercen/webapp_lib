@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
 import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/components/label_component.dart';
+import 'package:webapp_components/components/spacing_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 // import 'package:webapp_components/abstract/multi_value_component.dart';
 // import 'package:webapp_components/abstract/single_value_component.dart';
@@ -67,6 +68,16 @@ mixin ScreenBase {
   void refresh() {
     throw Exception(
         "Method refresh() must be overriden in classes with ScreenBase");
+  }
+
+  void addVerticalSpacing(String blockId,
+      {Component? parent, double height = 5}) {
+    var comp = SpacingComponent(height: height);
+    if (parent != null) {
+      comp.addParent(parent);
+    }
+
+    addComponent(blockId, comp);
   }
 
   void addHorizontalBar(String blockId,
