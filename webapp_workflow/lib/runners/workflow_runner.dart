@@ -682,14 +682,17 @@ class WorkflowRunner with ProgressDialog {
     }
   }
 
-  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId) async {
+  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId, {bool doSetup = true}) async {
     var factory = tercen.ServiceFactory();
 
     if( context != null ){
       openDialog(context);
     }
     
-    await setupRun(context);
+    if( doSetup ){
+      await setupRun(context);
+    }
+    
     var runTitle = getWorkflowName(template);
 
     List<String> stepsToRestore = [];
@@ -720,18 +723,24 @@ class WorkflowRunner with ProgressDialog {
       log("Running $stpName\n\n \nRunning final updates", dialogTitle: runTitle);
     }
 
-    for (var f in postRunCallbacks) {
-      await f();
-    }
+    
 
     for (var stp in workflow.steps) {
-      
+ 
       if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id) ) {
         stp.state.taskState = sci.InitState();
       }
     }
 
     await factory.workflowService.update(workflow);
+
+    for (var f in postRunCallbacks) {
+      await f();
+    }
+
+    for (var f in postRunIdCallbacks) {
+      await f(workflow.id);
+    }
 
     if( context != null ){
       await Future.delayed(const Duration(milliseconds: 1000), () {
