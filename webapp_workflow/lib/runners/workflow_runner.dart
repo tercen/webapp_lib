@@ -663,6 +663,7 @@ class WorkflowRunner with ProgressDialog {
 
       if( inPlace ){
         await factory.workflowService.update(workflow);
+        workflow = await factory.workflowService.get(workflow.id);
       }else{
         if (folderId == null) {
           sci.FolderDocument folder =
