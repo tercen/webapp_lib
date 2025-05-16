@@ -198,6 +198,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
     var taskStream = factory.eventService.channel(workflowTask.channelId);
 
+
     workflow.addMeta("workflow.task.id", workflowTask.id);
     workflow.addMeta("run.task.id", workflowTask.id);
     await factory.workflowService.update(workflow);
@@ -226,6 +227,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
     
     await for (var evt in taskStream) {
       if (evt is sci.PatchRecords) {
+        var newWkf = await factory.workflowService.get(workflow.id);
+        if( newWkf.rev != workflow.rev ){
+          workflow = newWkf;
+        }
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
           if(  pr.d.isEmpty){
@@ -258,22 +263,21 @@ class WorkflowQueuRunner extends WorkflowRunner {
           break;
         }
       }
-      if (evt is sci.TaskProgressEvent) {
-      } else if (evt is sci.TaskLogEvent) {
-      } else {
-        if (evt is sci.TaskStateEvent) {
-          if (evt.state is sci.DoneState) {}
-        }
-      }
+      // if (evt is sci.TaskProgressEvent) {
+      // } else if (evt is sci.TaskLogEvent) {
+      // } else {
+      //   if (evt is sci.TaskStateEvent) {
+      //     if (evt.state is sci.DoneState) {}
+      //   }
+      // }
 
-      if (hasFailed) {
-        break;
-      }
+      // if (hasFailed) {
+      //   break;
+      // }
 
-      if(workflow.steps.every((stp) => stp.state.taskState.isFinal)){
-        
-        break;
-      }
+      // if(workflow.steps.every((stp) => stp.state.taskState.isFinal)){
+      //   break;
+      // }
     }
 
 
