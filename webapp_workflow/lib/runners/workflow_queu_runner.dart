@@ -87,6 +87,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     var errorInformation = {"error": "", "reason": ""};
     var hasFailed = false;
     await for (var evt in taskStream) {
+      print(evt.toJson());
       if (evt is sci.PatchRecords) {
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
