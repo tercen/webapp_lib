@@ -16,27 +16,24 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
 
   @override
-  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId, {bool doSetup = true}) async {
+  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId, {bool doSetup = true, bool inPlace = false}) async {
     var factory = tercen.ServiceFactory();
 
     if( doSetup ){
       if( context != null ){
         log("Sending analysis to queu", dialogTitle: "Preparing Workflow");
       }
-      await setupRun(context);
+      await setupRun(context, inPlace: inPlace);
     }
     
-    var runTitle = getWorkflowName(template);
-
     List<String> stepsToRestore = [];
-    var stpName = "STEP";
+
     for (var stp in workflow.steps) {
       if (!(stp is sci.TableStep ||
           stp.state.taskState is sci.DoneState ||
           stp.state.taskState is sci.FailedState)) {
         if (stp.id == stepId) {
           stp.state.taskState = sci.InitState();
-          stpName = stp.name;
         } else {
           stp.state.taskState = sci.DoneState();
           stepsToRestore.add(stp.id);
@@ -172,7 +169,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
 
   @override
-  Future<sci.Workflow> doRun(BuildContext? context, {bool setup = true}) async {
+  Future<sci.Workflow> doRun(BuildContext? context, {bool setup = true, bool inPlace = false}) async {
     if (template.id == "") {
       throw Exception("Workflow not set in WorkflowRunner.");
     }
@@ -183,7 +180,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       if( context != null ){
         log("Sending analysis to queu", dialogTitle: "Preparing Workflow");
       }
-      await setupRun(context);
+      await setupRun(context, inPlace: inPlace);
     }else{
       workflow = template;
     }

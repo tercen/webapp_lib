@@ -74,7 +74,6 @@ class WorkflowRunner with ProgressDialog {
   final Map<String, List<String>> removeFilters = {};
 
   WorkflowRunner(this.template, {var timestampType = TimestampType.full, this.keepTemplate = false}) {
-    
     if( timestampType == TimestampType.short){
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
     }else{
@@ -557,7 +556,7 @@ class WorkflowRunner with ProgressDialog {
     return "${folderPrefix}${timeStr}${folderSuffix}";
   }
 
-  Future<void> setupRun(BuildContext? context) async {
+  Future<void> setupRun(BuildContext? context, {bool inPlace = false}) async {
     if (!isInit) {
       if (template.id == "") {
         throw Exception("Workflow not set in WorkflowRunner.");
@@ -579,7 +578,12 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       // Copy template into project
       //-----------------------------------------
-      workflow = await factory.workflowService.copyApp(template.id, AppUser().projectId);
+      if( inPlace ){
+        workflow = template;
+      }else{
+        workflow = await factory.workflowService.copyApp(template.id, AppUser().projectId);
+      }
+      
 
       if ( template.projectId == workflow.projectId) {
         // await factory.workflowService.delete(template.id, template.rev);
@@ -663,26 +667,27 @@ class WorkflowRunner with ProgressDialog {
         workflow.folderId = folderId!;
       }
 
-      workflow.name = getWorkflowName(workflow);
-      workflow.acl = sci.Acl()..owner = AppUser().teamname;
-      workflow.isHidden = false;
-      workflow.isDeleted = false;
+      if( inPlace ){
+        workflow.name = getWorkflowName(workflow);
+        workflow.acl = sci.Acl()..owner = AppUser().teamname;
+        workflow.isHidden = false;
+        workflow.isDeleted = false;
 
-      // if (workflow.id == "" || workflow.rev == "") {
-      workflow.id = "";
-      workflow.rev = "";
+        workflow.id = "";
+        workflow.rev = "";
 
-      workflow = await factory.workflowService.create(workflow);
-      // } else {
-        // await factory.workflowService.update(workflow);
-        // workflow = await factory.workflowService.get(workflow.id);
-      // }
+        workflow = await factory.workflowService.create(workflow);
+      }else{
+        await factory.workflowService.update(workflow);
+      }
+      
+
       workflowId = workflow.id;
       isInit = true;
     }
   }
 
-  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId, {bool doSetup = true}) async {
+  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId, {bool doSetup = true, bool inPlace = false}) async {
     var factory = tercen.ServiceFactory();
 
     if( context != null ){
@@ -690,7 +695,7 @@ class WorkflowRunner with ProgressDialog {
     }
     
     if( doSetup ){
-      await setupRun(context);
+      await setupRun(context, inPlace: inPlace);
     }
     
     var runTitle = getWorkflowName(template);
@@ -831,13 +836,13 @@ class WorkflowRunner with ProgressDialog {
     return workflow;
   }
 
-  Future<sci.Workflow> doRun(BuildContext? context, {bool setup = true}) async {
+  Future<sci.Workflow> doRun(BuildContext? context, {bool setup = true, bool inPlace = false}) async {
     if( context!=null){
       openDialog(context);
     }
     
     if( setup == true ){
-      await setupRun(context);
+      await setupRun(context, inPlace: inPlace);
     }else{
       workflow = template;
     }
