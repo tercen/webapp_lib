@@ -269,6 +269,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
       if (hasFailed) {
         break;
       }
+
+      if(workflow.steps.every((stp) => stp.state.taskState.isFinal)){
+        break;
+      }
     }
 
 
