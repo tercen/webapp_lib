@@ -123,7 +123,7 @@ class WorkflowRunner with ProgressDialog {
   
     Future<void> reEnableSteps(String workflowId) async {
     if( doNotRunList.isNotEmpty ){
-      var wkf = await WorkflowDataService().findWorkflowById(workflowId);
+      var wkf = await WorkflowDataService().findWorkflowById(workflowId, useCache: false);
       for( var stepId in doNotRunList ){
         final stp = wkf.steps.whereType<sci.DataStep>().firstWhere((step) => step.id == stepId, orElse: () => sci.DataStep());
         if( stp.id != ""){

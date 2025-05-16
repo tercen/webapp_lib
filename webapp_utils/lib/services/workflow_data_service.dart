@@ -146,7 +146,7 @@ class WorkflowDataService {
       return cache.getCachedValue(id);
     }else{
       var factory = tercen.ServiceFactory();
-      var workflow = factory.workflowService.get(id);
+      var workflow = await factory.workflowService.get(id);
 
       if( useCache ){
         cache.addToCache(id, workflow);
