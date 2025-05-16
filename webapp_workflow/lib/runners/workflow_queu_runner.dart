@@ -224,7 +224,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
     var hasFailed = false;
     print("Start reading stream");
     await for (var evt in taskStream) {
-      print(evt.toJson());
       if (evt is sci.PatchRecords) {
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
@@ -273,8 +272,8 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
 
     print("Workflow run done $hasFailed");
-    await factory.workflowService.update(workflow);
-    workflow = await factory.workflowService.get(workflow.id);
+    // workflow = await factory.workflowService.get(workflow.id);
+    // await factory.workflowService.update(workflow);
 
     if (!hasFailed) {
       for (var f in postRunCallbacks) {
