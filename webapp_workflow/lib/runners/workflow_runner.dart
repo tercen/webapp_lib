@@ -633,7 +633,7 @@ class WorkflowRunner with ProgressDialog {
         if( doNotRunList.contains(stp.id)){
           print("Adding ${stp.id} to do not run list");
           stp.state.taskState = sci.DoneState();
-          
+          stp.state.taskId = "";
         }
 
 
