@@ -247,9 +247,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
           } catch (e) {
             print(evt.toJson());
             print(e.toString());
-            
           }
-
         }
       }
       if (evt is sci.TaskStateEvent) {
@@ -271,8 +269,8 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
     }
 
-    // await factory.workflowService.update(workflow);
-    // var currentWorkflow = await factory.workflowService.get(workflow.id);
+    await factory.workflowService.update(workflow);
+    workflow = await factory.workflowService.get(workflow.id);
 
     if (!hasFailed) {
       for (var f in postRunCallbacks) {
@@ -294,7 +292,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     }
 
     workflowId = workflow.id;
-
+    workflow = await factory.workflowService.get(workflow.id);
     return workflow;
   }
 }
