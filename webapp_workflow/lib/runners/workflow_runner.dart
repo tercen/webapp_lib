@@ -659,17 +659,18 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       // General workflow parameters
       //-----------------------------------------
-      if (folderId == null) {
-        sci.FolderDocument folder =
-            await createFolder( folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
-        workflow.folderId = folder.id;
-      } else {
-        workflow.folderId = folderId!;
-      }
+
 
       if( inPlace ){
         await factory.workflowService.update(workflow);
       }else{
+        if (folderId == null) {
+          sci.FolderDocument folder =
+              await createFolder( folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
+          workflow.folderId = folder.id;
+        } else {
+          workflow.folderId = folderId!;
+        }
         workflow.name = getWorkflowName(workflow);
         workflow.acl = sci.Acl()..owner = AppUser().teamname;
         workflow.isHidden = false;
