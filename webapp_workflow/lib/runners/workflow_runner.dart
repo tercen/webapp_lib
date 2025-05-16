@@ -736,6 +736,7 @@ class WorkflowRunner with ProgressDialog {
  
       if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id) ) {
         stp.state.taskState = sci.InitState();
+        stp.state.taskId = "";
       }
     }
 
@@ -743,10 +744,12 @@ class WorkflowRunner with ProgressDialog {
 
     for (var f in postRunCallbacks) {
       await f();
+      workflow = await factory.workflowService.get(workflow.id);
     }
 
     for (var f in postRunIdCallbacks) {
       await f(workflow.id);
+      workflow = await factory.workflowService.get(workflow.id);
     }
 
     if( context != null ){
