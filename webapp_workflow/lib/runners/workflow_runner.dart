@@ -603,6 +603,9 @@ class WorkflowRunner with ProgressDialog {
       // Step-specific setup
       //-----------------------------------------
       for (var stp in workflow.steps) {
+        if( stp.state.taskState.isFinal ){
+          continue;
+        }
         if (stp.kind == "DataStep") {
           stp = updateFilterValues(stp as sci.DataStep);
           stp = updateOperatorSettings(stp, settings);
@@ -733,7 +736,6 @@ class WorkflowRunner with ProgressDialog {
     
 
     for (var stp in workflow.steps) {
- 
       if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id) ) {
         stp.state.taskState = sci.InitState();
         stp.state.taskId = "";
