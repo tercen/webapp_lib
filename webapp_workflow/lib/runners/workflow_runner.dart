@@ -668,6 +668,8 @@ class WorkflowRunner with ProgressDialog {
       }
 
       if( inPlace ){
+        await factory.workflowService.update(workflow);
+      }else{
         workflow.name = getWorkflowName(workflow);
         workflow.acl = sci.Acl()..owner = AppUser().teamname;
         workflow.isHidden = false;
@@ -677,8 +679,6 @@ class WorkflowRunner with ProgressDialog {
         workflow.rev = "";
 
         workflow = await factory.workflowService.create(workflow);
-      }else{
-        await factory.workflowService.update(workflow);
       }
       
 
