@@ -205,7 +205,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     await factory.workflowService.update(workflow);
 
 
-    // await factory.taskService.runTask(workflowTask.id);
+    await factory.taskService.runTask(workflowTask.id);
 
 
     if( context != null ){
