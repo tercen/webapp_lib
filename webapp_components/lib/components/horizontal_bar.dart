@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
 import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/mixins/component_base.dart';
+import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/string_utils.dart';
 
 class HorizontalBarComponent  extends Component with ComponentBase {
@@ -17,7 +18,7 @@ class HorizontalBarComponent  extends Component with ComponentBase {
   Widget buildContent(BuildContext context) {
     return Container(
       height: thickness,
-      color: Colors.black,
+      color: Styles()["black"],
     );
   }
 
