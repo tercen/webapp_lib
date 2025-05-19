@@ -15,12 +15,10 @@ import 'package:webapp_utils/model/step_setting.dart';
 import 'package:webapp_utils/services/app_user.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
 
-
 enum TimestampType { full, short }
 
 typedef PostRunCallback = Future<void> Function();
 typedef PostRunIdCallback = Future<void> Function(String workflowId);
-
 
 class WorkflowRunner with ProgressDialog {
   StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
@@ -46,8 +44,6 @@ class WorkflowRunner with ProgressDialog {
 
   final List<String> doNotRunList = [];
 
-  
-
   // final Value status = ValueHolder<RunStatus>(RunStatus.init);
 
   String folderSuffix = "";
@@ -57,7 +53,6 @@ class WorkflowRunner with ProgressDialog {
   String workflowRename = "";
   String workflowIdentifier = "";
   String workflowSuffix = "";
-
 
   String stepProgressMessage = "";
 
@@ -73,21 +68,21 @@ class WorkflowRunner with ProgressDialog {
   late final String timestamp;
   final Map<String, List<String>> removeFilters = {};
 
-  WorkflowRunner(this.template, {var timestampType = TimestampType.full, this.keepTemplate = false}) {
-    if( timestampType == TimestampType.short){
+  WorkflowRunner(this.template,
+      {var timestampType = TimestampType.full, this.keepTemplate = false}) {
+    if (timestampType == TimestampType.short) {
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
-    }else{
+    } else {
       timestamp = DateFormat("yyyy.MM.dd_HH:mm").format(DateTime.now());
     }
   }
 
-  void removedNamedFilter(String name, String stepId){
-    if( removeFilters.containsKey(stepId)){
+  void removedNamedFilter(String name, String stepId) {
+    if (removeFilters.containsKey(stepId)) {
       removeFilters[stepId]!.add(name);
-    }else{
+    } else {
       removeFilters[stepId] = [name];
     }
-    
   }
 
   final List<PostRunIdCallback> postRunIdCallbacks = [];
@@ -95,7 +90,6 @@ class WorkflowRunner with ProgressDialog {
   void addIdPostRun(PostRunIdCallback callback) {
     postRunIdCallbacks.add(callback);
   }
-
 
   void addWorkflowMeta(String key, String value) {
     workflowMeta.add(sci.Pair.from(key, value));
@@ -113,26 +107,30 @@ class WorkflowRunner with ProgressDialog {
     addTimestamp = val;
   }
 
-  void setParentFolderId( String folderId ){
+  void setParentFolderId(String folderId) {
     parentFolderId = folderId;
   }
 
-  void doNotRun(String stepId){
+  void doNotRun(String stepId) {
     doNotRunList.add(stepId);
   }
-  
-    Future<void> reEnableSteps(String workflowId) async {
-    if( doNotRunList.isNotEmpty ){
-      var wkf = await WorkflowDataService().findWorkflowById(workflowId, useCache: false);
-      for( var stepId in doNotRunList ){
-        final stp = wkf.steps.whereType<sci.DataStep>().firstWhere((step) => step.id == stepId, orElse: () => sci.DataStep());
-        if( stp.id != ""){
+
+  Future<void> reEnableSteps(String workflowId) async {
+    if (doNotRunList.isNotEmpty) {
+      var wkf = await WorkflowDataService()
+          .findWorkflowById(workflowId, useCache: false);
+      for (var stepId in doNotRunList) {
+        final stp = wkf.steps.whereType<sci.DataStep>().firstWhere(
+            (step) => step.id == stepId,
+            orElse: () => sci.DataStep());
+        if (stp.id != "") {
           stp.state.taskState = sci.InitState();
         }
       }
 
       final factory = tercen.ServiceFactory();
       await factory.workflowService.update(wkf);
+
     }
 
   }
@@ -244,8 +242,9 @@ class WorkflowRunner with ProgressDialog {
     rr.id = "rename_${rel.id}";
     return rr;
   }
-  
-  void addTableFromRelation(String stepId, sci.Relation relation, {String? name}) {
+
+  void addTableFromRelation(String stepId, sci.Relation relation,
+      {String? name}) {
     tableMap[stepId] = relation;
 
     if (name != null && name != "") {
@@ -398,8 +397,9 @@ class WorkflowRunner with ProgressDialog {
     return factors;
   }
 
-  void addAndFilter(String filterName, String stepId, List<String> keys,
-      List<dynamic> values, {List<sci.Pair> metas = const []}) {
+  void addAndFilter(
+      String filterName, String stepId, List<String> keys, List<dynamic> values,
+      {List<sci.Pair> metas = const []}) {
     var factors = convertToStepFactors(keys, getFactorNames(stepId));
     var filterKey = "$stepId$filterName";
 
@@ -425,7 +425,7 @@ class WorkflowRunner with ProgressDialog {
         ..name = filterName;
       namedFilter.filterExprs.add(andFilter);
 
-      for( var meta in metas ){
+      for (var meta in metas) {
         namedFilter.meta.add(meta);
       }
 
@@ -547,11 +547,11 @@ class WorkflowRunner with ProgressDialog {
     folderName = name;
   }
 
-  String getFolderName(){
-    if( folderName != null && folderName != ""){
+  String getFolderName() {
+    if (folderName != null && folderName != "") {
       return folderName!;
     }
-    
+
     var timeStr = addTimestampToFolder ? timestamp : "";
     return "${folderPrefix}${timeStr}${folderSuffix}";
   }
@@ -565,11 +565,10 @@ class WorkflowRunner with ProgressDialog {
       var factory = tercen.ServiceFactory();
 
       var runTitle = getWorkflowName(template);
-      
-      if( context != null){
+
+      if (context != null) {
         log("Set up", dialogTitle: runTitle);
       }
-      
 
       for (var entry in tableDocumentMap.entries) {
         tableMap[entry.key] = await loadDocumentInMemory(entry.value);
@@ -578,14 +577,14 @@ class WorkflowRunner with ProgressDialog {
       //-----------------------------------------
       // Copy template into project
       //-----------------------------------------
-      if( inPlace ){
+      if (inPlace) {
         workflow = template;
-      }else{
-        workflow = await factory.workflowService.copyApp(template.id, AppUser().projectId);
+      } else {
+        workflow = await factory.workflowService
+            .copyApp(template.id, AppUser().projectId);
       }
-      
 
-      if ( template.projectId == workflow.projectId) {
+      if (template.projectId == workflow.projectId) {
         // await factory.workflowService.delete(template.id, template.rev);
         // workflow.id = "";
         // workflow.rev = "";
@@ -603,7 +602,7 @@ class WorkflowRunner with ProgressDialog {
       // Step-specific setup
       //-----------------------------------------
       for (var stp in workflow.steps) {
-        if( stp.state.taskState.isFinal ){
+        if (stp.state.taskState.isFinal) {
           continue;
         }
         if (stp.kind == "DataStep") {
@@ -611,9 +610,10 @@ class WorkflowRunner with ProgressDialog {
           stp = updateOperatorSettings(stp, settings);
           stp = updateOperatorSettingsByName(stp, settingsByName);
 
-          if( removeFilters.containsKey(stp.id)){
-            for( var filterName in removeFilters[stp.id]!){
-              var namedFilter = List<sci.NamedFilter>.from(  stp.model.filters.namedFilters );
+          if (removeFilters.containsKey(stp.id)) {
+            for (var filterName in removeFilters[stp.id]!) {
+              var namedFilter =
+                  List<sci.NamedFilter>.from(stp.model.filters.namedFilters);
               namedFilter.removeWhere((filter) => filter.name == filterName);
               stp.model.filters.namedFilters.setValues(namedFilter);
             }
@@ -630,12 +630,11 @@ class WorkflowRunner with ProgressDialog {
           stp.state.taskState = sci.InitState();
           stp.state.taskId = "";
         }
-        if( doNotRunList.contains(stp.id)){
+        if (doNotRunList.contains(stp.id)) {
           print("Adding ${stp.id} to do not run list");
           stp.state.taskState = sci.DoneState();
           stp.state.taskId = "";
         }
-
 
         if (multiDsMap.containsKey(stp.id)) {
           var tmpStp = stp as sci.DataStep;
@@ -663,14 +662,14 @@ class WorkflowRunner with ProgressDialog {
       // General workflow parameters
       //-----------------------------------------
 
-
-      if( inPlace ){
+      if (inPlace) {
         await factory.workflowService.update(workflow);
         workflow = await factory.workflowService.get(workflow.id);
-      }else{
+      } else {
         if (folderId == null) {
-          sci.FolderDocument folder =
-              await createFolder( folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
+          sci.FolderDocument folder = await createFolder(
+              folderName: getFolderName(),
+              parentFolderId: parentFolderId ?? "");
           workflow.folderId = folder.id;
         } else {
           workflow.folderId = folderId!;
@@ -685,24 +684,24 @@ class WorkflowRunner with ProgressDialog {
 
         workflow = await factory.workflowService.create(workflow);
       }
-      
 
       workflowId = workflow.id;
       isInit = true;
     }
   }
 
-  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId, {bool doSetup = true, bool inPlace = false}) async {
+  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId,
+      {bool doSetup = true, bool inPlace = false}) async {
     var factory = tercen.ServiceFactory();
 
-    if( context != null ){
+    if (context != null) {
       openDialog(context);
     }
-    
-    if( doSetup ){
+
+    if (doSetup) {
       await setupRun(context, inPlace: inPlace);
     }
-    
+
     var runTitle = getWorkflowName(template);
 
     List<String> stepsToRestore = [];
@@ -729,14 +728,13 @@ class WorkflowRunner with ProgressDialog {
     workflow =
         await runWorkflowTask(workflow, runTitle: runTitle, stepName: stpName);
 
-    if( context != null ){
-      log("Running $stpName\n\n \nRunning final updates", dialogTitle: runTitle);
+    if (context != null) {
+      log("Running $stpName\n\n \nRunning final updates",
+          dialogTitle: runTitle);
     }
 
-    
-
     for (var stp in workflow.steps) {
-      if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id) ) {
+      if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id)) {
         stp.state.taskState = sci.InitState();
         stp.state.taskId = "";
       }
@@ -747,6 +745,7 @@ class WorkflowRunner with ProgressDialog {
     for (var f in postRunCallbacks) {
       await f();
       workflow = await factory.workflowService.get(workflow.id);
+      
     }
 
     for (var f in postRunIdCallbacks) {
@@ -754,7 +753,7 @@ class WorkflowRunner with ProgressDialog {
       workflow = await factory.workflowService.get(workflow.id);
     }
 
-    if( context != null ){
+    if (context != null) {
       await Future.delayed(const Duration(milliseconds: 1000), () {
         closeLog();
       });
@@ -789,8 +788,6 @@ class WorkflowRunner with ProgressDialog {
     await factory.workflowService.update(workflow);
 
     await factory.taskService.runTask(workflowTask.id);
-
-
 
     if (stepName == null) {
       updateStepProgress(workflow);
@@ -845,17 +842,18 @@ class WorkflowRunner with ProgressDialog {
     return workflow;
   }
 
-  Future<sci.Workflow> doRun(BuildContext? context, {bool setup = true, bool inPlace = false}) async {
-    if( context!=null){
+  Future<sci.Workflow> doRun(BuildContext? context,
+      {bool setup = true, bool inPlace = false}) async {
+    if (context != null) {
       openDialog(context);
     }
-    
-    if( setup == true ){
+
+    if (setup == true) {
       await setupRun(context, inPlace: inPlace);
-    }else{
+    } else {
       workflow = template;
     }
-    
+
     var runTitle = getWorkflowName(template);
 
     //-----------------------------------------
@@ -866,8 +864,10 @@ class WorkflowRunner with ProgressDialog {
     log("$stepProgressMessage\n\n \nRunning final updates",
         dialogTitle: runTitle);
 
-    final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) => step.state.taskState.kind != "DoneState" && step.state.taskState.kind != "InitState");
-    if( !hasFailed ){
+    final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) =>
+        step.state.taskState.kind != "DoneState" &&
+        step.state.taskState.kind != "InitState");
+    if (!hasFailed) {
       for (var f in postRunCallbacks) {
         await f();
       }
@@ -876,14 +876,7 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
-
-    // await handler.reloadProjectFiles();
-
-    // if (notificationKey != null) {
-    // handler.sendProjectFileUpdateNotification(notificationKey!);
-    // }
-
-    if( context!=null){
+    if (context != null) {
       await Future.delayed(const Duration(milliseconds: 1000), () {
         // status.value = RunStatus.finished;
         closeLog();
@@ -892,6 +885,9 @@ class WorkflowRunner with ProgressDialog {
 
     workflowId = workflow.id;
     // workflow = doneWorkflow;
+
+    final factory = tercen.ServiceFactory();
+    workflow = await factory.workflowService.get(workflow.id);
 
     return workflow;
   }

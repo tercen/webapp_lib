@@ -228,10 +228,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
     
     await for (var evt in taskStream) {
       if (evt is sci.PatchRecords) {
-        // var newWkf = await factory.workflowService.get(workflow.id);
-        // if( newWkf.rev != workflow.rev ){
-          // workflow = newWkf;
-        // }
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
           if(  pr.d.isEmpty){
@@ -260,7 +256,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
-          print("FINISHED WORKFLOW ${workflow.name}");
           break;
         }
       }
@@ -275,17 +270,11 @@ class WorkflowQueuRunner extends WorkflowRunner {
       // if (hasFailed) {
       //   break;
       // }
-
-      // if(workflow.steps.every((stp) => stp.state.taskState.isFinal)){
-      //   break;
-      // }
     }
-
-
     print("Workflow run done $hasFailed");
     //
-    await factory.workflowService.update(workflow);
-    workflow = await factory.workflowService.get(workflow.id);
+    // await factory.workflowService.update(workflow);
+    // workflow = await factory.workflowService.get(workflow.id);
 
     if (!hasFailed) {
       for (var f in postRunCallbacks) {
@@ -311,7 +300,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     }
 
     workflowId = workflow.id;
-    workflow = await factory.workflowService.get(workflow.id);
+    // workflow = await factory.workflowService.get(workflow.id);
     return workflow;
   }
 }
