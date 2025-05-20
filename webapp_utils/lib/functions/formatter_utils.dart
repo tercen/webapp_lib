@@ -13,4 +13,11 @@ class DateFormatter {
     var parseDt = DateTime.parse(dt.value);
     return dateFormatter.format(parseDt);
   }
+
+  static String formatLong(Date dt, {bool shortYear = false}) {
+    final year = shortYear ? 'yy' : 'yyyy';
+    final dateFormatter = DateFormat('$year/MM/dd hh:mm:ss.SSS');
+    var parseDt = DateTime.parse(dt.value);
+    return dateFormatter.format(parseDt);
+  }
 }
