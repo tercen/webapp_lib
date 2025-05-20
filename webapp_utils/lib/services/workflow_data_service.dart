@@ -606,7 +606,7 @@ class WorkflowDataService {
         .any((state) => state == false)) {
       results["status"] = "Finished";
     } else {
-      results["status"] = "Running";
+      results["status"] = "Unfinished";
     }
 
     return results;
