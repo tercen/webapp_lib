@@ -23,7 +23,7 @@ class ImageListComponent extends ListComponent with ProgressDialog{
 
   ImageListComponent(String super.id, String super.groupId,
       String super.componentLabel, super.dataFetchFunc,
-      {super.sortByLabel, super.collapsible, super.cache});
+      {super.sortByLabel, super.collapsible, super.cache, super.emptyMessage});
 
   Widget createImageListEntry(String title, Uint8List data) {
     return Image.memory(

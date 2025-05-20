@@ -68,6 +68,17 @@ class DefaultStyle extends StyleBase {
         color: styleMap["black"],
         fontWeight: FontWeight.w400,
         decoration: TextDecoration.none);
+    styleMap["textIt"] = TextStyle(
+        fontSize: 16,
+        color: styleMap["black"],
+        fontWeight: FontWeight.w400,
+        fontStyle: FontStyle.italic,
+        decoration: TextDecoration.none);
+    styleMap["textIt"] = TextStyle(
+        fontSize: 16,
+        color: styleMap["black"],
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.none);
     styleMap["textGray"] = TextStyle(
         fontSize: 16,
         color: styleMap["darkGray"],

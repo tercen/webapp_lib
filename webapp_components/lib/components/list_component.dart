@@ -8,19 +8,17 @@ import 'package:webapp_components/definitions/component.dart';
 
 import 'package:webapp_components/definitions/functions.dart';
 
-
 import 'package:webapp_components/mixins/component_base.dart';
 import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
-class ListComponent
-    extends FetchComponent implements Component{
+class ListComponent extends FetchComponent implements Component {
   final List<int> expandedRows = [];
 
   //ACTION Controls
-  
+
   final List<ExpansionTileController> expansionControllers = [];
   final TextEditingController filterController = TextEditingController();
   bool expandAll = false;
@@ -28,11 +26,15 @@ class ListComponent
 
   final bool sortByLabel;
   final bool collapsible;
+  final String? emptyMessage;
 
   // final DataFetchCallback dataFetchFunc;
 
   ListComponent(id, groupId, componentLabel, super.dataFetchFunc,
-      {this.sortByLabel = false, this.collapsible = true, cache = true}) {
+      {this.sortByLabel = false,
+      this.collapsible = true,
+      cache = true,
+      this.emptyMessage}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -42,7 +44,22 @@ class ListComponent
   Widget createListEntry(String value) {
     return Text(value);
   }
-  
+
+  @override
+  Widget buildEmptyTable() {
+    if (emptyMessage == null) {
+      return Container();
+    } else {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(10, 10, 0, 5),
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(emptyMessage!, style: Styles()["textIt"],),
+        ),
+      );
+    }
+  }
+
   @override
   Widget createWidget(BuildContext context) {
     expansionControllers.clear();
@@ -171,7 +188,6 @@ class ListComponent
   Widget buildContent(BuildContext context) {
     return build(context);
   }
-
 
   // @override
   // Widget buildContent(BuildContext context) {
