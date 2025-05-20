@@ -51,9 +51,9 @@ class ListComponent extends FetchComponent implements Component {
       return Container();
     } else {
       return Padding(
-        padding: EdgeInsets.fromLTRB(10, 10, 0, 5),
+        padding: EdgeInsets.fromLTRB(40, 10, 0, 5),
         child: Align(
-          alignment: Alignment.center,
+          alignment: Alignment.centerLeft,
           child: Text(emptyMessage!, style: Styles()["textIt"],),
         ),
       );
