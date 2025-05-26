@@ -280,13 +280,22 @@ class WorkflowQueuRunner extends WorkflowRunner {
       for (var f in postRunCallbacks) {
         await f();
         //In case function updates workflow
-        workflow = await factory.workflowService.get(workflow.id);
+        try {
+          workflow = await factory.workflowService.get(workflow.id);  
+        } catch (e) {
+          print("WORKFLOW ${workflow.id} not found");
+        }
+        
       }
 
       for (var f in postRunIdCallbacks) {
         await f(workflow.id);
         //In case function updates workflow
-        workflow = await factory.workflowService.get(workflow.id);
+        try {
+          workflow = await factory.workflowService.get(workflow.id);  
+        } catch (e) {
+          print("WORKFLOW ${workflow.id} not found");
+        }
       }
     } else {
       //Update workflow with error info
