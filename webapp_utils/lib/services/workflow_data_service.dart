@@ -565,8 +565,13 @@ class WorkflowDataService {
     }
     await factory.taskService.cancelTask(taskId);
     if (deleteWorkflow && workflowId != "") {
-      var workflow = await factory.workflowService.get(workflowId);
-      await factory.workflowService.delete(workflow.id, workflow.rev);
+      try {
+        var workflow = await factory.workflowService.get(workflowId);
+        await factory.workflowService.delete(workflow.id, workflow.rev);  
+      } catch (e) {
+        Logger().log(level: Logger.FINE, message: "Workflow $workflowId already deleted");
+      }
+      
     }
   }
 
