@@ -743,14 +743,24 @@ class WorkflowRunner with ProgressDialog {
     await factory.workflowService.update(workflow);
 
     for (var f in postRunCallbacks) {
-      await f();
-      workflow = await factory.workflowService.get(workflow.id);
       
+        await f();
+      try {
+        workflow = await factory.workflowService.get(workflow.id);  
+      } catch (e) {
+        
+      }
     }
 
     for (var f in postRunIdCallbacks) {
-      await f(workflow.id);
-      workflow = await factory.workflowService.get(workflow.id);
+      
+        await f(workflow.id);
+      try {
+        workflow = await factory.workflowService.get(workflow.id);  
+      } catch (e) {
+        print("Failed to get ${workflow.id}");
+      }
+      
     }
 
     if (context != null) {
