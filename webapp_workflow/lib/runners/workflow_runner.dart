@@ -22,7 +22,7 @@ typedef PostRunIdCallback = Future<void> Function(String workflowId);
 
 class WorkflowRunner with ProgressDialog {
   StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
-
+StreamSubscription? subscription;
   String? folderName;
   String? parentFolderId;
   final sci.Workflow template;
@@ -814,13 +814,10 @@ class WorkflowRunner with ProgressDialog {
       log("Running ${stepName}", dialogTitle: runTitle);
       print("Running ${stepName}");
     }
-
-
-
-    await for (var evt in taskStream) {
-      // Task is Done
-      print(evt.toJson());
-      if (evt is sci.PatchRecords) {
+    final completer = Completer();
+    subscription =  taskStream.listen((evt) async {
+          print(evt.toJson());
+                if (evt is sci.PatchRecords) {
         workflow = evt.apply(workflow);
             print("AFTER APPLY WORKFLOW:");
         for (var stp in workflow.steps) {
@@ -831,8 +828,7 @@ class WorkflowRunner with ProgressDialog {
         }
         if (stepName == null) {
           updateStepProgress(workflow);
-          log(stepProgressMessage, dialogTitle: runTitle);
-          
+          // log(stepProgressMessage, dialogTitle: runTitle);
         }
       }
       if (evt is sci.TaskStateEvent) {
@@ -845,27 +841,70 @@ class WorkflowRunner with ProgressDialog {
             stp.state.taskState.throwIfNotDone();
           }
         }
-          break;
+          await subscription?.cancel();
         }
       }
-      if (evt is sci.TaskProgressEvent) {
-        if (stepName == null || stepName == "") {
-          log("$stepProgressMessage\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        } else {
-          log("Running ${stepName}\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        }
-      } else if (evt is sci.TaskLogEvent) {
-        if (stepName == null || stepName == "") {
-          log("$stepProgressMessage\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        } else {
-          log("Running ${stepName}\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        }
-      }
-    }
+
+
+      },
+      onError:  (error) {
+    print("Stream error: $error");
+  },
+  onDone: () {
+    print("Stream closed");
+    completer.complete();
+  });
+
+
+await completer.future;
+    // await for (var evt in taskStream) {
+    //   // Task is Done
+    //   print(evt.toJson());
+    //   if (evt is sci.PatchRecords) {
+    //     workflow = evt.apply(workflow);
+    //         print("AFTER APPLY WORKFLOW:");
+    //     for (var stp in workflow.steps) {
+    //       print("${stp.name}: ${stp.state.taskState.kind}");
+    //       if (stp.state.taskState is! sci.InitState) {
+    //         stp.state.taskState.throwIfNotDone();
+    //       }
+    //     }
+    //     if (stepName == null) {
+    //       updateStepProgress(workflow);
+    //       log(stepProgressMessage, dialogTitle: runTitle);
+    //     }
+    //   }
+    //   if (evt is sci.TaskStateEvent) {
+    //     if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+    //       // var t = await factory.taskService.get(workflowTask.id);
+    //                   print("ON END:");
+    //     for (var stp in workflow.steps) {
+    //       print("${stp.name}: ${stp.state.taskState.kind}");
+    //       if (stp.state.taskState is! sci.InitState) {
+    //         stp.state.taskState.throwIfNotDone();
+    //       }
+    //     }
+    //       break;
+    //     }
+    //   }
+    //   if (evt is sci.TaskProgressEvent) {
+    //     if (stepName == null || stepName == "") {
+    //       log("$stepProgressMessage\n\nTask Log\n${evt.message}",
+    //           dialogTitle: runTitle);
+    //     } else {
+    //       log("Running ${stepName}\n\nTask Log\n${evt.message}",
+    //           dialogTitle: runTitle);
+    //     }
+    //   } else if (evt is sci.TaskLogEvent) {
+    //     if (stepName == null || stepName == "") {
+    //       log("$stepProgressMessage\n\nTask Log\n${evt.message}",
+    //           dialogTitle: runTitle);
+    //     } else {
+    //       log("Running ${stepName}\n\nTask Log\n${evt.message}",
+    //           dialogTitle: runTitle);
+    //     }
+    //   }
+    // }
 
     // var doneWorkflow = await factory.workflowService.get(workflow.id);
 
