@@ -824,6 +824,9 @@ class WorkflowRunner with ProgressDialog {
       }
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+          var t = await factory.taskService.get(workflowTask.id);
+          print("WILL END:");
+          print(t.toJson());
           break;
         }
       }
