@@ -842,6 +842,7 @@ StreamSubscription? subscription;
           }
         }
           await subscription?.cancel();
+          completer.complete();
         }
       }
 
