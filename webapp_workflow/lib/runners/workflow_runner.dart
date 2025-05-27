@@ -722,6 +722,11 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
+    print("BEFORE WORKFLOW:");
+    for (var stp in workflow.steps) {
+      print("${stp.name}: ${stp.state.taskState.kind}");
+    }
+
     await factory.workflowService.update(workflow);
 
     //-----------------------------------------
@@ -810,14 +815,20 @@ class WorkflowRunner with ProgressDialog {
       print("Running ${stepName}");
     }
 
-    var patchList = <sci.PatchRecords>[];
+
 
     await for (var evt in taskStream) {
       // Task is Done
       print(evt.toJson());
       if (evt is sci.PatchRecords) {
-        patchList.add(evt);
-        // workflow = evt.apply(workflow);
+        workflow = evt.apply(workflow);
+            print("AFTER APPLY WORKFLOW:");
+        for (var stp in workflow.steps) {
+          print("${stp.name}: ${stp.state.taskState.kind}");
+          if (stp.state.taskState is! sci.InitState) {
+            stp.state.taskState.throwIfNotDone();
+          }
+        }
         if (stepName == null) {
           updateStepProgress(workflow);
           log(stepProgressMessage, dialogTitle: runTitle);
@@ -826,9 +837,14 @@ class WorkflowRunner with ProgressDialog {
       }
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
-          var t = await factory.taskService.get(workflowTask.id);
-          print("WILL END:");
-          print(t.toJson());
+          // var t = await factory.taskService.get(workflowTask.id);
+                      print("ON END:");
+        for (var stp in workflow.steps) {
+          print("${stp.name}: ${stp.state.taskState.kind}");
+          if (stp.state.taskState is! sci.InitState) {
+            stp.state.taskState.throwIfNotDone();
+          }
+        }
           break;
         }
       }
@@ -849,10 +865,6 @@ class WorkflowRunner with ProgressDialog {
               dialogTitle: runTitle);
         }
       }
-    }
-
-    for( var evt in patchList ){
-      workflow = evt.apply(workflow);
     }
 
     // var doneWorkflow = await factory.workflowService.get(workflow.id);
