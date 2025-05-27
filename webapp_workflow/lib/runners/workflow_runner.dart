@@ -810,12 +810,14 @@ class WorkflowRunner with ProgressDialog {
       print("Running ${stepName}");
     }
 
+    var patchList = <sci.PatchRecords>[];
+
     await for (var evt in taskStream) {
       // Task is Done
       print(evt.toJson());
       if (evt is sci.PatchRecords) {
-        
-        workflow = evt.apply(workflow);
+        patchList.add(evt);
+        // workflow = evt.apply(workflow);
         if (stepName == null) {
           updateStepProgress(workflow);
           log(stepProgressMessage, dialogTitle: runTitle);
@@ -847,6 +849,10 @@ class WorkflowRunner with ProgressDialog {
               dialogTitle: runTitle);
         }
       }
+    }
+
+    for( var evt in patchList ){
+      workflow = evt.apply(workflow);
     }
 
     // var doneWorkflow = await factory.workflowService.get(workflow.id);
