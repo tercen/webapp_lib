@@ -847,7 +847,9 @@ class WorkflowRunner with ProgressDialog {
 
     // var doneWorkflow = await factory.workflowService.get(workflow.id);
 
+    print("AFTER Workflow:");
     for (var stp in workflow.steps) {
+      print("${stp.name}: ${stp.state.taskState.kind}");
       if (stp.state.taskState is! sci.InitState) {
         stp.state.taskState.throwIfNotDone();
       }
@@ -855,6 +857,13 @@ class WorkflowRunner with ProgressDialog {
     await factory.workflowService.update(workflow);
     workflowId = workflow.id;
     workflow = await factory.workflowService.get(workflow.id);
+    print("AFTER Workflow UPDATE:");
+    for (var stp in workflow.steps) {
+      print("${stp.name}: ${stp.state.taskState.kind}");
+      if (stp.state.taskState is! sci.InitState) {
+        stp.state.taskState.throwIfNotDone();
+      }
+    }
     return workflow;
   }
 
