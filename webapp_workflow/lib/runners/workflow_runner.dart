@@ -711,9 +711,11 @@ class WorkflowRunner with ProgressDialog {
           stp.state.taskState is sci.DoneState ||
           stp.state.taskState is sci.FailedState)) {
         if (stp.id == stepId) {
+          print("MArking ${stp.name} to run");
           stp.state.taskState = sci.InitState();
           stpName = stp.name;
         } else {
+          print("WILL NOT run ${stp.name}");
           stp.state.taskState = sci.DoneState();
           stepsToRestore.add(stp.id);
         }
@@ -735,6 +737,7 @@ class WorkflowRunner with ProgressDialog {
 
     for (var stp in workflow.steps) {
       if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id)) {
+        print("Restoring ${stp.name}");
         stp.state.taskState = sci.InitState();
         stp.state.taskId = "";
       }
@@ -804,15 +807,18 @@ class WorkflowRunner with ProgressDialog {
       log(stepProgressMessage, dialogTitle: runTitle);
     } else {
       log("Running ${stepName}", dialogTitle: runTitle);
+      print("Running ${stepName}");
     }
 
     await for (var evt in taskStream) {
       // Task is Done
       if (evt is sci.PatchRecords) {
+        print(evt.toJson());
         workflow = evt.apply(workflow);
         if (stepName == null) {
           updateStepProgress(workflow);
           log(stepProgressMessage, dialogTitle: runTitle);
+          
         }
       }
       if (evt is sci.TaskStateEvent) {
