@@ -812,8 +812,9 @@ class WorkflowRunner with ProgressDialog {
 
     await for (var evt in taskStream) {
       // Task is Done
+      print(evt.toJson());
       if (evt is sci.PatchRecords) {
-        print(evt.toJson());
+        
         workflow = evt.apply(workflow);
         if (stepName == null) {
           updateStepProgress(workflow);
