@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:webapp_components/components/action_table_component.dart';
 
@@ -15,41 +16,84 @@ import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
 import 'package:async/async.dart';
 
+class RunningTask {
+  String taskId;
+  String workflowId;
+  RunningTask(this.taskId, this.workflowId);
+
+  @override
+  int get hashCode => taskId.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    final eqObject = other is RunningTask;
+    final otherR = other as RunningTask;
+    final eqTask = taskId == otherR.taskId;
+    final eqWorkflow = workflowId == otherR.workflowId;
+    return eqObject && eqTask && eqWorkflow;
+  }
+}
+
 class WorkflowTaskComponent extends ActionTableComponent {
-  List<String> runningTasks = [];
-  List<String> workflowTasks = [];
+  List<RunningTask> runningTasks = [];
 
-  WebappTable initTable = WebappTable();
-
+  Future Function()? onEmptyQueu;
   final List<ListAction> workflowActions;
+  bool firstEmpty = true;
+
   List<CancelableOperation> futures = [];
+  CacheObject workflowCache = CacheObject();
 
   WorkflowTaskComponent(super.id, super.groupId, super.componentLabel,
       super.dataFetchCallback, super.actions, this.workflowActions,
-      {super.excludeColumns, super.hideColumns});
-
-  CacheObject workflowCache = CacheObject();
+      {super.excludeColumns, super.hideColumns, this.onEmptyQueu}) {
+    hideColumns = [".key", "IsWorkflowTask", "Workflow Name", "Workflow Id"];
+  }
 
   @override
   void dispose() {
     super.dispose();
+    for (var f in futures) {
+      f.cancel();
+    }
+  }
+
+  @override
+  Widget buildEmptyTable() {
+    if (firstEmpty == true && onEmptyQueu != null) {
+      onEmptyQueu!();
+      firstEmpty = false;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Center(
+        child: Text("No running tasks", style: Styles()["text"]),
+      ),
+    );
   }
 
   @override
   Widget createWidget(BuildContext context) {
+    firstEmpty = true;
     var table = dataTable;
+
     List<Widget> tableRows = [];
 
-    for (var workflowTaskId in workflowTasks) {
-      var idx = initTable["Id"].indexOf(workflowTaskId);
+    final wkfTaskTable = table.selectByColValue(["Type"], ["Workflow"]);
 
-      var workflowName = initTable["Name"][idx];
-      var tableLabel = Align(
+    for (var ri = 0; ri < wkfTaskTable.nRows; ri++) {
+      final row = wkfTaskTable.select([ri]);
+      final assocTasksTable =
+          table.selectByColValue(["Workflow Id"], [row["Workflow Id"].first]);
+
+      final workflowName = row["Workflow Name"].first;
+      final tableLabel = Align(
         alignment: Alignment.centerLeft,
         child: Row(
           children: [
             Text(
-              "Tasks for  $workflowName",
+              "Tasks for $workflowName",
               style: Styles()["textH2"],
             ),
             const SizedBox(
@@ -57,9 +101,8 @@ class WorkflowTaskComponent extends ActionTableComponent {
             ),
             IconButton(
                 onPressed: () {
-                  workflowActions.first.callAction(
-                      [initTable["WorkflowIds"][idx]],
-                      context: context);
+                  workflowActions.first
+                      .callAction([row["Workflow Id"].first], context: context);
                 },
                 icon: workflowActions.first.getIcon(params: []))
           ],
@@ -70,7 +113,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
         height: 20,
       ));
       tableRows.add(tableLabel);
-      tableRows.add(buildWorkflowTable(workflowTaskId, table, context));
+      tableRows.add(buildWorkflowTable(assocTasksTable, context));
       tableRows.add(const SizedBox(
         height: 20,
       ));
@@ -82,9 +125,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
         children: tableRows);
   }
 
-  Widget buildWorkflowTable(
-      String workflowId, WebappTable table, BuildContext context) {
-    // dataTable = table;
+  Widget buildWorkflowTable(WebappTable table, BuildContext context) {
     var nRows = table.nRows;
 
     colNames = table.colNames
@@ -126,15 +167,17 @@ class WorkflowTaskComponent extends ActionTableComponent {
     return tableWidget;
   }
 
-  Future<void> processTaskEvent(String channelId) async {
+  Future<void> processTaskEvent(String channelId, String workflowId) async {
     var factory = tercen.ServiceFactory();
     var taskStream = factory.eventService.channel(channelId);
     await for (var evt in taskStream) {
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal) {
-          runningTasks.remove(evt.taskId);
+          runningTasks.remove(RunningTask(evt.taskId, workflowId));
         } else {
-          runningTasks.add(evt.taskId);
+          if (!runningTasks.contains(RunningTask(evt.taskId, workflowId))) {
+            runningTasks.add(RunningTask(evt.taskId, workflowId));
+          }
         }
 
         runningTasks = runningTasks.toSet().toList();
@@ -153,6 +196,18 @@ class WorkflowTaskComponent extends ActionTableComponent {
     notifyListeners();
   }
 
+  Future<sci.Workflow> getCachedWorkflow(String workflowId) async {
+    if (workflowCache.hasCachedValue(workflowId)) {
+      return workflowCache.getCachedValue(workflowId);
+    } else {
+      var workflowService = WorkflowDataService();
+      var workflow = await workflowService.findWorkflowById(workflowId);
+
+      // var workflow = await workflowService.findWorkflowById(workflowId);
+      workflowCache.addToCache(workflowId, workflow);
+      return workflow;
+    }
+  }
 
   String getStepName(String taskId, List<sci.Workflow> workflowList) {
     var stepName = "";
@@ -173,46 +228,86 @@ class WorkflowTaskComponent extends ActionTableComponent {
 
   Future<void> loadTaskTable() async {
     var factory = tercen.ServiceFactory();
+    List<String> keys = [];
     List<String> taskId = [];
     List<String> taskType = [];
     List<String> taskDuration = [];
     List<String> taskStatus = [];
     List<String> taskStep = [];
+    List<String> workflowIds = [];
+    List<String> workflowNames = [];
 
     if (runningTasks.isNotEmpty) {
-      var tasks = await factory.taskService.list(runningTasks);
-      var workflowTasks = tasks.whereType<sci.RunWorkflowTask>();
-      var nonWorkflowTasks =
-          tasks.where((task) => task is! sci.RunWorkflowTask);
+      var tasks = await factory.taskService
+          .list(runningTasks.map((e) => e.taskId).toList());
 
-      
+      for (var taskIdInfo in runningTasks) {
+        final ct = tasks.firstWhere((task) => task.id == taskIdInfo.taskId,
+            orElse: () => sci.Task());
+        if (ct.id == "") {
+          continue;
+        }
 
-      List<sci.Workflow> workflows = [];
-      for (var ct in workflowTasks) {
-        var workflowId = ct.workflowId;
-        workflows.add(await WorkflowDataService().findWorkflowById(workflowId));
+        var workflowId = taskIdInfo.workflowId;
+        var wkf = await getCachedWorkflow(workflowId);
+        keys.add(const Uuid().v4());
         taskStep.add("");
         taskId.add(ct.id);
-        taskType.add(ct.kind);
-        taskDuration.add(DateFormatter.format(ct.lastModifiedDate));
-        taskStatus.add(ct.state.kind);
-      }
-      for (var ct in nonWorkflowTasks) {
-        taskStep.add(getStepName(ct.id, workflows));
-        taskId.add(ct.id);
-        taskType.add(ct.kind);
-        taskDuration.add(DateFormatter.format(ct.lastModifiedDate));
-        taskStatus.add(ct.state.kind);
+        taskType.add(formatTaskType(ct.kind));
+        taskDuration.add(
+            DateFormatter.formatLong(ct.lastModifiedDate, shortYear: true));
+        taskStatus.add(formatState(ct.state.kind));
+        workflowIds.add(workflowId);
+        workflowNames.add(wkf.name);
       }
     }
 
     dataTable = WebappTable();
+    dataTable.addColumn(".key", data: keys);
     dataTable.addColumn("Id", data: taskId);
     dataTable.addColumn("Type", data: taskType);
+    dataTable.addColumn("IsWorkflowTask",
+        data: taskType
+            .map((t) => t == "Workflow")
+            .map((e) => e.toString())
+            .toList());
     // Only "workflow" steps have meta information about the step
     // dataTable.addColumn("Step", data: taskStep);
     dataTable.addColumn("Status", data: taskStatus);
     dataTable.addColumn("Last Modified", data: taskDuration);
+    dataTable.addColumn("Workflow Id", data: workflowIds);
+    dataTable.addColumn("Workflow Name", data: workflowNames);
+  }
+
+  String formatTaskId(String id) {
+    return "...${id.substring(id.length - 5)}";
+  }
+
+  String formatTaskType(String task) {
+    switch (task) {
+      case 'RunWorkflowTask':
+        return "Workflow";
+      case 'RunComputationTask':
+        return "Step Task";
+      case 'CubeQueryTask':
+        return "Step Setup";
+      default:
+        return task;
+    }
+  }
+
+  String formatState(String state) {
+    return state.replaceAll("State", "");
+  }
+
+  @override
+  void reset() async {
+    for (var f in futures) {
+      await f.cancel();
+    }
+
+    runningTasks.clear();
+    super.reset();
   }
 
   @override
@@ -221,22 +316,25 @@ class WorkflowTaskComponent extends ActionTableComponent {
       runningTasks.clear();
       var factory = tercen.ServiceFactory();
 
-      initTable = await dataFetchCallback();
+      final initTable = await dataFetchCallback();
+      final taskIds = initTable["Id"].where((e) => e != "").toList();
 
-      workflowTasks = initTable["Id"].where((e) => e != "").toList();
-      runningTasks.addAll(workflowTasks);
+      var tasks = await factory.taskService.list(taskIds);
 
-      await loadTaskTable();
+      runningTasks.addAll(tasks
+          .whereType<sci.RunWorkflowTask>()
+          .map((el) => RunningTask(el.id, el.workflowId)));
+      runningTasks = runningTasks.toSet().toList();
 
-      var tasks = await factory.taskService.list(workflowTasks);
-
-      for (var task in tasks) {
-        runningTasks.add(task.id);
+      //Start listening to worklfow task channel
+      for (var task in tasks.whereType<sci.RunWorkflowTask>()) {
         futures.add(CancelableOperation.fromFuture(
-            processTaskEvent(task.channelId),
+            processTaskEvent(task.channelId, task.workflowId),
             onCancel: () => Logger().log(
                 level: Logger.FINER, message: "Process task was cancelled")));
       }
+
+      await loadTaskTable();
     }
     return true;
   }

@@ -6,6 +6,7 @@ import 'package:webapp_components/definitions/component.dart';
 
 import 'package:webapp_components/definitions/list_action.dart';
 import 'package:webapp_components/extra/infobox.dart';
+import 'package:webapp_components/extra/row_color_formatter.dart';
 
 import 'package:webapp_components/mixins/infobox_component.dart';
 
@@ -14,6 +15,26 @@ import 'package:webapp_ui_commons/styles/styles.dart';
 
 import 'package:uuid/uuid.dart';
 import 'package:webapp_utils/functions/list_utils.dart';
+
+typedef RowFilterFunction = bool Function(WebappTable rowData);
+
+class RowFilter {
+  final RowFilterFunction filter;
+  final Icon iconOn;
+  final Icon iconOff;
+  final String? tooltip;
+  bool isOn = false;
+
+  RowFilter(
+      {required this.filter,
+      required this.iconOn,
+      required this.iconOff,
+      this.tooltip});
+
+  void toggle() {
+    isOn = !isOn;
+  }
+}
 
 class ActionTableComponent extends FetchComponent
     with ComponentInfoBox
@@ -24,8 +45,10 @@ class ActionTableComponent extends FetchComponent
   List<String>? hideColumns;
   List<String> colNames = [];
   final List<ListAction> actions;
+  final List<RowFilter> rowFilters;
 
-  final bool useCache;
+  RowTextColorFormatter? rowFormatter;
+
   String sortingCol = "";
   String sortDirection = "";
 
@@ -38,12 +61,15 @@ class ActionTableComponent extends FetchComponent
       {this.excludeColumns,
       this.hideColumns,
       InfoBoxBuilder? infoBoxBuilder,
-      this.useCache = true,
-      this.shouldSave = false}) {
+      cache = true,
+      this.rowFormatter,
+      this.shouldSave = false,
+      this.rowFilters = const []}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
+    super.useCache = cache;
   }
 
   void rotateSortingDirection() {
@@ -150,8 +176,8 @@ class ActionTableComponent extends FetchComponent
     return row;
   }
 
-  TableRow createTableRow(BuildContext context, List<String> rowEls,  String rowKey,
-      List<ListAction> rowActions,
+  TableRow createTableRow(BuildContext context, List<String> rowEls,
+      String rowKey, List<ListAction> rowActions,
       {int rowIndex = -1}) {
     var rowDecoration = BoxDecoration(color: Styles()["white"]);
     if (rowIndex > -1) {
@@ -172,16 +198,19 @@ class ActionTableComponent extends FetchComponent
 
     for (var ci = 0; ci < colNames.length; ci++) {
       if (shouldDisplayColumn(colNames[ci])) {
+        var rowStyle = Styles()["text"];
+        if (rowFormatter != null && rowFormatter!.shouldHighlight(rowEls)) {
+          rowStyle = rowFormatter!.highlightStyle();
+        }
+
         dataRow.add(TableCell(
             verticalAlignment: TableCellVerticalAlignment.middle,
-            child: SizedBox(
-                height: 30,
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      rowEls[ci],
-                      style: Styles()["text"],
-                    )))));
+            child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  rowEls[ci],
+                  style: rowStyle,
+                ))));
       }
     }
     //
@@ -227,66 +256,90 @@ class ActionTableComponent extends FetchComponent
       }
     }
 
+    var widths = <double>[];
+    var di = 0;
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
       var key = table.columns[".key"]![ri];
       var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
-      rows.add(createTableRow(context, rowEls, key, actions, rowIndex: si));
+      var displayEls = colNames
+          .where((col) => col != "Id")
+          .where((col) => col != ".key")
+          .map((col) => table.columns[col]![ri])
+          .toList();
+      if (widths.isEmpty) {
+        widths.addAll(displayEls.map((el) => el.length as double));
+
+        // widths = widths.map((w) => (w/totalWidth) * 0.9).toList();
+      } else {
+        var tmp = displayEls.map((el) => el.length as double).toList();
+
+        for (var k = 0; k < widths.length; k++) {
+          widths[k] = widths[k] + tmp[k];
+        }
+      }
+
+      var displayRow = true;
+      for (var filter in rowFilters) {
+        if (filter.isOn) {
+          displayRow = displayRow && filter.filter(table.select([ri]));
+        }
+      }
+
+      if (displayRow) {
+        rows.add(createTableRow(context, rowEls, key, actions, rowIndex: di));
+        di = di + 1;
+      }
     }
 
+    var totalWidth = widths.reduce((a, b) => a + b);
+    final relativeWidth = widths.map((w) => (w / totalWidth) * 0.95).toList();
+
     Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
-        ? const {0: FixedColumnWidth(5)}
+        ? {0: const FixedColumnWidth(5)}
         : {0: const FixedColumnWidth(50)};
+
+    for (var k = 0; k < relativeWidth.length; k++) {
+      colWidths[k + 1] = FractionColumnWidth(relativeWidth[k]);
+    }
 
     var tableWidget = Table(
       columnWidths: colWidths,
       children: rows,
     );
 
-    return tableWidget;
+    if (rowFilters.isNotEmpty) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [createFilterRow(), tableWidget],
+      );
+    } else {
+      return tableWidget;
+    }
   }
 
-  // @override
-  // Future<void> init() async {
-  //   await super.init();
-  //   await loadTable();
-
-  //   // notifyListeners();
-  // }
-
-  // Future<bool> loadTable() async {
-  //   if (!isInit) {
-  //     busy();
-
-  //     var cacheKey = getCacheKey();
-  //     if (hasCachedValue(cacheKey) && useCache) {
-  //       dataTable = getCachedValue(cacheKey);
-  //     } else {
-  //       dataTable = await dataFetchCallback();
-  //       if (useCache) {
-  //         addToCache(cacheKey, dataTable);
-  //       }
-  //     }
-  //     idle();
-  //   }
-  //   return true;
-  // }
+  Widget createFilterRow() {
+    var wdgList = <Widget>[];
+    for (var f in rowFilters) {
+      wdgList.add(IconButton(
+        icon: f.isOn ? f.iconOn : f.iconOff,
+        tooltip: f.tooltip,
+        onPressed: () {
+          f.toggle();
+          notifyListeners();
+        },
+      ));
+    }
+    return Row(
+      children: wdgList,
+    );
+  }
 
   @override
   Widget buildContent(BuildContext context) {
     return build(context);
-    // if (dataTable.nRows == 0) {
-    //   if (isIdle) {
-    //     return Container();
-    //   } else {
-    //     return SizedBox(
-    //         height: 100,
-    //         child: TercenWaitIndicator()
-    //             .waitingMessage(suffixMsg: "  Loading Table"));
-    //   }
-    // } else {
-    //   return buildTable(dataTable, context);
-    // }
   }
 
   @override
@@ -311,7 +364,5 @@ class ActionTableComponent extends FetchComponent
   }
 
   @override
-  void setComponentValue(value) {
-    // TODO: implement setComponentValue
-  }
+  void setComponentValue(value) {}
 }

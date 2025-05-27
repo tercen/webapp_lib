@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 
 import 'package:syncfusion_flutter_pdf/pdf.dart' as pd;
 import 'package:webapp_components/components/list_component.dart';
-import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/mixin/progress_log.dart';
 
 class ExportPageContent {

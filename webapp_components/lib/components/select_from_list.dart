@@ -2,42 +2,51 @@ import 'package:flutter/material.dart';
 
 import 'package:list_picker/list_picker.dart';
 import 'package:webapp_components/abstract/serializable_component.dart';
+import 'package:webapp_components/components/fetch_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 
-import 'package:webapp_components/mixins/component_base.dart';
-import 'package:webapp_components/mixins/input_validator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
-class SelectFromListComponent with ChangeNotifier, ComponentBase, InputValidator implements SerializableComponent {
+class SelectFromListComponent extends FetchComponent
+    implements SerializableComponent {
   final List<String> options = [];
   String selectedUser = "";
-  final bool saveState;
-  SelectFromListComponent(id, groupId, componentLabel, {String? user, this.saveState = true}){
+  final bool shouldSave;
+  final String displayColumn;
+
+  SelectFromListComponent(id, groupId, componentLabel, super.dataFetchFunc, this.displayColumn,
+      {String? user, this.shouldSave = true}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
 
-    if( user != null ){
+    if (user != null) {
       selectedUser = user;
     }
   }
 
+
   @override
   Widget buildContent(BuildContext context) {
-    
+    return build(context);
+  }
+
+
+  @override
+  Widget createWidget(BuildContext context) {
     return Row(children: [
       IconButton(
           onPressed: () async {
             String team = (await showPickerDialog(
               context: context,
               label: "",
-              items: options,
+              items: dataTable[displayColumn],
             ))!;
             selectedUser = team;
             notifyListeners();
           },
           icon: const Icon(Icons.group_add)),
-      selectedUser != "" 
+      selectedUser != ""
           ? Text(
               selectedUser,
               style: Styles()["text"],
@@ -51,12 +60,9 @@ class SelectFromListComponent with ChangeNotifier, ComponentBase, InputValidator
     options.addAll(optList);
   }
 
-
-
-
   @override
   bool isFulfilled() {
-    return getComponentValue() != "" && isInputValid( getComponentValue() );
+    return getComponentValue() != "";
   }
 
   @override
@@ -64,23 +70,21 @@ class SelectFromListComponent with ChangeNotifier, ComponentBase, InputValidator
     return ComponentType.simple;
   }
 
-
-  
   @override
   getComponentValue() {
     return selectedUser;
   }
-  
+
   @override
   String getStateValue() {
     return selectedUser;
   }
-  
+
   @override
   void setComponentValue(value) {
     selectedUser = value;
   }
-  
+
   @override
   void setStateValue(String value) {
     selectedUser = value;
@@ -88,8 +92,6 @@ class SelectFromListComponent with ChangeNotifier, ComponentBase, InputValidator
   
   @override
   bool shouldSaveState() {
-    return saveState;
+    return shouldSave;
   }
-  
-  
-  }
+}

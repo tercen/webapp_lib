@@ -1,17 +1,11 @@
-import 'dart:async';
+
 
 import 'package:flutter/material.dart';
 import 'package:webapp_components/abstract/component.dart';
-import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/components/fetch_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 
-import 'package:webapp_components/definitions/functions.dart';
-
-import 'package:webapp_components/mixins/component_base.dart';
-import 'package:webapp_components/mixins/component_cache.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
-import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 class ListComponent extends FetchComponent implements Component {
@@ -28,7 +22,6 @@ class ListComponent extends FetchComponent implements Component {
   final bool collapsible;
   final String? emptyMessage;
 
-  // final DataFetchCallback dataFetchFunc;
 
   ListComponent(id, groupId, componentLabel, super.dataFetchFunc,
       {this.sortByLabel = false,
@@ -188,33 +181,6 @@ class ListComponent extends FetchComponent implements Component {
   Widget buildContent(BuildContext context) {
     return build(context);
   }
-
-  // @override
-  // Widget buildContent(BuildContext context) {
-  //   var cacheKey = getKey();
-
-  //   if (hasCachedValue(cacheKey)) {
-  //     return createWidget(context, getCachedValue(cacheKey));
-  //   } else {
-  //     return FutureBuilder(
-  //         future: dataFetchFunc() as Future<dynamic>?,
-  //         builder: (context, snapshot) {
-  //           if (snapshot.connectionState == ConnectionState.waiting) {
-  //             return waitingIndicator();
-  //           } else if (snapshot.hasData && snapshot.data != null) {
-  //             addToCache(cacheKey, snapshot.data);
-  //             return createWidget(context, snapshot.data);
-  //           } else if (snapshot.hasError) {
-  //             print("ERROR");
-  //             print(snapshot.error);
-  //             throw Exception(snapshot.error);
-  //           } else {
-  //             return TercenWaitIndicator()
-  //                 .waitingMessage(suffixMsg: "  Loading List"); // Load message
-  //           }
-  //         });
-  //   }
-  // }
 
   @override
   bool isFulfilled() {

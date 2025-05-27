@@ -1,27 +1,14 @@
 import 'package:flutter/material.dart';
-
-
-import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_components/components/fetch_component.dart';
-import 'package:webapp_components/components/multi_check_component.dart';
-import 'package:webapp_components/definitions/functions.dart';
-import 'package:webapp_components/extra/modal_Screen_base.dart';
-import 'package:webapp_components/mixins/component_base.dart';
 
-import 'package:webapp_components/mixins/component_cache.dart';
-import 'package:webapp_components/mixins/state_component.dart';
-import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_components/widgets/widget_builder.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
-import 'package:webapp_utils/functions/list_utils.dart';
 
-import 'package:flutter/material.dart';
+
 import 'package:webapp_components/abstract/serializable_component.dart';
 
 import 'package:webapp_components/definitions/component.dart';
-import 'package:webapp_components/mixins/component_base.dart';
-import 'package:webapp_ui_commons/styles/styles.dart';
 
 class MultiCheckComponentFetch
     extends FetchComponent

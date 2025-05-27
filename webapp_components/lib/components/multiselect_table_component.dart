@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -32,6 +31,8 @@ class MultiSelectTableComponent extends FetchComponent
 
   String currentRowKey = "";
   int currentRow = -1;
+
+  CancelableOperation? onHoverOp;
 
   MultiSelectTableComponent(
       id, groupId, componentLabel, super.dataFetchCallback,
@@ -160,6 +161,13 @@ class MultiSelectTableComponent extends FetchComponent
     currentRowKey = rowKey;
   }
 
+  Future<void> updateUiValue() async{
+    // await Future.delayed(const Duration(milliseconds: 70), () => uiUpdate.value = Random().nextInt(1 << 32 - 1),);
+    await Future.delayed(const Duration(milliseconds: 40), () => notifyListeners());
+
+    onHoverOp = null;
+  }
+
   Widget wrapSelectable(
       Widget contentWdg, List<String> selectionValues, String rowKey) {
     return InkWell(
@@ -169,10 +177,12 @@ class MultiSelectTableComponent extends FetchComponent
         } else {
           setSelectionRow(rowKey);
         }
-
-        uiUpdate.value = Random().nextInt(1 << 32 - 1);
-
-        // notifyListeners();
+        
+        if( onHoverOp != null ){
+          onHoverOp!.cancel();
+        }
+        //Prevents multiples trigger to onHover and rebuild when moving the mouse too fast
+        onHoverOp = CancelableOperation.fromFuture(updateUiValue() );
       },
       onTap: () {
         if (isSelected(rowKey)) {
@@ -195,13 +205,14 @@ class MultiSelectTableComponent extends FetchComponent
   }
 
   bool isSelected(String rowKey) {
-    // print("Checking selection: $selected  vs. {$rowHash} ]");
     return selected.any((e) => e == rowKey);
   }
 
   TableRow createTableRow(
       BuildContext context, List<String> rowEls, String rowKey,
       {int rowIndex = -1}) {
+
+    
     Widget selectedWidget = isSelected(rowKey)
         ? const SizedBox(
             width: 30,
@@ -258,16 +269,12 @@ class MultiSelectTableComponent extends FetchComponent
 
   @override
   Widget createWidget(BuildContext context) {
-    // dataTable = table;
     var table = dataTable;
     var nRows = table.nRows;
 
     colNames = columnOrder!
         .where((colName) => shouldIncludeColumn(colName))
         .toList();
-    // if (excludeColumns != null) {
-    //   colNames = colNames.where((e) => !excludeColumns!.contains(e)).toList();
-    // }
 
     List<TableRow> rows = [];
     rows.add(createTableHeader(
@@ -282,10 +289,12 @@ class MultiSelectTableComponent extends FetchComponent
       }
     }
 
+
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
-      var key = table.columns[".key"]![ri];
-      var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
+      var key = table[".key"][ri];
+      var rowEls = colNames.map((col) => table[col][ri]).toList();
+
       rows.add(createTableRow(context, rowEls, key, rowIndex: si));
     }
 
@@ -298,45 +307,16 @@ class MultiSelectTableComponent extends FetchComponent
       children: rows,
     );
 
+
+
     return tableWidget;
   }
 
-  // @override
-  // Future<void> init() async {
-  //   if (!isInit) {
-  //     super.init();
-  //   }
-  // }
-  // Future<bool> loadTable() async {
-  //   if (!isInit) {
-  //     busy();
-  //     var cacheKey = getCacheKey();
-  //     if (hasCachedValue(cacheKey)) {
-  //       dataTable = getCachedValue(cacheKey);
-  //     } else {
-  //       dataTable = await dataFetchCallback();
-  //       addToCache(cacheKey, dataTable);
-  //     }
-  //     idle();
-  //   }
-  //   return true;
-  // }
 
   @override
   Widget buildContent(BuildContext context) {
     return build(context);
-    // if (isBusy) {
-    //   return SizedBox(
-    //       height: 100,
-    //       child: TercenWaitIndicator()
-    //           .waitingMessage(suffixMsg: "  Loading Table"));
-    // } else {
-    //   if (dataTable.nRows == 0) {
-    //     return Container();
-    //   } else {
-    //     return buildTable(dataTable, context);
-    //   }
-    // }
+
   }
 
   @override

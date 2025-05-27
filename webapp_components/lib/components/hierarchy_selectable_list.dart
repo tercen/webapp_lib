@@ -11,7 +11,7 @@ import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 typedef TileBuilderCallback2 = Widget Function(
-    BuildContext context, String name, int level,
+    BuildContext context, String name, int level, WebappTable row,
     {bool isEven, bool bold});
 
 enum SelectionBehavior { none, single, multiLeaf, multi }
@@ -61,6 +61,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final SelectionBehavior selectionBehavior;
 
   final List<String> columnHierarchy;
+  final List<String> hideColumns;
   final List<String> expandedLevels = [];
 
   late TileBuilderCallback2 nonLeafCallback;
@@ -68,20 +69,19 @@ class HierarchySelectableListComponent extends FetchComponent
   int maxLevel = 0;
   final bool shouldSave;
 
-
-  HierarchySelectableListComponent(id, groupId, componentLabel, super.dataFetchCallback,
+  HierarchySelectableListComponent(
+      id, groupId, componentLabel, super.dataFetchCallback,
       {cache = true,
-      this.selectionBehavior = SelectionBehavior.none, 
+      this.selectionBehavior = SelectionBehavior.none,
       this.columnHierarchy = const [],
+      this.hideColumns = const [],
       InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
-    super.useCache = cache;
-
-
+    useCache = cache;
 
     maxLevel = columnHierarchy.length - 1;
 
@@ -96,22 +96,9 @@ class HierarchySelectableListComponent extends FetchComponent
     if (selectionBehavior == SelectionBehavior.multi) {
       nonLeafCallback = selectableLeafRowBuilder;
     } else {
-      nonLeafCallback = selectableLeafRowBuilder;
+      nonLeafCallback = nonSelectableRowBuilder;
     }
   }
-
-  @override
-  WebappTable postLoad(WebappTable table) {
-    var colNames = table.colNames;
-    for (var colName in colNames) {
-      if (!columnHierarchy.contains(colName)) {
-        table.removeColumn(colName);
-      }
-    }
-
-    return table;
-  }
-
 
   @override
   Widget createWidget(BuildContext context) {
@@ -142,7 +129,8 @@ class HierarchySelectableListComponent extends FetchComponent
     return build(context);
   }
 
-  Widget nonSelectableRowBuilder(BuildContext context, String name, int level,
+  Widget nonSelectableRowBuilder(
+      BuildContext context, String name, int level, WebappTable row,
       {bool isEven = true, bool bold = false}) {
     var row = Row(
       children: [
@@ -236,7 +224,8 @@ class HierarchySelectableListComponent extends FetchComponent
     }
   }
 
-  Widget buildSelectableEntry(BuildContext context, String name, int level,
+  Widget buildSelectableEntry(
+      BuildContext context, String name, int level, WebappTable row,
       {bool bold = false}) {
     var colName = columnHierarchy[level];
     var clickedRow = dataTable.selectByColValue([colName], [name]);
@@ -287,6 +276,7 @@ class HierarchySelectableListComponent extends FetchComponent
         const SizedBox(
           width: 5,
         ),
+        infoBoxBuilder != null ? infoBoxIcon(row, context) : Container(),
         textWdg
       ],
     );
@@ -295,28 +285,35 @@ class HierarchySelectableListComponent extends FetchComponent
   WebappTable selectedAsTable() {
     var level = maxLevel;
 
+    var originalColNames = dataTable.colNames;
+    var colNameIndex = originalColNames.indexOf(columnHierarchy[maxLevel]);
+
     var nodes = selectedNodes
         .where((node) => node.level == level)
         .map((node) => node.value)
         .toList();
-    var rows = dataTable.where((row) => nodes.contains(row[level])).toList();
+
+    var rows =
+        dataTable.where((row) => nodes.contains(row[colNameIndex])).toList();
+
     var tbl = WebappTable();
-    for (int i = 0; i <= maxLevel; i++) {
-      tbl.addColumn(columnHierarchy[i],
+    for (int i = 0; i < originalColNames.length; i++) {
+      tbl.addColumn(originalColNames[i],
           data: rows.map((row) => row[i]).toList());
     }
 
     return tbl;
   }
 
-  Widget selectableLeafRowBuilder(BuildContext context, String name, int level,
+  Widget selectableLeafRowBuilder(
+      BuildContext context, String name, int level, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
     var row = Row(
       children: [
         Container(
           height: 30,
           color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
-          child: buildSelectableEntry(context, name, level),
+          child: buildSelectableEntry(context, name, level, rowVals),
         )
       ],
     );
@@ -367,17 +364,29 @@ class HierarchySelectableListComponent extends FetchComponent
     var levelColumn = columnHierarchy[level];
     for (var ri = 0; ri < levelList.length; ri++) {
       if (level == maxLevel) {
-        wdg.add(createTabulatedEntry(level,
-            leafCallback(context, levelList[ri], level, isEven: ri % 2 == 0),
+        wdg.add(createTabulatedEntry(
+            level,
+            leafCallback(
+                context,
+                levelList[ri],
+                level,
+                isEven: ri % 2 == 0,
+                dataTable.select([ri])),
             isEven: ri % 2 == 0));
       } else {
         wdg.add(createTabulatedEntry(
             level,
             ExpansionTile(
+              shape: const Border(),
               controlAffinity: ListTileControlAffinity.leading,
               initiallyExpanded: expandedLevels.contains(levelColumn),
-              title: nonLeafCallback(context, levelList[ri], level,
-                  isEven: ri % 2 == 0, bold: true),
+              title: nonLeafCallback(
+                  context,
+                  levelList[ri],
+                  level,
+                  isEven: ri % 2 == 0,
+                  dataTable.select([ri]),
+                  bold: true),
               children:
                   createWidgets(context, level + 1, parentId: levelList[ri]),
             ),
@@ -392,9 +401,6 @@ class HierarchySelectableListComponent extends FetchComponent
   void reset() {
     selectedNodes.clear();
     super.reset();
-    // cancelAllOperations();
-    // isInit = false;
-    // init();
   }
 
   @override

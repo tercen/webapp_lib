@@ -280,6 +280,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       for (var f in postRunCallbacks) {
         await f();
         //In case function updates workflow
+        //Will generally trigger on task cancel
         try {
           workflow = await factory.workflowService.get(workflow.id);  
         } catch (e) {
@@ -294,6 +295,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
         try {
           workflow = await factory.workflowService.get(workflow.id);  
         } catch (e) {
+          //Will generally trigger on task cancel
           print("WORKFLOW ${workflow.id} not found");
         }
       }
