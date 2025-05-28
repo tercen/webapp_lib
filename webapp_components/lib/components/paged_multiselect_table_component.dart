@@ -49,10 +49,10 @@ class PagedMultiselectTableComponent extends MultiSelectTableComponent {
     }
 
     var p0 = 0;
-    var pf = nRows+1;
+    var pf = nRows;
     if (pageSize > 0) {
       p0 = (currentPage - 1) * pageSize;
-      pf = (currentPage) * pageSize - 1;
+      pf = (currentPage) * pageSize;
       if (pf > nRows) {
         pf = nRows;
       }
