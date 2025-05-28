@@ -177,6 +177,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
    
     if( setup == true ){
       if( context != null ){
+        openDialog(context);
         log("Sending analysis to queu", dialogTitle: "Preparing Workflow");
       }
       await setupRun(context, inPlace: inPlace);
