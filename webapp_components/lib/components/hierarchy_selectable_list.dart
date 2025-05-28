@@ -68,6 +68,7 @@ class HierarchySelectableListComponent extends FetchComponent
   late TileBuilderCallback2 leafCallback;
   int maxLevel = 0;
   final bool shouldSave;
+  final String infoboxCol;
 
   HierarchySelectableListComponent(
       id, groupId, componentLabel, super.dataFetchCallback,
@@ -76,7 +77,8 @@ class HierarchySelectableListComponent extends FetchComponent
       this.columnHierarchy = const [],
       this.hideColumns = const [],
       InfoBoxBuilder? infoBoxBuilder,
-      this.shouldSave = false}) {
+      this.shouldSave = false,
+      this.infoboxCol = ""}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -276,7 +278,7 @@ class HierarchySelectableListComponent extends FetchComponent
         const SizedBox(
           width: 5,
         ),
-        infoBoxBuilder != null ? infoBoxIcon(row, context) : Container(),
+        infoBoxBuilder != null ? infoBoxIcon(row[infoboxCol].first, context) : Container(),
         textWdg
       ],
     );
