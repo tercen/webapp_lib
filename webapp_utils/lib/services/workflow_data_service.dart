@@ -106,6 +106,8 @@ class WorkflowDataService {
           .findProjectObjectsByLastModifiedDate(
               startKey: [AppUser().projectId, '0000'], endKey: [AppUser().projectId, '9999']);
       var workflowIds = projObjs
+          .where((e) => e.isDeleted == false)
+          .where((e) => e.isHidden == false)
           .where((e) => e.subKind == "Workflow")
           .map((e) => e.id)
           .toList();
