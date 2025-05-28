@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:webapp_components/components/action_table_component.dart';
@@ -40,6 +41,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
   Future Function()? onEmptyQueu;
   final List<ListAction> workflowActions;
   bool firstEmpty = true;
+  final _lock = Lock();
 
   List<CancelableOperation> futures = [];
   CacheObject workflowCache = CacheObject();
@@ -172,17 +174,19 @@ class WorkflowTaskComponent extends ActionTableComponent {
     var taskStream = factory.eventService.channel(channelId);
     await for (var evt in taskStream) {
       if (evt is sci.TaskStateEvent) {
-        if (evt.state.isFinal) {
-          runningTasks.remove(RunningTask(evt.taskId, workflowId));
-        } else {
-          if (!runningTasks.contains(RunningTask(evt.taskId, workflowId))) {
-            runningTasks.add(RunningTask(evt.taskId, workflowId));
+        await _lock.synchronized(() async{
+          if (evt.state.isFinal) {
+            runningTasks.remove(RunningTask(evt.taskId, workflowId));
+          } else {
+            if (!runningTasks.contains(RunningTask(evt.taskId, workflowId))) {
+              runningTasks.add(RunningTask(evt.taskId, workflowId));
+            }
           }
-        }
 
-        runningTasks = runningTasks.toSet().toList();
-        await loadTaskTable();
-        notifyListeners();
+          runningTasks = runningTasks.toSet().toList();
+          await loadTaskTable();
+          notifyListeners();
+        });
       }
     }
   }

@@ -19,7 +19,7 @@ dependencies:
   list_picker: ^1.1.0
   json_annotation: ^4.9.0
   json_serializable: ^6.9.0
-  
+  synchronized: ^3.0.0
   syncfusion_flutter_pdf: ^27.2.2
   file_picker: ^8.0.5
   flutter_dropzone: ^4.0.1
