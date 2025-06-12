@@ -268,7 +268,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
 
     dataTable = WebappTable();
     dataTable.addColumn(".key", data: keys);
-    dataTable.addColumn("Id", data: taskId);
+    dataTable.addColumn("Name", data: workflowNames);
     dataTable.addColumn("Type", data: taskType);
     dataTable.addColumn("IsWorkflowTask",
         data: taskType
