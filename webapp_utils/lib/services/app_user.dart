@@ -1,25 +1,13 @@
-import 'dart:convert';
 import 'dart:html' as html;
-import 'dart:math';
-import 'package:flutter/material.dart';
+
 import 'package:jwt_decoder/jwt_decoder.dart';
 // import 'package:jwt_decoder/jwt_decoder.dart';
 // import 'package:kumo_analysis_app/left_menu.dart';
 // import 'package:kumo_analysis_app/util/tercen_util.dart';
 
-import 'package:sci_http_client/http_client.dart' as http_api;
-import 'package:sci_http_client/http_browser_client.dart' as io_http;
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
-import 'package:webapp_components/widgets/wait_indicator.dart';
-import 'package:webapp_ui_commons/menu/menu_item.dart';
-import 'package:webapp_ui_commons/menu/navigation_menu.dart';
-
-import 'package:sci_http_client/http_auth_client.dart' as auth_http;
-import 'package:webapp_ui_commons/styles/styles.dart';
-
-import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:webapp_utils/functions/logger.dart';
 
 class AppUser {
@@ -43,27 +31,27 @@ class AppUser {
     await setProject(_projectId);
   }
 
-  Future setProject(String projectId) async {
+  Future setProject(String projectId, {String? teamId}) async {
     final factory = tercen.ServiceFactory();
     if (projectId != "") {
       final project = await factory.projectService.get(projectId);
       _projectId = projectId;
-      _teamname = _getTeam();
+      _teamname = teamId ?? _getTeam();
       _projectName = project.name;
-     
+
       _username = _getUser();
     } else {
       _username = _getUser();
-      _teamname = _getTeam();
+      _teamname = teamId ?? _getTeam();
       _projectName = "No project loaded";
     }
   }
 
   String _getTeam() {
     var team = Uri.base.queryParameters["teamId"] ?? '';
-    if( team == '' ){
+    if (team == '') {
       return _getUser();
-    }else{
+    } else {
       return team;
     }
   }
@@ -133,7 +121,6 @@ class AppUser {
 
     href = "$href/${_getTeam()}";
 
-    
     if (_projectId != "") {
       href = "$href/p/$_projectId";
     }
