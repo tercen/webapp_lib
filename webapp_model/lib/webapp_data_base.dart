@@ -224,7 +224,7 @@ class WebAppDataBase with ChangeNotifier {
   }
 
   Future<void> createOrLoadProject(String projectName, String username) async {
-    var project = await projectService.getProjectByName(projectName);
+    var project = await projectService.getProjectByName(projectName, owner: username);
 
     if (project.id == "") {
       project = await projectService.doCreateProject(projectName, username);
@@ -234,7 +234,7 @@ class WebAppDataBase with ChangeNotifier {
     // app.projectName = project.name;
     // app.username = username;
     // app.teamname = project.acl.owner;
-    await AppUser().setProject(project.id);
+    await AppUser().setProject(project.id, teamId: username);
     await init();
     
   }

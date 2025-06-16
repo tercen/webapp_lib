@@ -236,9 +236,9 @@ class ProjectDataService {
   }
 
 
-  Future<Project> getProjectByName(String projectName) async{
+  Future<Project> getProjectByName(String projectName, {String? owner}) async{
     final factory = tercen.ServiceFactory();
-
+ 
     final allProjects = await Future.wait([
       factory.projectService.findByIsPublicAndLastModifiedDate(startKey: [true, "0000"], endKey: [true, "9999"]),
       factory.projectService.findByIsPublicAndLastModifiedDate(startKey: [false, "0000"], endKey: [false, "9999"])
@@ -247,7 +247,7 @@ class ProjectDataService {
     var projects = allProjects[0];
     projects.addAll(allProjects[1]);
     
-    return projects.firstWhere((proj) => proj.name == projectName, orElse: () => Project());
+    return projects.firstWhere((proj) => proj.name == projectName && (owner == null || proj.acl.owner == owner), orElse: () => Project());
   }
 
   Future<Project> doCreateProject(
