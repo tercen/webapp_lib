@@ -176,7 +176,7 @@ class ActionTableComponent extends FetchComponent
     return row;
   }
 
-  //TODO Remove List<String> 
+
   TableRow createTableRow(BuildContext context, WebappTable rowEls, 
       String rowKey, List<ListAction> rowActions, 
       {int rowIndex = -1}) {
@@ -209,7 +209,7 @@ class ActionTableComponent extends FetchComponent
             child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  rowEls.columns[ci]!.first,
+                  rowEls[colNames[ci]].first,
                   style: rowStyle,
                 ))));
       }
