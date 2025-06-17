@@ -161,6 +161,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
       var displayEls = colNames
           .where((col) => col != "Id")
           .where((col) => col != ".key")
+          .where((col) => hideColumns == null || !hideColumns!.contains(col) )
           .map((col) => table.columns[col]![ri])
           .toList();
       if (widths.isEmpty) {
