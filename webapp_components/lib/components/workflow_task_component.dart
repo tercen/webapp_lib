@@ -104,9 +104,9 @@ class WorkflowTaskComponent extends ActionTableComponent {
             IconButton(
                 onPressed: () {
                   workflowActions.first
-                      .callAction([row["Workflow Id"].first], context: context);
+                      .callAction(row, context: context);
                 },
-                icon: workflowActions.first.getIcon(params: []))
+                icon: workflowActions.first.getIcon())
           ],
         ),
       );
@@ -157,7 +157,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
       var key = table.columns[".key"]![ri];
       var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
       // await
-      rows.add(createTableRow(context, rowEls, key, actions, rowIndex: si));
+      rows.add(createTableRow(context, table.select([ri]), key, actions,  rowIndex: si));
       var displayEls = colNames
           .where((col) => col != "Id")
           .where((col) => col != ".key")

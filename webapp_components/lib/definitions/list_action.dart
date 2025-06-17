@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:webapp_components/components/label_component.dart';
 import 'package:webapp_components/extra/modal_Screen_base.dart';
+import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 
-typedef CheckActionCallback = bool Function( List<String> row );
-typedef RowActionCallback = Future<void> Function( List<String> row ) ;
+typedef CheckActionCallback = bool Function( WebappTable row );
+typedef RowActionCallback = Future<void> Function( WebappTable row ) ;
 
 class ListAction{
   final Icon actionIcon;
@@ -29,8 +30,11 @@ class ListAction{
     disabledIcon = Icon( actionIcon.icon, color: Styles()["gray"],);
   }
 
-  Icon getIcon({List<String> params = const []}){
-    if( params.isEmpty || isEnabled(params)){
+  Icon getIcon({WebappTable? params}){
+    if( params == null){
+      params = WebappTable();
+    }
+    if( params.nRows == 0 || isEnabled(params)){
       if( toggleIcon != null && toggle ){
         return toggleIcon!;
       }else{
@@ -42,13 +46,13 @@ class ListAction{
     }
   }
 
-  bool isEnabled(List<String> params){
+  bool isEnabled(WebappTable params){
     return this.enabledCallback == null || this.enabledCallback!( params );
   }
 
 
 
-  Future<void> callAction(List<String> params, {BuildContext? context}) async {
+  Future<void> callAction(WebappTable params, {BuildContext? context}) async {
     if( isEnabled(params)){
       if( requireConfirmation ){
         assert( context != null );

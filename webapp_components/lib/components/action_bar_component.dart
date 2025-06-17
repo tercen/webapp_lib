@@ -3,6 +3,7 @@ import 'package:webapp_components/abstract/component.dart';
 import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/definitions/list_action.dart';
 import 'package:webapp_components/mixins/component_base.dart';
+import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 class ActionBarComponent
@@ -23,10 +24,10 @@ class ActionBarComponent
   }
 
   Widget buildActionWidget(ListAction action, BuildContext context) {
-    var rszIcon = Icon(action.getIcon( params: [] ).icon, size: 32);
+    var rszIcon = Icon(action.getIcon(  ).icon, size: 32);
     var actionIcon = IconButton(
       onPressed: () async {
-        action.callAction([], context: context);
+        action.callAction(WebappTable(), context: context);
       },
       icon: rszIcon,
       tooltip: action.description,

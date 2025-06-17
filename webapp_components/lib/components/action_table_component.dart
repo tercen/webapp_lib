@@ -176,8 +176,9 @@ class ActionTableComponent extends FetchComponent
     return row;
   }
 
-  TableRow createTableRow(BuildContext context, List<String> rowEls,
-      String rowKey, List<ListAction> rowActions,
+  //TODO Remove List<String> 
+  TableRow createTableRow(BuildContext context, WebappTable rowEls, 
+      String rowKey, List<ListAction> rowActions, 
       {int rowIndex = -1}) {
     var rowDecoration = BoxDecoration(color: Styles()["white"]);
     if (rowIndex > -1) {
@@ -208,7 +209,7 @@ class ActionTableComponent extends FetchComponent
             child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  rowEls[ci],
+                  rowEls.columns[ci]!.first,
                   style: rowStyle,
                 ))));
       }
@@ -287,7 +288,7 @@ class ActionTableComponent extends FetchComponent
       }
 
       if (displayRow) {
-        rows.add(createTableRow(context, rowEls, key, actions, rowIndex: di));
+        rows.add(createTableRow(context, table.select([ri]), key, actions,  rowIndex: di));
         di = di + 1;
       }
     }
