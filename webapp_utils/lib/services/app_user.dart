@@ -48,7 +48,12 @@ class AppUser {
   }
 
   String _getTeam() {
-    var team = Uri.base.queryParameters["teamId"] ?? '';
+    
+    var team = _teamname; 
+    if( team == '' ){
+      team = Uri.base.queryParameters["teamId"] ?? '';
+    }
+    //If still empty
     if (team == '') {
       return _getUser();
     } else {
