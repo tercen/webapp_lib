@@ -49,7 +49,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
   WorkflowTaskComponent(super.id, super.groupId, super.componentLabel,
       super.dataFetchCallback, super.actions, this.workflowActions,
       {super.excludeColumns, super.hideColumns, this.onEmptyQueu}) {
-    hideColumns = [".key", "IsWorkflowTask", "Workflow Name", "Workflow Id"];
+    hideColumns = [".key", "IsWorkflowTask", "Workflow Name", "Workflow Id", "Id"];
   }
 
   @override
@@ -180,7 +180,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
     //     : {0: const FixedColumnWidth(30), 1: const FixedColumnWidth(50)};
 
     var totalWidth = widths.reduce((a, b) => a + b);
-    final relativeWidth = widths.map((w) => (w / totalWidth) * 0.9).toList();
+    final relativeWidth = widths.map((w) => (w / totalWidth) * 0.96).toList();
 
     Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
         ? {0: const FixedColumnWidth(5)}
@@ -190,7 +190,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
       colWidths[k + 1] = FractionColumnWidth(relativeWidth[k]);
     }
 
-    colWidths[relativeWidth.length+1]=FractionColumnWidth(0.06); // Actions
+    colWidths[relativeWidth.length+1]=FractionColumnWidth(0.03); // Actions
     var tableWidget = Table(
       columnWidths: colWidths,
       children: rows,
@@ -299,6 +299,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
     dataTable = WebappTable();
     dataTable.addColumn(".key", data: keys);
     dataTable.addColumn("Name", data: workflowNames);
+    dataTable.addColumn("Id", data: taskId);
     dataTable.addColumn("Type", data: taskType);
     dataTable.addColumn("IsWorkflowTask",
         data: taskType
