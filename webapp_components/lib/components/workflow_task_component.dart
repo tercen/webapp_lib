@@ -144,7 +144,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
 
     var indices = List<int>.generate(nRows, (i) => i);
     if (sortDirection != "" && sortingCol != "") {
-      indices = ListUtils.getSortedIndices(table.columns[sortingCol]!);
+      indices = ListUtils.getSortedIndices(table[sortingCol]);
 
       if (sortDirection == "desc") {
         indices = indices.reversed.toList();
@@ -154,15 +154,15 @@ class WorkflowTaskComponent extends ActionTableComponent {
     var widths = <double>[];
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
-      var key = table.columns[".key"]![ri];
-      var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
+      var key = table[".key"][ri];
+      // var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
       // await
       rows.add(createTableRow(context, table.select([ri]), key, actions,  rowIndex: si));
       var displayEls = colNames
           .where((col) => col != "Id")
           .where((col) => col != ".key")
           .where((col) => hideColumns == null || !hideColumns!.contains(col) )
-          .map((col) => table.columns[col]![ri])
+          .map((col) => table[col][ri])
           .toList();
       if (widths.isEmpty) {
         widths.addAll(displayEls.map((el) => el.length as double));
