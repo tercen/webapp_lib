@@ -155,8 +155,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
       var key = table[".key"][ri];
-      // var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
-      // await
+
       rows.add(createTableRow(context, table.select([ri]), key, actions,  rowIndex: si));
       var displayEls = colNames
           .where((col) => col != "Id")
@@ -167,7 +166,6 @@ class WorkflowTaskComponent extends ActionTableComponent {
       if (widths.isEmpty) {
         widths.addAll(displayEls.map((el) => el.length as double));
 
-        // widths = widths.map((w) => (w/totalWidth) * 0.9).toList();
       } else {
         var tmp = displayEls.map((el) => el.length as double).toList();
 
@@ -182,7 +180,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
     //     : {0: const FixedColumnWidth(30), 1: const FixedColumnWidth(50)};
 
     var totalWidth = widths.reduce((a, b) => a + b);
-    final relativeWidth = widths.map((w) => (w / totalWidth) * 0.95).toList();
+    final relativeWidth = widths.map((w) => (w / totalWidth) * 0.9).toList();
 
     Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
         ? {0: const FixedColumnWidth(5)}
@@ -192,7 +190,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
       colWidths[k + 1] = FractionColumnWidth(relativeWidth[k]);
     }
 
-
+    colWidths[relativeWidth.length+1]=FractionColumnWidth(0.06); // Actions
     var tableWidget = Table(
       columnWidths: colWidths,
       children: rows,
