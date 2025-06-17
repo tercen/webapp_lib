@@ -121,6 +121,8 @@ class WorkflowTaskComponent extends ActionTableComponent {
       ));
     }
 
+
+
     return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,17 +151,46 @@ class WorkflowTaskComponent extends ActionTableComponent {
       }
     }
 
+    var widths = <double>[];
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
       var key = table.columns[".key"]![ri];
       var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
       // await
       rows.add(createTableRow(context, rowEls, key, actions, rowIndex: si));
+      var displayEls = colNames
+          .where((col) => col != "Id")
+          .where((col) => col != ".key")
+          .map((col) => table.columns[col]![ri])
+          .toList();
+      if (widths.isEmpty) {
+        widths.addAll(displayEls.map((el) => el.length as double));
+
+        // widths = widths.map((w) => (w/totalWidth) * 0.9).toList();
+      } else {
+        var tmp = displayEls.map((el) => el.length as double).toList();
+
+        for (var k = 0; k < widths.length; k++) {
+          widths[k] = widths[k] + tmp[k];
+        }
+      }
     }
 
+    // Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
+    //     ? const {0: FixedColumnWidth(30)}
+    //     : {0: const FixedColumnWidth(30), 1: const FixedColumnWidth(50)};
+
+    var totalWidth = widths.reduce((a, b) => a + b);
+    final relativeWidth = widths.map((w) => (w / totalWidth) * 0.95).toList();
+
     Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
-        ? const {0: FixedColumnWidth(30)}
-        : {0: const FixedColumnWidth(30), 1: const FixedColumnWidth(50)};
+        ? {0: const FixedColumnWidth(5)}
+        : {0: const FixedColumnWidth(50)};
+
+    for (var k = 0; k < relativeWidth.length; k++) {
+      colWidths[k + 1] = FractionColumnWidth(relativeWidth[k]);
+    }
+
 
     var tableWidget = Table(
       columnWidths: colWidths,
