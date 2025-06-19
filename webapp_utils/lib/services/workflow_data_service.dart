@@ -310,7 +310,7 @@ class WorkflowDataService {
       List<String> excludedFiles = const [],
       List<String> nameFilter = const [],
       List<String> includeStepId = const [],
-      bool force = false}) async {
+      bool useCache = false}) async {
     var factory = tercen.ServiceFactory();
     var wkf = await factory.workflowService.get(workflowId);
     return fetchWorkflowImages(wkf,
@@ -318,7 +318,7 @@ class WorkflowDataService {
         excludedFiles: excludedFiles,
         nameFilter: nameFilter,
         includeStepId: includeStepId,
-        force: force);
+        useCache: useCache);
   }
 
   Future<WebappTable> fetchWorkflowImages(Workflow wkf,
@@ -326,13 +326,13 @@ class WorkflowDataService {
       List<String> excludedFiles = const [],
       List<String> nameFilter = const [],
       List<String> includeStepId = const [],
-      bool force = false}) async {
+      bool useCache = false}) async {
     var key = "${wkf.id}_${contentTypes.join("_")}";
     if (excludedFiles.isNotEmpty) {
       key = "${key}_${excludedFiles.join("_")}";
     }
 
-    if (cache.hasCachedValue(key) && !force) {
+    if (cache.hasCachedValue(key) && !useCache) {
       return cache.getCachedValue(key);
     }
 
@@ -501,7 +501,7 @@ class WorkflowDataService {
     var workflows = await factory.workflowService.list(uniqueWorkflowIds);
     for (var w in workflows) {
       var newTbl = await fetchWorkflowImages(w,
-          includeStepId: uniqueStepIds, force: true);
+          includeStepId: uniqueStepIds, useCache: true);
       if (outTbl.colNames.isEmpty) {
         outTbl = newTbl;
       } else {
