@@ -93,18 +93,35 @@ class WorkflowDataService {
     return libObjs;
   }
 
+  Future<Workflow> fetch(String id, {bool useCache = true}) async {
+    var cacheKey = "${id}_workflow";
+    if (useCache && cache.hasCachedValue(cacheKey)) {
+      return cache.getCachedValue(cacheKey);
+    }
+
+    final factory = tercen.ServiceFactory();
+    final wkf = await factory.workflowService.get(id);
+
+    if (useCache) {
+      cache.addToCache(cacheKey, wkf);
+    }
+
+    return wkf;
+  }
+
   Future<List<Workflow>> getProjectWorkflowList(
       {bool fetchOnServer = false, bool useCache = true}) async {
     var factory = tercen.ServiceFactory();
     var cacheKey = "${AppUser().projectId}_workflowList";
-    if(useCache && cache.hasCachedValue(cacheKey)){
+    if (useCache && cache.hasCachedValue(cacheKey)) {
       return cache.getCachedValue(cacheKey);
     }
     List<Workflow> workflowList = [];
     if (fetchOnServer) {
       var projObjs = await factory.projectDocumentService
           .findProjectObjectsByLastModifiedDate(
-              startKey: [AppUser().projectId, '0000'], endKey: [AppUser().projectId, '9999']);
+              startKey: [AppUser().projectId, '0000'],
+              endKey: [AppUser().projectId, '9999']);
       var workflowIds = projObjs
           .where((e) => e.isDeleted == false)
           .where((e) => e.isHidden == false)
@@ -112,7 +129,7 @@ class WorkflowDataService {
           .map((e) => e.id)
           .toList();
 
-      workflowList =  await factory.workflowService.list(workflowIds);
+      workflowList = await factory.workflowService.list(workflowIds);
     } else {
       var workflowIds = ProjectDataService()
           .folderTreeRoot
@@ -123,34 +140,35 @@ class WorkflowDataService {
           .toList();
       workflowList = await factory.workflowService.list(workflowIds);
     }
-    if( useCache ){
+    if (useCache) {
       cache.addToCache(cacheKey, workflowList);
     }
 
     return workflowList;
   }
 
-  bool workflowHasMetas( Workflow workflow, List<Pair> metas ){
+  bool workflowHasMetas(Workflow workflow, List<Pair> metas) {
     return metas.every((meta) => workflow.getMeta(meta.key) == meta.value);
   }
 
-  Future<List<Workflow>> findWorkflowByMetas( List<Pair> metas,
-      {bool fetchOnServer = false, bool useCache = true})  async {
-    
-    var workflowList = await getProjectWorkflowList( fetchOnServer: fetchOnServer, useCache: useCache);
+  Future<List<Workflow>> findWorkflowByMetas(List<Pair> metas,
+      {bool fetchOnServer = false, bool useCache = true}) async {
+    var workflowList = await getProjectWorkflowList(
+        fetchOnServer: fetchOnServer, useCache: useCache);
 
-    workflowList = workflowList.where((wkf) => workflowHasMetas(wkf, metas)).toList();
+    workflowList =
+        workflowList.where((wkf) => workflowHasMetas(wkf, metas)).toList();
     return workflowList;
   }
 
   Future<Workflow> findWorkflowById(String id, {bool useCache = true}) async {
-    if( useCache && cache.hasCachedValue(id)){
+    if (useCache && cache.hasCachedValue(id)) {
       return cache.getCachedValue(id);
-    }else{
+    } else {
       var factory = tercen.ServiceFactory();
       var workflow = await factory.workflowService.get(id);
 
-      if( useCache ){
+      if (useCache) {
         cache.addToCache(id, workflow);
       }
 
@@ -175,10 +193,16 @@ class WorkflowDataService {
           .whereType<DataStep>()
           .where((step) =>
               step.model.operatorSettings.operatorRef.operatorId != "")
-          .where((step) => step.model.operatorSettings.operatorRef.name != "File Downloader")
-          .where((step) => step.model.operatorSettings.operatorRef.name != "Gating")
-          .where((step) => step.model.operatorSettings.operatorRef.operatorKind != "WebappOperator")
-          .where((step) => step.model.operatorSettings.operatorRef.operatorKind != "Operator")
+          .where((step) =>
+              step.model.operatorSettings.operatorRef.name != "File Downloader")
+          .where((step) =>
+              step.model.operatorSettings.operatorRef.name != "Gating")
+          .where((step) =>
+              step.model.operatorSettings.operatorRef.operatorKind !=
+              "WebappOperator")
+          .where((step) =>
+              step.model.operatorSettings.operatorRef.operatorKind !=
+              "Operator")
           .toList();
       var opIds = dataSteps
           .map((step) => step.model.operatorSettings.operatorRef)
@@ -237,9 +261,9 @@ class WorkflowDataService {
               step.name, step.id, prop.name, "", "string", prop.description);
         });
         // Logger().log(
-            // level: Logger.ALL,
-            // message:
-                // "\tAdded ${props.length}/${op.properties.length} properties for step ${step.id} ${step.name}");
+        // level: Logger.ALL,
+        // message:
+        // "\tAdded ${props.length}/${op.properties.length} properties for step ${step.id} ${step.name}");
         workflowSettings.addAll(props);
       }
     }
@@ -569,11 +593,12 @@ class WorkflowDataService {
     if (deleteWorkflow && workflowId != "") {
       try {
         var workflow = await factory.workflowService.get(workflowId);
-        await factory.workflowService.delete(workflow.id, workflow.rev);  
+        await factory.workflowService.delete(workflow.id, workflow.rev);
       } catch (e) {
-        Logger().log(level: Logger.FINE, message: "Workflow $workflowId already deleted");
+        Logger().log(
+            level: Logger.FINE,
+            message: "Workflow $workflowId already deleted");
       }
-      
     }
   }
 
@@ -624,9 +649,7 @@ class WorkflowDataService {
     if (cache.hasCachedValue(key)) {
       return cache.getCachedValue(key);
     } else {
-
       var workflows = await getProjectWorkflowList(fetchOnServer: true);
-
 
       var res = WebappTable();
 
