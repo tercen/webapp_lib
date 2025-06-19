@@ -18,13 +18,13 @@ class DropdownComponent extends FetchComponent
   final Future Function(WebappTable rowTable)? onChange;
 
   DropdownComponent(
-      id, groupId, componentLabel, super.dataFetchFunc, this.displayColumn,
+      super.id, super.groupId, super.componentLabel, super.dataFetchFunc, this.displayColumn,
       {infoBoxBuilder,
       String Function(String, {String id})? pathTransformCallback,
       this.shouldSave = true, this.onChange}) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
   }
 
   @override

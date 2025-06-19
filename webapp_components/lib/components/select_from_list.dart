@@ -14,11 +14,11 @@ class SelectFromListComponent extends FetchComponent
   final bool shouldSave;
   final String displayColumn;
 
-  SelectFromListComponent(id, groupId, componentLabel, super.dataFetchFunc, this.displayColumn,
+  SelectFromListComponent(super.id, super.groupId, super.componentLabel, super.dataFetchFunc, this.displayColumn,
       {String? user, this.shouldSave = true}) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
 
     if (user != null) {
       selectedUser = user;

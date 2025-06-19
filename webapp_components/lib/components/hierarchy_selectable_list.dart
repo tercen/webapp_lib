@@ -74,7 +74,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final double maxHeight;
 
   HierarchySelectableListComponent(
-      id, groupId, componentLabel, super.dataFetchCallback,
+      super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
       {cache = true,
       this.selectionBehavior = SelectionBehavior.none,
       this.expanded = true,

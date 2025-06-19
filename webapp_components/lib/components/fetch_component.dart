@@ -20,7 +20,11 @@ class FetchComponent with
   bool useCache = true;
   Future<WebappTable> Function() dataFetchCallback;
 
-  FetchComponent( this.dataFetchCallback );
+  FetchComponent(id, groupId, componentLabel,  this.dataFetchCallback ){
+    super.id = id;
+    super.groupId = groupId;
+    super.componentLabel = componentLabel;
+  }
 
   @override
   void dispose() {

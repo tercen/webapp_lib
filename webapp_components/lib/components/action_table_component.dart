@@ -57,7 +57,7 @@ class ActionTableComponent extends FetchComponent
   bool shouldSave;
 
   ActionTableComponent(
-      id, groupId, componentLabel, super.dataFetchCallback, this.actions,
+      super.id, super.groupId, super.componentLabel, super.dataFetchCallback, this.actions,
       {this.excludeColumns,
       this.hideColumns,
       InfoBoxBuilder? infoBoxBuilder,
@@ -65,9 +65,9 @@ class ActionTableComponent extends FetchComponent
       this.rowFormatter,
       this.shouldSave = false,
       this.rowFilters = const []}) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
     super.useCache = cache;
   }

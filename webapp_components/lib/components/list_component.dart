@@ -23,14 +23,14 @@ class ListComponent extends FetchComponent implements Component {
   final String? emptyMessage;
 
 
-  ListComponent(id, groupId, componentLabel, super.dataFetchFunc,
+  ListComponent(super.id, super.groupId, super.componentLabel, super.dataFetchFunc,
       {this.sortByLabel = false,
       this.collapsible = true,
       cache = true,
       this.emptyMessage}) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
     super.useCache = cache;
   }
 

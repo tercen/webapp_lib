@@ -22,14 +22,14 @@ class SelectableListComponent extends FetchComponent
   String? cacheKey;
   final bool shouldSave;
 
-  SelectableListComponent(id, groupId, componentLabel, super.dataFetchFunc,
+  SelectableListComponent(super.id, super.groupId, super.componentLabel, super.dataFetchFunc,
       {infoBoxBuilder,
       String Function(String, {String id})? pathTransformCallback,
       this.sortByLabel = false,
       this.shouldSave = true}) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
 
     if (pathTransformCallback == null) {

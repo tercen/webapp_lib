@@ -23,15 +23,15 @@ class MultiCheckComponentFetch
   double? columnWidth;
   final bool saveState;
 
-  MultiCheckComponentFetch(id, groupId, componentLabel, super.dataFetchCallback,
+  MultiCheckComponentFetch(super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
       {this.columns = 5,
       this.hasSelectAll = false,
       this.selectAll = false,
       this.columnWidth,
       this.saveState = true}) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
     allSelected = selectAll;
   }
 

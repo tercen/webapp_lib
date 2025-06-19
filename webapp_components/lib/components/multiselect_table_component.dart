@@ -35,16 +35,16 @@ class MultiSelectTableComponent extends FetchComponent
   CancelableOperation? onHoverOp;
 
   MultiSelectTableComponent(
-      id, groupId, componentLabel, super.dataFetchCallback,
+      super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
       {this.excludeColumns,
       this.saveState = true,
       this.hideColumns,
       InfoBoxBuilder? infoBoxBuilder,
       this.columnOrder,
       cache = true}) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
     super.useCache = cache;
 
