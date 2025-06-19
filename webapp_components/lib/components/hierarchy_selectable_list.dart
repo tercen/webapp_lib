@@ -56,6 +56,7 @@ class SelectionNode {
 class HierarchySelectableListComponent extends FetchComponent
     with ComponentInfoBox
     implements SerializableComponent {
+  final ScrollController scrollController = ScrollController();
   List<SelectionNode> selectedNodes = [];
 
   final SelectionBehavior selectionBehavior;
@@ -130,8 +131,10 @@ class HierarchySelectableListComponent extends FetchComponent
               maxHeight: height, // only scroll if content exceeds this
             ),
             child: Scrollbar(
+              controller: scrollController,
               thumbVisibility: true, // Always show the scrollbar
               child: SingleChildScrollView(
+                controller: scrollController,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: buildWidgetTree(context),
