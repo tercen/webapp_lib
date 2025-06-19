@@ -84,9 +84,9 @@ class HierarchySelectableListComponent extends FetchComponent
       InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false,
       this.infoboxCol = ""}) {
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
     useCache = cache;
 
