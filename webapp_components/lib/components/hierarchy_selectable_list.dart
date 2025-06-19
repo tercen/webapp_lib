@@ -115,12 +115,12 @@ class HierarchySelectableListComponent extends FetchComponent
         return Container();
       }
     }
-    if( maxHeight == 0 ){
+    if (maxHeight == 0) {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: buildWidgetTree(context),
       );
-    }else{
+    } else {
       final screenHeight = MediaQuery.of(context).size.height;
       final height = screenHeight * maxHeight;
       return LayoutBuilder(
@@ -129,10 +129,13 @@ class HierarchySelectableListComponent extends FetchComponent
             constraints: BoxConstraints(
               maxHeight: height, // only scroll if content exceeds this
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: buildWidgetTree(context),
+            child: Scrollbar(
+              thumbVisibility: true, // Always show the scrollbar
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: buildWidgetTree(context),
+                ),
               ),
             ),
           );
@@ -150,10 +153,9 @@ class HierarchySelectableListComponent extends FetchComponent
   Future<void> init() async {
     if (!isInit) {
       super.init();
-      if( expanded ){
+      if (expanded) {
         expandedLevels.addAll(columnHierarchy);
       }
-      
     }
   }
 
@@ -309,7 +311,9 @@ class HierarchySelectableListComponent extends FetchComponent
         const SizedBox(
           width: 5,
         ),
-        infoBoxBuilder != null ? infoBoxIcon(row[infoboxCol].first, context) : Container(),
+        infoBoxBuilder != null
+            ? infoBoxIcon(row[infoboxCol].first, context)
+            : Container(),
         textWdg
       ],
     );
