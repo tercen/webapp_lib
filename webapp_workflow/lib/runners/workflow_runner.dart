@@ -700,6 +700,8 @@ StreamSubscription? subscription;
 
     if (doSetup) {
       await setupRun(context, inPlace: inPlace);
+    }else{
+      workflow = template;
     }
 
     var runTitle = getWorkflowName(template);

@@ -24,7 +24,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
         log("Sending analysis to queu", dialogTitle: "Preparing Workflow");
       }
       await setupRun(context, inPlace: inPlace);
+    }else{
+      workflow = template;
     }
+
     
     List<String> stepsToRestore = [];
 
