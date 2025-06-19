@@ -21,9 +21,9 @@ class FetchComponent with
   Future<WebappTable> Function() dataFetchCallback;
 
   FetchComponent(id, groupId, componentLabel,  this.dataFetchCallback ){
-    super.id = id;
-    super.groupId = groupId;
-    super.componentLabel = componentLabel;
+    // super.id = id;
+    // super.groupId = groupId;
+    // super.componentLabel = componentLabel;
   }
 
   @override
