@@ -69,11 +69,13 @@ class HierarchySelectableListComponent extends FetchComponent
   int maxLevel = 0;
   final bool shouldSave;
   final String infoboxCol;
+  final bool expanded;
 
   HierarchySelectableListComponent(
       id, groupId, componentLabel, super.dataFetchCallback,
       {cache = true,
       this.selectionBehavior = SelectionBehavior.none,
+      this.expanded = true,
       this.columnHierarchy = const [],
       this.hideColumns = const [],
       InfoBoxBuilder? infoBoxBuilder,
@@ -122,7 +124,10 @@ class HierarchySelectableListComponent extends FetchComponent
   Future<void> init() async {
     if (!isInit) {
       super.init();
-      expandedLevels.addAll(columnHierarchy);
+      if( expanded ){
+        expandedLevels.addAll(columnHierarchy);
+      }
+      
     }
   }
 

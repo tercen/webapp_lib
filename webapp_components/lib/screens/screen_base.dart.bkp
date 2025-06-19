@@ -17,15 +17,38 @@ import 'package:webapp_model/webapp_data_base.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/logger.dart';
 
+class Action {
+  final String actionName;
+  final Function actionCallback;
+  final Function? enabledCallback;
+
+  Action(this.actionName, this.actionCallback, this.enabledCallback);
+
+  Widget build() {
+    bool enabled = enabledCallback != null ? enabledCallback!() : true;
+    return ElevatedButton(
+      style: enabled ? Styles()["buttonEnabled"] : Styles()["buttonDisabled"],
+      onPressed: () {
+        if (enabled) {
+          actionCallback();
+        }
+      },
+      child: Text(
+        actionName,
+        style: Styles()["textButton"],
+      ),
+    );
+  }
+}
+
 enum ComponentBlockType { simple, expanded, collapsed }
 
 class ComponentEntry {
   final Component component;
   final String componentName;
   final ComponentType componentType;
-  final int order;
 
-  ComponentEntry(this.component, this.componentName, this.componentType, {this.order = 0});
+  ComponentEntry(this.component, this.componentName, this.componentType);
 }
 
 mixin ScreenBase {
@@ -38,7 +61,9 @@ mixin ScreenBase {
   bool finishedCompInit = false;
   Timer? updateTimer;
   bool isMenuCollapsed = false;
-
+  void addActionComponent(ActionComponent component) {
+    _actionComponents.add(component);
+  }
 
   void refresh() {
     throw Exception(
@@ -84,13 +109,13 @@ mixin ScreenBase {
     }
   }
 
-  void addComponent(String blockId, dynamic component,
+  void addComponent(String blockId, Component component,
       {ComponentBlockType blockType = ComponentBlockType.simple}) {
     component.addListener(refresh);
     component.addListener(updateModel);
 
     if (component is ComponentBase) {
-      component.addUiListener(refresh);
+      (component as ComponentBase).addUiListener(refresh);
     }
 
     var entry = ComponentEntry(
@@ -98,8 +123,6 @@ mixin ScreenBase {
 
     if (componentBlocks.containsKey(blockId)) {
       componentBlocks[blockId]!.add(entry);
-
-      
     } else {
       blockOrder.add(blockId);
       blockTypes.add(blockType);
@@ -146,7 +169,9 @@ mixin ScreenBase {
   List<Component> getAllComponents() {
     List<Component> components = [];
     for (var block in componentBlocks.values) {
-      components.addAll(block.map((ce) => ce.component).whereType<Component>() );
+      for (var comp in block) {
+        components.add(comp.component);
+      }
     }
 
     return components;
@@ -197,7 +222,7 @@ mixin ScreenBase {
 
   List<Component> getComponentsPerBlock(String blockId) {
     var componentEntryList = componentBlocks[blockId]!;
-    return componentEntryList.map((e) => e.component).whereType<Component>().toList();
+    return componentEntryList.map((e) => e.component).toList();
   }
 
   void disposeComponents() {
@@ -429,9 +454,6 @@ mixin ScreenBase {
             height: 15,
           ));
         }
-
-
-        
       }
 
       if (isExpBlock) {
@@ -449,10 +471,10 @@ mixin ScreenBase {
       }
     }
 
-    // var actionRow = Row(
-        // mainAxisAlignment: MainAxisAlignment.start,
-        // children:
-            // _actionComponents.map((e) => e.buildContent(context)).toList());
+    var actionRow = Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children:
+            _actionComponents.map((e) => e.buildContent(context)).toList());
 
     return Padding(
         padding: const EdgeInsets.all(5),
@@ -462,10 +484,10 @@ mixin ScreenBase {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ...widgetRows,
-                // const SizedBox(
-                //   height: 25,
-                // ),
-                // actionRow
+                const SizedBox(
+                  height: 25,
+                ),
+                actionRow
               ],
             ),
           ),
