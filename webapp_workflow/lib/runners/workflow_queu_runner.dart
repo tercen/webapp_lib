@@ -193,7 +193,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       await setupRun(context, inPlace: inPlace);
     }else{
       workflow = template;
-      return workflow;
+      // return workflow;
     }
     //-----------------------------------------
     // Task preparation and running
@@ -239,7 +239,12 @@ class WorkflowQueuRunner extends WorkflowRunner {
     
     await for (var evt in taskStream) {
       if (evt is sci.PatchRecords) {
-        workflow = evt.apply(workflow);
+        try {
+          workflow = evt.apply(workflow);  
+        } catch (e) {
+          continue;
+        }
+        
         for (var pr in evt.rs) {
           if(  pr.d.isEmpty){
             continue;
