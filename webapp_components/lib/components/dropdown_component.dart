@@ -16,9 +16,10 @@ class DropdownComponent extends FetchComponent
   String displayColumn;
   final bool shouldSave;
   final Future Function(WebappTable rowTable)? onChange;
+  final Future<String> Function()? initValue;
 
   DropdownComponent(
-      super.id, super.groupId, super.componentLabel, super.dataFetchFunc, this.displayColumn,
+      super.id, super.groupId, super.componentLabel, super.dataFetchFunc, this.displayColumn, this.initValue,
       {infoBoxBuilder,
       String Function(String, {String id})? pathTransformCallback,
       this.shouldSave = true, this.onChange}) {
@@ -33,6 +34,34 @@ class DropdownComponent extends FetchComponent
   }
 
 
+  @override
+  Future<bool> loadTable() async {
+    if (!isInit) {
+      isInit = true;
+      busy();
+      var cacheKey = getKey();
+      if (useCache && cacheObj.hasCachedValue(cacheKey)) {
+        dataTable = cacheObj.getCachedValue(cacheKey);
+      } else {
+        startFuture("dataLoad", dataFetchCallback());
+
+        dataTable = await waitResult("dataLoad"); //  await dataFetchCallback();
+
+        dataTable = postLoad(dataTable);
+        if( useCache ){
+          cacheObj.addToCache(cacheKey, dataTable);
+        }
+        
+        if( initValue != null ){
+          selected = await initValue!();
+        }
+        
+      }
+      idle();
+
+    }
+    return true;
+  }
   @override
   Widget createWidget(BuildContext context) {
     if( selected.isEmpty ){
