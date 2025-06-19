@@ -70,6 +70,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final bool shouldSave;
   final String infoboxCol;
   final bool expanded;
+  final double maxHeight;
 
   HierarchySelectableListComponent(
       id, groupId, componentLabel, super.dataFetchCallback,
@@ -78,6 +79,7 @@ class HierarchySelectableListComponent extends FetchComponent
       this.expanded = true,
       this.columnHierarchy = const [],
       this.hideColumns = const [],
+      this.maxHeight = 0,
       InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false,
       this.infoboxCol = ""}) {
@@ -113,11 +115,35 @@ class HierarchySelectableListComponent extends FetchComponent
         return Container();
       }
     }
+    if( maxHeight == 0 ){
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: buildWidgetTree(context),
+      );
+    }else{
+      final screenHeight = MediaQuery.of(context).size.height;
+      final height = screenHeight * maxHeight;
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: height, // only scroll if content exceeds this
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: buildWidgetTree(context),
+              ),
+            ),
+          );
+        },
+      );
+    }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: buildWidgetTree(context),
-    );
+    // return Column(
+    //   mainAxisSize: MainAxisSize.min,
+    //   children: buildWidgetTree(context),
+    // );
   }
 
   @override
