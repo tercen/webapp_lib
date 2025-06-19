@@ -89,8 +89,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
     var errorInformation = {"error": "", "reason": ""};
     var hasFailed = false;
+    print("GONNA READ STREAM");
     await for (var evt in taskStream) {
       if (evt is sci.PatchRecords) {
+        print(evt.toJson());
         workflow = evt.apply(workflow);
         for (var pr in evt.rs) {
           if(  pr.d.isEmpty){
@@ -138,7 +140,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
     }
 
-
+    print("RESTORING STEPS");
     for (var stp in workflow.steps) {
       if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id) ) {
         stp.state.taskState = sci.InitState();
@@ -161,7 +163,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       currentWorkflow.meta.add(sci.Pair.from(
           "run.error.reason", errorInformation["reason"] as String));
     }
-
+    print("FINISHING");
     await factory.workflowService.update(workflow);
     workflowId = workflow.id;
     workflow = await factory.workflowService.get(workflow.id);
