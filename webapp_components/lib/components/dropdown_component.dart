@@ -19,8 +19,8 @@ class DropdownComponent extends FetchComponent
   final Future<String> Function()? initValue;
 
   DropdownComponent(
-      super.id, super.groupId, super.componentLabel, super.dataFetchFunc, this.displayColumn, this.initValue,
-      {infoBoxBuilder,
+      super.id, super.groupId, super.componentLabel, super.dataFetchFunc, this.displayColumn, 
+      {infoBoxBuilder, this.initValue,
       String Function(String, {String id})? pathTransformCallback,
       this.shouldSave = true, this.onChange}) {
     // super.id = id;
