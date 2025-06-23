@@ -92,7 +92,7 @@ mixin ScreenBase {
   }
 
   void addComponent(String blockId, dynamic component,
-      {ComponentBlockType blockType = ComponentBlockType.simple}) {
+      {ComponentBlockType blockType = ComponentBlockType.simple, int order = -1}) {
     component.addListener(refresh);
     component.addListener(updateModel);
 
@@ -104,9 +104,12 @@ mixin ScreenBase {
         component, component.getId(), component.getComponentType());
 
     if (componentBlocks.containsKey(blockId)) {
-      componentBlocks[blockId]!.add(entry);
+      if( order == -1 ){
+        componentBlocks[blockId]!.add(entry);
+      }else{
+        componentBlocks[blockId]!.insert(order, entry);
+      }
 
-      
     } else {
       blockOrder.add(blockId);
       blockTypes.add(blockType);
@@ -118,6 +121,32 @@ mixin ScreenBase {
     isMenuCollapsed = modelLayer.app.isMenuCollapsed;
     refresh();
   }
+
+  // void reinitComponents() {
+  //   final components = getAllComponents();
+
+  //     for (var comp in components) {
+  //     if (comp is ComponentBase) {
+  //       (comp as ComponentBase).setActive();
+  //       (comp as ComponentBase)
+  //           .init()
+  //           .then((val) => (comp as ComponentBase).postInit());
+  //     }
+
+  //     if (comp is SerializableComponent && comp.shouldSaveState()) {
+  //       var modelValue = modelLayer.getData(comp.getId(), comp.getGroupId());
+  //       if (modelValue != null) {
+  //         Logger().log(
+  //           level: Logger.FINER,
+  //           message: "Initializing ${comp.getId()} with $modelValue"
+  //         );
+          
+  //         comp.setStateValue(modelValue);
+  //       }
+  //     }
+  //   }
+
+  // }
 
   void initScreen(WebAppDataBase modelLayer) {
     final components = getAllComponents();
