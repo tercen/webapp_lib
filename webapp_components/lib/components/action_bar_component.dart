@@ -63,6 +63,11 @@ class ActionBarComponent
   }
 
   @override
+  void reset() {
+    
+  }
+
+  @override
   ComponentType getComponentType() {
     return ComponentType.simpleNoLabel;
   }
