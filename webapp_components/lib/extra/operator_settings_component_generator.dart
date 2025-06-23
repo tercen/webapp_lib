@@ -8,15 +8,13 @@ import 'package:webapp_utils/services/settings_data_service.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
 
 class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
-  Future<List<Component>> getSettings(String operatorUrl, String workflowId,
-      String stepId, String screenName, List<String> filterIdList,
+  Future<List<Component>> getSettings(String workflowId,
+      String stepId, List<String> filterIdList,
       {String? operatorVersion}) async {
     final fExpr = SettingsDataService()
         .operatorSettingsFilters
         .filters
-        .where((f) => f.operatorUrl == operatorUrl)
-        .firstWhere((f) =>
-            operatorVersion == null || f.operatorVersion == operatorVersion);
+        .firstWhere((f) => filterIdList.contains( f.filterId));
 
     final workflow = await WorkflowDataService().fetch(workflowId);
     final step =
