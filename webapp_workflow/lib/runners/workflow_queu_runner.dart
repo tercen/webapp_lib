@@ -289,7 +289,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     }
     print("Workflow run done $hasFailed");
     //
-    // await factory.workflowService.update(workflow);
+    workflow.rev = await factory.workflowService.update(workflow);
     // workflow = await factory.workflowService.get(workflow.id);
 
     if (!hasFailed) {
@@ -327,7 +327,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     }
 
     workflowId = workflow.id;
-    // workflow = await factory.workflowService.get(workflow.id);
+    workflow.rev = await factory.workflowService.update(workflow);
     return workflow;
   }
 }
