@@ -332,7 +332,7 @@ class WorkflowDataService {
       key = "${key}_${excludedFiles.join("_")}";
     }
 
-    if (cache.hasCachedValue(key) && !useCache) {
+    if (cache.hasCachedValue(key) && useCache) {
       return cache.getCachedValue(key);
     }
 
