@@ -51,8 +51,10 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
           for( var func in onChangeFunctions){
             func();
           }
-          // setValue(id, getGroupId(),  [value], notify: false);
-          notifyListeners();
+          if( onChangeFunctions.isNotEmpty ){
+            notifyListeners();
+          }
+          
         } ,
         onTapOutside: (event) {
           // setValue(id, getGroupId(),  [controller.text], notify: false);
