@@ -17,7 +17,6 @@ class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
         .firstWhere((f) => filterIdList.contains( f.filterId));
 
 
-    print("Found ${fExpr.filterId}");
     final workflow = await WorkflowDataService().fetch(workflowId);
     final step =
         workflow.steps.firstWhere((step) => step.id == stepId) as sci.DataStep;
@@ -67,7 +66,6 @@ class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
         }
       }
     }
-    print("Should include ${prop.name}: $include");
     return include;
   }
 
