@@ -84,6 +84,13 @@ mixin ScreenBase {
     }
   }
 
+
+  void removeComponent( String componentId, String blockId ){
+    if (componentBlocks.containsKey(blockId)) {
+      componentBlocks[blockId]!.removeWhere((comp) => comp.component.getId() == componentId);
+    }
+  }
+
   void addComponent(String blockId, dynamic component,
       {ComponentBlockType blockType = ComponentBlockType.simple}) {
     component.addListener(refresh);
