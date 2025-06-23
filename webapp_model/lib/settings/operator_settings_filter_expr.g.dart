@@ -1,0 +1,29 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'operator_settings_filter_expr.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+OperatorSettingsFilterExpr _$OperatorSettingsFilterExprFromJson(
+        Map<String, dynamic> json) =>
+    OperatorSettingsFilterExpr(
+      filterId: json['filterId'] as String,
+      operatorUrl: json['operatorUrl'] as String,
+      operatorVersion: json['operatorVersion'] as String,
+      type: json['type'] as String,
+      settingNames: (json['settingNames'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+    );
+
+Map<String, dynamic> _$OperatorSettingsFilterExprToJson(
+        OperatorSettingsFilterExpr instance) =>
+    <String, dynamic>{
+      'filterId': instance.filterId,
+      'operatorUrl': instance.operatorUrl,
+      'operatorVersion': instance.operatorVersion,
+      'type': instance.type,
+      'settingNames': instance.settingNames,
+    };

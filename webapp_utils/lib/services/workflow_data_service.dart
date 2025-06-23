@@ -206,23 +206,9 @@ class WorkflowDataService {
           .toList();
       var opIds = dataSteps
           .map((step) => step.model.operatorSettings.operatorRef)
-          // .where((opRef) => opRef.name != "File Downloader")
-          // .where((opRef) => opRef.name != "Gating")
-          // .where((opRef) => opRef.operatorKind != "WebappOperator")
-          // .where((opRef) => opRef.operatorKind != "Operator")
           .map((opRef) => opRef.operatorId)
           .toList();
 
-      var opRefs = dataSteps
-          .map((step) => step.model.operatorSettings.operatorRef)
-          .toList();
-
-      // for (var opRef in opRefs) {
-      //   Logger().log(
-      //       level: Logger.ALL,
-      //       message:
-      //           "\tOperator: ${opRef.name} (${opRef.version}) :: ${opRef.operatorId} ");
-      // }
 
       var operators = await factory.operatorService.list(opIds);
 

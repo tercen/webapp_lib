@@ -524,6 +524,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "synchronized",
+      "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/synchronized-3.3.0+3",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "term_glyph",
       "rootUri": "file:///home/thiago/.pub-cache/hosted/pub.dev/term_glyph-1.2.2",
       "packageUri": "lib/",
@@ -698,7 +704,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2025-04-02T14:12:19.142303Z",
+  "generated": "2025-06-23T13:44:20.359400Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///usr/bin/flutter",

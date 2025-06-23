@@ -54,6 +54,7 @@ class WebAppDataBase with ChangeNotifier {
       {String reposJsonPath = "",
       String settingFilterFile = "",
       String stepMapperJsonFile = "",
+      String operatorSettingFilterFile = "",
       bool storeNavigation = true}) async {
     clear();
 
@@ -63,7 +64,9 @@ class WebAppDataBase with ChangeNotifier {
       // workflowService.init(reposJsonPath: reposJsonPath),
       settingsService.loadTemplateConfig(reposJsonPath),
       settingsService.loadSettingsFilter(settingFilterFile),
-      settingsService.loadWorkflowStepMapper(stepMapperJsonFile)
+      settingsService.loadOperatorSettingsFilter(operatorSettingFilterFile),
+      settingsService.loadWorkflowStepMapper(stepMapperJsonFile),
+      
     ]);
 
     //Those need to be in order

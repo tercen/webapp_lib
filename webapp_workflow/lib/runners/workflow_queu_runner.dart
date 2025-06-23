@@ -315,6 +315,11 @@ class WorkflowQueuRunner extends WorkflowRunner {
           print("WORKFLOW ${workflow.id} not found");
         }
       }
+      
+      if( postRunCallbacks.isNotEmpty || postRunIdCallbacks.isNotEmpty ){
+        workflow.rev = await factory.workflowService.update(workflow);
+      }
+      
     } else {
       //Update workflow with error info
       
@@ -327,7 +332,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
     }
 
     workflowId = workflow.id;
-    workflow.rev = await factory.workflowService.update(workflow);
+    
     return workflow;
   }
 }
