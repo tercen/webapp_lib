@@ -74,27 +74,23 @@ class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
         .firstWhere((p) => p.name == prop.name);
     
     if (prop is sci.DoubleProperty || prop.kind == "DoubleProperty") {
-      print("Converting ${prop.name} as double");
       return WorkflowSetting(step.name, step.id, prop.name, propVal.value,
           "double", prop.description);
     }
         if (prop is sci.EnumeratedProperty || prop.kind == "EnumeratedProperty") {
-      print("Converting ${prop.name} as enumerated");
       return WorkflowSetting(
           step.name,
           step.id,
           prop.name,
           propVal.value,
           (prop as sci.EnumeratedProperty).isSingleSelection ? "ListSingle" : "ListMultiple",
-          prop.description);
+          prop.description, opOptions: prop.values);
     }
     if (prop is sci.BooleanProperty || prop.kind == "BooleanProperty") {
-      print("Converting ${prop.name} as boolean");
       return WorkflowSetting(step.name, step.id, prop.name, propVal.value,
           "boolean", prop.description);
     }
     if (prop is sci.StringProperty || prop.kind == "StringProperty") {
-      print("Converting ${prop.name} as string");
       return WorkflowSetting(step.name, step.id, prop.name, propVal.value,
           "string", prop.description);
     }
