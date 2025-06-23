@@ -40,7 +40,10 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
           for( var func in onFocusLostFunctions){
             func();
           }
-          notifyListeners();
+          if( onFocusLostFunctions.isNotEmpty ){
+            notifyListeners();
+          }
+          
         }
       },
       child: TextField(
