@@ -112,6 +112,8 @@ class SettingsDataService {
     operatorSettingsFilters =
         OperatorSettingsFilter.fromJson(jsonString.decodedValueAsMap);
 
-    for (var f in operatorSettingsFilters.filters) {}
+    for (var f in operatorSettingsFilters.filters) {
+      await loadOperator(f);
+    }
   }
 }
