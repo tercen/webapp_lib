@@ -52,17 +52,17 @@ class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
 
   bool _shouldInclude(
       sci.Property prop, List<OperatorSettingsFilterExpr> filters) {
-    var include = true;
+    var include = false;
 
     for (var f in filters) {
       if (f.type == "include") {
         if (f.settingNames != null && f.settingNames!.contains(prop.name)) {
-          include = include && true;
+          include = include || true;
         }
       }
       if (f.type == "exclude") {
         if (f.settingNames != null && f.settingNames!.contains(prop.name)) {
-          include = include && false;
+          include = include || false;
         }
       }
     }
