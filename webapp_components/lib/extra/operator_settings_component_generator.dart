@@ -34,15 +34,15 @@ class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
             case "int":
             case "double":
             case "string":
-              return createTextNumericComponent(setting, screenName);
+              return createTextNumericComponent(setting, "");
             case "boolean":
-              return createBooleanComponent(setting, screenName);
+              return createBooleanComponent(setting, "");
             case "ListSingle":
-              return createSingleListComponent(setting, screenName);
+              return createSingleListComponent(setting, "");
             case "ListMultiple":
-              return createMultipleListComponent(setting, screenName);
+              return createMultipleListComponent(setting, "");
             default:
-              return createTextNumericComponent(setting, screenName);
+              return createTextNumericComponent(setting, "");
           }
         })
         .whereType<Component>()
