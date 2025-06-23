@@ -78,12 +78,7 @@ class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
       return WorkflowSetting(step.name, step.id, prop.name, propVal.value,
           "double", prop.description);
     }
-    if (prop is sci.StringProperty || prop.kind == "StringProperty") {
-      print("Converting ${prop.name} as string");
-      return WorkflowSetting(step.name, step.id, prop.name, propVal.value,
-          "string", prop.description);
-    }
-    if (prop is sci.EnumeratedProperty || prop.kind == "EnumeratedProperty") {
+        if (prop is sci.EnumeratedProperty || prop.kind == "EnumeratedProperty") {
       print("Converting ${prop.name} as enumerated");
       return WorkflowSetting(
           step.name,
@@ -98,6 +93,12 @@ class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
       return WorkflowSetting(step.name, step.id, prop.name, propVal.value,
           "boolean", prop.description);
     }
+    if (prop is sci.StringProperty || prop.kind == "StringProperty") {
+      print("Converting ${prop.name} as string");
+      return WorkflowSetting(step.name, step.id, prop.name, propVal.value,
+          "string", prop.description);
+    }
+
 
     throw sci.ServiceError(500, "Unexpected property type: ${prop.toJson()}");
   }
