@@ -14,6 +14,7 @@ class ActionBarComponent
   ActionBarComponent(id, groupId, this.actions) {
     super.id = id;
     super.groupId = groupId;
+    super.componentLabel = "";
   }
 
   Widget createButtonLabel(String label) {
