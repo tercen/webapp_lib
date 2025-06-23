@@ -1,8 +1,8 @@
 class Logger {
-  static const ALL = 0;
-  static const FINER = 50;
-  static const FINE = 100;
+  static const FINER = 0;
+  static const FINE = 50;
   static const WARN = 200;
+  static const ALL =  100000;
 
   
 
