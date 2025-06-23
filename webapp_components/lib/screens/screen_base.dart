@@ -92,7 +92,7 @@ mixin ScreenBase {
   }
 
   void addComponent(String blockId, dynamic component,
-      {ComponentBlockType blockType = ComponentBlockType.simple, int order = -1}) {
+      {ComponentBlockType blockType = ComponentBlockType.simple, int order = -1, int blockIndex = -1}) {
     component.addListener(refresh);
     component.addListener(updateModel);
 
@@ -111,8 +111,14 @@ mixin ScreenBase {
       }
 
     } else {
-      blockOrder.add(blockId);
-      blockTypes.add(blockType);
+      if( blockIndex == -1 ){
+        blockOrder.add(blockId);
+        blockTypes.add(blockType);  
+      }else{
+        blockOrder.insert(blockIndex, blockId);
+        blockTypes.insert(blockIndex, blockType);  
+      }
+      
       componentBlocks[blockId] = [entry];
     }
   }
