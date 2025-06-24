@@ -64,6 +64,9 @@ class DropdownComponent extends FetchComponent
   }
   @override
   Widget createWidget(BuildContext context) {
+    if( dataTable.isEmpty ){
+      return Container();
+    }
     if( selected.isEmpty ){
       selected=dataTable[displayColumn].first;
       onChange!( dataTable.selectByColValue([displayColumn], [selected]));
