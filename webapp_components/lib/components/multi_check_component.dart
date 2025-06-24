@@ -20,6 +20,7 @@ class MultiCheckComponent extends MultiCheckComponentFetch {
   @override
   void reset() {
     selected.clear();
+    options.clear();
   }
 
   Future<WebappTable> optionLoadHolder() async {

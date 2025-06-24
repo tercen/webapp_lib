@@ -22,6 +22,7 @@ class SelectDropDownComponent
   @override
   void reset() {
     selected = "";
+    options.clear();
   }
 
   @override
