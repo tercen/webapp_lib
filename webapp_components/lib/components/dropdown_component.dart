@@ -69,7 +69,9 @@ class DropdownComponent extends FetchComponent
     }
     if( selected.isEmpty ){
       selected=dataTable[displayColumn].first;
+      if( onChange != null){
       onChange!( dataTable.selectByColValue([displayColumn], [selected]));
+      }
     }
     return DropdownButton(
         value: selected,
