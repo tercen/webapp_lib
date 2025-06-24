@@ -20,6 +20,11 @@ class SelectDropDownComponent
   }
 
   @override
+  void reset() {
+    selected = "";
+  }
+
+  @override
   Widget buildContent(BuildContext context) {
     var wdg = DropdownButton(
         borderRadius: Styles()["borderRounding"],
