@@ -21,6 +21,12 @@ class BooleanComponent with ChangeNotifier, ComponentBase implements Serializabl
     notifyListeners();
   }
 
+
+  @override
+  void reset() {
+    selected = false;
+  }
+
   @override
   Widget buildContent(BuildContext context) {
     return CommonWidgets.checkbox(selected, onClick, {});
