@@ -24,6 +24,10 @@ class InputTextComponent with ChangeNotifier, ComponentBase, InputValidator impl
     // updateTrack.addListener(modelUpdated);
   }
 
+  @override
+  void reset() {
+    controller.text = "";
+  }
 
 
   @override
