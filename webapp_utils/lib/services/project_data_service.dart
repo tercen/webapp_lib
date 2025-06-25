@@ -235,6 +235,18 @@ class ProjectDataService {
     return fileDoc;
   }
 
+  Future<Project> fetchProject(String id) async{
+    if( cache.hasCachedValue(id)){
+      return cache.getCachedValue(id);
+    }else{
+      final factory = tercen.ServiceFactory();
+      final proj = await factory.projectService.get(id);
+      cache.addToCache(id, proj);
+      return proj;
+    }
+    
+    
+  }
 
   Future<Project> getProjectByName(String projectName, {String? owner}) async{
     final factory = tercen.ServiceFactory();

@@ -14,6 +14,7 @@ import 'package:webapp_utils/functions/list_utils.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_model/sci_model.dart' as sci;
 import 'package:webapp_utils/functions/logger.dart';
+import 'package:webapp_utils/services/project_data_service.dart';
 import 'package:webapp_utils/services/workflow_data_service.dart';
 import 'package:async/async.dart';
 
@@ -90,14 +91,26 @@ class WorkflowTaskComponent extends ActionTableComponent {
           table.selectByColValue(["Workflow Id"], [row["Workflow Id"].first]);
 
       final workflowName = row["Workflow Name"].first;
+      final projectName = row["Project Name"].first;
       final tableLabel = Align(
         alignment: Alignment.centerLeft,
         child: Row(
           children: [
-            Text(
-              "Tasks for $workflowName",
-              style: Styles()["textH2"],
-            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Tasks for $workflowName",
+                  style: Styles()["textH2"],
+                ),
+                Text(
+                  "In: $projectName",
+                  style: Styles()["text"],
+                )
+
+              ],
+            )
+            ,
             const SizedBox(
               width: 10,
             ),
@@ -174,10 +187,6 @@ class WorkflowTaskComponent extends ActionTableComponent {
         }
       }
     }
-
-    // Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
-    //     ? const {0: FixedColumnWidth(30)}
-    //     : {0: const FixedColumnWidth(30), 1: const FixedColumnWidth(50)};
 
     var totalWidth = widths.reduce((a, b) => a + b);
     final relativeWidth = widths.map((w) => (w / totalWidth) * 0.96).toList();
@@ -270,6 +279,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
     List<String> taskStep = [];
     List<String> workflowIds = [];
     List<String> workflowNames = [];
+    List<String> projectNames = [];
 
     if (runningTasks.isNotEmpty) {
       var tasks = await factory.taskService
@@ -283,7 +293,9 @@ class WorkflowTaskComponent extends ActionTableComponent {
         }
 
         var workflowId = taskIdInfo.workflowId;
+        
         var wkf = await getCachedWorkflow(workflowId);
+        var project = await ProjectDataService().fetchProject(wkf.projectId);
         keys.add(const Uuid().v4());
         taskStep.add("");
         taskId.add(ct.id);
@@ -293,6 +305,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
         taskStatus.add(formatState(ct.state.kind));
         workflowIds.add(workflowId);
         workflowNames.add(wkf.name);
+        projectNames.add(project.name);
       }
     }
 
@@ -312,6 +325,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
     dataTable.addColumn("Last Modified", data: taskDuration);
     dataTable.addColumn("Workflow Id", data: workflowIds);
     dataTable.addColumn("Workflow Name", data: workflowNames);
+    dataTable.addColumn("Project Name", data: projectNames);
   }
 
   String formatTaskId(String id) {
