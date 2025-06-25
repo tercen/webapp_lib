@@ -95,6 +95,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
       final tableLabel = Align(
         alignment: Alignment.centerLeft,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Column(
               mainAxisSize: MainAxisSize.min,
@@ -103,6 +104,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
                   "Tasks for $workflowName",
                   style: Styles()["textH2"],
                 ),
+                SizedBox(height: 10,),
                 Text(
                   "In: $projectName",
                   style: Styles()["text"],
