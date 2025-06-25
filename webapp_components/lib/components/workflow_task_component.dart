@@ -99,6 +99,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
           children: [
             Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Tasks for $workflowName",
