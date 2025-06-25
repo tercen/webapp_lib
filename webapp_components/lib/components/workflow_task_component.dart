@@ -105,11 +105,12 @@ class WorkflowTaskComponent extends ActionTableComponent {
                   "Tasks for $workflowName",
                   style: Styles()["textH2"],
                 ),
-                SizedBox(height: 10,),
+                
                 Text(
                   "In: $projectName",
                   style: Styles()["text"],
-                )
+                ),
+                SizedBox(height: 5,),
 
               ],
             )
