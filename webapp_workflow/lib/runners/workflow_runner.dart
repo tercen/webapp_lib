@@ -720,8 +720,7 @@ class WorkflowRunner with ProgressDialog {
   }
 
   Future<sci.Workflow> doRunStep(
-      BuildContext? context, sci.Workflow workflow, String stepId,
-      {bool doSetup = true, bool inPlace = false}) async {
+      BuildContext? context, sci.Workflow workflow, String stepId      ) async {
     var factory = tercen.ServiceFactory();
 
     if (context != null) {
