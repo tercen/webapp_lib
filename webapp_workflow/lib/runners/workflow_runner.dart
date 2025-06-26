@@ -82,7 +82,7 @@ class WorkflowRunner with ProgressDialog {
   late String timestamp;
   final Map<String, List<String>> removeFilters = {};
 
-  WorkflowRunner( {var timestampType = TimestampType.full}) {
+  WorkflowRunner({var timestampType = TimestampType.full}) {
     if (timestampType == TimestampType.short) {
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
     } else {
@@ -720,7 +720,7 @@ class WorkflowRunner with ProgressDialog {
   }
 
   Future<sci.Workflow> doRunStep(
-      BuildContext? context, sci.Workflow workflow, String stepId      ) async {
+      BuildContext? context, sci.Workflow workflow, String stepId) async {
     var factory = tercen.ServiceFactory();
 
     if (context != null) {
@@ -799,12 +799,17 @@ class WorkflowRunner with ProgressDialog {
       // Task is Done
 
       if (evt is sci.PatchRecords) {
-        try {
-          workflow = evt.apply(workflow);
-        } catch (e) {
-          print("Failed to apply: ");
-          print(evt.toJson());
-          continue;
+        for (var record in evt.rs) {
+          try {
+            record.apply(workflow);
+          } catch (e) {
+            print("Failed to apply: ");
+            print(evt.toJson());
+            print(e);
+            continue;
+          }
+
+          // workflow = evt.apply(workflow);
         }
 
         print("AFTER APPLY WORKFLOW:");
