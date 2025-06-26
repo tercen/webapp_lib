@@ -805,7 +805,7 @@ StreamSubscription? subscription;
 
     workflow.addMeta("workflow.task.id", workflowTask.id);
     workflow.addMeta("run.task.id", workflowTask.id);
-    await factory.workflowService.update(workflow);
+    workflow.rev = await factory.workflowService.update(workflow);
 
     await factory.taskService.runTask(workflowTask.id);
 
@@ -821,10 +821,12 @@ StreamSubscription? subscription;
       // Task is Done
 
       if (evt is sci.PatchRecords) {
-        print(evt.toJson());
+        
         try {
           workflow = evt.apply(workflow);  
         } catch (e) {
+          print("Failed to apply: ");
+          print(evt.toJson());
           continue;
         }
         
@@ -873,9 +875,9 @@ StreamSubscription? subscription;
         stp.state.taskState.throwIfNotDone();
       }
     }
-    await factory.workflowService.update(workflow);
+    workflow.rev = await factory.workflowService.update(workflow);
     workflowId = workflow.id;
-    workflow = await factory.workflowService.get(workflow.id);
+    // workflow = await factory.workflowService.get(workflow.id);
     print("AFTER Workflow UPDATE:");
     for (var stp in workflow.steps) {
       print("${stp.name}: ${stp.state.taskState.kind}");

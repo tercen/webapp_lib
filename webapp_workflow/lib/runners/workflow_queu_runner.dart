@@ -44,7 +44,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
     }
 
-    await factory.workflowService.update(workflow);
+    workflow.rev = await factory.workflowService.update(workflow);
 
     //-----------------------------------------
     // Task preparation and running
@@ -63,7 +63,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
     workflow.addMeta("workflow.task.id", workflowTask.id);
     workflow.addMeta("run.task.id", workflowTask.id);
-    await factory.workflowService.update(workflow);
+    workflow.rev = await factory.workflowService.update(workflow);
 
 
     await factory.taskService.runTask(workflowTask.id);
@@ -92,13 +92,13 @@ class WorkflowQueuRunner extends WorkflowRunner {
     print("GONNA READ STREAM");
     await for (var evt in taskStream) {
       if (evt is sci.PatchRecords) {
-        print(evt.toJson());
         try {
           workflow = evt.apply(workflow);  
         } catch (e) {
+          print("Failed to apply: ");
+          print(evt.toJson());
           continue;
         }
-        
         for (var pr in evt.rs) {
           if(  pr.d.isEmpty){
             continue;
@@ -169,9 +169,9 @@ class WorkflowQueuRunner extends WorkflowRunner {
           "run.error.reason", errorInformation["reason"] as String));
     }
     print("FINISHING");
-    await factory.workflowService.update(workflow);
+    workflow.rev = await factory.workflowService.update(workflow);
     workflowId = workflow.id;
-    workflow = await factory.workflowService.get(workflow.id);
+    // workflow = await factory.workflowService.get(workflow.id);
 
     return workflow;
   }
@@ -213,7 +213,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
     workflow.addMeta("workflow.task.id", workflowTask.id);
     workflow.addMeta("run.task.id", workflowTask.id);
-    await factory.workflowService.update(workflow);
+    workflow.rev = await factory.workflowService.update(workflow);
 
 
     await factory.taskService.runTask(workflowTask.id);
@@ -242,6 +242,8 @@ class WorkflowQueuRunner extends WorkflowRunner {
         try {
           workflow = evt.apply(workflow);  
         } catch (e) {
+          print("Failed to apply: ");
+          print(evt.toJson());
           continue;
         }
         
@@ -328,7 +330,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
           .add(sci.Pair.from("run.error", errorInformation["error"] as String));
       currentWorkflow.meta.add(sci.Pair.from(
           "run.error.reason", errorInformation["reason"] as String));
-      await factory.workflowService.update(currentWorkflow);
+      workflow.rev = await factory.workflowService.update(currentWorkflow);
     }
 
     workflowId = workflow.id;
