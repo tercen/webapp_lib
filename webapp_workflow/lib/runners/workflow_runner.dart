@@ -9,7 +9,6 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:tson/tson.dart' as tson;
 // import 'package:sci_base/value.dart';
 import 'package:uuid/uuid.dart';
-import 'package:webapp_utils/functions/formatter_utils.dart';
 import 'package:webapp_utils/functions/string_utils.dart';
 import 'package:webapp_utils/model/step_setting.dart';
 import 'package:webapp_utils/services/app_user.dart';
@@ -20,15 +19,31 @@ enum TimestampType { full, short }
 typedef PostRunCallback = Future<void> Function();
 typedef PostRunIdCallback = Future<void> Function(String workflowId);
 
+class FilterConfig {
+  final String filterName;
+  final String stepId;
+  final List<String> keys;
+  final List<dynamic> values;
+  final List<sci.Pair> metas;
+
+  FilterConfig(
+      {required this.filterName,
+      required this.stepId,
+      required this.keys,
+      required this.values,
+      required this.metas});
+}
+
 class WorkflowRunner with ProgressDialog {
   StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
-StreamSubscription? subscription;
+  StreamSubscription? subscription;
   String? folderName;
   String? parentFolderId;
-  final sci.Workflow template;
 
   final List<String> initStepIds = [];
   final List<sci.Pair> workflowMeta = [];
+
+  final List<FilterConfig> filterConfigList = [];
 
   final List<sci.Pair> folderMeta = [];
   final Map<String, sci.NamedFilter> filterMap = {};
@@ -53,6 +68,7 @@ StreamSubscription? subscription;
   String workflowRename = "";
   String workflowIdentifier = "";
   String workflowSuffix = "";
+  bool isRunningStep = false;
 
   String stepProgressMessage = "";
 
@@ -60,16 +76,13 @@ StreamSubscription? subscription;
   var addTimestampToFolder = true;
 
   var isInit = false;
-  final bool keepTemplate;
-  var workflow = sci.Workflow();
 
   final List<String> stepsToRemove = [];
   final List<sci.Pair> settingsByName = [];
   late final String timestamp;
   final Map<String, List<String>> removeFilters = {};
 
-  WorkflowRunner(this.template,
-      {var timestampType = TimestampType.full, this.keepTemplate = false}) {
+  WorkflowRunner(this.timestamp, {var timestampType = TimestampType.full}) {
     if (timestampType == TimestampType.short) {
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
     } else {
@@ -130,9 +143,7 @@ StreamSubscription? subscription;
 
       final factory = tercen.ServiceFactory();
       await factory.workflowService.update(wkf);
-
     }
-
   }
 
   /// Setting by name will search through the steps in a workflow looking for a matching name
@@ -331,9 +342,9 @@ StreamSubscription? subscription;
     return factors;
   }
 
-  List<String> getFactorNames(String stepId) {
+  List<String> getFactorNames(sci.Workflow workflow, String stepId) {
     List<String> factors = [];
-    for (var stp in template.steps) {
+    for (var stp in workflow.steps) {
       if (stp.id == stepId) {
         sci.DataStep dataStp = stp as sci.DataStep;
         for (var axis in dataStp.model.axis.xyAxis) {
@@ -397,46 +408,61 @@ StreamSubscription? subscription;
     return factors;
   }
 
+  void setupFilters(sci.Workflow workflow) {
+    for (var fc in filterConfigList) {
+      final filterName = fc.filterName;
+      final stepId = fc.stepId;
+      final keys = fc.keys;
+      final values = fc.values;
+      final metas = fc.metas;
+
+      var factors =
+          convertToStepFactors(keys, getFactorNames(workflow, stepId));
+      var filterKey = "$stepId$filterName";
+
+      sci.Filter andFilter = sci.Filter()
+        ..logical = "and"
+        ..not = false;
+
+      for (var i = 0; i < factors.length; i++) {
+        for (var j = 0; i < values.length; i++) {
+          andFilter.filterExprs
+              .add(createFilterExpr(factors[i], values[i][j] as String));
+        }
+      }
+
+      if (!filterMap.containsKey(filterKey)) {
+        sci.NamedFilter namedFilter = sci.NamedFilter()
+          ..logical = "or"
+          ..not = false
+          ..name = filterName;
+        namedFilter.filterExprs.add(andFilter);
+
+        for (var meta in metas) {
+          namedFilter.meta.add(meta);
+        }
+
+        sci.Filters filters = sci.Filters()..removeNaN = true;
+        filters.namedFilters.add(namedFilter);
+        filterMap[filterKey] = namedFilter; //filters;
+      } else {
+        sci.NamedFilter namedFilter = filterMap[filterKey]!;
+        namedFilter.filterExprs.add(andFilter);
+        filterMap[filterKey] = namedFilter;
+      }
+    }
+  }
+
   void addAndFilter(
       String filterName, String stepId, List<String> keys, List<dynamic> values,
       {List<sci.Pair> metas = const []}) {
-    var factors = convertToStepFactors(keys, getFactorNames(stepId));
-    var filterKey = "$stepId$filterName";
-
-    // if( removeIfExists && filterMap.containsKey(filterKey)){
-    //   filterMap.removeWhere((key, value) => key == filterKey);
-    // }
-
-    sci.Filter andFilter = sci.Filter()
-      ..logical = "and"
-      ..not = false;
-
-    for (var i = 0; i < factors.length; i++) {
-      for (var j = 0; i < values.length; i++) {
-        andFilter.filterExprs
-            .add(createFilterExpr(factors[i], values[i][j] as String));
-      }
-    }
-
-    if (!filterMap.containsKey(filterKey)) {
-      sci.NamedFilter namedFilter = sci.NamedFilter()
-        ..logical = "or"
-        ..not = false
-        ..name = filterName;
-      namedFilter.filterExprs.add(andFilter);
-
-      for (var meta in metas) {
-        namedFilter.meta.add(meta);
-      }
-
-      sci.Filters filters = sci.Filters()..removeNaN = true;
-      filters.namedFilters.add(namedFilter);
-      filterMap[filterKey] = namedFilter; //filters;
-    } else {
-      sci.NamedFilter namedFilter = filterMap[filterKey]!;
-      namedFilter.filterExprs.add(andFilter);
-      filterMap[filterKey] = namedFilter;
-    }
+    final fc = FilterConfig(
+        filterName: filterName,
+        stepId: stepId,
+        keys: keys,
+        values: values,
+        metas: metas);
+    filterConfigList.add(fc);
   }
 
   bool shouldResetStep(sci.Step step) {
@@ -556,141 +582,138 @@ StreamSubscription? subscription;
     return "${folderPrefix}${timeStr}${folderSuffix}";
   }
 
-  Future<void> setupRun(BuildContext? context, {bool inPlace = false}) async {
-    if (!isInit) {
-      if (template.id == "") {
-        throw Exception("Workflow not set in WorkflowRunner.");
-      }
+  Future<sci.Workflow> doSetup(BuildContext? context, sci.Workflow template,
+      {bool inPlace = false}) async {
+    var factory = tercen.ServiceFactory();
 
-      var factory = tercen.ServiceFactory();
+    var runTitle = getWorkflowName(template);
 
-      var runTitle = getWorkflowName(template);
-
-      if (context != null) {
-        log("Set up", dialogTitle: runTitle);
-      }
-
-      for (var entry in tableDocumentMap.entries) {
-        tableMap[entry.key] = await loadDocumentInMemory(entry.value);
-      }
-
-      //-----------------------------------------
-      // Copy template into project
-      //-----------------------------------------
-      if (inPlace) {
-        workflow = template;
-      } else {
-        workflow = await factory.workflowService
-            .copyApp(template.id, AppUser().projectId);
-      }
-
-      if (template.projectId == workflow.projectId) {
-        // await factory.workflowService.delete(template.id, template.rev);
-        // workflow.id = "";
-        // workflow.rev = "";
-      }
-
-      for (var stepToRemove in stepsToRemove) {
-        workflow = removeStepFromWorkflow(stepToRemove, workflow);
-      }
-
-      for (var meta in workflowMeta) {
-        workflow.addMeta(meta.key, meta.value);
-      }
-      addIdPostRun(reEnableSteps);
-      //-----------------------------------------
-      // Step-specific setup
-      //-----------------------------------------
-      for (var stp in workflow.steps) {
-        if (stp.state.taskState.isFinal) {
-          continue;
-        }
-        if (stp.kind == "DataStep") {
-          stp = updateFilterValues(stp as sci.DataStep);
-          stp = updateOperatorSettings(stp, settings);
-          stp = updateOperatorSettingsByName(stp, settingsByName);
-
-          if (removeFilters.containsKey(stp.id)) {
-            for (var filterName in removeFilters[stp.id]!) {
-              var namedFilter =
-                  List<sci.NamedFilter>.from(stp.model.filters.namedFilters);
-              namedFilter.removeWhere((filter) => filter.name == filterName);
-              stp.model.filters.namedFilters.setValues(namedFilter);
-            }
-          }
-
-          for (var mapEntry in filterMap.entries) {
-            if (mapEntry.key.contains(stp.id)) {
-              stp.model.filters.namedFilters.add(mapEntry.value);
-            }
-          }
-        }
-
-        if (shouldResetStep(stp)) {
-          stp.state.taskState = sci.InitState();
-          stp.state.taskId = "";
-        }
-        if (doNotRunList.contains(stp.id)) {
-          print("Adding ${stp.id} to do not run list");
-          stp.state.taskState = sci.DoneState();
-          stp.state.taskId = "";
-        }
-
-        if (multiDsMap.containsKey(stp.id)) {
-          var tmpStp = stp as sci.DataStep;
-          tmpStp.parentDataStepId = multiDsMap[stp.id]!;
-        }
-
-        if (tableMap.containsKey(stp.id)) {
-          sci.TableStep tmpStp = stp as sci.TableStep;
-          tmpStp.model.relation = tableMap[stp.id]!;
-          tmpStp.state.taskState = sci.DoneState();
-
-          if (tableNameMap.containsKey(stp.id)) {
-            tmpStp.name = tableNameMap[stp.id]!;
-          }
-
-          stp = tmpStp;
-        }
-
-        if (gatherMap.containsKey(stp.id)) {
-          (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
-        }
-      }
-
-      //-----------------------------------------
-      // General workflow parameters
-      //-----------------------------------------
-
-      if (inPlace) {
-        await factory.workflowService.update(workflow);
-        workflow = await factory.workflowService.get(workflow.id);
-      } else {
-        if (folderId == null) {
-          sci.FolderDocument folder = await createFolder(
-              folderName: getFolderName(),
-              parentFolderId: parentFolderId ?? "");
-          workflow.folderId = folder.id;
-        } else {
-          workflow.folderId = folderId!;
-        }
-        workflow.name = getWorkflowName(workflow);
-        workflow.acl = sci.Acl()..owner = AppUser().teamname;
-        workflow.isHidden = false;
-        workflow.isDeleted = false;
-
-        workflow.id = "";
-        workflow.rev = "";
-
-        workflow = await factory.workflowService.create(workflow);
-      }
-
-      workflowId = workflow.id;
-      isInit = true;
+    if (context != null) {
+      log("Set up", dialogTitle: runTitle);
     }
+
+    for (var entry in tableDocumentMap.entries) {
+      tableMap[entry.key] = await loadDocumentInMemory(entry.value);
+    }
+
+    //-----------------------------------------
+    var workflow = sci.Workflow();
+    // Copy template into project
+    //-----------------------------------------
+    if (inPlace) {
+      workflow = template;
+    } else {
+      workflow = await factory.workflowService
+          .copyApp(template.id, AppUser().projectId);
+    }
+
+    setupFilters(workflow);
+
+    if (template.projectId == workflow.projectId) {
+      // await factory.workflowService.delete(template.id, template.rev);
+      // workflow.id = "";
+      // workflow.rev = "";
+    }
+
+    for (var stepToRemove in stepsToRemove) {
+      workflow = removeStepFromWorkflow(stepToRemove, workflow);
+    }
+
+    for (var meta in workflowMeta) {
+      workflow.addMeta(meta.key, meta.value);
+    }
+    addIdPostRun(reEnableSteps);
+    //-----------------------------------------
+    // Step-specific setup
+    //-----------------------------------------
+    for (var stp in workflow.steps) {
+      if (stp.state.taskState.isFinal) {
+        continue;
+      }
+      if (stp.kind == "DataStep") {
+        stp = updateFilterValues(stp as sci.DataStep);
+        stp = updateOperatorSettings(stp, settings);
+        stp = updateOperatorSettingsByName(stp, settingsByName);
+
+        if (removeFilters.containsKey(stp.id)) {
+          for (var filterName in removeFilters[stp.id]!) {
+            var namedFilter =
+                List<sci.NamedFilter>.from(stp.model.filters.namedFilters);
+            namedFilter.removeWhere((filter) => filter.name == filterName);
+            stp.model.filters.namedFilters.setValues(namedFilter);
+          }
+        }
+
+        for (var mapEntry in filterMap.entries) {
+          if (mapEntry.key.contains(stp.id)) {
+            stp.model.filters.namedFilters.add(mapEntry.value);
+          }
+        }
+      }
+
+      if (shouldResetStep(stp)) {
+        stp.state.taskState = sci.InitState();
+        stp.state.taskId = "";
+      }
+      if (doNotRunList.contains(stp.id)) {
+        print("Adding ${stp.id} to do not run list");
+        stp.state.taskState = sci.DoneState();
+        stp.state.taskId = "";
+      }
+
+      if (multiDsMap.containsKey(stp.id)) {
+        var tmpStp = stp as sci.DataStep;
+        tmpStp.parentDataStepId = multiDsMap[stp.id]!;
+      }
+
+      if (tableMap.containsKey(stp.id)) {
+        sci.TableStep tmpStp = stp as sci.TableStep;
+        tmpStp.model.relation = tableMap[stp.id]!;
+        tmpStp.state.taskState = sci.DoneState();
+
+        if (tableNameMap.containsKey(stp.id)) {
+          tmpStp.name = tableNameMap[stp.id]!;
+        }
+
+        stp = tmpStp;
+      }
+
+      if (gatherMap.containsKey(stp.id)) {
+        (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
+      }
+    }
+
+    //-----------------------------------------
+    // General workflow parameters
+    //-----------------------------------------
+
+    if (inPlace) {
+      await factory.workflowService.update(workflow);
+      workflow = await factory.workflowService.get(workflow.id);
+    } else {
+      if (folderId == null) {
+        sci.FolderDocument folder = await createFolder(
+            folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
+        workflow.folderId = folder.id;
+      } else {
+        workflow.folderId = folderId!;
+      }
+      workflow.name = getWorkflowName(workflow);
+      workflow.acl = sci.Acl()..owner = AppUser().teamname;
+      workflow.isHidden = false;
+      workflow.isDeleted = false;
+
+      workflow.id = "";
+      workflow.rev = "";
+
+      workflow = await factory.workflowService.create(workflow);
+    }
+
+    return workflow;
   }
 
-  Future<sci.Workflow> doRunStep(BuildContext? context, String stepId,
+  Future<sci.Workflow> doRunStep(
+      BuildContext? context, sci.Workflow workflow, String stepId,
       {bool doSetup = true, bool inPlace = false}) async {
     var factory = tercen.ServiceFactory();
 
@@ -698,90 +721,39 @@ StreamSubscription? subscription;
       openDialog(context);
     }
 
-    if (doSetup) {
-      await setupRun(context, inPlace: inPlace);
-    }else{
-      workflow = template;
-    }
+    doNotRunList.clear();
 
-    var runTitle = getWorkflowName(template);
+    var stepNames = workflow.steps
+        .where((step) => step is! sci.TableStep)
+        .where((step) => step.id != stepId)
+        .map((step) => step.name);
+    print("Will not run: ${stepNames.join("\n")}");
+    doNotRunList.addAll(workflow.steps
+        .where((step) => step is! sci.TableStep)
+        .where((step) => !step.state.taskState.isFinal)
+        .where((step) => step.id != stepId)
+        .map((step) => step.id));
 
-    List<String> stepsToRestore = [];
-    var stpName = "STEP";
     for (var stp in workflow.steps) {
-      if (!(stp is sci.TableStep ||
-          stp.state.taskState is sci.DoneState ||
-          stp.state.taskState is sci.FailedState)) {
-        if (stp.id == stepId) {
-          print("MArking ${stp.name} to run");
-          stp.state.taskState = sci.InitState();
-          stpName = stp.name;
-        } else {
-          print("WILL NOT run ${stp.name}");
-          stp.state.taskState = sci.DoneState();
-          stepsToRestore.add(stp.id);
-        }
+      if (doNotRunList.contains(stp.id)) {
+        print("Setting state of ${stp.name} to DoneState");
+        stp.state.taskState = sci.DoneState();
       }
     }
 
-    print("BEFORE WORKFLOW:");
-    for (var stp in workflow.steps) {
-      print("${stp.name}: ${stp.state.taskState.kind}");
-    }
+    workflow.rev = await factory.workflowService.update(workflow);
+    // await setupRun(context, inPlace: true);
 
-    await factory.workflowService.update(workflow);
+    workflow = await doRun(context, workflow);
 
-    //-----------------------------------------
-    // Task preparation and running
-    //-----------------------------------------
-    workflow =
-        await runWorkflowTask(workflow, runTitle: runTitle, stepName: stpName);
-
-    if (context != null) {
-      log("Running $stpName\n\n \nRunning final updates",
-          dialogTitle: runTitle);
-    }
-
-    for (var stp in workflow.steps) {
-      if (stepsToRestore.contains(stp.id) && !doNotRunList.contains(stp.id)) {
-        print("Restoring ${stp.name}");
+    for (var stpId in doNotRunList) {
+      var stp = workflow.steps.firstWhere((stp) => stp.id == stpId);
+      if (stp.state.taskState is sci.InitState) {
         stp.state.taskState = sci.InitState();
-        stp.state.taskId = "";
       }
     }
 
-    await factory.workflowService.update(workflow);
-
-    for (var f in postRunCallbacks) {
-      
-        await f();
-      try {
-        workflow = await factory.workflowService.get(workflow.id);  
-      } catch (e) {
-        
-      }
-    }
-
-    for (var f in postRunIdCallbacks) {
-      
-        await f(workflow.id);
-      try {
-        workflow = await factory.workflowService.get(workflow.id);  
-      } catch (e) {
-        print("Failed to get ${workflow.id}");
-      }
-      
-    }
-
-    if (context != null) {
-      await Future.delayed(const Duration(milliseconds: 1000), () {
-        closeLog();
-      });
-    }
-
-    workflowId = workflow.id;
-    workflow = workflow;
-
+    workflow.rev = await factory.workflowService.update(workflow);
     return workflow;
   }
 
@@ -821,16 +793,15 @@ StreamSubscription? subscription;
       // Task is Done
 
       if (evt is sci.PatchRecords) {
-        
         try {
-          workflow = evt.apply(workflow);  
+          workflow = evt.apply(workflow);
         } catch (e) {
           print("Failed to apply: ");
           print(evt.toJson());
           continue;
         }
-        
-            print("AFTER APPLY WORKFLOW:");
+
+        print("AFTER APPLY WORKFLOW:");
         for (var stp in workflow.steps) {
           print("${stp.name}: ${stp.state.taskState.kind}");
           if (stp.state.taskState is! sci.InitState) {
@@ -888,19 +859,13 @@ StreamSubscription? subscription;
     return workflow;
   }
 
-  Future<sci.Workflow> doRun(BuildContext? context,
-      {bool setup = true, bool inPlace = false}) async {
+  Future<sci.Workflow> doRun(
+      BuildContext? context, sci.Workflow workflow) async {
     if (context != null) {
       openDialog(context);
     }
 
-    if (setup == true) {
-      await setupRun(context, inPlace: inPlace);
-    } else {
-      workflow = template;
-    }
-
-    var runTitle = getWorkflowName(template);
+    var runTitle = getWorkflowName(workflow);
 
     //-----------------------------------------
     // Task preparation and running
