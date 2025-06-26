@@ -781,8 +781,8 @@ class WorkflowRunner with ProgressDialog {
 
     var taskStream = factory.eventService.channel(workflowTask.channelId);
 
-    workflow.addMeta("workflow.task.id", workflowTask.id);
-    workflow.addMeta("run.task.id", workflowTask.id);
+    // workflow.addMeta("workflow.task.id", workflowTask.id);
+    // workflow.addMeta("run.task.id", workflowTask.id);
     workflow.rev = await factory.workflowService.update(workflow);
 
     await factory.taskService.runTask(workflowTask.id);
@@ -799,18 +799,16 @@ class WorkflowRunner with ProgressDialog {
       // Task is Done
 
       if (evt is sci.PatchRecords) {
-        for (var record in evt.rs) {
-          try {
-            record.apply(workflow);
-          } catch (e) {
-            print("Failed to apply: ");
-            print(evt.toJson());
-            print(e);
-            continue;
-          }
 
-          // workflow = evt.apply(workflow);
+        try {
+          workflow = evt.apply(workflow);
+        } catch (e) {
+          print("Failed to apply: ");
+          print(evt.toJson());
+          print(e);
+          continue;
         }
+
 
         print("AFTER APPLY WORKFLOW:");
         for (var stp in workflow.steps) {
