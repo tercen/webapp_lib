@@ -819,9 +819,15 @@ StreamSubscription? subscription;
 
     await for (var evt in taskStream) {
       // Task is Done
-      print(evt.toJson());
+
       if (evt is sci.PatchRecords) {
-        workflow = evt.apply(workflow);
+        print(evt.toJson());
+        try {
+          workflow = evt.apply(workflow);  
+        } catch (e) {
+          continue;
+        }
+        
             print("AFTER APPLY WORKFLOW:");
         for (var stp in workflow.steps) {
           print("${stp.name}: ${stp.state.taskState.kind}");
