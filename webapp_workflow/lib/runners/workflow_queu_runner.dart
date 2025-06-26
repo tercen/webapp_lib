@@ -11,7 +11,7 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
 
 class WorkflowQueuRunner extends WorkflowRunner {
-  WorkflowQueuRunner(super.timestamp,  
+  WorkflowQueuRunner(
       {super.timestampType = TimestampType.full});
 
 

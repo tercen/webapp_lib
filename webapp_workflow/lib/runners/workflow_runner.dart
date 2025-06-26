@@ -79,10 +79,10 @@ class WorkflowRunner with ProgressDialog {
 
   final List<String> stepsToRemove = [];
   final List<sci.Pair> settingsByName = [];
-  late final String timestamp;
+  late String timestamp;
   final Map<String, List<String>> removeFilters = {};
 
-  WorkflowRunner(this.timestamp, {var timestampType = TimestampType.full}) {
+  WorkflowRunner( {var timestampType = TimestampType.full}) {
     if (timestampType == TimestampType.short) {
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
     } else {
