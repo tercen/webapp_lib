@@ -584,6 +584,9 @@ class WorkflowRunner with ProgressDialog {
 
   Future<sci.Workflow> doSetup(BuildContext? context, sci.Workflow template,
       {bool inPlace = false}) async {
+    if (context != null) {
+      openDialog(context);
+    }
     var factory = tercen.ServiceFactory();
 
     var runTitle = getWorkflowName(template);
@@ -707,6 +710,10 @@ class WorkflowRunner with ProgressDialog {
       workflow.rev = "";
 
       workflow = await factory.workflowService.create(workflow);
+    }
+
+    if (context != null) {
+      closeLog();
     }
 
     return workflow;
