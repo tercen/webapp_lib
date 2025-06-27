@@ -490,8 +490,10 @@ class HierarchySelectableListComponent extends FetchComponent
         level = 0;
       }
     }
-    final name = getLevelList(level, null).first;
-    var selectedNode = SelectionNode(0, name);
+    print("\tLevel is $level");
+    final names = getLevelList(level, null);
+    print("\t$names");
+    var selectedNode = SelectionNode(level, names.first);
     select(selectedNode);
     notifyListeners();
   }
