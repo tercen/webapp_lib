@@ -54,6 +54,8 @@ class DropdownComponent extends FetchComponent
         
         if( initValue != null ){
           selected = await initValue!();
+        }else{
+          selected = dataTable[displayColumn].first;
         }
         
       }
