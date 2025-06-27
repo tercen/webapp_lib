@@ -73,6 +73,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final bool expanded;
   final double maxHeight;
   final String emptyMessage;
+  final boolSelectFirst;
 
   HierarchySelectableListComponent(
       super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
@@ -85,10 +86,8 @@ class HierarchySelectableListComponent extends FetchComponent
       this.emptyMessage = "No data available",
       InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false,
+      this.boolSelectFirst = false,
       this.infoboxCol = ""}) {
-    // super.id = id;
-    // super.groupId = groupId;
-    // super.componentLabel = componentLabel;
     super.infoBoxBuilder = infoBoxBuilder;
     useCache = cache;
 
@@ -107,6 +106,16 @@ class HierarchySelectableListComponent extends FetchComponent
     } else {
       nonLeafCallback = nonSelectableRowBuilder;
     }
+  }
+
+  @override
+  WebappTable postLoad(WebappTable table){
+    final colName = columnHierarchy[0];
+    final name = getLevelList(0, null).first;
+        // var clickedRow = dataTable.selectByColValue([colName], [name]);
+    var selectedNode = SelectionNode(0, name);
+    select(selectedNode);
+    return table;
   }
 
   @override
@@ -148,10 +157,6 @@ class HierarchySelectableListComponent extends FetchComponent
       );
     }
 
-    // return Column(
-    //   mainAxisSize: MainAxisSize.min,
-    //   children: buildWidgetTree(context),
-    // );
   }
 
   @override
