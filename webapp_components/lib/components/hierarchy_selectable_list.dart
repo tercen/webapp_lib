@@ -482,7 +482,7 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   void _setSelected(String value, String? column){
-    
+    print("Calling setSelected");
     var level = 0;
     if( column != null){
       level = columnHierarchy.indexWhere((col) => col == column);
