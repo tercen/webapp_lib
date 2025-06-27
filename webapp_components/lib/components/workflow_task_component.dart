@@ -364,8 +364,8 @@ class WorkflowTaskComponent extends ActionTableComponent {
   }
 
   @override
-  Future<bool> loadTable() async {
-    if (!isInit) {
+  Future<bool> loadTable({bool force = false}) async {
+    if (!isInit || force ==   true) {
       runningTasks.clear();
       var factory = tercen.ServiceFactory();
 
