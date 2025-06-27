@@ -74,6 +74,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final double maxHeight;
   final String emptyMessage;
   final bool selectFirst;
+  final Future Function(WebappTable rowTable, bool selected)? onChange;
 
   HierarchySelectableListComponent(
       super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
@@ -87,6 +88,7 @@ class HierarchySelectableListComponent extends FetchComponent
       InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false,
       this.selectFirst = false,
+      this.onChange,
       this.infoboxCol = ""}) {
     super.infoBoxBuilder = infoBoxBuilder;
     useCache = cache;
@@ -314,16 +316,25 @@ class HierarchySelectableListComponent extends FetchComponent
 
                 select(selectedNode);
 
+                
+
                 if (selectionBehavior == SelectionBehavior.multi) {
                   selectFather(clickedRow, level);
                   selectChildren(clickedRow, level);
                 }
+                if( onChange != null ){
+                  onChange!(clickedRow, true);
+                }
+                
               } else {
                 deselect(selectedNode);
 
                 if (selectionBehavior == SelectionBehavior.multi) {
                   checkSiblings(clickedRow, level);
                   deselectChildren(clickedRow, level);
+                }
+                if( onChange != null ){
+                  onChange!(clickedRow, false);
                 }
               }
               notifyListeners();
