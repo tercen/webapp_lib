@@ -220,6 +220,9 @@ class HierarchySelectableListComponent extends FetchComponent
 
   void select(SelectionNode node) {
     if (!isSelected(node)) {
+      if( selectionBehavior == SelectionBehavior.single ){
+        selectedNodes.clear();
+      }
       selectedNodes.add(node);
     }
   }
@@ -494,6 +497,7 @@ class HierarchySelectableListComponent extends FetchComponent
     final names = getLevelList(level, null);
     print("\t$names");
     var selectedNode = SelectionNode(level, names.firstWhere((test) => test == value, orElse: () => names.first));
+    
     select(selectedNode);
     notifyListeners();
   }
