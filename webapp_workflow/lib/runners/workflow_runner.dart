@@ -133,7 +133,7 @@ class WorkflowRunner with ProgressDialog {
       var wkf = await WorkflowDataService()
           .findWorkflowById(workflowId, useCache: false);
       for (var stepId in doNotRunList) {
-        final stp = wkf.steps.whereType<sci.DataStep>().firstWhere(
+        final stp = wkf.steps.where((step) => step is! sci.TableStep).firstWhere(
             (step) => step.id == stepId,
             orElse: () => sci.DataStep());
         if (stp.id != "") {
@@ -752,14 +752,14 @@ class WorkflowRunner with ProgressDialog {
 
     workflow = await doRun(context, workflow);
 
-    for (var stpId in doNotRunList) {
-      var stp = workflow.steps.firstWhere((stp) => stp.id == stpId);
-      if (stp.state.taskState is sci.InitState) {
-        stp.state.taskState = sci.InitState();
-      }
-    }
+    // for (var stpId in doNotRunList) {
+    //   var stp = workflow.steps.firstWhere((stp) => stp.id == stpId);
+    //   if (stp.state.taskState is sci.InitState) {
+    //     stp.state.taskState = sci.InitState();
+    //   }
+    // }
 
-    workflow.rev = await factory.workflowService.update(workflow);
+    // workflow.rev = await factory.workflowService.update(workflow);
     return workflow;
   }
 
@@ -780,9 +780,9 @@ class WorkflowRunner with ProgressDialog {
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
     
-    // workflow.addMeta("workflow.task.id", workflowTask.id);
+    workflow.addMeta("run.workflow.task.id", workflowTask.id);
     // workflow.addMeta("run.task.id", workflowTask.id);
-    // workflow.rev = await factory.workflowService.update(workflow);
+    workflow.rev = await factory.workflowService.update(workflow);
 
     var taskStream = factory.eventService.channel(workflowTask.channelId);
 
@@ -800,7 +800,7 @@ class WorkflowRunner with ProgressDialog {
       // Task is Done
 
       if (evt is sci.PatchRecords) {
-
+        // evt.rs.first.apply(rebuilt)
         try {
           workflow = evt.apply(workflow);
         } catch (e) {
@@ -810,14 +810,6 @@ class WorkflowRunner with ProgressDialog {
           continue;
         }
 
-
-        print("AFTER APPLY WORKFLOW:");
-        for (var stp in workflow.steps) {
-          print("${stp.name}: ${stp.state.taskState.kind}");
-          if (stp.state.taskState is! sci.InitState) {
-            stp.state.taskState.throwIfNotDone();
-          }
-        }
         if (stepName == null) {
           updateStepProgress(workflow);
           log(stepProgressMessage, dialogTitle: runTitle);
@@ -847,25 +839,9 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
-    // var doneWorkflow = await factory.workflowService.get(workflow.id);
-
-    print("AFTER Workflow:");
-    for (var stp in workflow.steps) {
-      print("${stp.name}: ${stp.state.taskState.kind}");
-      if (stp.state.taskState is! sci.InitState) {
-        stp.state.taskState.throwIfNotDone();
-      }
-    }
     workflow.rev = await factory.workflowService.update(workflow);
     workflowId = workflow.id;
-    // workflow = await factory.workflowService.get(workflow.id);
-    print("AFTER Workflow UPDATE:");
-    for (var stp in workflow.steps) {
-      print("${stp.name}: ${stp.state.taskState.kind}");
-      if (stp.state.taskState is! sci.InitState) {
-        stp.state.taskState.throwIfNotDone();
-      }
-    }
+
     return workflow;
   }
 
