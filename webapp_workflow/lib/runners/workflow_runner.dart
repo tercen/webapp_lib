@@ -659,7 +659,6 @@ class WorkflowRunner with ProgressDialog {
         stp.state.taskId = "";
       }
       if (doNotRunList.contains(stp.id)) {
-        print("Adding ${stp.id} to do not run list");
         stp.state.taskState = sci.DoneState();
         stp.state.taskId = "";
       }
@@ -729,11 +728,7 @@ class WorkflowRunner with ProgressDialog {
 
     doNotRunList.clear();
 
-    var stepNames = workflow.steps
-        .where((step) => step is! sci.TableStep)
-        .where((step) => step.id != stepId)
-        .map((step) => step.name);
-    print("Will not run: ${stepNames.join("\n")}");
+
     doNotRunList.addAll(workflow.steps
         .where((step) => step is! sci.TableStep)
         .where((step) => !step.state.taskState.isFinal)
@@ -742,7 +737,6 @@ class WorkflowRunner with ProgressDialog {
 
     for (var stp in workflow.steps) {
       if (doNotRunList.contains(stp.id)) {
-        print("Setting state of ${stp.name} to DoneState");
         stp.state.taskState = sci.DoneState();
       }
     }
