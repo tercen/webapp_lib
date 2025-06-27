@@ -465,6 +465,21 @@ class HierarchySelectableListComponent extends FetchComponent
     return wdg;
   }
 
+
+  void setSelected(String value, String? column){
+    var level = 0;
+    if( column != null){
+      level = columnHierarchy.indexWhere((col) => col == column);
+      if( level == -1 ){
+        level = 0;
+      }
+    }
+    final name = getLevelList(level, null).first;
+    var selectedNode = SelectionNode(0, name);
+    select(selectedNode);
+    notifyListeners();
+  }
+
   @override
   void reset() {
     selectedNodes.clear();
