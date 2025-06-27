@@ -73,7 +73,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final bool expanded;
   final double maxHeight;
   final String emptyMessage;
-  final boolSelectFirst;
+  final bool selectFirst;
 
   HierarchySelectableListComponent(
       super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
@@ -86,7 +86,7 @@ class HierarchySelectableListComponent extends FetchComponent
       this.emptyMessage = "No data available",
       InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false,
-      this.boolSelectFirst = false,
+      this.selectFirst = false,
       this.infoboxCol = ""}) {
     super.infoBoxBuilder = infoBoxBuilder;
     useCache = cache;
