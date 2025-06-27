@@ -72,6 +72,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final String infoboxCol;
   final bool expanded;
   final double maxHeight;
+  final String emptyMessage;
 
   HierarchySelectableListComponent(
       super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
@@ -81,6 +82,7 @@ class HierarchySelectableListComponent extends FetchComponent
       this.columnHierarchy = const [],
       this.hideColumns = const [],
       this.maxHeight = 0,
+      this.emptyMessage = "No data available",
       InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false,
       this.infoboxCol = ""}) {
@@ -160,6 +162,13 @@ class HierarchySelectableListComponent extends FetchComponent
         expandedLevels.addAll(columnHierarchy);
       }
     }
+  }
+
+  @override
+  Widget buildEmptyTable() {
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 10, 0, 10),
+        child: Text(emptyMessage, style: Styles()["text"]));
   }
 
   @override
