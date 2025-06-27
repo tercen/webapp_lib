@@ -34,13 +34,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
-    var taskStream = factory.eventService.channel(workflowTask.channelId);
-
-
-    workflow.addMeta("workflow.task.id", workflowTask.id);
-    workflow.addMeta("run.task.id", workflowTask.id);
+    workflow.addMeta("run.workflow.task.id", workflowTask.id);
     workflow.rev = await factory.workflowService.update(workflow);
 
+    var taskStream = factory.eventService.channel(workflowTask.channelId);
 
     await factory.taskService.runTask(workflowTask.id);
 
