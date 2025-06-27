@@ -113,10 +113,8 @@ class HierarchySelectableListComponent extends FetchComponent
 
   @override
   WebappTable postLoad(WebappTable table){
-    if( table.nRows > 0 && selectFirst ){
-      final colName = columnHierarchy[0];
+    if( table.nRows > 0 && selectFirst &&  delayedSelection == null){
       final name = getLevelList(0, null).first;
-          // var clickedRow = dataTable.selectByColValue([colName], [name]);
       var selectedNode = SelectionNode(0, name);
       select(selectedNode);
       notifyListeners();
@@ -220,9 +218,6 @@ class HierarchySelectableListComponent extends FetchComponent
 
   void select(SelectionNode node) {
     if (!isSelected(node)) {
-      if( selectionBehavior == SelectionBehavior.single ){
-        selectedNodes.clear();
-      }
       selectedNodes.add(node);
     }
   }
