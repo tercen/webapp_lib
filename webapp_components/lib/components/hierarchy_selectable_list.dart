@@ -482,7 +482,7 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   void _setSelected(String value, String? column){
-    print("Calling setSelected");
+
     var level = 0;
     if( column != null){
       level = columnHierarchy.indexWhere((col) => col == column);
@@ -490,10 +490,10 @@ class HierarchySelectableListComponent extends FetchComponent
         level = 0;
       }
     }
-    print("\tLevel is $level");
+
     final names = getLevelList(level, null);
-    print("\t$names");
-    var selectedNode = SelectionNode(level, names.first);
+
+    var selectedNode = SelectionNode(level, names.firstWhere((test) => test == value, orElse: () => names.first));
     select(selectedNode);
     notifyListeners();
   }
