@@ -75,6 +75,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final String emptyMessage;
   final bool selectFirst;
   final Future Function(WebappTable rowTable, bool selected)? onChange;
+  Function? delayedSelection;
 
   HierarchySelectableListComponent(
       super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
@@ -119,6 +120,10 @@ class HierarchySelectableListComponent extends FetchComponent
       var selectedNode = SelectionNode(0, name);
       select(selectedNode);
       notifyListeners();
+    }
+    if( delayedSelection != null ){
+      delayedSelection!();
+      delayedSelection = null;
     }
     return table;
   }
@@ -466,7 +471,18 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
 
+  
+
   void setSelected(String value, String? column){
+    if( isInit ){
+      _setSelected(value, column);
+    }else{
+      delayedSelection =  () => _setSelected(value, column);
+    }
+  }
+
+  void _setSelected(String value, String? column){
+    
     var level = 0;
     if( column != null){
       level = columnHierarchy.indexWhere((col) => col == column);
