@@ -13,7 +13,7 @@ import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 
 typedef TileBuilderCallback2 = Widget Function(
-    BuildContext context, String name, int level, WebappTable row,
+    BuildContext context, int level, WebappTable row,
     {bool isEven, bool bold});
 
 enum SelectionBehavior { none, single, multiLeaf, multi }
@@ -201,7 +201,7 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget nonSelectableRowBuilder(
-      BuildContext context, String name, int level, WebappTable row,
+      BuildContext context, int level, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
     var row = Row(
       children: [
@@ -210,7 +210,7 @@ class HierarchySelectableListComponent extends FetchComponent
           height: 30,
           color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
           child: Text(
-            name,
+            rowEls[columnHierarchy[level]].first,
             style: bold ? Styles()["textH2"] : Styles()["text"],
           ),
         )
@@ -264,7 +264,7 @@ class HierarchySelectableListComponent extends FetchComponent
       for (var i = 0; i < children.nRows; i++) {
         var row = children.select([i]);
         var selectedNode =
-            SelectionNode(level + 1, row[columnHierarchy[level + 1]].first);
+            SelectionNode(level + 1, row[columns[level + 1]].first);
         deselect(selectedNode);
         deselectChildren(row, level + 1);
       }
@@ -298,14 +298,14 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget buildSelectableEntry(
-      BuildContext context, String name, int level, WebappTable row,
+      BuildContext context, int level, WebappTable row,
       {bool bold = false}) {
     var colName = columns[level];
-    var clickedRow = dataTable.selectByColValue([colName], [name]);
-    var selectedNode = SelectionNode(level, name);
+    var clickedRow = dataTable.selectByColValue([colName], row[colName] );
+    var selectedNode = SelectionNode(level, row[colName].first);
 
     var textWdg = Text(
-      name,
+      row[columnHierarchy[level]].first,
       style: bold ? Styles()["textH2"] : Styles()["text"],
     );
 
@@ -390,14 +390,14 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget selectableLeafRowBuilder(
-      BuildContext context, String name, int level, WebappTable rowVals,
+      BuildContext context,  int level, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
     var row = Row(
       children: [
         Container(
           height: 30,
           color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
-          child: buildSelectableEntry(context, name, level, rowVals),
+          child: buildSelectableEntry(context, level, rowVals),
         )
       ],
     );
@@ -452,7 +452,6 @@ class HierarchySelectableListComponent extends FetchComponent
             level,
             leafCallback(
                 context,
-                levelList[ri],
                 level,
                 isEven: ri % 2 == 0,
                 dataTable.select([ri])),
@@ -466,7 +465,6 @@ class HierarchySelectableListComponent extends FetchComponent
               initiallyExpanded: expandedLevels.contains(levelColumn),
               title: nonLeafCallback(
                   context,
-                  levelList[ri],
                   level,
                   isEven: ri % 2 == 0,
                   dataTable.select([ri]),
