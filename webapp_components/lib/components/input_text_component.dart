@@ -17,7 +17,9 @@ class InputTextComponent
 
   final bool saveState;
 
-  InputTextComponent(id, groupId, componentLabel, {this.saveState = true}) {
+  final String? hint;
+
+  InputTextComponent(id, groupId, componentLabel, {this.saveState = true, this.hint}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -50,6 +52,7 @@ class InputTextComponent
           }
         },
         child: TextField(
+          
             controller: controller,
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[\x00-\x7F]')),
@@ -67,6 +70,7 @@ class InputTextComponent
             },
             style: Styles()["text"],
             decoration: InputDecoration(
+              hintText: hint,
               border:
                   OutlineInputBorder(borderRadius: Styles()["borderRounding"]),
             )));
