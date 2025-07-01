@@ -43,7 +43,7 @@ class AppUser {
     } else {
       _username = _getUser();
       _teamname = teamId ?? _getTeam();
-      _projectName = "No project loaded";
+      _projectName = "";
     }
   }
 
