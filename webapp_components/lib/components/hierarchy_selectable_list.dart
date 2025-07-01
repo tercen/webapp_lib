@@ -10,6 +10,8 @@ import 'package:webapp_components/mixins/infobox_component.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
+import 'package:sci_tercen_client/sci_client.dart' as sci;
+
 typedef TileBuilderCallback2 = Widget Function(
     BuildContext context, String name, int level, WebappTable row,
     {bool isEven, bool bold});
@@ -62,6 +64,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final SelectionBehavior selectionBehavior;
 
   final List<String> columnHierarchy;
+  final List<String>? selectionHierarchy;
   final List<String> hideColumns;
   final List<String> expandedLevels = [];
 
@@ -90,6 +93,7 @@ class HierarchySelectableListComponent extends FetchComponent
       this.shouldSave = false,
       this.selectFirst = false,
       this.onChange,
+      this.selectionHierarchy,
       this.infoboxCol = ""}) {
     super.infoBoxBuilder = infoBoxBuilder;
     useCache = cache;
@@ -109,7 +113,14 @@ class HierarchySelectableListComponent extends FetchComponent
     } else {
       nonLeafCallback = nonSelectableRowBuilder;
     }
+
+    if( selectionHierarchy != null && selectionHierarchy!.length != columnHierarchy.length ){
+      throw sci.ServiceError(500,
+          "The selection hierarchy must have the same length as the column hierarchy.");
+    }
   }
+
+  List<String> get columns => selectionHierarchy ?? columnHierarchy;
 
   @override
   WebappTable postLoad(WebappTable table){
@@ -226,16 +237,18 @@ class HierarchySelectableListComponent extends FetchComponent
     selectedNodes.remove(node);
   }
 
+  
+
   void selectChildren(WebappTable clickedRow, int level) {
     if (level < maxLevel) {
-      var clickedValue = clickedRow[columnHierarchy[level]].first;
+      var clickedValue = clickedRow[columns[level]].first;
       var children =
-          dataTable.selectByColValue([columnHierarchy[level]], [clickedValue]);
+          dataTable.selectByColValue([columns[level]], [clickedValue]);
 
       for (var i = 0; i < children.nRows; i++) {
         var row = children.select([i]);
         var selectedNode =
-            SelectionNode(level + 1, row[columnHierarchy[level + 1]].first);
+            SelectionNode(level + 1, row[columns[level + 1]].first);
         select(selectedNode);
         selectChildren(row, level + 1);
       }
@@ -244,9 +257,9 @@ class HierarchySelectableListComponent extends FetchComponent
 
   void deselectChildren(WebappTable clickedRow, int level) {
     if (level < maxLevel) {
-      var clickedValue = clickedRow[columnHierarchy[level]].first;
+      var clickedValue = clickedRow[columns[level]].first;
       var children =
-          dataTable.selectByColValue([columnHierarchy[level]], [clickedValue]);
+          dataTable.selectByColValue([columns[level]], [clickedValue]);
 
       for (var i = 0; i < children.nRows; i++) {
         var row = children.select([i]);
@@ -260,7 +273,7 @@ class HierarchySelectableListComponent extends FetchComponent
 
   void selectFather(WebappTable clickedRow, int level) {
     if (level > 0) {
-      var parentVal = clickedRow[columnHierarchy[level - 1]].first;
+      var parentVal = clickedRow[columns[level - 1]].first;
       var parentNode = SelectionNode(level - 1, parentVal);
       select(parentNode);
       selectFather(clickedRow, level - 1);
@@ -269,10 +282,10 @@ class HierarchySelectableListComponent extends FetchComponent
 
   void checkSiblings(WebappTable clickedRow, int level) {
     if (level > 0) {
-      var parentVal = clickedRow[columnHierarchy[level - 1]].first;
-      var value = clickedRow[columnHierarchy[level]].first;
+      var parentVal = clickedRow[columns[level - 1]].first;
+      var value = clickedRow[columns[level]].first;
       var children =
-          dataTable.selectByColValue([columnHierarchy[level - 1]], [parentVal]);
+          dataTable.selectByColValue([columns[level - 1]], [parentVal]);
 
       if (children.every((rowEls) {
         var node = SelectionNode(level, rowEls[level]);
@@ -287,7 +300,7 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget buildSelectableEntry(
       BuildContext context, String name, int level, WebappTable row,
       {bool bold = false}) {
-    var colName = columnHierarchy[level];
+    var colName = columns[level];
     var clickedRow = dataTable.selectByColValue([colName], [name]);
     var selectedNode = SelectionNode(level, name);
 
