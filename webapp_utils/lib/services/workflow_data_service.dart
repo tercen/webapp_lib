@@ -209,7 +209,6 @@ class WorkflowDataService {
           .map((opRef) => opRef.operatorId)
           .toList();
 
-
       var operators = await factory.operatorService.list(opIds);
 
       List<int>.generate(operators.length, (i) => i).map((i) {});
@@ -296,6 +295,7 @@ class WorkflowDataService {
       List<String> excludedFiles = const [],
       List<String> nameFilter = const [],
       List<String> includeStepId = const [],
+      bool fetchData = true,
       bool useCache = false}) async {
     var factory = tercen.ServiceFactory();
     var wkf = await factory.workflowService.get(workflowId);
@@ -304,6 +304,7 @@ class WorkflowDataService {
         excludedFiles: excludedFiles,
         nameFilter: nameFilter,
         includeStepId: includeStepId,
+        fetchData: fetchData,
         useCache: useCache);
   }
 
@@ -312,6 +313,7 @@ class WorkflowDataService {
       List<String> excludedFiles = const [],
       List<String> nameFilter = const [],
       List<String> includeStepId = const [],
+      bool fetchData = true,
       bool useCache = false}) async {
     var key = "${wkf.id}_${contentTypes.join("_")}";
     if (excludedFiles.isNotEmpty) {
@@ -366,8 +368,13 @@ class WorkflowDataService {
 
         if (isDev) {
           // Avoid CORS issue with downloading image through browser request
-          contentTable = await factory.tableSchemaService.select(
-              sch.id, [sch.columns[nameIdx].name, ".content"], 0, sch.nRows);
+          if (fetchData == true) {
+            contentTable = await factory.tableSchemaService.select(
+                sch.id, [sch.columns[nameIdx].name, ".content"], 0, sch.nRows);
+          } else {
+            contentTable = await factory.tableSchemaService
+                .select(sch.id, [sch.columns[nameIdx].name], 0, sch.nRows);
+          }
 
           List<Pair> uniqueNameType = [];
           for (var i = 0; i < tbl.nRows; i++) {
@@ -398,17 +405,19 @@ class WorkflowDataService {
 
               contentTypeList.add(nameContent.value);
 
-              var bStr = "";
+              if (fetchData == true) {
+                var bStr = "";
 
-              for (var i = 0; i < tbl.nRows; i++) {
-                var tname = tbl.columns[0].values[i];
-                if (nameContent.key == tname) {
-                  var newBStr = String.fromCharCodes(
-                      base64Decode(contentTable.columns[1].values[i]));
-                  bStr = "$bStr$newBStr";
+                for (var i = 0; i < tbl.nRows; i++) {
+                  var tname = tbl.columns[0].values[i];
+                  if (nameContent.key == tname) {
+                    var newBStr = String.fromCharCodes(
+                        base64Decode(contentTable.columns[1].values[i]));
+                    bStr = "$bStr$newBStr";
+                  }
                 }
+                bytes.add(bStr);
               }
-              bytes.add(bStr);
             }
           }
         } else {
@@ -428,13 +437,15 @@ class WorkflowDataService {
                   var ct = tbl.columns[1].values[i];
 
                   contentTypeList.add(ct);
+                  if (fetchData == true) {
+                    var bytesStream = factory.tableSchemaService
+                        .getFileMimetypeStream(
+                            sch.id, tbl.columns[0].values[i]);
+                    var imgBytes = await bytesStream.toList();
 
-                  var bytesStream = factory.tableSchemaService
-                      .getFileMimetypeStream(sch.id, tbl.columns[0].values[i]);
-                  var imgBytes = await bytesStream.toList();
-
-                  bytes.add(
-                      String.fromCharCodes(Uint8List.fromList(imgBytes[0])));
+                    bytes.add(
+                        String.fromCharCodes(Uint8List.fromList(imgBytes[0])));
+                  }
                 }
               }
             }
@@ -448,8 +459,11 @@ class WorkflowDataService {
       ..addColumn("filename", data: filenames)
       ..addColumn("step", data: stepNames)
       ..addColumn("stepId", data: stepIds)
-      ..addColumn("data", data: bytes)
       ..addColumn("contentType", data: contentTypeList);
+
+    if (fetchData == true) {
+      tbl.addColumn("bytes", data: bytes);
+    }
     cache.addToCache(key, tbl);
 
     return tbl;
