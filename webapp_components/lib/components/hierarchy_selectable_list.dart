@@ -280,7 +280,7 @@ class HierarchySelectableListComponent extends FetchComponent
         selectionHierarchy: selectionHierarchy,
       );
 
-      print(hierarchyRoot.toString());
+      
       if(selectFirst &&  delayedSelection == null){
         select(hierarchyRoot.children.first);
         notifyListeners();

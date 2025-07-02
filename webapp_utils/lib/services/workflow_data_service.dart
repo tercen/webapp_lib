@@ -290,6 +290,43 @@ class WorkflowDataService {
     return l;
   }
 
+  Future<List<WebappTable>> fetchStepResults(String workflowId, String stepId,
+      {bool useCache = false}) async {
+    var factory = tercen.ServiceFactory();
+    var wkf = await factory.workflowService.get(workflowId);
+    var key = "${wkf.id}_$stepId";
+
+    if (cache.hasCachedValue(key) && useCache) {
+      return cache.getCachedValue(key);
+    }
+
+    final dStp = wkf.steps.firstWhere((step) => step.id == stepId, orElse: () => sci.Step()) as sci.DataStep;
+    if( dStp.id == ""){
+      return <WebappTable>[];
+    }
+
+    final relList = getSimpleRelations(dStp.computedRelation);
+
+    final schList =
+        await factory.tableSchemaService.list(relList.map((e) => e.id).toList());
+    final outList = <WebappTable>[];
+    for (var sch in schList) {
+      final colNames  = sch.columns.map((e) => e.name).toList();
+      final tbl = await factory.tableSchemaService.select(
+            sch.id,
+            colNames,
+            0,
+            sch.nRows);
+      final outTbl = WebappTable();
+      for( var colName in colNames ){
+        outTbl.addColumn(colName, data: tbl.columns.firstWhere((e) => e.name == colName).values);
+      }
+      outList.add(outTbl);
+    }
+
+    return outList;
+  }
+
   Future<WebappTable> fetchWorkflowImagesByWorkflowId(String workflowId,
       {List<String> contentTypes = const ["image"],
       List<String> excludedFiles = const [],
@@ -299,6 +336,9 @@ class WorkflowDataService {
       bool useCache = false}) async {
     var factory = tercen.ServiceFactory();
     var wkf = await factory.workflowService.get(workflowId);
+
+
+
     return fetchWorkflowImages(wkf,
         contentTypes: contentTypes,
         excludedFiles: excludedFiles,
