@@ -518,13 +518,19 @@ class HierarchySelectableListComponent extends FetchComponent
     );
   }
 
-  WebappTable selectTableRow( HierarchyNode node){
+  WebappTable selectTableRow( HierarchyNode node ){
     final selColumns = <String>[];
     final selVals = <String>[];
-    for( var lvl = node.level; lvl >= 0; lvl-- ){
-      selColumns.add(columns[lvl]);
-      selVals.add(dataTable[columns[node.level]].first);
+
+
+    
+    var lvlNode = node;
+    while( lvlNode.level >= 0){
+      selColumns.add(lvlNode.selectionColumnName);
+      selVals.add(lvlNode.id);
+      lvlNode = lvlNode.parent ?? HierarchyNode("root", "root", -1, "", "");
     }
+
     return dataTable.selectByColValue(
       selColumns,
       selVals
@@ -540,9 +546,12 @@ class HierarchySelectableListComponent extends FetchComponent
 
     for( var node in selectedNodes ){
       final row = selectTableRow(node);
-      for( var col in dataTable.colNames ){
-        tbl[col].add(row[col].first);
+      if( row.nRows > 0 ){
+        for( var col in dataTable.colNames ){
+          tbl[col].add(row[col].first);
+        }
       }
+      
     }
 
     // var level = maxLevel;
