@@ -11,9 +11,10 @@ import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:webapp_utils/functions/logger.dart';
 
-typedef TileBuilderCallback2 = Widget Function(
-    BuildContext context, int level, WebappTable row,
+typedef TileBuilderCallback = Widget Function(
+    BuildContext context, HierarchyNode node, WebappTable row,
     {bool isEven, bool bold});
 
 enum SelectionBehavior { none, single, multiLeaf, multi }
@@ -55,21 +56,164 @@ class SelectionNode {
   }
 }
 
+
+class HierarchyNode {
+  final String id;
+  final String label;
+  final int level;
+  final String columnName;
+  final String selectionColumnName;
+  final HierarchyNode? parent;
+  final List<HierarchyNode> children = [];
+
+  HierarchyNode(this.id, this.label, this.level, this.columnName, this.selectionColumnName, {this.parent});
+
+  void addChild(HierarchyNode child) {
+    children.add(child);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is HierarchyNode && id == other.id;
+  }
+
+  @override
+  String toString() {
+    var s = "ROOT";
+    for( var child in children ){
+      s = "$s\n${printNode(child)}";
+    }
+    return s;
+  }
+
+  String printNode(node) {
+    
+    var tab = "";
+    for (var i = 0; i < node.level; i++) {
+      tab += "....";
+    }
+    var s = "$tab${node.label} (${node.id})";
+    for( var child in node.children ){
+      s = "$s\n${printNode(child)}";
+    }
+    return s;
+  }
+
+  List<HierarchyNode> getDescendants(){
+    final descendants = <HierarchyNode>[];
+    for( var child in children ){
+      descendants.add(child);
+      descendants.addAll(child.getDescendants());
+    }
+    return descendants;
+  }
+
+  WebappTable selectTableRow( WebappTable table,  List<String> vals, List<String> columns){
+    final selColumns = <String>[];
+    final selVals = <String>[];
+
+    for( var i =0; i < vals.length; i++ ){
+      selColumns.add(columns[i]);
+      selVals.add(vals[i]);
+    }
+    return table.selectByColValue(
+      selColumns,
+      selVals
+    );
+  }
+
+
+  List<HierarchyNode> createLevelNodes( int level, WebappTable table, List<String> columnHierarchy, List<String> selectionHierarchy, {HierarchyNode? parent}  ){
+    if( level >= columnHierarchy.length ){
+      return [];
+    }
+
+    final selectionCols = selectionHierarchy.isEmpty ? columnHierarchy : selectionHierarchy;
+    final levelNodes = <HierarchyNode>[];
+    final addedIds = <String>[];
+
+    var pNode = parent;
+    final vals = <String>[];
+    while (pNode != null) {
+      if (pNode.level >= 0) {  // Only collect IDs from valid data levels
+        vals.insert(0, pNode.id);  // Maintain order: root to current
+      }
+      pNode = pNode.parent;
+    }
+    final levelTable = parent == null ? table : selectTableRow( table,  vals, selectionCols.getRange(0, level+1).toList());// table.selectByColValue([selectionHierarchy[level-1]], [parent.id]);
+
+    for( var i = 0; i < levelTable.nRows; i++ ){
+      final row = levelTable.select([i]);
+      final id = row[selectionCols[level]].first;
+      final label = row[columnHierarchy[level]].first;
+      
+      if( !addedIds.contains(id) ){
+        addedIds.add(id);
+        final newNode = HierarchyNode(id, label, level, columnHierarchy[level], selectionCols[level], parent: parent);
+        newNode.children.addAll(
+          newNode.createLevelNodes(level + 1, table, columnHierarchy, selectionHierarchy, parent: newNode)
+        );
+        levelNodes.add(newNode);
+      }
+
+    }
+
+    return levelNodes;
+  }
+
+  static HierarchyNode fromTable(WebappTable table, List<String> columnHierarchy, {List<String>? selectionHierarchy} ){
+    final selectionCols = selectionHierarchy ?? columnHierarchy;
+    final rootNode = HierarchyNode("root", "root", -1, "", "");
+
+    rootNode.children.addAll(rootNode.createLevelNodes(
+      0,
+      table,
+      columnHierarchy,
+      selectionCols,
+    ));
+
+    return rootNode;
+  }
+  
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  String toStringMap(){
+    return "{'id':'$id', 'label':'$label', 'level':$level, 'columnName':'$columnName', 'selectionColumnName':'$selectionColumnName', 'parent':${parent?.id ?? "null"}}";
+  }
+
+  static HierarchyNode fromMapString(String json) {
+    var valMap = jsonDecode(json);
+    return HierarchyNode(
+      valMap['id'],
+      valMap['label'],
+      valMap['level'],
+      valMap['columnName'],
+      valMap['selectionColumnName'],
+      parent: valMap['parent'] != null ? HierarchyNode.fromMapString(valMap['parent']) : null,
+    );
+  }
+
+}
+
 class HierarchySelectableListComponent extends FetchComponent
     with ComponentInfoBox
     implements SerializableComponent {
   final ScrollController scrollController = ScrollController();
-  List<SelectionNode> selectedNodes = [];
+  List<HierarchyNode> selectedNodes = [];
 
   final SelectionBehavior selectionBehavior;
+
+  HierarchyNode hierarchyRoot = HierarchyNode("root", "root", -1, "", "");
 
   final List<String> columnHierarchy;
   final List<String>? selectionHierarchy;
   final List<String> hideColumns;
   final List<String> expandedLevels = [];
 
-  late TileBuilderCallback2 nonLeafCallback;
-  late TileBuilderCallback2 leafCallback;
+  late TileBuilderCallback nonLeafCallback;
+  late TileBuilderCallback leafCallback;
   int maxLevel = 0;
   final bool shouldSave;
   final String infoboxCol;
@@ -121,14 +265,29 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   List<String> get columns => selectionHierarchy ?? columnHierarchy;
+  //TODO Add reset
+
+  List<HierarchyNode> getLevelNodes(int level, {String? parentId}) {
+    return hierarchyRoot.getDescendants().where((node) => node.level == level).where((node) => parentId == null || node.parent?.id == parentId ).toList();
+  }
 
   @override
   WebappTable postLoad(WebappTable table){
-    if( table.nRows > 0 && selectFirst &&  delayedSelection == null){
-      final name = getLevelList(0, null).first;
-      var selectedNode = SelectionNode(0, name);
-      select(selectedNode);
-      notifyListeners();
+    if( table.nRows > 0 ){
+      hierarchyRoot = HierarchyNode.fromTable(
+        table,
+        columnHierarchy,
+        selectionHierarchy: selectionHierarchy,
+      );
+
+      print(hierarchyRoot.toString());
+      if(selectFirst &&  delayedSelection == null){
+        select(hierarchyRoot.children.first);
+        notifyListeners();
+      }
+      
+    }else{
+      hierarchyRoot.children.clear();
     }
     if( delayedSelection != null ){
       delayedSelection!();
@@ -201,7 +360,7 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget nonSelectableRowBuilder(
-      BuildContext context, int level, WebappTable rowEls,
+      BuildContext context,HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
     var row = Row(
       children: [
@@ -210,7 +369,7 @@ class HierarchySelectableListComponent extends FetchComponent
           height: 30,
           color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
           child: Text(
-            rowEls[columnHierarchy[level]].first,
+            node.label,
             style: bold ? Styles()["textH2"] : Styles()["text"],
           ),
         )
@@ -223,89 +382,83 @@ class HierarchySelectableListComponent extends FetchComponent
     );
   }
 
-  bool isSelected(SelectionNode node) {
+  bool isSelected(HierarchyNode node) {
     return selectedNodes.contains(node);
   }
 
-  void select(SelectionNode node) {
+  void select(HierarchyNode node) {
     if (!isSelected(node)) {
+      print("Selecting node: ${node.id} at level ${node.level}");
       selectedNodes.add(node);
     }
   }
 
-  void deselect(SelectionNode node) {
+  void deselect(HierarchyNode node) {
     selectedNodes.remove(node);
   }
 
   
 
-  void selectChildren(WebappTable clickedRow, int level) {
-    if (level < maxLevel) {
-      var clickedValue = clickedRow[columns[level]].first;
-      var children =
-          dataTable.selectByColValue([columns[level]], [clickedValue]);
+  void selectChildren(HierarchyNode node) {
+    for( var child in node.children ){
+      select(child);
+      selectChildren(child);
+    }
+    // if (level < maxLevel) {
+    //   var clickedValue = clickedRow[columns[level]].first;
+    //   var children =
+    //       dataTable.selectByColValue([columns[level]], [clickedValue]);
 
-      for (var i = 0; i < children.nRows; i++) {
-        var row = children.select([i]);
-        var selectedNode =
-            SelectionNode(level + 1, row[columns[level + 1]].first);
-        select(selectedNode);
-        selectChildren(row, level + 1);
+    //   for (var i = 0; i < children.nRows; i++) {
+    //     var row = children.select([i]);
+    //     var selectedNode =
+    //         SelectionNode(level + 1, row[columns[level + 1]].first);
+    //     select(selectedNode);
+    //     selectChildren(row, level + 1);
+    //   }
+    // }
+  }
+
+  void deselectChildren(HierarchyNode node) {
+    for( var child in node.children ){
+      deselect(child);
+      deselectChildren(child);
+    }
+  }
+
+  void selectFather(HierarchyNode node) {
+    // if (level > 0) {
+      // var parentVal = clickedRow[columns[level - 1]].first;
+      // var parentNode = SelectionNode(level - 1, parentVal);
+      if( node.parent != null ){
+        select(node.parent!);
+        selectFather(node.parent!);
       }
-    }
+      
+      
+    // }
   }
 
-  void deselectChildren(WebappTable clickedRow, int level) {
-    if (level < maxLevel) {
-      var clickedValue = clickedRow[columns[level]].first;
-      var children =
-          dataTable.selectByColValue([columns[level]], [clickedValue]);
-
-      for (var i = 0; i < children.nRows; i++) {
-        var row = children.select([i]);
-        var selectedNode =
-            SelectionNode(level + 1, row[columns[level + 1]].first);
-        deselect(selectedNode);
-        deselectChildren(row, level + 1);
-      }
-    }
-  }
-
-  void selectFather(WebappTable clickedRow, int level) {
-    if (level > 0) {
-      var parentVal = clickedRow[columns[level - 1]].first;
-      var parentNode = SelectionNode(level - 1, parentVal);
-      select(parentNode);
-      selectFather(clickedRow, level - 1);
-    }
-  }
-
-  void checkSiblings(WebappTable clickedRow, int level) {
-    if (level > 0) {
-      var parentVal = clickedRow[columns[level - 1]].first;
-      var value = clickedRow[columns[level]].first;
-      var children =
-          dataTable.selectByColValue([columns[level - 1]], [parentVal]);
-
-      if (children.every((rowEls) {
-        var node = SelectionNode(level, rowEls[level]);
-        return rowEls[level] == value || !isSelected(node);
-      })) {
-        var parentNode = SelectionNode(level - 1, parentVal);
+  void checkSiblings(HierarchyNode node) {
+    final parentNode = node.parent;
+    if( parentNode != null ){
+      if(!parentNode.children.every((child) => isSelected(child))){
         deselect(parentNode);
       }
     }
+
   }
 
   Widget buildSelectableEntry(
-      BuildContext context, int level, WebappTable row,
+      BuildContext context, HierarchyNode node, WebappTable row,
       {bool bold = false}) {
-    var colName = columns[level];
-    var clickedRow = dataTable.selectByColValue([colName], row[colName] );
-    var selectedNode = SelectionNode(level, row[colName].first);
+    // var colName = columns[level];
+    // var clickedRow = dataTable.selectByColValue([colName], row[colName] );
+    // var selectedNode = SelectionNode(level, row[colName].first);
 
+    
     var textWdg = Text(
-      row[columnHierarchy[level]].first,
+      node.label,
       style: bold ? Styles()["textH2"] : Styles()["text"],
     );
 
@@ -314,7 +467,7 @@ class HierarchySelectableListComponent extends FetchComponent
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Checkbox(
-            value: isSelected(selectedNode),
+            value: isSelected(node),
             checkColor: Styles()["black"],
             side: WidgetStateBorderSide.resolveWith((states) => BorderSide(
                   color: Styles()["black"],
@@ -330,27 +483,26 @@ class HierarchySelectableListComponent extends FetchComponent
                   selectedNodes.clear();
                 }
 
-                select(selectedNode);
-
-                
+                select(node);
 
                 if (selectionBehavior == SelectionBehavior.multi) {
-                  selectFather(clickedRow, level);
-                  selectChildren(clickedRow, level);
+                  selectFather(node);
+                  selectChildren(node);
                 }
                 if( onChange != null ){
-                  onChange!(clickedRow, true);
+                  // dataTable.selectByColValue([columns[node.level]], dataTable[columns[node.level]]);
+                  onChange!(selectTableRow(node), true);
                 }
                 
               } else {
-                deselect(selectedNode);
+                deselect(node);
 
                 if (selectionBehavior == SelectionBehavior.multi) {
-                  checkSiblings(clickedRow, level);
-                  deselectChildren(clickedRow, level);
+                  checkSiblings(node);
+                  deselectChildren(node);
                 }
                 if( onChange != null ){
-                  onChange!(clickedRow, false);
+                  onChange!(selectTableRow(node), false);
                 }
               }
               notifyListeners();
@@ -366,15 +518,28 @@ class HierarchySelectableListComponent extends FetchComponent
     );
   }
 
+  WebappTable selectTableRow( HierarchyNode node){
+    final selColumns = <String>[];
+    final selVals = <String>[];
+    for( var lvl = node.level; lvl >= 0; lvl-- ){
+      selColumns.add(columns[lvl]);
+      selVals.add(dataTable[columns[node.level]].first);
+    }
+    return dataTable.selectByColValue(
+      selColumns,
+      selVals
+    );
+  }
+
   WebappTable selectedAsTable() {
     var level = maxLevel;
 
     var originalColNames = dataTable.colNames;
-    var colNameIndex = originalColNames.indexOf(columnHierarchy[maxLevel]);
+    var colNameIndex = originalColNames.indexOf(columns[maxLevel]);
 
     var nodes = selectedNodes
         .where((node) => node.level == level)
-        .map((node) => node.value)
+        .map((node) => node.id)
         .toList();
 
     var rows =
@@ -390,14 +555,14 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget selectableLeafRowBuilder(
-      BuildContext context,  int level, WebappTable rowVals,
+      BuildContext context,  HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
     var row = Row(
       children: [
         Container(
           height: 30,
           color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
-          child: buildSelectableEntry(context, level, rowVals),
+          child: buildSelectableEntry(context, node, rowVals),
         )
       ],
     );
@@ -414,10 +579,10 @@ class HierarchySelectableListComponent extends FetchComponent
 
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
     var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
-    var offset = (level == 0 ? 0 : 50) as double;
+    var offset = (level == 0 ? 0 : 25) as double;
     var row = Row(mainAxisSize: MainAxisSize.min, children: [
       Container(
-        constraints: BoxConstraints(minWidth: level * 50 + offset),
+        constraints: BoxConstraints(minWidth: level * 25 + offset),
       ),
       Flexible(child: wdg)
     ]);
@@ -428,31 +593,34 @@ class HierarchySelectableListComponent extends FetchComponent
     );
   }
 
-  List<String> getLevelList(int level, String? parent) {
-    if (level == 0 || parent == null) {
-      return dataTable[columnHierarchy[level]].toSet().toList();
-    } else {
-      return dataTable
-          .selectByColValue(
-              [columnHierarchy[level - 1]], [parent])[columnHierarchy[level]]
-          .toSet()
-          .toList();
-    }
-  }
+  // List<String> getLevelList(int level, String? parent) {
+  //   if (level == 0 || parent == null) {
+  //     return dataTable[columnHierarchy[level]].toSet().toList();
+  //   } else {
+  //     return dataTable
+  //         .selectByColValue(
+  //             [columns[level - 1]], [parent])[columnHierarchy[level]]
+  //         .toSet()
+  //         .toList();
+  //   }
+  // }
 
   List<Widget> createWidgets(BuildContext context, int level,
       {String? parentId}) {
     List<Widget> wdg = [];
-    List<String> levelList = getLevelList(level, parentId);
+    final levelNodes = getLevelNodes(level, parentId: parentId );
 
-    var levelColumn = columnHierarchy[level];
-    for (var ri = 0; ri < levelList.length; ri++) {
+
+    for (var ri = 0; ri < levelNodes.length; ri++) {
+      // final levelId = levelTable[selectionCol][ri];
+      final node = levelNodes[ri];
+
       if (level == maxLevel) {
         wdg.add(createTabulatedEntry(
             level,
             leafCallback(
                 context,
-                level,
+                node,
                 isEven: ri % 2 == 0,
                 dataTable.select([ri])),
             isEven: ri % 2 == 0));
@@ -462,15 +630,15 @@ class HierarchySelectableListComponent extends FetchComponent
             ExpansionTile(
               shape: const Border(),
               controlAffinity: ListTileControlAffinity.leading,
-              initiallyExpanded: expandedLevels.contains(levelColumn),
+              initiallyExpanded: expandedLevels.contains(levelNodes[ri].id),
               title: nonLeafCallback(
                   context,
-                  level,
+                  node,
                   isEven: ri % 2 == 0,
                   dataTable.select([ri]),
                   bold: true),
               children:
-                  createWidgets(context, level + 1, parentId: levelList[ri]),
+                  createWidgets(context, level + 1, parentId: node.id),
             ),
             isEven: ri % 2 == 0));
       }
@@ -491,23 +659,18 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   void _setSelected(String value, String? column){
-    
-    var level = 0;
-    if( column != null){
-      level = columnHierarchy.indexWhere((col) => col == column);
-      if( level == -1 ){
-        level = 0;
-      }
-    }
+    final node = hierarchyRoot.getDescendants().where((node) => column == null || node.selectionColumnName == column) .firstWhere((node) => node.id == value, orElse: () => hierarchyRoot);
 
-    final names = getLevelList(level, null);
+    if( node.level == -1 ){
+      Logger().log(level: Logger.WARN, message: "_setSelected: Node with id $value not found in hierarchy.");
+      return;
+    }
 
     if( selectionBehavior == SelectionBehavior.single) {
       selectedNodes.clear();
     }
-    var selectedNode = SelectionNode(level, names.firstWhere((test) => test == value, orElse: () => names.first));
-    
-    select(selectedNode);
+
+    select(node);
     notifyListeners();
   }
 
@@ -532,7 +695,7 @@ class HierarchySelectableListComponent extends FetchComponent
     List<String> stateValues = [];
 
     for (var node in selectedNodes) {
-      stateValues.add(node.toMapString());
+      stateValues.add(node.toStringMap());
     }
     return stateValues.join("|@|");
   }
@@ -549,7 +712,7 @@ class HierarchySelectableListComponent extends FetchComponent
   void setStateValue(String value) {
     var nodeStrings = value.split("|@|");
     for (var v in nodeStrings) {
-      selectedNodes.add(SelectionNode.fromMapString(v));
+      selectedNodes.add(HierarchyNode.fromMapString(v));
     }
   }
 
