@@ -532,24 +532,37 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   WebappTable selectedAsTable() {
-    var level = maxLevel;
+    final tbl = WebappTable();
 
-    var originalColNames = dataTable.colNames;
-    var colNameIndex = originalColNames.indexOf(columns[maxLevel]);
-
-    var nodes = selectedNodes
-        .where((node) => node.level == level)
-        .map((node) => node.id)
-        .toList();
-
-    var rows =
-        dataTable.where((row) => nodes.contains(row[colNameIndex])).toList();
-
-    var tbl = WebappTable();
-    for (int i = 0; i < originalColNames.length; i++) {
-      tbl.addColumn(originalColNames[i],
-          data: rows.map((row) => row[i]).toList());
+    for( var col in dataTable.colNames ){
+      tbl.addColumn(col, data: <String>[]);
     }
+
+    for( var node in selectedNodes ){
+      final row = selectTableRow(node);
+      for( var col in dataTable.colNames ){
+        tbl[col].add(row[col].first);
+      }
+    }
+
+    // var level = maxLevel;
+
+    // var originalColNames = dataTable.colNames;
+    // var colNameIndex = originalColNames.indexOf(columns[maxLevel]);
+
+    // var nodes = selectedNodes
+    //     .where((node) => node.level == level)
+    //     .map((node) => node.id)
+    //     .toList();
+
+    // var rows =
+    //     dataTable.where((row) => nodes.contains(row[colNameIndex])).toList();
+
+    
+    // for (int i = 0; i < originalColNames.length; i++) {
+    //   tbl.addColumn(originalColNames[i],
+    //       data: rows.map((row) => row[i]).toList());
+    // }
 
     return tbl;
   }

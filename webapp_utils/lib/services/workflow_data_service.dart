@@ -319,7 +319,7 @@ class WorkflowDataService {
             sch.nRows);
       final outTbl = WebappTable();
       for( var colName in colNames ){
-        outTbl.addColumn(colName, data: tbl.columns.firstWhere((e) => e.name == colName).values);
+        outTbl.addColumn(colName, data: (tbl.columns.firstWhere((e) => e.name == colName).values as List).map((e) => e.toString()).toList() ) ;
       }
       outList.add(outTbl);
     }
