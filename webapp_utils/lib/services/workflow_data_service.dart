@@ -462,7 +462,7 @@ class WorkflowDataService {
       ..addColumn("contentType", data: contentTypeList);
 
     if (fetchData == true) {
-      tbl.addColumn("bytes", data: bytes);
+      tbl.addColumn("data", data: bytes);
     }
     cache.addToCache(key, tbl);
 
