@@ -155,6 +155,7 @@ mixin ScreenBase {
   // }
 
   void initScreen(WebAppDataBase modelLayer) {
+    
     final components = getAllComponents();
     this.modelLayer = modelLayer;
     modelLayer.app.addListener(checkMenuCollapse);
@@ -450,6 +451,8 @@ mixin ScreenBase {
     return null;
   }
 
+  final ScrollController _screenScrollController = ScrollController(keepScrollOffset: true);
+
   Widget buildComponents(BuildContext context) {
     List<Widget> widgetRows = [];
     for (var bi = 0; bi < blockOrder.length; bi++) {
@@ -505,6 +508,7 @@ mixin ScreenBase {
         padding: const EdgeInsets.all(5),
         child: SizedBox.expand(
           child: SingleChildScrollView(
+            controller: _screenScrollController,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
