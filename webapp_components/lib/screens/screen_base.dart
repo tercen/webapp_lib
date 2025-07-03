@@ -89,9 +89,10 @@ mixin ScreenBase {
     if (componentBlocks.containsKey(blockId)) {
       componentBlocks[blockId]!.removeWhere((comp) => comp.component.getId() == componentId);
       if( componentBlocks[blockId]!.isEmpty ){
+        var idx = blockOrder.indexOf(blockId);
         componentBlocks.remove(blockId);
         blockOrder.remove(blockId);
-        blockTypes.removeAt(blockOrder.indexOf(blockId));
+        blockTypes.removeAt(idx);
       }
     }
   }
