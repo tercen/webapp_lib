@@ -34,7 +34,7 @@ class ListAction{
     if( params == null){
       params = WebappTable();
     }
-    if( params.nRows == 0 || isEnabled(params)){
+    if(  isEnabled(params)){
       if( toggleIcon != null && toggle ){
         return toggleIcon!;
       }else{
