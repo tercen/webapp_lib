@@ -456,6 +456,7 @@ mixin ScreenBase {
   Widget buildComponents(BuildContext context) {
     List<Widget> widgetRows = [];
     for (var bi = 0; bi < blockOrder.length; bi++) {
+      print("Adding ${blockOrder[bi]} with type ${blockTypes[bi]}");
       List<Widget> blockWidgets = [];
       var componentList = componentBlocks[blockOrder[bi]]!;
       var blockType = blockTypes[bi];
@@ -464,7 +465,7 @@ mixin ScreenBase {
       final isSameRow = blockType == ComponentBlockType.sameRow;
       for (var ci = 0; ci < componentList.length; ci++) {
         var comp = componentList[ci];
-
+        print("\t${comp.component.label()}");
         if (comp.component is InputValidator) {
           (comp.component as InputValidator).validate();
         }
