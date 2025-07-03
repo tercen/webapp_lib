@@ -25,10 +25,14 @@ class ActionBarComponent
   }
 
   Widget buildActionWidget(ListAction action, BuildContext context) {
-    var rszIcon = Icon(action.getIcon(  ).icon, size: 32);
+
+    var rszIcon =   Icon(action.getIcon(  ).icon, size: 32);
     var actionIcon = IconButton(
       onPressed: () async {
-        action.callAction(WebappTable(), context: context);
+        if( action.isEnabled( WebappTable()) ){
+          action.callAction(WebappTable(), context: context);
+        }
+        
       },
       icon: rszIcon,
       tooltip: action.description,
