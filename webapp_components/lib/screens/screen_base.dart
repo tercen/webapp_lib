@@ -127,8 +127,6 @@ mixin ScreenBase {
         
       }
 
-      print(blockOrder);
-      print(blockTypes);
       componentBlocks[blockId] = [entry];
     }
   }
