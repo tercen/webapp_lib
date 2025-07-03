@@ -35,13 +35,17 @@ class ListAction{
       params = WebappTable();
     }
     if(  isEnabled(params)){
+      
       if( toggleIcon != null && toggle ){
+        print("Loading ${description} with toggle");
         return toggleIcon!;
       }else{
+        print("Loading ${description} normally");
         return actionIcon;
       }
       
     }else{
+      print("Loading ${description} disabled");
       return disabledIcon;
     }
   }
