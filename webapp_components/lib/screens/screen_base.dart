@@ -88,6 +88,11 @@ mixin ScreenBase {
   void removeComponent( String componentId, String blockId ){
     if (componentBlocks.containsKey(blockId)) {
       componentBlocks[blockId]!.removeWhere((comp) => comp.component.getId() == componentId);
+      if( componentBlocks[blockId]!.isEmpty ){
+        componentBlocks.remove(blockId);
+        blockOrder.remove(blockId);
+        blockTypes.removeAt(blockOrder.indexOf(blockId));
+      }
     }
   }
 
