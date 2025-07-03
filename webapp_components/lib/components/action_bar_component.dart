@@ -26,7 +26,7 @@ class ActionBarComponent
 
   Widget buildActionWidget(ListAction action, BuildContext context) {
 
-    var rszIcon =   Icon(action.getIcon(  ).icon, size: 32);
+    var rszIcon =   Icon(action.getIcon(  ).icon, size: 32, color: action.getIcon().color,);
     var actionIcon = IconButton(
       onPressed: () async {
         if( action.isEnabled( WebappTable()) ){
