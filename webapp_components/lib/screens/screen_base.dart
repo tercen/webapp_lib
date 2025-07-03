@@ -100,7 +100,7 @@ mixin ScreenBase {
       component.addUiListener(refresh);
     }
 
-    print("Calling addComponent with blockId: $blockId, component: ${component.getId()}");
+    print("Calling addComponent with blockId: $blockId (${componentBlocks.containsKey(blockId)}), component: ${component.getId()}");
 
     var entry = ComponentEntry(
         component, component.getId(), component.getComponentType());
@@ -119,8 +119,11 @@ mixin ScreenBase {
       }else{
         blockOrder.insert(blockIndex, blockId);
         blockTypes.insert(blockIndex, blockType);  
+        
       }
-      
+
+      print(blockOrder);
+      print(blockTypes);
       componentBlocks[blockId] = [entry];
     }
   }
