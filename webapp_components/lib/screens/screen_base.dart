@@ -100,6 +100,8 @@ mixin ScreenBase {
       component.addUiListener(refresh);
     }
 
+    print("Calling addComponent with blockId: $blockId, component: ${component.getId()}");
+
     var entry = ComponentEntry(
         component, component.getId(), component.getComponentType());
 
@@ -499,7 +501,7 @@ mixin ScreenBase {
         widgetRows.addAll(blockWidgets);
       }
     }
-
+    print("-------------------------");
     // var actionRow = Row(
         // mainAxisAlignment: MainAxisAlignment.start,
         // children:
