@@ -46,9 +46,9 @@ class InputTextComponent
             for (var func in onFocusLostFunctions) {
               func();
             }
-            if (onFocusLostFunctions.isNotEmpty) {
+            // if (onFocusLostFunctions.isNotEmpty) {
               notifyListeners();
-            }
+            // }
           }
         },
         child: TextField(
