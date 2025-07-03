@@ -17,7 +17,7 @@ import 'package:webapp_model/webapp_data_base.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/logger.dart';
 
-enum ComponentBlockType { simple, expanded, collapsed }
+enum ComponentBlockType { simple, expanded, collapsed, sameRow }
 
 class ComponentEntry {
   final Component component;
@@ -316,7 +316,9 @@ mixin ScreenBase {
       }
     }
     if (comp is ComponentBase) {
+      
       var msg = (comp as ComponentBase).getDescription();
+      final label = (comp as ComponentBase).changed ? "*" + comp.label() : comp.label();
 
       final questionIcon = Stack(
         alignment: Alignment.center,
@@ -337,7 +339,7 @@ mixin ScreenBase {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            shouldBreakLabel ? breakLabel( comp.label() ) : comp.label(),
+            shouldBreakLabel ? breakLabel( label ) : label,
             style: Styles()["textH2"],
           ),
           msg.isEmpty
@@ -456,6 +458,7 @@ mixin ScreenBase {
       var blockType = blockTypes[bi];
       var isExpBlock = blockType == ComponentBlockType.expanded ||
           blockType == ComponentBlockType.collapsed;
+      final isSameRow = blockType == ComponentBlockType.sameRow;
       for (var ci = 0; ci < componentList.length; ci++) {
         var comp = componentList[ci];
 
@@ -486,6 +489,8 @@ mixin ScreenBase {
           initiallyExpanded: blockType == ComponentBlockType.expanded,
           children: blockWidgets,
         ));
+      } else if( isSameRow ){
+
       } else {
         widgetRows.addAll(blockWidgets);
       }

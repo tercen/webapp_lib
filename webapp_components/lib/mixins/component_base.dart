@@ -10,7 +10,8 @@ mixin class ComponentBase {
   late final String id;
   late final String groupId;
   late final String componentLabel;
-  
+
+  bool changed = false;  
 
   String description = "";
  
