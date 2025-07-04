@@ -649,8 +649,13 @@ class WorkflowDataService {
     await factory.taskService.cancelTask(taskId);
     if (deleteWorkflow && workflowId != "") {
       try {
-        var workflow = await factory.workflowService.get(workflowId);
+        var workflow = await factory.workflowService.get(workflowId );
         await factory.workflowService.delete(workflow.id, workflow.rev);
+
+        final nodes = ProjectDataService().folderTreeRoot.getDescendants().where((node) => node.document.meta.any((m) => m.value == workflow.id));
+        for( var node in nodes ){
+          await factory.projectDocumentService.delete(node.document.id, node.document.rev);
+        }
       } catch (e) {
         Logger().log(
             level: Logger.FINE,
