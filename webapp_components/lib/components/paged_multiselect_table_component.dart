@@ -41,7 +41,7 @@ class PagedMultiselectTableComponent extends MultiSelectTableComponent {
 
     var indices = List<int>.generate(nRows, (i) => i);
     if (sortDirection != "" && sortingCol != "") {
-      indices = ListUtils.getSortedIndices(table.columns[sortingCol]!);
+      indices = ListUtils.getSortedIndices(table.columns[sortingCol]!, checkAlphanumeric: true);
 
       if (sortDirection == "desc") {
         indices = indices.reversed.toList();
