@@ -640,12 +640,12 @@ class WorkflowDataService {
       {bool deleteWorkflow = false}) async {
     var factory = tercen.ServiceFactory();
     var workflowId = "";
-    // if (deleteWorkflow) {
-    //   var task = await factory.taskService.get(taskId);
-    //   if (task is RunWorkflowTask) {
-    //     workflowId = task.workflowId;
-    //   }
-    // }
+    if (deleteWorkflow) {
+      var task = await factory.taskService.get(taskId);
+      if (task is RunWorkflowTask) {
+        workflowId = task.workflowId;
+      }
+    }
     await factory.taskService.cancelTask(taskId);
     if (deleteWorkflow && workflowId != "") {
       try {
