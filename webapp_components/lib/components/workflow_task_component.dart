@@ -226,7 +226,9 @@ class WorkflowTaskComponent extends ActionTableComponent {
             }
           }
 
-          runningTasks = runningTasks.toSet().toList();
+          // runningTasks = runningTasks.toSet().toList();
+          final unique = <RunningTask>{};
+          runningTasks.retainWhere(unique.add);
           await loadTaskTable();
           notifyListeners();
         });
@@ -274,6 +276,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
   }
 
   Future<void> loadTaskTable() async {
+    final currentTasks = List<RunningTask>.from(runningTasks);
     var factory = tercen.ServiceFactory();
     List<String> keys = [];
     List<String> taskId = [];
@@ -285,11 +288,11 @@ class WorkflowTaskComponent extends ActionTableComponent {
     List<String> workflowNames = [];
     List<String> projectNames = [];
 
-    if (runningTasks.isNotEmpty) {
+    if (currentTasks.isNotEmpty) {
       var tasks = await factory.taskService
-          .list(runningTasks.map((e) => e.taskId).toList());
+          .list(currentTasks.map((e) => e.taskId).toList());
 
-      for (var taskIdInfo in runningTasks) {
+      for (var taskIdInfo in currentTasks) {
         final ct = tasks.firstWhere((task) => task.id == taskIdInfo.taskId,
             orElse: () => sci.Task());
         if (ct.id == "") {
