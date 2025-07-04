@@ -619,16 +619,33 @@ class WorkflowDataService {
     factory.fileService.upload(doc, dataStream);
   }
 
+  Future<void> deleteWorkflow(String workflowId,
+      {bool deleteWorkflow = false}) async {
+    var factory = tercen.ServiceFactory();
+
+    if (deleteWorkflow && workflowId != "") {
+      try {
+        var workflow = await factory.workflowService.get(workflowId);
+        await factory.workflowService.delete(workflow.id, workflow.rev);
+      } catch (e) {
+        Logger().log(
+            level: Logger.FINE,
+            message: "Workflow $workflowId already deleted");
+      }
+
+  }
+}
+
   Future<void> cancelWorkflowTask(String taskId,
       {bool deleteWorkflow = false}) async {
     var factory = tercen.ServiceFactory();
     var workflowId = "";
-    if (deleteWorkflow) {
-      var task = await factory.taskService.get(taskId);
-      if (task is RunWorkflowTask) {
-        workflowId = task.workflowId;
-      }
-    }
+    // if (deleteWorkflow) {
+    //   var task = await factory.taskService.get(taskId);
+    //   if (task is RunWorkflowTask) {
+    //     workflowId = task.workflowId;
+    //   }
+    // }
     await factory.taskService.cancelTask(taskId);
     if (deleteWorkflow && workflowId != "") {
       try {
