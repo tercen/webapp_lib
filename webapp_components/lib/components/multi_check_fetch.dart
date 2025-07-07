@@ -28,7 +28,7 @@ class MultiCheckComponentFetch
       this.hasSelectAll = false,
       this.selectAll = false,
       this.columnWidth,
-      this.saveState = true}) {
+      this.saveState = true, super.onLoad}) {
     // super.id = id;
     // super.groupId = groupId;
     // super.componentLabel = componentLabel;

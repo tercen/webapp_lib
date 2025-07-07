@@ -20,7 +20,7 @@ class PagedMultiselectTableComponent extends MultiSelectTableComponent {
       super.columnOrder,
       this.pageSize = 20,
       this.pagingOptions = const ["-1", "10", "20", "50", "100"],
-      cache = true}) {
+      cache = true, super.onLoad}) {
     super.infoBoxBuilder = infoBoxBuilder;
     super.useCache = cache;
   }

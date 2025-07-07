@@ -41,7 +41,7 @@ class MultiSelectTableComponent extends FetchComponent
       this.hideColumns,
       InfoBoxBuilder? infoBoxBuilder,
       this.columnOrder,
-      cache = true}) {
+      cache = true, super.onLoad}) {
     // super.id = id;
     // super.groupId = groupId;
     // super.componentLabel = componentLabel;

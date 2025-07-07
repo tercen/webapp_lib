@@ -19,8 +19,9 @@ class FetchComponent with
   bool isInit = false;
   bool useCache = true;
   Future<WebappTable> Function() dataFetchCallback;
+  Future<void> Function(WebappTable)? onLoad;
 
-  FetchComponent(id, groupId, componentLabel, this.dataFetchCallback ){
+  FetchComponent(id, groupId, componentLabel, this.dataFetchCallback, {this.onLoad} ){
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -63,6 +64,11 @@ class FetchComponent with
         dataTable = await waitResult("dataLoad"); //  await dataFetchCallback();
 
         dataTable = postLoad(dataTable);
+
+        if( onLoad != null ){
+          await onLoad!(dataTable);
+        }
+
         if( useCache ){
           cacheObj.addToCache(cacheKey, dataTable);
         }
@@ -75,6 +81,7 @@ class FetchComponent with
   }
 
 
+  @Deprecated("Use the onLoad parameter instead")
   WebappTable postLoad(WebappTable table){
     return table;
   }

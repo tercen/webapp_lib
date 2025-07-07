@@ -26,7 +26,7 @@ class SelectableListComponent extends FetchComponent
       {infoBoxBuilder,
       String Function(String, {String id})? pathTransformCallback,
       this.sortByLabel = false,
-      this.shouldSave = true}) {
+      this.shouldSave = true, super.onLoad}) {
     // super.id = id;
     // super.groupId = groupId;
     // super.componentLabel = componentLabel;
