@@ -54,6 +54,9 @@ class WorkflowRunner with ProgressDialog {
   final Map<String, String> multiDsMap = {};
   final Map<String, String> filterValueUpdate = {};
 
+  final Map<String, String> xAxisCoord = {};
+  final Map<String, String> yAxisCoord = {};
+
   final List<StepSetting> settings = [];
   final List<PostRunCallback> postRunCallbacks = [];
 
@@ -126,6 +129,14 @@ class WorkflowRunner with ProgressDialog {
 
   void doNotRun(String stepId) {
     doNotRunList.add(stepId);
+  }
+
+  void addXAxisCoord(String stepId, String coord) {
+    xAxisCoord[stepId] = coord;
+  }
+
+  void addYAxisCoord(String stepId, String coord) {
+    yAxisCoord[stepId] = coord;
   }
 
   Future<void> reEnableSteps(String workflowId) async {
@@ -682,6 +693,17 @@ class WorkflowRunner with ProgressDialog {
 
       if (gatherMap.containsKey(stp.id)) {
         (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
+      }
+
+      if( xAxisCoord.containsKey(stp.id)){
+        //TODO set it on the step
+        (stp as sci.DataStep).model.axis.xyAxis.first.xAxis.graphicalFactor.factor.name =
+            xAxisCoord[stp.id]!;
+      }
+      if( yAxisCoord.containsKey(stp.id)){
+        //TODO set it on the step
+        (stp as sci.DataStep).model.axis.xyAxis.first.yAxis.graphicalFactor.factor.name =
+            yAxisCoord[stp.id]!;
       }
     }
 
