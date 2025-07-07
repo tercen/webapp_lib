@@ -51,6 +51,10 @@ class DropdownComponent extends FetchComponent
         if( useCache ){
           cacheObj.addToCache(cacheKey, dataTable);
         }
+
+        if( onLoad != null ){
+          await onLoad!(dataTable);
+        }
         
         if( initValue != null ){
           selected = await initValue!();
