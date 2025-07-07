@@ -294,7 +294,7 @@ class WorkflowDataService {
       {bool useCache = false}) async {
     var factory = tercen.ServiceFactory();
     var wkf = await factory.workflowService.get(workflowId);
-    var key = "${wkf.id}_$stepId";
+    var key = "${wkf.id}_${stepId}_cols";
 
     if (cache.hasCachedValue(key) && useCache) {
       return cache.getCachedValue(key);
@@ -324,6 +324,9 @@ class WorkflowDataService {
       //   outTbl.addColumn(colName, data: (tbl.columns.firstWhere((e) => e.name == colName).values as List).map((e) => e.toString()).toList() ) ;
       // }
       outList.add(outTbl);
+    }
+    if (useCache) {
+       cache.addToCache(key, outList);
     }
 
     return outList;
@@ -362,6 +365,9 @@ class WorkflowDataService {
         outTbl.addColumn(colName, data: (tbl.columns.firstWhere((e) => e.name == colName).values as List).map((e) => e.toString()).toList() ) ;
       }
       outList.add(outTbl);
+    }
+    if (useCache) {
+       cache.addToCache(key, outList);
     }
 
     return outList;
