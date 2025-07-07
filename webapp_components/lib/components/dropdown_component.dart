@@ -34,40 +34,40 @@ class DropdownComponent extends FetchComponent
   }
 
 
-  @override
-  Future<bool> loadTable({bool force = false}) async {
-    if (!isInit || force == true) {
-      isInit = true;
-      busy();
-      var cacheKey = getKey();
-      if (useCache && cacheObj.hasCachedValue(cacheKey)) {
-        dataTable = cacheObj.getCachedValue(cacheKey);
-      } else {
-        startFuture("dataLoad", dataFetchCallback());
+  // @override
+  // Future<bool> loadTable({bool force = false}) async {
+  //   if (!isInit || force == true) {
+  //     isInit = true;
+  //     busy();
+  //     var cacheKey = getKey();
+  //     if (useCache && cacheObj.hasCachedValue(cacheKey)) {
+  //       dataTable = cacheObj.getCachedValue(cacheKey);
+  //     } else {
+  //       startFuture("dataLoad", dataFetchCallback());
 
-        dataTable = await waitResult("dataLoad"); //  await dataFetchCallback();
+  //       dataTable = await waitResult("dataLoad"); //  await dataFetchCallback();
 
-        dataTable = postLoad(dataTable);
-        if( useCache ){
-          cacheObj.addToCache(cacheKey, dataTable);
-        }
+  //       dataTable = postLoad(dataTable);
+  //       if( useCache ){
+  //         cacheObj.addToCache(cacheKey, dataTable);
+  //       }
 
-        if( onLoad != null ){
-          await onLoad!(dataTable);
-        }
+  //       if( onLoad != null ){
+  //         await onLoad!(dataTable);
+  //       }
         
-        if( initValue != null ){
-          selected = await initValue!();
-        }else{
-          selected = dataTable[displayColumn].first;
-        }
+  //       // if( initValue != null ){
+  //       //   selected = await initValue!();
+  //       // }else{
+  //       //   selected = dataTable[displayColumn].first;
+  //       // }
         
-      }
-      idle();
+  //     }
+  //     idle();
 
-    }
-    return true;
-  }
+  //   }
+  //   return true;
+  // }
   @override
   Widget createWidget(BuildContext context) {
     if( dataTable.isEmpty ){
