@@ -637,6 +637,8 @@ class WorkflowRunner with ProgressDialog {
       workflow.addMeta(meta.key, meta.value);
     }
     addIdPostRun(reEnableSteps);
+
+    print(xAxisCoord);
     //-----------------------------------------
     // Step-specific setup
     //-----------------------------------------
