@@ -697,6 +697,8 @@ class WorkflowRunner with ProgressDialog {
 
       if( xAxisCoord.containsKey(stp.id)){
         //TODO set it on the step
+        print("Setting X axis coord for step ${stp.name} to ${xAxisCoord[stp.id]}");
+        print((stp as sci.DataStep).model.toJson());
         (stp as sci.DataStep).model.axis.xyAxis.first.xAxis.graphicalFactor.factor.name =
             xAxisCoord[stp.id]!;
       }
