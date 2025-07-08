@@ -644,6 +644,10 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
     for (var stp in workflow.steps) {
       print("Checking ${stp.name} (${stp.id})");
+      if (shouldResetStep(stp)) {
+        stp.state.taskState = sci.InitState();
+        stp.state.taskId = "";
+      }
       if (stp.state.taskState.isFinal) {
         continue;
       }
@@ -668,10 +672,7 @@ class WorkflowRunner with ProgressDialog {
         }
       }
 
-      if (shouldResetStep(stp)) {
-        stp.state.taskState = sci.InitState();
-        stp.state.taskId = "";
-      }
+
       if (doNotRunList.contains(stp.id)) {
         stp.state.taskState = sci.DoneState();
         stp.state.taskId = "";
