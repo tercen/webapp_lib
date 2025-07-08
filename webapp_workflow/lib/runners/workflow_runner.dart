@@ -643,6 +643,7 @@ class WorkflowRunner with ProgressDialog {
     // Step-specific setup
     //-----------------------------------------
     for (var stp in workflow.steps) {
+      print("Checking ${stp.name} (${stp.id})");
       if (stp.state.taskState.isFinal) {
         continue;
       }
