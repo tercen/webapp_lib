@@ -414,6 +414,9 @@ class HierarchySelectableListComponent extends FetchComponent
     var row = Row(
       children: [
         // SizedBox(width: 20 ),
+        infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
+            ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
+            : Container(),
         Container(
           height: 30,
           color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
