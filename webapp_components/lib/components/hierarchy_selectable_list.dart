@@ -202,7 +202,7 @@ class HierarchySelectableListComponent extends FetchComponent
   final ScrollController scrollController = ScrollController();
   List<HierarchyNode> selectedNodes = [];
 
-  final List<InfoBoxBuilder> infoBoxBuilderList;
+  final List<InfoBoxBuilder?> infoBoxBuilderList;
   final List<String> infoBoxCols;
 
   final SelectionBehavior selectionBehavior;
@@ -246,6 +246,18 @@ class HierarchySelectableListComponent extends FetchComponent
 
     if( infoBoxCols.isEmpty ){
       infoBoxCols.add(columnHierarchy.last);
+    }
+
+    if( infoBoxBuilderList.length != infoBoxCols.length ){
+      throw sci.ServiceError(500,
+          "The infoBoxBuilderList must have the same length as the infoBoxCols.");
+    }
+
+    if( infoBoxBuilderList.length < columnHierarchy.length){
+      for( var i = infoBoxBuilderList.length; i < columnHierarchy.length; i++ ){
+        infoBoxBuilderList.insert(0, null);
+        infoBoxCols.insert(0, "");
+      }
     }
 
     if (selectionBehavior == SelectionBehavior.single ||
@@ -547,8 +559,8 @@ class HierarchySelectableListComponent extends FetchComponent
         const SizedBox(
           width: 5,
         ),
-        infoBoxBuilderList.isNotEmpty
-            ? infoBoxIcon(infoBoxBuilderList[node.level], row[infoBoxCols[node.level]].first, context)
+        infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
+            ? infoBoxIcon(infoBoxBuilderList[node.level]!, row[infoBoxCols[node.level]].first, context)
             : Container(),
         textWdg
       ],
