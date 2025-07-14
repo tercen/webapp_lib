@@ -18,7 +18,7 @@ typedef TileBuilderCallback = Widget Function(
     {bool isEven, bool bold});
 
 enum SelectionBehavior { none, single, multiLeaf, multi }
-
+ 
 class SelectionNode {
   int level;
   String value;
@@ -198,10 +198,12 @@ class HierarchyNode {
 }
 
 class HierarchySelectableListComponent extends FetchComponent
-    with ComponentInfoBox
     implements SerializableComponent {
   final ScrollController scrollController = ScrollController();
   List<HierarchyNode> selectedNodes = [];
+
+  final List<InfoBoxBuilder> infoBoxBuilderList;
+  final List<String> infoBoxCols;
 
   final SelectionBehavior selectionBehavior;
 
@@ -216,7 +218,6 @@ class HierarchySelectableListComponent extends FetchComponent
   late TileBuilderCallback leafCallback;
   int maxLevel = 0;
   final bool shouldSave;
-  final String infoboxCol;
   final bool expanded;
   final double maxHeight;
   final String emptyMessage;
@@ -231,18 +232,21 @@ class HierarchySelectableListComponent extends FetchComponent
       this.expanded = true,
       this.columnHierarchy = const [],
       this.hideColumns = const [],
+      this.infoBoxBuilderList = const [],
       this.maxHeight = 0,
       this.emptyMessage = "No data available",
-      InfoBoxBuilder? infoBoxBuilder,
       this.shouldSave = false,
       this.selectFirst = false,
       this.onChange,
       this.selectionHierarchy,
-      this.infoboxCol = ""}) {
-    super.infoBoxBuilder = infoBoxBuilder;
+      this.infoBoxCols = const []}) {
     useCache = cache;
 
     maxLevel = columnHierarchy.length - 1;
+
+    if( infoBoxCols.isEmpty ){
+      infoBoxCols.add(columnHierarchy.last);
+    }
 
     if (selectionBehavior == SelectionBehavior.single ||
         selectionBehavior == SelectionBehavior.multi ||
@@ -269,6 +273,39 @@ class HierarchySelectableListComponent extends FetchComponent
 
   List<HierarchyNode> getLevelNodes(int level, {String? parentId}) {
     return hierarchyRoot.getDescendants().where((node) => node.level == level).where((node) => parentId == null || node.parent?.id == parentId ).toList();
+  }
+
+  Widget infoBoxIcon(InfoBoxBuilder infoBoxBuilder, dynamic value, BuildContext context, {String? title}) {
+    return IconButton(
+      alignment: Alignment.center,
+      padding: EdgeInsets.all(0),
+        onPressed: () async {
+          showDialog(
+              context: context,
+              builder: (dialogContext) {
+                return StatefulBuilder(builder: (stfCtx, stfSetState) {
+                  infoBoxBuilder.notifier.addListener(() {
+                    stfSetState(() {});
+                  });
+                  return infoBoxBuilder.build(context, value, titleOverride: title);
+                });
+              });
+        },
+        icon: const Icon(Icons.info_outline));
+  }
+
+  Widget buildInfoBoxIcon(InfoBoxBuilder infoBoxBuilder, dynamic value, BuildContext context,
+      {String? title, double iconCellWidth = 50}) {
+    Widget infoBoxWidget = Container();
+    double infoBoxWidth = 5;
+    
+    infoBoxWidget = infoBoxIcon(infoBoxBuilder, value, context, title: title);
+    infoBoxWidth =iconCellWidth ;
+    
+    return SizedBox(
+      width: infoBoxWidth,
+      child: infoBoxWidget,
+    );
   }
 
   @override
@@ -510,8 +547,8 @@ class HierarchySelectableListComponent extends FetchComponent
         const SizedBox(
           width: 5,
         ),
-        infoBoxBuilder != null
-            ? infoBoxIcon(row[infoboxCol].first, context)
+        infoBoxBuilderList.isNotEmpty
+            ? infoBoxIcon(infoBoxBuilderList[node.level], row[infoBoxCols[node.level]].first, context)
             : Container(),
         textWdg
       ],
