@@ -220,7 +220,7 @@ class WorkflowRunner with ProgressDialog {
       factorType = "int";
     }
     if( factorValue is double){
-      factorType = "numeric";
+      factorType = "double";
     }
 
     sci.Factor filterFactor = sci.Factor()
@@ -444,7 +444,7 @@ class WorkflowRunner with ProgressDialog {
         ..not = false;
 
       for (var i = 0; i < factors.length; i++) {
-        for (var j = 0; i < values.length; i++) {
+        for (var j = 0; j < values[i].length; j++) {
           andFilter.filterExprs
               .add(createFilterExpr(factors[i], values[i][j]));
         }
