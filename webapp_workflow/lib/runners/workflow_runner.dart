@@ -214,9 +214,17 @@ class WorkflowRunner with ProgressDialog {
     folderId = id;
   }
 
-  sci.FilterExpr createFilterExpr(String factorName, String factorValue) {
+  sci.FilterExpr createFilterExpr(String factorName, dynamic factorValue) {
+    var factorType = "string";
+    if( factorValue is int){
+      factorType = "int";
+    }
+    if( factorValue is double){
+      factorType = "numeric";
+    }
+
     sci.Factor filterFactor = sci.Factor()
-      ..type = "string"
+      ..type = factorType
       ..name = factorName;
     var filterExpr = sci.FilterExpr()
       ..filterOp = "equals"
@@ -438,7 +446,7 @@ class WorkflowRunner with ProgressDialog {
       for (var i = 0; i < factors.length; i++) {
         for (var j = 0; i < values.length; i++) {
           andFilter.filterExprs
-              .add(createFilterExpr(factors[i], values[i][j] as String));
+              .add(createFilterExpr(factors[i], values[i][j]));
         }
       }
 
