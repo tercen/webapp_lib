@@ -108,7 +108,7 @@ class WorkflowDataService {
 
     return wkf.steps.firstWhere(
         (step) => step.id == stepId,
-        orElse: () => sci.Step(),
+        orElse: () => sci.DataStep(),
     );
   }
 
