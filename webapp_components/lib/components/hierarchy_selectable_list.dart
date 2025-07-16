@@ -411,7 +411,10 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget nonSelectableRowBuilder(
       BuildContext context,HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
-    return SizedBox(
+    var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
+    
+    return Container(
+      color: clr,
       width: double.infinity,
       child: Row(
         children: [
@@ -630,8 +633,12 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget selectableLeafRowBuilder(
       BuildContext context,  HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
+    var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
+    
     return Container(
+      color: clr,
       height: 30,
+      width: double.infinity,
       child: buildSelectableEntry(context, node, rowVals),
     );
   }
@@ -641,12 +648,10 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
-    var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
+    // Just handle indentation, let individual widgets handle their own background
     var offset = (level == 0 ? 0 : 25) as double;
     
-    return Container(
-      color: clr,
-      width: double.infinity,
+    return Padding(
       padding: EdgeInsets.only(left: level * 25 + offset),
       child: wdg,
     );
