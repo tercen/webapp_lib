@@ -419,7 +419,6 @@ class HierarchySelectableListComponent extends FetchComponent
             : Container(),
         Container(
           height: 30,
-          color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
           child: Text(
             node.label,
             style: bold ? Styles()["textH2"] : Styles()["text"],
@@ -635,7 +634,6 @@ class HierarchySelectableListComponent extends FetchComponent
       children: [
         Container(
           height: 30,
-          color: isEven ? Styles()["evenRow"] : Styles()["oddRow"],
           child: buildSelectableEntry(context, node, rowVals),
         )
       ],
@@ -705,6 +703,8 @@ class HierarchySelectableListComponent extends FetchComponent
             ExpansionTile(
               shape: const Border(),
               controlAffinity: ListTileControlAffinity.leading,
+              backgroundColor: Colors.transparent,
+              collapsedBackgroundColor: Colors.transparent,
               initiallyExpanded: expandedLevels.contains(levelNodes[ri].id),
               title: nonLeafCallback(
                   context,
