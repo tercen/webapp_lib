@@ -102,14 +102,18 @@ class WorkflowDataService {
     final factory = tercen.ServiceFactory();
     final wkf = await factory.workflowService.get(id);
 
-    if (useCache) {
-      cache.addToCache(cacheKey, wkf);
-    }
 
-    return wkf.steps.firstWhere(
+    final step = wkf.steps.firstWhere(
         (step) => step.id == stepId,
         orElse: () => sci.DataStep(),
     );
+
+
+    if (useCache) {
+      cache.addToCache(cacheKey, step);
+    }
+
+    return step;
   }
 
   Future<Workflow> fetch(String id, {bool useCache = true}) async {
