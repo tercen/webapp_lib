@@ -652,17 +652,14 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
     var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
     var offset = (level == 0 ? 0 : 25) as double;
-    var row = Row(mainAxisSize: MainAxisSize.max, children: [
-      Container(
-        constraints: BoxConstraints(minWidth: level * 25 + offset),
-      ),
-      Expanded(child: wdg)
-    ]);
-
+    
     return Container(
       color: clr,
       width: double.infinity,
-      child: row,
+      child: Padding(
+        padding: EdgeInsets.only(left: level * 25 + offset),
+        child: wdg,
+      ),
     );
   }
 
@@ -705,6 +702,8 @@ class HierarchySelectableListComponent extends FetchComponent
               controlAffinity: ListTileControlAffinity.leading,
               backgroundColor: Colors.transparent,
               collapsedBackgroundColor: Colors.transparent,
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
               initiallyExpanded: expandedLevels.contains(levelNodes[ri].id),
               title: nonLeafCallback(
                   context,
