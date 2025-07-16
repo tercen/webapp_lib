@@ -634,7 +634,8 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   List<Widget> buildWidgetTree(BuildContext context) {
-    return createWidgets(context, 0, globalRowIndex: 0);
+    var globalCounter = {"count": 0}; // Use a map so it's passed by reference
+    return createWidgets(context, 0, globalCounter: globalCounter);
   }
 
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
@@ -664,14 +665,15 @@ class HierarchySelectableListComponent extends FetchComponent
   // }
 
   List<Widget> createWidgets(BuildContext context, int level,
-      {String? parentId, int globalRowIndex = 0}) {
+      {String? parentId, Map<String, int>? globalCounter}) {
     List<Widget> wdg = [];
     final levelNodes = getLevelNodes(level, parentId: parentId );
-    int currentGlobalIndex = globalRowIndex;
+    globalCounter ??= {"count": 0};
 
     for (var ri = 0; ri < levelNodes.length; ri++) {
-      // final levelId = levelTable[selectionCol][ri];
       final node = levelNodes[ri];
+      final currentIndex = globalCounter["count"]!;
+      globalCounter["count"] = currentIndex + 1;
 
       if (level == maxLevel) {
         wdg.add(createTabulatedEntry(
@@ -679,10 +681,9 @@ class HierarchySelectableListComponent extends FetchComponent
             leafCallback(
                 context,
                 node,
-                isEven: currentGlobalIndex % 2 == 0,
+                isEven: currentIndex % 2 == 0,
                 dataTable.select([ri])),
-            isEven: currentGlobalIndex % 2 == 0));
-        currentGlobalIndex++;
+            isEven: currentIndex % 2 == 0));
       } else {
         wdg.add(createTabulatedEntry(
             level,
@@ -697,14 +698,13 @@ class HierarchySelectableListComponent extends FetchComponent
               title: nonLeafCallback(
                   context,
                   node,
-                  isEven: currentGlobalIndex % 2 == 0,
+                  isEven: currentIndex % 2 == 0,
                   dataTable.select([ri]),
                   bold: true),
               children:
-                  createWidgets(context, level + 1, parentId: node.id, globalRowIndex: currentGlobalIndex + 1),
+                  createWidgets(context, level + 1, parentId: node.id, globalCounter: globalCounter),
             ),
-            isEven: currentGlobalIndex % 2 == 0));
-        currentGlobalIndex++;
+            isEven: currentIndex % 2 == 0));
       }
     }
 
