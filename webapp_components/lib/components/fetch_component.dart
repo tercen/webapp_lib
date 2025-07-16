@@ -53,7 +53,7 @@ class FetchComponent with
 
   Future<bool> loadTable({bool force = false}) async {
     if (!isInit || force == true) {
-      isInit = true;
+      // isInit = true;
       busy();
       var cacheKey = getKey();
       if (useCache && cacheObj.hasCachedValue(cacheKey)) {
