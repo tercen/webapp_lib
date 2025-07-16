@@ -411,22 +411,22 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget nonSelectableRowBuilder(
       BuildContext context,HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        // SizedBox(width: 20 ),
-        infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
-            ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
-            : Container(),
-        Container(
-          height: 30,
-          child: Text(
-            node.label,
-            style: bold ? Styles()["textH2"] : Styles()["text"],
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        children: [
+          infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
+              ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
+              : Container(),
+          Container(
+            height: 30,
+            child: Text(
+              node.label,
+              style: bold ? Styles()["textH2"] : Styles()["text"],
+            ),
           ),
-        ),
-        Expanded(child: Container()), // Fill remaining space
-      ],
+        ],
+      ),
     );
   }
 
@@ -510,61 +510,62 @@ class HierarchySelectableListComponent extends FetchComponent
       style: bold ? Styles()["textH2"] : Styles()["text"],
     );
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Checkbox(
-            value: isSelected(node),
-            checkColor: Styles()["black"],
-            side: WidgetStateBorderSide.resolveWith((states) => BorderSide(
-                  color: Styles()["black"],
-                  width: 1.5,
-                )),
-            fillColor: WidgetStateProperty.resolveWith<Color>(
-                (Set<WidgetState> states) {
-              return Styles()["clear"];
-            }),
-            onChanged: (value) {
-              if (value == true) {
-                if (selectionBehavior == SelectionBehavior.single) {
-                  selectedNodes.clear();
-                }
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Checkbox(
+              value: isSelected(node),
+              checkColor: Styles()["black"],
+              side: WidgetStateBorderSide.resolveWith((states) => BorderSide(
+                    color: Styles()["black"],
+                    width: 1.5,
+                  )),
+              fillColor: WidgetStateProperty.resolveWith<Color>(
+                  (Set<WidgetState> states) {
+                return Styles()["clear"];
+              }),
+              onChanged: (value) {
+                if (value == true) {
+                  if (selectionBehavior == SelectionBehavior.single) {
+                    selectedNodes.clear();
+                  }
 
-                select(node);
+                  select(node);
 
-                if (selectionBehavior == SelectionBehavior.multi) {
-                  selectFather(node);
-                  selectChildren(node);
-                }
-                if( onChange != null ){
-                  // dataTable.selectByColValue([columns[node.level]], dataTable[columns[node.level]]);
-                  onChange!(selectTableRow(node), true);
-                }
-                
-              } else {
-                deselect(node);
+                  if (selectionBehavior == SelectionBehavior.multi) {
+                    selectFather(node);
+                    selectChildren(node);
+                  }
+                  if( onChange != null ){
+                    // dataTable.selectByColValue([columns[node.level]], dataTable[columns[node.level]]);
+                    onChange!(selectTableRow(node), true);
+                  }
+                  
+                } else {
+                  deselect(node);
 
-                if (selectionBehavior == SelectionBehavior.multi) {
-                  checkSiblings(node);
-                  deselectChildren(node);
+                  if (selectionBehavior == SelectionBehavior.multi) {
+                    checkSiblings(node);
+                    deselectChildren(node);
+                  }
+                  if( onChange != null ){
+                    onChange!(selectTableRow(node), false);
+                  }
                 }
-                if( onChange != null ){
-                  onChange!(selectTableRow(node), false);
-                }
-              }
-              notifyListeners();
-            }),
-        const SizedBox(
-          width: 5,
-        ),
-        infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
-            ? infoBoxIcon(infoBoxBuilderList[node.level]!, row[infoBoxCols[node.level]].first, context)
-            : Container(),
-        textWdg,
-        Expanded(child: Container()), // Fill remaining space
-      ],
+                notifyListeners();
+              }),
+          const SizedBox(
+            width: 5,
+          ),
+          infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
+              ? infoBoxIcon(infoBoxBuilderList[node.level]!, row[infoBoxCols[node.level]].first, context)
+              : Container(),
+          textWdg
+        ],
+      ),
     );
   }
 
@@ -629,15 +630,9 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget selectableLeafRowBuilder(
       BuildContext context,  HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Container(
-          height: 30,
-          child: buildSelectableEntry(context, node, rowVals),
-        ),
-        Expanded(child: Container()), // Fill remaining space
-      ],
+    return Container(
+      height: 30,
+      child: buildSelectableEntry(context, node, rowVals),
     );
   }
 
@@ -649,20 +644,11 @@ class HierarchySelectableListComponent extends FetchComponent
     var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
     var offset = (level == 0 ? 0 : 25) as double;
     
-    var row = Row(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Container(
-          constraints: BoxConstraints(minWidth: level * 25 + offset),
-        ),
-        Expanded(child: wdg)
-      ],
-    );
-
     return Container(
       color: clr,
       width: double.infinity,
-      child: row,
+      padding: EdgeInsets.only(left: level * 25 + offset),
+      child: wdg,
     );
   }
 
