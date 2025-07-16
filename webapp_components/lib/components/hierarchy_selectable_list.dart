@@ -412,21 +412,25 @@ class HierarchySelectableListComponent extends FetchComponent
       BuildContext context,HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
+    var offset = (node.level == 0 ? 0 : 25) as double;
     
     return Container(
       color: clr,
       width: double.infinity,
       height: 30,
-      child: Row(
-        children: [
-          infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
-              ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
-              : Container(),
-          Text(
-            node.label,
-            style: bold ? Styles()["textH2"] : Styles()["text"],
-          ),
-        ],
+      child: Padding(
+        padding: EdgeInsets.only(left: node.level * 25 + offset),
+        child: Row(
+          children: [
+            infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
+                ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
+                : Container(),
+            Text(
+              node.label,
+              style: bold ? Styles()["textH2"] : Styles()["text"],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -632,12 +636,16 @@ class HierarchySelectableListComponent extends FetchComponent
       BuildContext context,  HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
+    var offset = (node.level == 0 ? 0 : 25) as double;
     
     return Container(
       color: clr,
       width: double.infinity,
       height: 30,
-      child: buildSelectableEntry(context, node, rowVals),
+      child: Padding(
+        padding: EdgeInsets.only(left: node.level * 25 + offset),
+        child: buildSelectableEntry(context, node, rowVals),
+      ),
     );
   }
 
@@ -647,12 +655,8 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
-    var offset = (level == 0 ? 0 : 25) as double;
-    
-    return Padding(
-      padding: EdgeInsets.only(left: level * 25 + offset),
-      child: wdg,
-    );
+    // Pass the indentation level to the widget itself
+    return wdg;
   }
 
   // List<String> getLevelList(int level, String? parent) {
