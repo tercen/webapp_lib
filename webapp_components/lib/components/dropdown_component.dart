@@ -22,7 +22,8 @@ class DropdownComponent extends FetchComponent
       super.id, super.groupId, super.componentLabel, super.dataFetchFunc, this.displayColumn, 
       {infoBoxBuilder, this.initValue,
       String Function(String, {String id})? pathTransformCallback,
-      this.shouldSave = true, this.onChange, super.onLoad}) {
+      this.shouldSave = true, this.onChange, super.onLoad, bool cache = true}) {
+    super.useCache = cache;
     // super.id = id;
     // super.groupId = groupId;
     // super.componentLabel = componentLabel;
