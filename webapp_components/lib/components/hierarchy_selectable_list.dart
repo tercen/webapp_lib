@@ -429,8 +429,8 @@ class HierarchySelectableListComponent extends FetchComponent
             if (hasChildren)
               Icon(
                 expandedLevels.contains(node.id) 
-                    ? Icons.add 
-                    : Icons.remove,
+                    ? Icons.remove 
+                    : Icons.add,
                 size: 16,
               ),
             if (hasChildren) SizedBox(width: 4),
@@ -709,6 +709,14 @@ class HierarchySelectableListComponent extends FetchComponent
             Theme(
               data: Theme.of(context).copyWith(
                 hoverColor: Colors.transparent,
+                focusColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                listTileTheme: ListTileTheme.of(context).copyWith(
+                  // hoverColor: Colors.transparent,
+                  // focusColor: Colors.transparent,
+                  selectedColor: Colors.transparent,
+                ),
               ),
               child: ExpansionTile(
                 shape: const Border(),
