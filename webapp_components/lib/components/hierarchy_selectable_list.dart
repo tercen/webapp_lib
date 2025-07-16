@@ -706,23 +706,28 @@ class HierarchySelectableListComponent extends FetchComponent
       } else {
         wdg.add(createTabulatedEntry(
             level,
-            ExpansionTile(
-              shape: const Border(),
-              controlAffinity: ListTileControlAffinity.trailing,
-              backgroundColor: Colors.transparent,
-              collapsedBackgroundColor: Colors.transparent,
-              tilePadding: EdgeInsets.zero,
-              childrenPadding: EdgeInsets.zero,
-              trailing: SizedBox.shrink(), // Hide the default chevron
-              initiallyExpanded: expandedLevels.contains(levelNodes[ri].id),
-              title: nonLeafCallback(
-                  context,
-                  node,
-                  isEven: currentIndex % 2 == 0,
-                  dataTable.select([ri]),
-                  bold: true),
-              children:
-                  createWidgets(context, level + 1, parentId: node.id, globalCounter: globalCounter),
+            Theme(
+              data: Theme.of(context).copyWith(
+                hoverColor: Colors.transparent,
+              ),
+              child: ExpansionTile(
+                shape: const Border(),
+                controlAffinity: ListTileControlAffinity.trailing,
+                backgroundColor: Colors.transparent,
+                collapsedBackgroundColor: Colors.transparent,
+                tilePadding: EdgeInsets.zero,
+                childrenPadding: EdgeInsets.zero,
+                trailing: SizedBox.shrink(), // Hide the default chevron
+                initiallyExpanded: expandedLevels.contains(levelNodes[ri].id),
+                title: nonLeafCallback(
+                    context,
+                    node,
+                    isEven: currentIndex % 2 == 0,
+                    dataTable.select([ri]),
+                    bold: true),
+                children:
+                    createWidgets(context, level + 1, parentId: node.id, globalCounter: globalCounter),
+              ),
             ),
             isEven: currentIndex % 2 == 0));
       }
