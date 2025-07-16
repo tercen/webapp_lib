@@ -411,7 +411,8 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget nonSelectableRowBuilder(
       BuildContext context,HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
-    var row = Row(
+    return Row(
+      mainAxisSize: MainAxisSize.max,
       children: [
         // SizedBox(width: 20 ),
         infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
@@ -423,13 +424,9 @@ class HierarchySelectableListComponent extends FetchComponent
             node.label,
             style: bold ? Styles()["textH2"] : Styles()["text"],
           ),
-        )
+        ),
+        Expanded(child: Container()), // Fill remaining space
       ],
-    );
-
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: row,
     );
   }
 
@@ -630,18 +627,15 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget selectableLeafRowBuilder(
       BuildContext context,  HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
-    var row = Row(
+    return Row(
+      mainAxisSize: MainAxisSize.max,
       children: [
         Container(
           height: 30,
           child: buildSelectableEntry(context, node, rowVals),
-        )
+        ),
+        Expanded(child: Container()), // Fill remaining space
       ],
-    );
-
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: row,
     );
   }
 
