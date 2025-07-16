@@ -93,7 +93,7 @@ class WorkflowDataService {
     return libObjs;
   }
 
-  Future<Step> fetchStep(String id, String stepId, {bool useCache = true}) async {
+  Future<sci.Step> fetchStep(String id, String stepId, {bool useCache = true}) async {
     var cacheKey = "${id}_${stepId}_step";
     if (useCache && cache.hasCachedValue(cacheKey)) {
       return cache.getCachedValue(cacheKey);
