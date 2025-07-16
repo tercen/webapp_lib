@@ -37,7 +37,7 @@ class FetchComponent with
     if (isActive() && !isInit) {
       super.init();
       loadTable();
-      
+      notifyListeners();
     }
   }
 
