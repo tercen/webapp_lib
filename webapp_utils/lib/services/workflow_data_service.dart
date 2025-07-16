@@ -93,6 +93,25 @@ class WorkflowDataService {
     return libObjs;
   }
 
+  Future<Step> fetchStep(String id, String stepId, {bool useCache = true}) async {
+    var cacheKey = "${id}_${stepId}_step";
+    if (useCache && cache.hasCachedValue(cacheKey)) {
+      return cache.getCachedValue(cacheKey);
+    }
+
+    final factory = tercen.ServiceFactory();
+    final wkf = await factory.workflowService.get(id);
+
+    if (useCache) {
+      cache.addToCache(cacheKey, wkf);
+    }
+
+    return wkf.steps.firstWhere(
+        (step) => step.id == stepId,
+        orElse: () => sci.Step(),
+    );
+  }
+
   Future<Workflow> fetch(String id, {bool useCache = true}) async {
     var cacheKey = "${id}_workflow";
     if (useCache && cache.hasCachedValue(cacheKey)) {
