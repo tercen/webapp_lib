@@ -512,6 +512,7 @@ class HierarchySelectableListComponent extends FetchComponent
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Checkbox(
@@ -561,7 +562,8 @@ class HierarchySelectableListComponent extends FetchComponent
         infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
             ? infoBoxIcon(infoBoxBuilderList[node.level]!, row[infoBoxCols[node.level]].first, context)
             : Container(),
-        textWdg
+        textWdg,
+        Expanded(child: Container()), // Fill remaining space
       ],
     );
   }
@@ -647,13 +649,20 @@ class HierarchySelectableListComponent extends FetchComponent
     var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
     var offset = (level == 0 ? 0 : 25) as double;
     
+    var row = Row(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Container(
+          constraints: BoxConstraints(minWidth: level * 25 + offset),
+        ),
+        Expanded(child: wdg)
+      ],
+    );
+
     return Container(
       color: clr,
       width: double.infinity,
-      child: Padding(
-        padding: EdgeInsets.only(left: level * 25 + offset),
-        child: wdg,
-      ),
+      child: row,
     );
   }
 
