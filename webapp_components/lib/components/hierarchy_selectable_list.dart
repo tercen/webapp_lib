@@ -411,19 +411,23 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget nonSelectableRowBuilder(
       BuildContext context,HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
-    return Row(
-      children: [
-        infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
-            ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
-            : Container(),
-        Container(
-          height: 30,
-          child: Text(
+    var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
+    
+    return Container(
+      color: clr,
+      width: double.infinity,
+      height: 30,
+      child: Row(
+        children: [
+          infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
+              ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
+              : Container(),
+          Text(
             node.label,
             style: bold ? Styles()["textH2"] : Styles()["text"],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -627,7 +631,11 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget selectableLeafRowBuilder(
       BuildContext context,  HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
+    var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
+    
     return Container(
+      color: clr,
+      width: double.infinity,
       height: 30,
       child: buildSelectableEntry(context, node, rowVals),
     );
@@ -639,16 +647,11 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
-    var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
     var offset = (level == 0 ? 0 : 25) as double;
     
-    return Container(
-      color: clr,
-      width: double.infinity,
-      child: Padding(
-        padding: EdgeInsets.only(left: level * 25 + offset),
-        child: wdg,
-      ),
+    return Padding(
+      padding: EdgeInsets.only(left: level * 25 + offset),
+      child: wdg,
     );
   }
 
