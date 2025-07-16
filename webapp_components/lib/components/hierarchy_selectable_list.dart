@@ -412,16 +412,28 @@ class HierarchySelectableListComponent extends FetchComponent
       BuildContext context,HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
-    var offset = (node.level == 0 ? 0 : 25) as double;
+    var offset = node.level * 25 as double;
+    
+    // Check if this node has children to show chevron
+    bool hasChildren = node.children.isNotEmpty;
     
     return Container(
       color: clr,
       width: double.infinity,
       height: 30,
       child: Padding(
-        padding: EdgeInsets.only(left: node.level * 25 + offset),
+        padding: EdgeInsets.only(left:  offset),
         child: Row(
           children: [
+            // Chevron icon next to content (only if has children)
+            if (hasChildren)
+              Icon(
+                expandedLevels.contains(node.id) 
+                    ? Icons.add 
+                    : Icons.remove,
+                size: 16,
+              ),
+            if (hasChildren) SizedBox(width: 4),
             infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
                 ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
                 : Container(),
@@ -636,14 +648,14 @@ class HierarchySelectableListComponent extends FetchComponent
       BuildContext context,  HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
-    var offset = (node.level == 0 ? 0 : 25) as double;
+    var offset = node.level * 25 as double;
     
     return Container(
       color: clr,
       width: double.infinity,
       height: 30,
       child: Padding(
-        padding: EdgeInsets.only(left: node.level * 25 + offset),
+        padding: EdgeInsets.only(left: offset + 50),
         child: buildSelectableEntry(context, node, rowVals),
       ),
     );
@@ -696,11 +708,12 @@ class HierarchySelectableListComponent extends FetchComponent
             level,
             ExpansionTile(
               shape: const Border(),
-              controlAffinity: ListTileControlAffinity.leading,
+              controlAffinity: ListTileControlAffinity.trailing,
               backgroundColor: Colors.transparent,
               collapsedBackgroundColor: Colors.transparent,
               tilePadding: EdgeInsets.zero,
               childrenPadding: EdgeInsets.zero,
+              trailing: SizedBox.shrink(), // Hide the default chevron
               initiallyExpanded: expandedLevels.contains(levelNodes[ri].id),
               title: nonLeafCallback(
                   context,
