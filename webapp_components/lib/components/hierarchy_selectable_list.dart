@@ -411,25 +411,19 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget nonSelectableRowBuilder(
       BuildContext context,HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
-    var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
-    
-    return Container(
-      color: clr,
-      width: double.infinity,
-      child: Row(
-        children: [
-          infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
-              ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
-              : Container(),
-          Container(
-            height: 30,
-            child: Text(
-              node.label,
-              style: bold ? Styles()["textH2"] : Styles()["text"],
-            ),
+    return Row(
+      children: [
+        infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
+            ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
+            : Container(),
+        Container(
+          height: 30,
+          child: Text(
+            node.label,
+            style: bold ? Styles()["textH2"] : Styles()["text"],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -633,12 +627,8 @@ class HierarchySelectableListComponent extends FetchComponent
   Widget selectableLeafRowBuilder(
       BuildContext context,  HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
-    var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
-    
     return Container(
-      color: clr,
       height: 30,
-      width: double.infinity,
       child: buildSelectableEntry(context, node, rowVals),
     );
   }
@@ -648,12 +638,16 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
-    // Just handle indentation, let individual widgets handle their own background
+    var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
     var offset = (level == 0 ? 0 : 25) as double;
     
-    return Padding(
-      padding: EdgeInsets.only(left: level * 25 + offset),
-      child: wdg,
+    return Container(
+      color: clr,
+      width: double.infinity,
+      child: Padding(
+        padding: EdgeInsets.only(left: level * 25 + offset),
+        child: wdg,
+      ),
     );
   }
 
@@ -688,6 +682,7 @@ class HierarchySelectableListComponent extends FetchComponent
                 isEven: currentGlobalIndex % 2 == 0,
                 dataTable.select([ri])),
             isEven: currentGlobalIndex % 2 == 0));
+        currentGlobalIndex++;
       } else {
         wdg.add(createTabulatedEntry(
             level,
@@ -709,8 +704,8 @@ class HierarchySelectableListComponent extends FetchComponent
                   createWidgets(context, level + 1, parentId: node.id, globalRowIndex: currentGlobalIndex + 1),
             ),
             isEven: currentGlobalIndex % 2 == 0));
+        currentGlobalIndex++;
       }
-      currentGlobalIndex++;
     }
 
     return wdg;
