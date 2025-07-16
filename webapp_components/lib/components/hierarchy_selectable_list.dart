@@ -728,13 +728,13 @@ class HierarchySelectableListComponent extends FetchComponent
                 trailing: SizedBox.shrink(), // Hide the default chevron
                 initiallyExpanded: expandedLevels.contains(levelNodes[ri].id),
                 onExpansionChanged: (expanded) {
-                  // if (expanded) {
-                  //   if (!expandedLevels.contains(node.id)) {
-                  //     expandedLevels.add(node.id);
-                  //   }
-                  // } else {
-                  //   expandedLevels.remove(node.id);
-                  // }
+                  if (expanded) {
+                    if (!expandedLevels.contains(node.id)) {
+                      expandedLevels.add(node.id);
+                    }
+                  } else {
+                    expandedLevels.remove(node.id);
+                  }
                   notifyListeners(); // Trigger rebuild to update icons
                 },
                 title: nonLeafCallback(
