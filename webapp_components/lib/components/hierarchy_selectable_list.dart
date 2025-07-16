@@ -648,21 +648,22 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   List<Widget> buildWidgetTree(BuildContext context) {
-    return createWidgets(context, 0);
+    return createWidgets(context, 0, globalRowIndex: 0);
   }
 
   Widget createTabulatedEntry(int level, Widget wdg, {bool isEven = false}) {
     var clr = isEven ? Styles()["evenRow"] : Styles()["oddRow"];
     var offset = (level == 0 ? 0 : 25) as double;
-    var row = Row(mainAxisSize: MainAxisSize.min, children: [
+    var row = Row(mainAxisSize: MainAxisSize.max, children: [
       Container(
         constraints: BoxConstraints(minWidth: level * 25 + offset),
       ),
-      Flexible(child: wdg)
+      Expanded(child: wdg)
     ]);
 
     return Container(
       color: clr,
+      width: double.infinity,
       child: row,
     );
   }
@@ -680,10 +681,10 @@ class HierarchySelectableListComponent extends FetchComponent
   // }
 
   List<Widget> createWidgets(BuildContext context, int level,
-      {String? parentId}) {
+      {String? parentId, int globalRowIndex = 0}) {
     List<Widget> wdg = [];
     final levelNodes = getLevelNodes(level, parentId: parentId );
-
+    int currentGlobalIndex = globalRowIndex;
 
     for (var ri = 0; ri < levelNodes.length; ri++) {
       // final levelId = levelTable[selectionCol][ri];
@@ -695,9 +696,9 @@ class HierarchySelectableListComponent extends FetchComponent
             leafCallback(
                 context,
                 node,
-                isEven: ri % 2 == 0,
+                isEven: currentGlobalIndex % 2 == 0,
                 dataTable.select([ri])),
-            isEven: ri % 2 == 0));
+            isEven: currentGlobalIndex % 2 == 0));
       } else {
         wdg.add(createTabulatedEntry(
             level,
@@ -708,14 +709,15 @@ class HierarchySelectableListComponent extends FetchComponent
               title: nonLeafCallback(
                   context,
                   node,
-                  isEven: ri % 2 == 0,
+                  isEven: currentGlobalIndex % 2 == 0,
                   dataTable.select([ri]),
                   bold: true),
               children:
-                  createWidgets(context, level + 1, parentId: node.id),
+                  createWidgets(context, level + 1, parentId: node.id, globalRowIndex: currentGlobalIndex + 1),
             ),
-            isEven: ri % 2 == 0));
+            isEven: currentGlobalIndex % 2 == 0));
       }
+      currentGlobalIndex++;
     }
 
     return wdg;
