@@ -125,6 +125,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
           workflow = await factory.workflowService.get(workflow.id);  
         } catch (e) {
           print("WORKFLOW ${workflow.id} not found");
+          return sci.Workflow();
         }
         
       }
@@ -137,6 +138,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
         } catch (e) {
           //Will generally trigger on task cancel
           print("WORKFLOW ${workflow.id} not found");
+          return sci.Workflow();
         }
       }
       
