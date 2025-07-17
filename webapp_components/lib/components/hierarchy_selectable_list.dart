@@ -770,7 +770,9 @@ class HierarchySelectableListComponent extends FetchComponent
   
 
   void setSelected(String value, String? column){
+    print("Calling setSelected with value: $value, column: $column [$isInit]");
     if( isInit ){
+
       _setSelected(value, column);
     }else{
       delayedSelection =  () => _setSelected(value, column);
@@ -781,7 +783,7 @@ class HierarchySelectableListComponent extends FetchComponent
     print("Setting selected: $value, column: $column");
     print(hierarchyRoot.getDescendants().where((node) => column == null || node.selectionColumnName == column));
     final node = hierarchyRoot.getDescendants().where((node) => column == null || node.selectionColumnName == column) .firstWhere((node) => node.id == value, orElse: () => hierarchyRoot);
-  
+
     if( node.level == -1 ){
       Logger().log(level: Logger.WARN, message: "_setSelected: Node with id $value not found in hierarchy.");
       return;
