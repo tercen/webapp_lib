@@ -226,11 +226,17 @@ class WorkflowTaskComponent extends ActionTableComponent {
             }
           }
 
-          // runningTasks = runningTasks.toSet().toList();
-          final unique = <RunningTask>{};
-          runningTasks.retainWhere(unique.add);
-          await loadTaskTable();
-          notifyListeners();
+          try {
+            final unique = <RunningTask>{};
+            runningTasks.retainWhere(unique.add);
+            await loadTaskTable();
+            notifyListeners();  
+          } catch (e) {
+            Logger().log(
+                level: Logger.WARN,
+                message: "Failed to update task table: $e\n\nWORKFLOW ID: $workflowId");
+          }
+          
         });
       }
     }

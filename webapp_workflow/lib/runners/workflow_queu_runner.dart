@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
+import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/services/app_user.dart';
 import 'package:webapp_workflow/runners/workflow_runner.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
@@ -18,6 +19,14 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
   @override
   Future<sci.Workflow> doRun(BuildContext? context, sci.Workflow workflow) async {
+    try {
+      return _doRun(context, workflow);
+    } catch (e) {
+      Logger().log(level: Logger.WARN, message: "WorkflowQueuRunner.doRun failed");
+      return sci.Workflow();
+    }
+  }
+  Future<sci.Workflow> _doRun(BuildContext? context, sci.Workflow workflow) async {
     var factory = tercen.ServiceFactory();
    
 
