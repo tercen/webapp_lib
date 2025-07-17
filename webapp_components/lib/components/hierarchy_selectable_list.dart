@@ -661,13 +661,13 @@ class HierarchySelectableListComponent extends FetchComponent
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
     var offset = node.level * 25 as double;
-    
+    var offsetExtra = node.children.isEmpty ? 50 : 0;
     return Container(
       color: clr,
       width: double.infinity,
       height: 30,
       child: Padding(
-        padding: EdgeInsets.only(left: offset + 50),
+        padding: EdgeInsets.only(left: offset + offsetExtra),
         child: buildSelectableEntry(context, node, rowVals),
       ),
     );
