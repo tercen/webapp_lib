@@ -694,7 +694,7 @@ class HierarchySelectableListComponent extends FetchComponent
       final currentIndex = globalCounter["count"]!;
       globalCounter["count"] = currentIndex + 1;
 
-      if ( node.children.isEmpty) { //Leaf
+      if (node.children.isEmpty && level == maxLevel) { //Leaf
         wdg.add(createTabulatedEntry(
             level,
             leafCallback(
