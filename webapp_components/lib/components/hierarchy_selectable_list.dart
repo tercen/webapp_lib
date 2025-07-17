@@ -527,12 +527,24 @@ class HierarchySelectableListComponent extends FetchComponent
       style: bold ? Styles()["textH2"] : Styles()["text"],
     );
 
+    // Check if this node has children to show chevron
+    bool hasChildren = node.children.isNotEmpty;
+
     return SizedBox(
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Chevron icon next to checkbox (only if has children)
+          if (hasChildren)
+            Icon(
+              expandedLevels.contains(node.id) 
+                  ? Icons.remove 
+                  : Icons.add,
+              size: 16,
+            ),
+          if (hasChildren) SizedBox(width: 4),
           Checkbox(
               value: isSelected(node),
               checkColor: Styles()["black"],
