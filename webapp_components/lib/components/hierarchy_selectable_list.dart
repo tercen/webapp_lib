@@ -203,7 +203,7 @@ class HierarchySelectableListComponent extends FetchComponent
   List<HierarchyNode> selectedNodes = [];
 
   final List<InfoBoxBuilder?> infoBoxBuilderList;
-  final List<String> infoBoxCols;
+  List<String> infoBoxCols;
 
   final SelectionBehavior selectionBehavior;
 
@@ -245,7 +245,7 @@ class HierarchySelectableListComponent extends FetchComponent
     maxLevel = columnHierarchy.length - 1;
 
     if( infoBoxCols.isEmpty ){
-      infoBoxCols.add(columnHierarchy.last);
+      infoBoxCols = [columnHierarchy.last];
     }
 
     if( infoBoxBuilderList.length != infoBoxCols.length ){
