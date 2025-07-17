@@ -83,6 +83,7 @@ class ListComponent extends FetchComponent implements Component {
         title,
         style: Styles()["textH2"],
       ),
+      controlAffinity: ListTileControlAffinity.leading,
       controller: expansionControllers.last,
       initiallyExpanded: expandedRows.contains(row),
       onExpansionChanged: (isExpanded) {
