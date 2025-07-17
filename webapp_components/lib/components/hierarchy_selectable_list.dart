@@ -253,7 +253,7 @@ class HierarchySelectableListComponent extends FetchComponent
           "The infoBoxBuilderList must have the same length as the infoBoxCols.");
     }
 
-    if( infoBoxBuilderList.length < columnHierarchy.length){
+    if( infoBoxBuilderList.isNotEmpty &&  infoBoxBuilderList.length < columnHierarchy.length){
       for( var i = infoBoxBuilderList.length; i < columnHierarchy.length; i++ ){
         infoBoxBuilderList.insert(0, null);
         infoBoxCols.insert(0, "");
