@@ -244,7 +244,7 @@ class HierarchySelectableListComponent extends FetchComponent
 
     maxLevel = columnHierarchy.length - 1;
 
-    if( infoBoxCols.isEmpty ){
+    if( infoBoxCols.isEmpty && infoBoxBuilderList.length == 1 ){
       infoBoxCols = [columnHierarchy.last];
     }
 
