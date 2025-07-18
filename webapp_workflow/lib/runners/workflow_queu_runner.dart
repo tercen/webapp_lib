@@ -113,10 +113,11 @@ class WorkflowQueuRunner extends WorkflowRunner {
     }
     print("Workflow run done $hasFailed");
     //
-    workflow.rev = await factory.workflowService.update(workflow);
+    
     // workflow = await factory.workflowService.get(workflow.id);
 
     if (!hasFailed) {
+      workflow.rev = await factory.workflowService.update(workflow);
       for (var f in postRunCallbacks) {
         await f();
         //In case function updates workflow
