@@ -3,6 +3,7 @@ class Logger {
   static const WARN = 50;
   static const FINER = 100;
   static const FINE = 250;
+  static const INFO = 500;
   static const ALL =  100000;
 
   

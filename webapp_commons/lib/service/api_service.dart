@@ -1,0 +1,107 @@
+import 'dart:convert';
+
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:sci_http_client/http_client.dart' as http_api;
+import 'package:sci_http_client/http_browser_client.dart' as io_http;
+import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+import 'dart:html' as html;
+import 'package:sci_http_client/http_auth_client.dart' as auth_http;
+import 'package:webapp_commons/utils/logger.dart';
+
+class ApiService {
+  static final ApiService _singleton = ApiService._internal();
+
+  factory ApiService() {
+    return _singleton;
+  }
+
+  ApiService._internal();
+
+  late sci.UserSession session;
+
+  bool get isDev => Uri.base.hasPort && (Uri.base.port > 10000);
+
+  Future<void> _initTercenFactory(String token) async {
+    if (token.isEmpty) {
+      throw sci.ServiceError(403, "Unauthorized",
+          "A Token is required to initialize the service.");
+    }
+
+    try {
+      var authClient =
+          auth_http.HttpAuthClient(token, io_http.HttpBrowserClient());
+
+      var factory = sci.ServiceFactory();
+
+      if (isDev) {
+        Logger()
+            .log(level: Logger.INFO, message: "Running in development mode");
+
+        await factory.initializeWith(
+            Uri.parse('http://127.0.0.1:5400'), authClient);
+      } else {
+        var uriBase = Uri.base;
+        await factory.initializeWith(
+            Uri(scheme: uriBase.scheme, host: uriBase.host, port: uriBase.port),
+            authClient);
+      }
+
+      http_api.HttpClient.setCurrent(authClient);
+
+      tercen.ServiceFactory.CURRENT = factory;
+
+      Logger().log(
+          level: Logger.FINE, message: "Tercen service factory initialized");
+    } catch (e) {
+      throw sci.ServiceError(500, "Failed: _initTercenFactory", e.toString());
+    }
+  }
+
+  Future<void> connect() async {
+    """
+      Connects to the Tercen service and initializes the user session.
+
+      Must be called before any other service calls during App initialization.
+    """;
+    http_api.HttpClient.setCurrent(io_http.HttpBrowserClient());
+
+    if (isDev) {
+      var tok = Uri.base.queryParameters["token"] ?? '';
+      var decodedToken = JwtDecoder.decode(tok);
+      session = sci.UserSession()
+        ..user = (sci.User()..id = decodedToken['data']['u'])
+        ..token = (sci.Token()..token = tok);
+    } else {
+      var auth = json.decode(html.window.localStorage['authorization'] ?? "");
+
+      session = sci.UserSession.json(auth);
+    }
+
+    // navMenu.addLink("Exit App", AppUser().projectUrl);
+
+    await _initTercenFactory(session.token.token);
+    var factory = tercen.ServiceFactory();
+    var userService = factory.userService as sci.UserService;
+
+    await userService.setSession(session);
+  }
+
+  Future<Map<String, String>> getPackageInfo() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      return {
+        'appName': packageInfo.appName.isNotEmpty
+            ? packageInfo.appName
+            : 'webapp_ai_template',
+        'version':
+            packageInfo.version.isNotEmpty ? packageInfo.version : '1.0.0',
+      };
+    } catch (e) {
+      return {
+        'appName': 'No App Information'
+      };
+    }
+  }
+}
