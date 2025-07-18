@@ -527,6 +527,10 @@ class HierarchySelectableListComponent extends FetchComponent
       style: bold ? Styles()["textH2"] : Styles()["text"],
     );
 
+    print("Building row (${row.nRows}):");
+    print("\t${row["labelUmap"].first} - ${row["labelDataPrep"].first}");
+    print("============");
+
     // Check if this node has children to show chevron
     bool hasChildren = node.children.isNotEmpty;
 
@@ -620,11 +624,14 @@ class HierarchySelectableListComponent extends FetchComponent
   WebappTable selectedAsTable() {
     final tbl = WebappTable();
 
+    final maxLevel = selectedNodes.map((node) => node.level).reduce((a, b) => a > b ? a : b);
+    final selection = selectedNodes.where((node) => node.level == maxLevel).toList();
+
     for( var col in dataTable.colNames ){
       tbl.addColumn(col, data: <String>[]);
     }
-
-    for( var node in selectedNodes ){
+    
+    for( var node in selection ){
       final row = selectTableRow(node);
       if( row.nRows > 0 ){
         for( var col in dataTable.colNames ){
@@ -633,25 +640,6 @@ class HierarchySelectableListComponent extends FetchComponent
       }
       
     }
-
-    // var level = maxLevel;
-
-    // var originalColNames = dataTable.colNames;
-    // var colNameIndex = originalColNames.indexOf(columns[maxLevel]);
-
-    // var nodes = selectedNodes
-    //     .where((node) => node.level == level)
-    //     .map((node) => node.id)
-    //     .toList();
-
-    // var rows =
-    //     dataTable.where((row) => nodes.contains(row[colNameIndex])).toList();
-
-    
-    // for (int i = 0; i < originalColNames.length; i++) {
-    //   tbl.addColumn(originalColNames[i],
-    //       data: rows.map((row) => row[i]).toList());
-    // }
 
     return tbl;
   }
@@ -713,7 +701,7 @@ class HierarchySelectableListComponent extends FetchComponent
                 context,
                 node,
                 isEven: currentIndex % 2 == 0,
-                dataTable.select([ri])),
+                selectTableRow(node)),
             isEven: currentIndex % 2 == 0));
       } else {
         wdg.add(createTabulatedEntry(
@@ -737,7 +725,7 @@ class HierarchySelectableListComponent extends FetchComponent
                 collapsedBackgroundColor: Colors.transparent,
                 tilePadding: EdgeInsets.zero,
                 childrenPadding: EdgeInsets.zero,
-                trailing: SizedBox.shrink(), // Hide the default chevron
+                trailing: const SizedBox.shrink(), // Hide the default chevron
                 initiallyExpanded: expandedLevels.contains(levelNodes[ri].id),
                 onExpansionChanged: (expanded) {
                   if (expanded) {
@@ -753,7 +741,7 @@ class HierarchySelectableListComponent extends FetchComponent
                     context,
                     node,
                     isEven: currentIndex % 2 == 0,
-                    dataTable.select([ri]),
+                    selectTableRow(node),
                     bold: true),
                 children:
                     createWidgets(context, level + 1, parentId: node.id, globalCounter: globalCounter),
@@ -770,7 +758,6 @@ class HierarchySelectableListComponent extends FetchComponent
   
 
   void setSelected(String value, String? column){
-    print("Calling setSelected with value: $value, column: $column [$isInit]");
     if( isInit ){
 
       _setSelected(value, column);
@@ -780,8 +767,6 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   void _setSelected(String value, String? column){
-    print("Setting selected: $value, column: $column");
-    print(hierarchyRoot.getDescendants().where((node) => column == null || node.selectionColumnName == column));
     final node = hierarchyRoot.getDescendants().where((node) => column == null || node.selectionColumnName == column) .firstWhere((node) => node.id == value, orElse: () => hierarchyRoot);
 
     if( node.level == -1 ){
