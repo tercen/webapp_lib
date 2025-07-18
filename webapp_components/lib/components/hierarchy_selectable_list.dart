@@ -527,9 +527,6 @@ class HierarchySelectableListComponent extends FetchComponent
       style: bold ? Styles()["textH2"] : Styles()["text"],
     );
 
-    print("Building row (${row.nRows}):");
-    print("\t${row["labelUmap"].first} - ${row["labelDataPrep"].first}");
-    print("============");
 
     // Check if this node has children to show chevron
     bool hasChildren = node.children.isNotEmpty;
