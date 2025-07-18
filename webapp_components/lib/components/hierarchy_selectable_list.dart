@@ -507,7 +507,7 @@ class HierarchySelectableListComponent extends FetchComponent
   void checkSiblings(HierarchyNode node) {
     final parentNode = node.parent;
     if( parentNode != null ){
-      if(!parentNode.children.every((child) => isSelected(child))){
+      if(!parentNode.children.any((child) => isSelected(child))){
         deselect(parentNode);
       }
     }
