@@ -620,7 +620,9 @@ class HierarchySelectableListComponent extends FetchComponent
 
   WebappTable selectedAsTable() {
     final tbl = WebappTable();
-
+    if( selectedNodes.isEmpty ){
+      return tbl;
+    }
     final maxLevel = selectedNodes.map((node) => node.level).reduce((a, b) => a > b ? a : b);
     final selection = selectedNodes.where((node) => node.level == maxLevel).toList();
 
