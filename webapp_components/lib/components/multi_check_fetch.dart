@@ -223,6 +223,7 @@ class MultiCheckComponentFetch
 
   @override
   getComponentValue() {
+    selected.sort();
     return selected;
   }
 
