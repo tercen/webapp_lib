@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 class Styles {
 
+  static double get minNavigationSz => 0.08;
+  static double get maxNavigationSz => 0.10;
+  static double get maxFooterHeight => 0.06;
+
   static Color get activeBackgroundColor => Colors.purple;
   static Color get activeForegroundColor => Colors.white;
   static Color get appBackgroundColor => Colors.white;

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../styles.dart';
-import '../service/tercen_service.dart';
-import '../models/team.dart';
-import '../widgets/tooltip_widget.dart';
-import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:webapp_commons/model/id_label.dart';
+import 'package:webapp_commons/widgets/tooltip_widget.dart';
+import 'package:webapp_commons/service/api_service.dart';
+import 'package:webapp_commons/service/project_service.dart';
+import 'package:webapp_commons/snippets/styles.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,12 +16,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _projectController = TextEditingController();
   final FocusNode _projectFocusNode = FocusNode();
-  final TercenService _tercenService = TercenService();
-  final Styles _styles = Styles();
+
   
-  List<sci.Project> _projects = [];
-  List<Team> _teams = [];
-  Team? _selectedTeam;
+  List<IdLabel> _projects = [];
+  List<IdLabel> _teams = [];
+  IdLabel _selectedTeam = IdLabel(id: "", label: "", kind: "team");
   List<String> _filteredProjectNames = [];
   bool _isLoading = false;
   bool _showAutocomplete = false;
@@ -40,42 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _projectFocusNode.dispose();
     super.dispose();
   }
-
-  Future<void> _loadInitialData() async {
+  
+  Future<void> _loadProjectsForTeam(String teamName) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final teams = await _tercenService.fetchTeamsForCurrentUser();
-      final selectedTeam = teams.isNotEmpty ? teams.first : null;
-      
-      // Load projects for the selected team
-      final projects = await _tercenService.fetchProjects(selectedTeam?.name);
-      
-      setState(() {
-        _projects = projects;
-        _teams = teams;
-        _selectedTeam = selectedTeam;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        _showErrorDialog('Failed to load initial data: ${e.toString()}');
-      }
-    }
-  }
-
-  Future<void> _loadProjectsForTeam(String? teamName) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final projects = await _tercenService.fetchProjects(teamName);
+      final projects = await ProjectService().fetchProjects(teamName, filterByOwner: true);
       setState(() {
         _projects = projects;
         _isLoading = false;
@@ -94,18 +66,49 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+
+  Future<void> _loadInitialData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final teams = await ApiService().fetchTeamsForCurrentUser();
+      final selectedTeam = ProjectService().hasProject ? ProjectService().projectOwner : teams.first.id;
+      
+      // Load projects for the selected team
+      final projects = await ProjectService().fetchProjects(selectedTeam);
+      
+      setState(() {
+        _projects = projects;
+        _teams = teams;
+        _selectedTeam = IdLabel(id: selectedTeam, label: selectedTeam);
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        //TODO Move error dialog to a top level error processing, or, at least, use a generic error handling class
+        _showErrorDialog('Failed to load initial data: ${e.toString()}');
+      }
+    }
+  }
+
+
   void _onProjectTextChanged() {
     final text = _projectController.text.toLowerCase();
     setState(() {
       if (text.isEmpty) {
         // Show all projects when field is empty but focused
-        _filteredProjectNames = _projects.map((project) => project.name ?? '').where((name) => name.isNotEmpty).toList();
+        _filteredProjectNames = _projects.map((project) => project.label ).where((name) => name.isNotEmpty).toList();
         _showAutocomplete = _projectFocusNode.hasFocus && _filteredProjectNames.isNotEmpty;
       } else {
         // Filter projects when user types
         _filteredProjectNames = _projects
-            .where((project) => project.name != null && project.name.toLowerCase().contains(text))
-            .map((project) => project.name!)
+            .where((project) => project.label.toLowerCase().contains(text))
+            .map((project) => project.label)
             .toList();
         _showAutocomplete = _filteredProjectNames.isNotEmpty;
       }
@@ -241,11 +244,11 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Text(
           'Project',
-          style: _styles.labelStyle,
+          style: Styles.labelStyle,
         ),
         const SizedBox(width: 4),
         const TooltipWidget(
-          message: 'If project name does not exist, a new one will be created.',
+          message: 'If project does not exist, a new one will be created.',
         ),
       ],
     );
@@ -292,7 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(4),
-        color: Colors.white,
+        color: Styles.appBackgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -315,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: hovered == name ? Colors.grey.withOpacity(0.1) : Colors.transparent,
+                  color: hovered == name ? Styles.inactiveBackground.withOpacity(0.1) : Colors.transparent,
                 ),
                 child: Text(
                   name,
@@ -332,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTeamLabel() {
     return Text(
       'Team',
-      style: _styles.labelStyle,
+      style: Styles.labelStyle,
     );
   }
 
@@ -341,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          _selectedTeam?.name ?? 'No team selected',
+          _selectedTeam.label.isEmpty ? 'No team selected' : _selectedTeam.label,
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(width: 8),
@@ -359,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildLoadProjectButton() {
     return ElevatedButton(
       onPressed: _loadProject,
-      style: _styles.buttonStyle,
+      style: Styles.buttonStyle,
       child: const Text('Load Project'),
     );
   }
@@ -371,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _showTeamDialog() async {
     String searchQuery = '';
-    List<Team> filteredTeams = List.from(_teams);
+    var filteredTeams = List.from(_teams);
 
     await showDialog(
       context: context,
@@ -393,8 +396,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     onChanged: (value) {
                       setDialogState(() {
                         searchQuery = value.toLowerCase();
+                        
                         filteredTeams = _teams
-                            .where((team) => team.name.toLowerCase().contains(searchQuery))
+                            .where((team) => team.label.toLowerCase().contains(searchQuery))
                             .toList();
                       });
                     },
@@ -447,12 +451,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     // Check if project exists
-    final existingProject = _projects.firstWhere(
-      (p) => p.name == projectName,
-      orElse: () => sci.Project()..id = ''..name = '',
-    );
+    final projectExists = await ProjectService().projectExists(projectName, _selectedTeam.id);
 
-    if (existingProject.id == null || existingProject.id!.isEmpty) {
+    if (!projectExists) {
       // Project doesn't exist, show confirmation dialog
       final shouldCreate = await _showCreateProjectDialog();
       if (!shouldCreate) return;

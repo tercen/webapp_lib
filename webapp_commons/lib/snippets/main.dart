@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:webapp_ai_template/screens/result_screen.dart';
+
 import 'package:webapp_commons/service/api_service.dart';
-import 'package:webapp_commons/snippets/screens/result_screen.dart';
+import 'package:webapp_commons/service/project_service.dart';
+// import 'package:webapp_commons/snippets/screens/result_screen.dart';
+import 'package:webapp_commons/utils/logger.dart';
 import 'screens/home_screen.dart';
 
 import 'styles.dart';
-import 'service/tercen_service.dart';
 
 void main() async {
   // CRITICAL: Initialize Flutter binding first
@@ -82,7 +82,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'APP Title',
       theme: ThemeData(
-        // primarySwatch: Styles.activeBackgroundColor,
+        // primarySwatch: Mater,
         useMaterial3: true,
       ),
       home: const MainScreen(),
@@ -110,17 +110,17 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const ResultScreen(),
+    // const ResultScreen(),
   ];
 
   final List<IconData> _icons = [
     Icons.home,
-    Icons.api,
+    // Icons.api,
   ];
 
   final List<String> _labels = [
     'Home',
-    'Results',
+    // 'Results',
   ];
 
   @override
@@ -139,34 +139,26 @@ class _MainScreenState extends State<MainScreen> {
 
 
   Future<void> _loadAppInfo() async {
-    final packageInfo = await _tercenService.getPackageInfo();
+    final packageInfo = await ApiService().getPackageInfo();
     setState(() {
-      _appName = packageInfo['appName'] ?? 'PDF Analysis App';
-      _appVersion = packageInfo['version'] ?? '1.0.0';
+      _appName = packageInfo['appName'] ?? 'Tercen WebApp';
+      _appVersion = packageInfo['version'] ?? 'No Version Info';
     });
   }
 
   Future<void> _loadFooterInfo() async {
     try {
-      debugPrint('Fetching footer info...');
-      debugPrint('Connection status: ${_tercenService.isConnected}');
-      
-      final project = await _tercenService.fetchProject();
-      final user = await _tercenService.fetchUser();
-      final team = await _tercenService.fetchTeam();
-      
-      debugPrint('Footer values - Project: $project, User: $user, Team: $team');
-      
       setState(() {
-        _projectName = project;
-        _userName = user;
-        _teamName = team;
+        _projectName = ProjectService().projectName;
+        _userName = ApiService().user;
+        _teamName = ApiService().team;
       });
-      
-      debugPrint('Footer state updated');
     } catch (e) {
       // Handle error gracefully
-      debugPrint('Error loading footer info: $e');
+      Logger().log(
+        level: Logger.ERROR,
+        message: 'Error loading footer info: $e',
+      );
       setState(() {
         _projectName = 'Error loading project';
         _userName = 'Error loading user';
@@ -179,9 +171,6 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final safeArea = MediaQuery.of(context).padding;
-    
-    // Debug current state
-    debugPrint('Build - Connected: ${_tercenService.isConnected}, User: $_userName, Team: $_teamName, Project: $_projectName');
     
     return Scaffold(
       backgroundColor: Colors.white,
@@ -243,7 +232,7 @@ class _MainScreenState extends State<MainScreen> {
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.image, size: 50, color: Colors.grey),
+                child: Icon(Icons.image, size: 50, color: Styles.inactiveForeground),
               );
             },
           ),
@@ -252,7 +241,7 @@ class _MainScreenState extends State<MainScreen> {
           // App Name
           Text(
             _appName,
-            style: _styles.appHeader,
+            style: Styles.appHeader,
           ),
         ],
       ),
@@ -263,10 +252,10 @@ class _MainScreenState extends State<MainScreen> {
     
     var cont =  Container(
       constraints: BoxConstraints(
-        minHeight: (screenSize.height - safeArea.top - safeArea.bottom) * 0.08,
-        maxHeight: (screenSize.height - safeArea.top - safeArea.bottom) * 0.10,
+        minHeight: (screenSize.height - safeArea.top - safeArea.bottom) * Styles.minNavigationSz,
+        maxHeight: (screenSize.height - safeArea.top - safeArea.bottom) * Styles.maxNavigationSz,
       ),
-      color: Colors.white,
+      color: Styles.appBackgroundColor,
       child: Row(
         children: List.generate(_icons.length, (index) {
           final isSelected = index == _selectedIndex;
@@ -280,7 +269,7 @@ class _MainScreenState extends State<MainScreen> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.purple : Colors.transparent,
+                color: isSelected ? Styles.activeBackgroundColor : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -290,14 +279,14 @@ class _MainScreenState extends State<MainScreen> {
                   Icon(
                     _icons[index],
                     size: 38,
-                    color: isSelected ? Colors.white : Colors.black,
+                    color: isSelected ? Styles.activeForegroundColor : Styles.appForegroundColor,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     _labels[index],
                     style: TextStyle(
                       fontSize: 11,
-                      color: isSelected ? Colors.white : Colors.black,
+                      color: isSelected ? Styles.activeForegroundColor : Styles.appForegroundColor,
                     ),
                   ),
                 ],
@@ -314,7 +303,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildFooter(Size screenSize, EdgeInsets safeArea) {
     return Container(
       constraints: BoxConstraints(
-        maxHeight: (screenSize.height - safeArea.top - safeArea.bottom) * 0.06,
+        maxHeight: (screenSize.height - safeArea.top - safeArea.bottom) * Styles.maxFooterHeight,
       ),
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -323,20 +312,24 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           Text(
             '$_appName ($_appVersion)',
-            style: _styles.footerTextStyle,
+            style: Styles.footerTextStyle,
           ),
           const SizedBox(width: 20),
           Text(
             _projectName,
-            style: _styles.footerTextStyle,
+            style: Styles.footerTextStyle,
           ),
           const SizedBox(width: 20),
           Text(
-            _tercenService.isConnected 
-                ? '$_userName ($_teamName)'
-                : 'Not connected to Tercen',
-            style: _styles.footerTextStyle,
+            "User: $_userName",
+            style: Styles.footerTextStyle,
           ),
+          const SizedBox(width: 20),
+          Text(
+            "Team: $_teamName",
+            style: Styles.footerTextStyle,
+          ),
+
         ],
       ),
     );

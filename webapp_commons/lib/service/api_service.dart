@@ -8,7 +8,9 @@ import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'dart:html' as html;
 import 'package:sci_http_client/http_auth_client.dart' as auth_http;
+import 'package:webapp_commons/model/id_label.dart';
 import 'package:webapp_commons/utils/logger.dart';
+import 'package:webapp_commons/service/project_service.dart';
 
 class ApiService {
   static final ApiService _singleton = ApiService._internal();
@@ -20,6 +22,9 @@ class ApiService {
   ApiService._internal();
 
   late sci.UserSession session;
+
+  String get user => session.user.id;
+  String get team => ProjectService().projectOwner.isEmpty ?  session.user.teamAcl.owner : ProjectService().projectOwner;
 
   bool get isDev => Uri.base.hasPort && (Uri.base.port > 10000);
 
@@ -103,5 +108,34 @@ class ApiService {
         'appName': 'No App Information'
       };
     }
+  }
+
+
+  Future<List<IdLabel>> fetchTeamsForCurrentUser() async {
+    final currentUser = session.user;
+    if( currentUser.name.isEmpty ){
+      throw sci.ServiceError(500, "User not defined", "No user information in current session.");
+    }
+
+    final teams = <IdLabel>[];
+    final userTeam = sci.Team()..name = currentUser.id;
+    teams.add(IdLabel(id: userTeam.name, label: userTeam.name, kind: "team"));
+      
+    // Get teams from user's teamAcl
+
+    for (final ace in currentUser.teamAcl.aces) {
+      try {
+        if (ace.principals.isNotEmpty) {
+          final teamName = ace.principals[0].principalId;
+          if ( teamName.isNotEmpty ) {
+            teams.add(IdLabel(id: teamName, label: teamName, kind: "team"));
+          }
+        }
+      } catch (e) {
+        // Silently continue on error
+      }
+    }
+
+    return teams;
   }
 }

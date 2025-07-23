@@ -1,5 +1,6 @@
 class Logger {
   static const NONE = 0;
+  static const ERROR = 10;
   static const WARN = 50;
   static const FINER = 100;
   static const FINE = 250;
