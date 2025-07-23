@@ -22,13 +22,13 @@ class MultiCheckComponentFetch
   late bool allSelected;
   double? columnWidth;
   final bool saveState;
-
+  final Future Function(List<String> selected)? onChange;
   MultiCheckComponentFetch(super.id, super.groupId, super.componentLabel, super.dataFetchCallback,
       {this.columns = 5,
       this.hasSelectAll = false,
       this.selectAll = false,
       this.columnWidth,
-      this.saveState = true, super.onLoad}) {
+      this.saveState = true, super.onLoad, this.onChange}) {
     // super.id = id;
     // super.groupId = groupId;
     // super.componentLabel = componentLabel;
@@ -42,6 +42,10 @@ class MultiCheckComponentFetch
         allSelected = true;
       }
     }
+
+    if (onChange != null) {
+      onChange!(selected);
+    }
   }
 
   @override
@@ -54,6 +58,9 @@ class MultiCheckComponentFetch
   void deselect(String el) {
     selected.remove(el);
     allSelected = false;
+    if (onChange != null) {
+      onChange!(selected);
+    }
   }
 
 

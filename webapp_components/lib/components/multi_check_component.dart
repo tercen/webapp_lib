@@ -5,6 +5,8 @@ import 'package:webapp_components/components/multi_check_fetch.dart';
 import 'package:webapp_model/webapp_table.dart';
 
 class MultiCheckComponent extends MultiCheckComponentFetch {
+  
+
   MultiCheckComponent(id, groupId, componentLabel,
       {super.columns = 5,
       super.hasSelectAll = false,
