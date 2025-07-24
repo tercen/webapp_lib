@@ -1,0 +1,50 @@
+@startuml Enhanced Update Process
+participant USER
+participant DEVELOPER  
+participant REVIEWER
+
+USER -> DEVELOPER: Update request with specific requirements
+note right: What needs to be changed,\nadded, or fixed
+
+== Pre-Update Analysis Phase ==
+DEVELOPER -> DEVELOPER: Analyze existing codebase structure
+DEVELOPER -> DEVELOPER: Identify all files that need modification
+DEVELOPER -> DEVELOPER: Map dependencies and integration points
+DEVELOPER -> DEVELOPER: Assess impact on existing functionality
+note right: Impact Assessment:\n- File Analysis\n- Component Dependencies\n- State Management\n- Service Integration
+
+== Implementation Phase ==
+DEVELOPER -> DEVELOPER: Read current implementation thoroughly
+DEVELOPER -> DEVELOPER: Implement changes following existing patterns
+note right: Change Implementation:\n- Minimal Impact\n- Backward Compatibility\n- Error Handling\n- State Consistency
+
+DEVELOPER -> DEVELOPER: Test changed functionality
+DEVELOPER -> DEVELOPER: Perform regression testing on existing features
+DEVELOPER -> DEVELOPER: Verify integration with existing code
+note right: Testing Requirements:\n- Changed Functionality\n- Regression Testing\n- Integration Testing\n- Edge Cases
+
+DEVELOPER -> DEVELOPER: Complete UPDATE_CHECKLIST.md
+note right: Evidence Required:\n- Before/after screenshots\n- Modified files list\n- Testing performed\n- Compilation proof
+
+DEVELOPER -> REVIEWER: Submit changes with documentation
+note right: Submission includes:\n- Code changes\n- Before/after evidence\n- Testing summary\n- Impact analysis
+
+== Review Phase ==
+REVIEWER -> REVIEWER: Review code changes for quality and consistency
+REVIEWER -> REVIEWER: Verify requirements are fully met
+REVIEWER -> REVIEWER: Test both new and existing functionality
+REVIEWER -> REVIEWER: Validate integration with existing codebase
+
+alt Changes Meet Requirements
+    REVIEWER -> REVIEWER: Verify no regressions introduced
+    REVIEWER -> REVIEWER: Confirm architectural consistency
+    REVIEWER -> USER: Approve with review assessment
+    note right: Approval includes:\n- Functionality verification\n- Regression test results\n- Integration confirmation
+else Changes Need Improvements
+    REVIEWER -> DEVELOPER: Return with specific feedback
+    note right: Feedback includes:\n- Required fixes\n- Quality issues\n- Testing gaps\n- Pattern violations
+    DEVELOPER -> DEVELOPER: Address feedback and retest
+    DEVELOPER -> REVIEWER: Resubmit with improvements
+end
+
+@enduml

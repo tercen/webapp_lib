@@ -1,0 +1,32 @@
+@startuml Simplified Development Process
+participant USER
+participant PROJECT_MANAGER  
+participant DEVELOPER
+participant REVIEWER
+
+USER -> PROJECT_MANAGER: Screen description/requirements
+PROJECT_MANAGER -> PROJECT_MANAGER: Analyze requirements and create tasks
+PROJECT_MANAGER -> DEVELOPER: Assign implementation task with clear specs
+
+loop Development Iteration
+DEVELOPER -> DEVELOPER: Implement Flutter code following webapp_components patterns
+DEVELOPER -> DEVELOPER: Compile, test, and verify functionality
+DEVELOPER -> DEVELOPER: Complete DEVELOPER_CHECKLIST.md with evidence
+DEVELOPER -> REVIEWER: Submit code with checklist and evidence
+
+REVIEWER -> REVIEWER: Review code quality and architecture compliance
+REVIEWER -> REVIEWER: Verify functionality matches requirements  
+REVIEWER -> REVIEWER: Test interactive elements and user workflows
+alt Code Approved
+REVIEWER -> PROJECT_MANAGER: Approve with review assessment
+else Code Rejected
+REVIEWER -> DEVELOPER: Return with specific feedback and required fixes
+REVIEWER -> PROJECT_MANAGER: Escalate if requirements unclear
+end
+end
+
+PROJECT_MANAGER -> PROJECT_MANAGER: Validate deliverable meets original requirements
+PROJECT_MANAGER -> USER: Deliver completed code with verification evidence
+
+@enduml
+
