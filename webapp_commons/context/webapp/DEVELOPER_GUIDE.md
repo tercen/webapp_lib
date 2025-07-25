@@ -10,7 +10,7 @@
 ✓ **File Organization**: Each screen in separate file, widgets >100 lines separated
 ✓ **State Management**: Avoid nested StatefulBuilder, implement proper disposal
 ✓ **Component Integration**: Use webapp_commons library patterns
-✓ **Template Guide**: Use webaapp_ai_template/lib as a foundational example
+✓ **Template Guide**: Use webaapp_commons/lib as a foundational example
 
 **CLOUD & SERVICE INTEGRATION REQUIREMENTS**
 ✓ All service calls must include timeout configurations
