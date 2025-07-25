@@ -2,10 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:webapp_commons/model/id_label.dart';
 import 'package:webapp_commons/utils/logger.dart';
 import 'package:webapp_commons/utils/simple_cache.dart';
-import 'package:webapp_commons/utils/tree_node.dart';
+import 'package:webapp_commons/model/tree_node.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 class ProjectService {
+  // Singleton offering multiple functions to search, create, and manage projects.
   static final ProjectService _singleton = ProjectService._internal();
 
   factory ProjectService() {
@@ -85,6 +86,7 @@ class ProjectService {
     projectUpdate.value = _currentProject.id;
   }
 
+  //Fetch list of projects
   Future<List<IdLabel>> fetchProjects(String teamName, {bool useCache = true, bool filterByOwner = false}) async {
     final key = "projects_${teamName}_$filterByOwner";
     if( useCache && SimpleCache.hasCachedValue(key)){

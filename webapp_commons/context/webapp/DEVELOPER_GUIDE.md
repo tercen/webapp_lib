@@ -4,12 +4,13 @@
 ✓ **Widget Properties**: All Flutter widget properties must be valid (no invalid enums, properties)
 ✓ **Imports**: All imports must exist and be compatible
 ✓ **Error Handling**: Implement error handling for all async operations
-✓ **Async Functions**: Prefix with 'fetch', 'load', 'get', or 'run' and place in TercenService singleton
+✓ **Async Functions**: Prefix with 'fetch', 'load', 'get', or 'run' and place in *Service singletons, if one is not already available
 ✓ **Constructors**: Use const constructors where possible
 ✓ **Responsive Design**: Use Container with BoxConstraints, set min/max sizes
 ✓ **File Organization**: Each screen in separate file, widgets >100 lines separated
 ✓ **State Management**: Avoid nested StatefulBuilder, implement proper disposal
-✓ **Component Integration**: Use webapp_components library patterns
+✓ **Component Integration**: Use webapp_commons library patterns
+✓ **Template Guide**: Use webaapp_ai_template/lib as a foundational example
 
 **CLOUD & SERVICE INTEGRATION REQUIREMENTS**
 ✓ All service calls must include timeout configurations

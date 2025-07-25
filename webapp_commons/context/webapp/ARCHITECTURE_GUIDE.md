@@ -11,6 +11,7 @@ Your task is to design system architecture, ensure proper integration with Terce
 ✓ Consistent error handling patterns across all layers
 ✓ Scalable folder structure for multiple lab variations
 ✓ Configuration-driven customization for different deployments
+✓ Use sci_client models (i.e. do not redefine them in the flutter project)
 
 **FLUTTER APPLICATION STRUCTURE**
 
@@ -21,7 +22,6 @@ lib/
 ├── screens/                     # UI screens (one per file)
 ├── widgets/                     # Reusable UI components
 ├── services/
-│   ├── tercen_service.dart     # gRPC/MCP communication layer
 │   └── [other_services].dart   # Additional service integrations
 ├── utils/                      # Utility functions and helpers
 ├── constants/                  # Application constants
@@ -30,45 +30,32 @@ lib/
 
 **TERCEN SERVICE ARCHITECTURE**
 
-✓ Singleton pattern for TercenService class
 ✓ All async operations prefixed with 'fetch', 'load', 'get', or 'run'
+✓ Server Async Functions are part of *Service classes in the webapp_commons package
 ✓ Centralized error handling and logging
-✓ Service layer abstraction over platform communication (gRPC, REST, etc.)
 ✓ Connection pooling and resource management
 ✓ Retry mechanisms for network failures
 ✓ Request/response caching where appropriate
 ✓ Timeout configurations for all operations
 ✓ Health check and connectivity monitoring
 
-**TERCEN PLATFORM INTEGRATION PATTERNS**
-
-✓ Service discovery and endpoint configuration
-✓ Authentication token management
-✓ Request/response serialization handling
-✓ Stream processing for large data transfers
-✓ Connection lifecycle management
-✓ Error mapping from platform services to Flutter exceptions
-✓ Metadata handling for tracing and monitoring
-✓ Load balancing and failover configuration
 
 **TERCEN PLATFORM SERVICE INTEGRATION**
 
 ✓ Service interface definitions maintained
-✓ Method call abstraction in TercenService
 ✓ API capability discovery and versioning
 ✓ Resource management for platform connections
 ✓ Event handling for server-side notifications
 ✓ Version compatibility checking
-✓ Graceful fallback mechanisms for connectivity issues
+
 
 **DATA FLOW ARCHITECTURE**
 
 ✓ Unidirectional data flow from UI to services
 ✓ State management centralized (Provider/Bloc pattern)
 ✓ Reactive programming for real-time updates
-✓ Data transformation layers for API responses
+✓ Data transformation layers for API responses (Use webapp_commons IdLabel, TreeNode where appropriate)
 ✓ Caching strategies for frequently accessed data
-✓ Offline capability considerations
 ✓ Data validation at service boundaries
 
 **LONG-RUNNING WORKFLOW ARCHITECTURE**
@@ -92,15 +79,6 @@ lib/
 ✓ Background task processing
 ✓ Progressive loading indicators
 
-**SECURITY ARCHITECTURE**
-
-✓ Authentication flow design
-✓ Authorization pattern implementation
-✓ Secure token storage and refresh
-✓ API key management
-✓ Data encryption at rest and in transit
-✓ Input validation architecture
-✓ Audit logging integration
 
 **TESTING ARCHITECTURE**
 
@@ -112,20 +90,10 @@ lib/
 ✓ Automated testing pipeline design
 ✓ Test environment provisioning
 
-**DEPLOYMENT ARCHITECTURE**
-
-✓ Containerization strategy
-✓ Environment configuration management
-✓ CI/CD pipeline design
-✓ Monitoring and observability setup
-✓ Logging aggregation patterns
-✓ Health check implementations
-✓ Rollback procedures
 
 **EXTENSIBILITY PATTERNS**
 
 ✓ Plugin architecture for custom analyses
-✓ Hook system for workflow customization
 ✓ Configuration-driven UI generation
 ✓ Dynamic form generation
 ✓ Custom widget registration
