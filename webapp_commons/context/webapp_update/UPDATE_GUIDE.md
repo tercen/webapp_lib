@@ -49,6 +49,7 @@
 ✓ **Async Conventions**: Follow existing async function naming (fetch/load/get/run)
 ✓ **Error Patterns**: Use existing error handling patterns
 ✓ **State Updates**: Follow existing state update patterns
+✓ **Model Usage**: Use sci_tercen_client models (Project, ProjectDocument, User, Team, etc.) - DO NOT redefine them
 
 ### **Component Updates**
 ✓ **webapp_components**: Use existing component library patterns

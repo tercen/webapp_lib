@@ -69,3 +69,14 @@ USER (update request) → DEVELOPER (analyze & implement) → REVIEWER (verify &
 - Reduced bureaucratic overhead
 - Maintains quality standards
 - Prevents regressions
+
+## Important: Model Usage
+
+**ALL Tercen platform models (Project, ProjectDocument, User, Team, etc.) MUST be imported from the `sci_tercen_client` package:**
+
+```dart
+import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+```
+
+**DO NOT redefine these models in your Flutter application.** Refer to `webapp_commons/lib/` foundational example for proper integration patterns.

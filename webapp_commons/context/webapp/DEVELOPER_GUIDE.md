@@ -10,7 +10,9 @@
 ✓ **File Organization**: Each screen in separate file, widgets >100 lines separated
 ✓ **State Management**: Avoid nested StatefulBuilder, implement proper disposal
 ✓ **Component Integration**: Use webapp_commons library patterns
-✓ **Template Guide**: Use webaapp_commons/lib as a foundational example
+✓ **Template Guide**: Use webapp_commons/lib as a foundational example
+✓ **Model Usage**: Use sci_tercen_client models (Project, ProjectDocument, User, Team, etc.) - DO NOT redefine them
+✓ **Package Imports**: Import sci_client models with `import 'package:sci_tercen_client/sci_client.dart' as sci;`
 
 **CLOUD & SERVICE INTEGRATION REQUIREMENTS**
 ✓ All service calls must include timeout configurations

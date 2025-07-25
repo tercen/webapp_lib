@@ -53,3 +53,14 @@
 USER → PROJECT_MANAGER → DEVELOPER → REVIEWER → PROJECT_MANAGER → USER
 
 This simplified framework maintains code quality while eliminating bureaucratic overhead, ensuring consistent Flutter app generation across different LLM sessions.
+
+## Important: Model Usage
+
+**ALL Tercen platform models (Project, ProjectDocument, User, Team, etc.) MUST be imported from the `sci_tercen_client` package:**
+
+```dart
+import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+```
+
+**DO NOT redefine these models in your Flutter application.** Use the foundational example in `webapp_commons/lib/` as a reference for proper integration patterns.

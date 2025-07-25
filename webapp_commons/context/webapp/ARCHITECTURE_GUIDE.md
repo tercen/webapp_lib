@@ -18,15 +18,28 @@ Your task is to design system architecture, ensure proper integration with Terce
 ```
 lib/
 ├── main.dart                    # Application entry point
-├── models/                      # Data models and entities
 ├── screens/                     # UI screens (one per file)
-├── widgets/                     # Reusable UI components
+├── widgets/                     # Reusable UI components  
 ├── services/
 │   └── [other_services].dart   # Additional service integrations
 ├── utils/                      # Utility functions and helpers
 ├── constants/                  # Application constants
 └── config/                     # Environment configuration
 ```
+
+**IMPORTANT: All Tercen platform models (Project, ProjectDocument, User, Team, etc.) are provided by the `sci_tercen_client` package. DO NOT redefine these models in your Flutter application. Import and use them directly:**
+
+```dart
+import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+
+// Use sci_client models directly
+sci.Project project = sci.Project();
+sci.ProjectDocument document = sci.ProjectDocument();
+sci.User user = sci.User();
+```
+
+**Utility models from webapp_commons (IdLabel, TreeNode) can be used for UI-specific data structures.**
 
 **TERCEN SERVICE ARCHITECTURE**
 
@@ -54,7 +67,7 @@ lib/
 ✓ Unidirectional data flow from UI to services
 ✓ State management centralized (Provider/Bloc pattern)
 ✓ Reactive programming for real-time updates
-✓ Data transformation layers for API responses (Use webapp_commons IdLabel, TreeNode where appropriate)
+✓ Data transformation layers for API responses (Use sci_client models and webapp_commons IdLabel, TreeNode where appropriate)
 ✓ Caching strategies for frequently accessed data
 ✓ Data validation at service boundaries
 
