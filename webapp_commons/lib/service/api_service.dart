@@ -89,8 +89,7 @@ class ApiService {
     try {
       if (isDev) {
         print('Running in development mode'); // Debug output
-        var queryParams = Map<String, String>.from(Uri.base.queryParameters);
-        var tok = queryParams["token"] ?? '';
+        var tok = Uri.base.queryParameters["token"] ?? '';
         print('Token from URL: ${tok.isNotEmpty ? "present" : "missing"}'); // Debug output
         
         if (tok.isEmpty) {

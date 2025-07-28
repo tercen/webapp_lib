@@ -103,7 +103,7 @@ class ProjectService {
       projects = projects.where((project) => project.acl.owner == teamName).toList();
     }
 
-    final projectList = projects.map((project) => IdLabel(
+    var projectList = projects.map((project) => IdLabel(
       id: project.id,
       rev: project.rev,
       label: project.name,
