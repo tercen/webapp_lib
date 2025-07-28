@@ -2,10 +2,12 @@
 
 1 **USE WebFetch to analyze webapp_commons/lib/snippets/**
 2 **COPY the main.dart content and create lib/main.dart**
-3 **COPY the main.dart content and create lib/pubspec.yaml**
+3 **COPY the pubspec.yaml content and create pubspec.yaml**
 4 **COPY and modify all relevant snippets/ files, including the snippets/assets folder files**
 5 **CREATE pubspec.yaml with required dependencies**
 6 **ANALYZE Service functions contained in the sci_tercen_client package as well as examples of it in the snippets folder**
+
+**IMPORTANT** DO NOT modify the ci_tercen_client not webapp_commons import in the pubspec file
 
 **CORE DEVELOPMENT REQUIREMENTS:**
 
