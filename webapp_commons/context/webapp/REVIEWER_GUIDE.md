@@ -113,6 +113,13 @@ EVIDENCE VALIDATION:
 
 DECISION: [APPROVED/REJECTED]
 REASON: [Specific feedback based on actual code inspection]
-NEXT STEPS: [Actions required if rejected]
+
+TARGETED FIXES REQUIRED (if rejected):
+[List ONLY the specific problems that need fixing, with exact file names and line numbers where possible]
+- Fix [specific issue] in [exact file path]
+- Update [specific component/function] in [exact file path] 
+- Add [missing element] to [exact file path]
+
+DO NOT request recreation of entire files that are mostly working correctly.
 ```
 
