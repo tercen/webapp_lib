@@ -22,9 +22,23 @@ class ApiService {
   ApiService._internal();
 
   late sci.UserSession session;
+  bool _sessionInitialized = false;
 
-  String get user => session.user.id;
-  String get team => ProjectService().projectOwner.isEmpty ?  session.user.teamAcl.owner : ProjectService().projectOwner;
+  String get user {
+    if (!_sessionInitialized) {
+      print('Warning: Accessing user before session is initialized');
+      return 'Session not initialized';
+    }
+    return session.user.id;
+  }
+  
+  String get team {
+    if (!_sessionInitialized) {
+      print('Warning: Accessing team before session is initialized');
+      return 'Session not initialized';
+    }
+    return ProjectService().projectOwner.isEmpty ? session.user.teamAcl.owner : ProjectService().projectOwner;
+  }
 
   bool get isDev => Uri.base.hasPort && (Uri.base.port > 10000);
 
@@ -72,25 +86,51 @@ class ApiService {
     """;
     http_api.HttpClient.setCurrent(io_http.HttpBrowserClient());
 
-    if (isDev) {
-      var tok = Uri.base.queryParameters["token"] ?? '';
-      var decodedToken = JwtDecoder.decode(tok);
-      session = sci.UserSession()
-        ..user = (sci.User()..id = decodedToken['data']['u'])
-        ..token = (sci.Token()..token = tok);
-    } else {
-      var auth = json.decode(html.window.localStorage['authorization'] ?? "");
+    try {
+      if (isDev) {
+        print('Running in development mode'); // Debug output
+        var tok = Uri.base.queryParameters["token"] ?? '';
+        print('Token from URL: ${tok.isNotEmpty ? "present" : "missing"}'); // Debug output
+        
+        if (tok.isEmpty) {
+          throw sci.ServiceError(401, "Token Missing", 
+              "Development mode requires a token parameter in the URL");
+        }
+        
+        var decodedToken = JwtDecoder.decode(tok);
+        session = sci.UserSession()
+          ..user = (sci.User()..id = decodedToken['data']['u'])
+          ..token = (sci.Token()..token = tok);
+      } else {
+        print('Running in production mode'); // Debug output
+        var authData = html.window.localStorage['authorization'];
+        print('Auth data from localStorage: ${authData != null ? "present" : "missing"}'); // Debug output
+        
+        if (authData == null || authData.isEmpty) {
+          throw sci.ServiceError(401, "Authorization Missing", 
+              "No authorization data found in localStorage. Please ensure you're accessing this app through Tercen.");
+        }
+        
+        var auth = json.decode(authData);
+        session = sci.UserSession.json(auth);
+      }
+      
+      print('Session initialized successfully'); // Debug output
+      _sessionInitialized = true;
+      
+      // navMenu.addLink("Exit App", AppUser().projectUrl);
 
-      session = sci.UserSession.json(auth);
+      await _initTercenFactory(session.token.token);
+      var factory = tercen.ServiceFactory();
+      var userService = factory.userService as sci.UserService;
+
+      await userService.setSession(session);
+      
+      print('Tercen connection completed successfully'); // Debug output
+    } catch (e) {
+      print('Error in connect(): $e'); // Debug output
+      rethrow; // Re-throw the error to be handled by the caller
     }
-
-    // navMenu.addLink("Exit App", AppUser().projectUrl);
-
-    await _initTercenFactory(session.token.token);
-    var factory = tercen.ServiceFactory();
-    var userService = factory.userService as sci.UserService;
-
-    await userService.setSession(session);
   }
 
   Future<Map<String, String>> getPackageInfo() async {
@@ -112,6 +152,10 @@ class ApiService {
 
 
   Future<List<IdLabel>> fetchTeamsForCurrentUser() async {
+    if (!_sessionInitialized) {
+      throw sci.ServiceError(500, "Session not initialized", "Session must be initialized before fetching teams.");
+    }
+    
     final currentUser = session.user;
     if( currentUser.name.isEmpty ){
       throw sci.ServiceError(500, "User not defined", "No user information in current session.");
