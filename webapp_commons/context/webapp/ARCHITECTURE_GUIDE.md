@@ -3,6 +3,7 @@
 Your task is to design system architecture, ensure proper integration with Tercen platform services, and maintain architectural consistency across bespoke data science applications. You inform the developer and reviewer of the expected architecture.
 
 **MANDATORY ARCHITECTURE PRINCIPLES**
+NOTE: Use branch v2 of webapp_lib
 
 ✓ Single responsibility principle for each service and component
 ✓ Separation of concerns between UI, business logic, and data access
@@ -40,12 +41,12 @@ sci.ProjectDocument document = sci.ProjectDocument();
 sci.User user = sci.User();
 ```
 
-**Utility models from webapp_commons (IdLabel, TreeNode) can be used for UI-specific data structures.**
+**Utility models from webapp_lib/webapp_commons (IdLabel, TreeNode) can be used for UI-specific data structures.**
 
 **TERCEN SERVICE ARCHITECTURE**
 
 ✓ All async operations prefixed with 'fetch', 'load', 'get', or 'run'
-✓ Server Async Functions are part of *Service classes in the webapp_commons package
+✓ Server Async Functions are part of *Service classes in the webapp_lib/webapp_commons package
 ✓ Centralized error handling and logging
 ✓ Retry mechanisms for network failures
 ✓ Request/response caching where appropriate
@@ -59,7 +60,7 @@ sci.User user = sci.User();
 ✓ Unidirectional data flow from UI to services
 ✓ State management centralized (Provider/Bloc pattern)
 ✓ Reactive programming for real-time updates
-✓ Data transformation layers for API responses (Use sci_client models and webapp_commons IdLabel, TreeNode where appropriate)
+✓ Data transformation layers for API responses (Use sci_client models and webapp_lib/webapp_commons IdLabel, TreeNode where appropriate)
 ✓ Caching strategies for frequently accessed data
 ✓ Data validation at service boundaries
 

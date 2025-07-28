@@ -1,6 +1,8 @@
 **MANDATORY FIRST STEPS - DO THESE BEFORE ANYTHING ELSE:**
 
-1 **USE WebFetch to analyze webapp_commons/lib/snippets/**
+NOTE: Use branch v2 of webapp_lib
+
+1 **USE WebFetch to analyze webapp_lib/webapp_commons/lib/snippets/**
 2 **COPY the main.dart content and create lib/main.dart**
 3 **COPY the pubspec.yaml content and create pubspec.yaml**
 4 **COPY and modify all relevant snippets/ files, including the snippets/assets folder files**
@@ -20,9 +22,9 @@
 ✓ **Responsive Design**: Use Container with BoxConstraints, set min/max sizes
 ✓ **File Organization**: Each screen in separate file, widgets >100 lines separated
 ✓ **State Management**: Avoid nested StatefulBuilder, implement proper disposal
-✓ **Component Integration**: Use webapp_commons library patterns
-✓ **Template Guide**: COPY files from webapp_commons/lib/snippets/ as starting templates
-✓ **Model Usage**: Use sci_tercen_client as webapp_commons models. NEVER create view models.
+✓ **Component Integration**: Use  webapp_lib/webapp_commons library patterns
+✓ **Template Guide**: COPY files from  webapp_lib/webapp_commons/lib/snippets/ as starting templates
+✓ **Model Usage**: Use sci_tercen_client as  webapp_lib/webapp_commons models. NEVER create view models.
 ✓ **Package Imports**: Import sci_client models with `import 'package:sci_tercen_client/sci_client.dart' as sci;`
 
 
