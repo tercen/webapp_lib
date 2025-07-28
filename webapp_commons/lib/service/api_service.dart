@@ -87,9 +87,10 @@ class ApiService {
     http_api.HttpClient.setCurrent(io_http.HttpBrowserClient());
 
     try {
+      var tok = "";
       if (isDev) {
         print('Running in development mode'); // Debug output
-        var tok = Uri.base.queryParameters["token"] ?? '';
+        tok = Uri.base.queryParameters["token"] ?? '';
         print('Token from URL: ${tok.isNotEmpty ? "present" : "missing"}'); // Debug output
         
         if (tok.isEmpty) {
@@ -97,6 +98,8 @@ class ApiService {
               "Development mode requires a token parameter in the URL");
         }
         
+        
+
         var decodedToken = JwtDecoder.decode(tok);
         session = sci.UserSession()
           ..user = (sci.User()..id = decodedToken['data']['u']..name = decodedToken['data']['u'])
@@ -123,6 +126,12 @@ class ApiService {
       await _initTercenFactory(session.token.token);
       var factory = tercen.ServiceFactory();
       var userService = factory.userService as sci.UserService;
+      if (isDev) {
+        final u = await userService.get(session.user.id);
+        session = sci.UserSession()
+          ..user = u
+          ..token = (sci.Token()..token = tok);
+      }
 
       await userService.setSession(session);
       
@@ -166,7 +175,7 @@ class ApiService {
     teams.add(IdLabel(id: userTeam.name, label: userTeam.name, kind: "team"));
       
     // Get teams from user's teamAcl
-    print("${currentUser.teamAcl.aces.length} ACL entries found for user ${currentUser.id}");
+    print('${currentUser.teamAcl.aces.length} ACL entries found for user ${currentUser.id}');
     for (final ace in currentUser.teamAcl.aces) {
       try {
         if (ace.principals.isNotEmpty) {
@@ -177,7 +186,6 @@ class ApiService {
         }
       } catch (e) {
         // Silently continue on error
-        print(e.toString());
       }
     }
 
