@@ -89,7 +89,8 @@ class ApiService {
     try {
       if (isDev) {
         print('Running in development mode'); // Debug output
-        var tok = Uri.base.queryParameters["token"] ?? '';
+        var queryParams = Map<String, String>.from(Uri.base.queryParameters);
+        var tok = queryParams["token"] ?? '';
         print('Token from URL: ${tok.isNotEmpty ? "present" : "missing"}'); // Debug output
         
         if (tok.isEmpty) {
@@ -99,7 +100,7 @@ class ApiService {
         
         var decodedToken = JwtDecoder.decode(tok);
         session = sci.UserSession()
-          ..user = (sci.User()..id = decodedToken['data']['u'] ..name = decodedToken['data']['u'])
+          ..user = (sci.User()..id = decodedToken['data']['u']..name = decodedToken['data']['u'])
           ..token = (sci.Token()..token = tok);
       } else {
         print('Running in production mode'); // Debug output
