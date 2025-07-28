@@ -1,32 +1,40 @@
-@startuml Simplified Development Process
+@startuml Task-Based Development Process
 participant USER
 participant PROJECT_MANAGER  
 participant DEVELOPER
 participant REVIEWER
 
 USER -> PROJECT_MANAGER: Screen description/requirements
-PROJECT_MANAGER -> PROJECT_MANAGER: Analyze requirements and create tasks
-PROJECT_MANAGER -> DEVELOPER: Assign implementation task with clear specs
+PROJECT_MANAGER -> PROJECT_MANAGER: Analyze requirements and create numbered task list
+PROJECT_MANAGER -> USER: Display task list for confirmation
+USER -> PROJECT_MANAGER: Confirm task list
 
 loop Development Iteration
-DEVELOPER -> DEVELOPER: Implement Flutter code following webapp_components patterns
-DEVELOPER -> DEVELOPER: Compile, test, and verify functionality
-DEVELOPER -> DEVELOPER: Complete DEVELOPER_CHECKLIST.md with evidence
-DEVELOPER -> REVIEWER: Submit code with checklist and evidence
-
-REVIEWER -> REVIEWER: Review code quality and architecture compliance
-REVIEWER -> REVIEWER: Verify functionality matches requirements  
-REVIEWER -> REVIEWER: Test interactive elements and user workflows
-alt Code Approved
-REVIEWER -> PROJECT_MANAGER: Approve with review assessment
-else Code Rejected
-REVIEWER -> DEVELOPER: Return with specific feedback and required fixes
-REVIEWER -> PROJECT_MANAGER: Escalate if requirements unclear
+  PROJECT_MANAGER -> PROJECT_MANAGER: Get tasks to execute (original or revision tasks)
+  
+  loop For Each Task
+    PROJECT_MANAGER -> DEVELOPER: Send individual task for implementation
+    DEVELOPER -> DEVELOPER: Read GitHub repositories for context (WebFetch)
+    DEVELOPER -> DEVELOPER: Implement specific task following patterns
+    DEVELOPER -> DEVELOPER: Provide task completion confirmation
+    DEVELOPER -> PROJECT_MANAGER: Return completed task implementation
+    PROJECT_MANAGER -> PROJECT_MANAGER: Track task as completed
+  end
+  
+  PROJECT_MANAGER -> REVIEWER: Submit all completed work for review
+  REVIEWER -> REVIEWER: Review complete implementation against requirements
+  REVIEWER -> REVIEWER: Verify all tasks properly completed
+  
+  alt All Work Approved
+    REVIEWER -> PROJECT_MANAGER: Approve with final assessment
+  else Work Rejected
+    REVIEWER -> PROJECT_MANAGER: Return specific issues that need revision
+    PROJECT_MANAGER -> PROJECT_MANAGER: Create revision task list based on issues
+  end
 end
-end
 
-PROJECT_MANAGER -> PROJECT_MANAGER: Validate deliverable meets original requirements
-PROJECT_MANAGER -> USER: Deliver completed code with verification evidence
+PROJECT_MANAGER -> PROJECT_MANAGER: Final validation of complete deliverable
+PROJECT_MANAGER -> USER: Deliver completed code with task completion evidence
 
 @enduml
 

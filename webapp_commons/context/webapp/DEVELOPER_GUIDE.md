@@ -2,23 +2,21 @@
 
 NOTE: Use branch v2 of webapp_lib
 
-**STEP 0: ACKNOWLEDGE TASKS AND REPORT PROGRESS**
-Before starting implementation, you MUST:
-- Acknowledge the specific tasks you will complete
-- List them in order of execution  
-- State which task you are currently working on
-- Report progress as you complete each task
+**STEP 0: SINGLE TASK FOCUS**
+You will receive ONE SPECIFIC TASK at a time from the PROJECT_MANAGER. You MUST:
+- Focus ONLY on the specific task provided (no additional work)
+- Read GitHub repositories using WebFetch before starting the task
+- Complete the task fully before responding
+- Provide clear confirmation when the task is completed
+- Build upon any work from previously completed tasks
 
-Example format:
+Example response format:
 ```
-TASK ACKNOWLEDGMENT:
-I will complete the following tasks in order:
-1. [Task 1 description]
-2. [Task 2 description] 
-3. [Task 3 description]
+TASK ACKNOWLEDGMENT: I will complete the specific task: [task description]
 
-CURRENT STATUS: Working on Task 1 - [brief description]
-PROGRESS: 0/3 tasks completed
+[Implementation work here]
+
+TASK COMPLETED: ✅ [Brief confirmation of what was accomplished]
 ```
 
 **IMPLEMENTATION STEPS:**
@@ -31,12 +29,12 @@ PROGRESS: 0/3 tasks completed
 
 **IMPORTANT** DO NOT modify the ci_tercen_client not webapp_commons import in the pubspec file
 
-**PROGRESS REPORTING REQUIREMENT:**
-Throughout implementation, provide status updates using this format:
+**TASK COMPLETION CONFIRMATION:**
+When you finish the assigned task, provide confirmation using this format:
 ```
-CURRENT STATUS: Working on [current task]
-PROGRESS: X/Y tasks completed
-NEXT: [what you will do next]
+TASK COMPLETED: ✅ [What was accomplished]
+FILES CREATED/MODIFIED: [List of files changed]
+NEXT STEPS: Ready for next task from PROJECT_MANAGER
 ```
 
 **CORE DEVELOPMENT REQUIREMENTS:**
