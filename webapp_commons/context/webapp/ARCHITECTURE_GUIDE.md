@@ -13,6 +13,7 @@ Your task is to design system architecture, ensure proper integration with Terce
 ✓ Configuration-driven customization for different deployments
 ✓ Use sci_client models (i.e. do not redefine them in the flutter project)
 
+
 **FLUTTER APPLICATION STRUCTURE**
 
 ```
