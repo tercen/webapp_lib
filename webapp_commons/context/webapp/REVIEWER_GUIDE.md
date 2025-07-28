@@ -8,10 +8,21 @@
 - Focus on complete implementation against the original PROJECT_MANAGER task list
 - Evaluate integration and consistency across all completed tasks
 
-**STOP: Before reviewing anything, use Read tool to verify these files exist:**
+**CRITICAL FILE CREATION CHECK:**
+BEFORE any other review, immediately check if ANY files were actually created:
+- Use LS tool to check the project directory
+- If NO files were created, immediately REJECT with: "REJECTED - No files were created by the developer"
+- Look for evidence of tool usage (Write, Read, WebFetch calls) in the developer response
+
+**MANDATORY FILE VERIFICATION:**
+After confirming files exist, verify these core files:
 - **lib/main.dart** (MANDATORY - reject immediately if missing)
-- **pubspec.yaml** (MANDATORY - reject immediately if missing)
+- **pubspec.yaml** (MANDATORY - reject immediately if missing)  
 - **All specified screen files** (reject if missing)
+
+**NO FILE CREATION = AUTOMATIC REJECTION**
+If the developer response shows 0 tool calls or no file creation evidence, immediately respond:
+"REJECTED - Developer failed to create any files or use required tools (Write, Read, WebFetch, LS)"
 
 **NEVER review plans or descriptions. ONLY review actual generated code files.**
 
