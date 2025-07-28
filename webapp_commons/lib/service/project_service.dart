@@ -89,6 +89,7 @@ class ProjectService {
   //Fetch list of projects
   Future<List<IdLabel>> fetchProjects(String teamName, {bool useCache = true, bool filterByOwner = false}) async {
     final key = "projects_${teamName}_$filterByOwner";
+    print("Fetching projects key $key");
     if( useCache && SimpleCache.hasCachedValue(key)){
       return SimpleCache.getCachedValue(key) as List<IdLabel>;
     }
@@ -98,10 +99,11 @@ class ProjectService {
             startKey: [teamName, true, '0000'],
             endKey: [teamName, false, '9999'],
           );
-    
+    print("Found ${projects.length} projects for team $teamName");
     if (filterByOwner) {
       projects = projects.where((project) => project.acl.owner == teamName).toList();
     }
+    print("After filter, found ${projects.length} projects for team $teamName");
 
     final projectList = projects.map((project) => IdLabel(
       id: project.id,
@@ -109,7 +111,7 @@ class ProjectService {
       label: project.name,
       kind: "project",
     )).toList();
-
+    print("Got final list");
 
 
     if( useCache ){
