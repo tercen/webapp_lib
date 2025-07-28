@@ -166,7 +166,7 @@ class ApiService {
     teams.add(IdLabel(id: userTeam.name, label: userTeam.name, kind: "team"));
       
     // Get teams from user's teamAcl
-
+    print("${currentUser.teamAcl.aces.length} ACL entries found for user ${currentUser.id}");
     for (final ace in currentUser.teamAcl.aces) {
       try {
         if (ace.principals.isNotEmpty) {
@@ -177,6 +177,7 @@ class ApiService {
         }
       } catch (e) {
         // Silently continue on error
+        print(e.toString());
       }
     }
 
