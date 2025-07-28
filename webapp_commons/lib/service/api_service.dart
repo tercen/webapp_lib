@@ -99,7 +99,7 @@ class ApiService {
         
         var decodedToken = JwtDecoder.decode(tok);
         session = sci.UserSession()
-          ..user = (sci.User()..id = decodedToken['data']['u'])
+          ..user = (sci.User()..id = decodedToken['data']['u'] ..name = decodedToken['data']['u'])
           ..token = (sci.Token()..token = tok);
       } else {
         print('Running in production mode'); // Debug output
