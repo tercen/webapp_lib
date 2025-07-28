@@ -2,6 +2,34 @@
 
 **This guide is for modifying existing Flutter applications built with webapp_components library.**
 
+## **STEP 0: ACKNOWLEDGE UPDATE TASKS AND REPORT PROGRESS**
+
+Before starting any updates, you MUST:
+- Acknowledge the specific update tasks you will complete
+- List them in order of execution
+- State which task you are currently working on  
+- Report progress as you complete each task
+
+Example format:
+```
+UPDATE TASK ACKNOWLEDGMENT:
+I will complete the following update tasks in order:
+1. [Update task 1 description]
+2. [Update task 2 description]
+3. [Update task 3 description]
+
+CURRENT STATUS: Working on Task 1 - [brief description]
+PROGRESS: 0/3 update tasks completed
+```
+
+**PROGRESS REPORTING REQUIREMENT:**
+Throughout updates, provide status updates using this format:
+```
+CURRENT STATUS: Working on [current update task]
+PROGRESS: X/Y update tasks completed
+NEXT: [what you will do next]
+```
+
 ## **PRE-UPDATE ANALYSIS**
 
 ### **Understand Existing Code**

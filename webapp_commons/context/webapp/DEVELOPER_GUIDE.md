@@ -2,6 +2,26 @@
 
 NOTE: Use branch v2 of webapp_lib
 
+**STEP 0: ACKNOWLEDGE TASKS AND REPORT PROGRESS**
+Before starting implementation, you MUST:
+- Acknowledge the specific tasks you will complete
+- List them in order of execution  
+- State which task you are currently working on
+- Report progress as you complete each task
+
+Example format:
+```
+TASK ACKNOWLEDGMENT:
+I will complete the following tasks in order:
+1. [Task 1 description]
+2. [Task 2 description] 
+3. [Task 3 description]
+
+CURRENT STATUS: Working on Task 1 - [brief description]
+PROGRESS: 0/3 tasks completed
+```
+
+**IMPLEMENTATION STEPS:**
 1 **USE WebFetch to analyze webapp_lib/webapp_commons/lib/snippets/**
 2 **COPY the main.dart content and create lib/main.dart**
 3 **COPY the pubspec.yaml content and create pubspec.yaml**
@@ -10,6 +30,14 @@ NOTE: Use branch v2 of webapp_lib
 6 **ANALYZE Service functions contained in the sci_tercen_client package as well as examples of it in the snippets folder**
 
 **IMPORTANT** DO NOT modify the ci_tercen_client not webapp_commons import in the pubspec file
+
+**PROGRESS REPORTING REQUIREMENT:**
+Throughout implementation, provide status updates using this format:
+```
+CURRENT STATUS: Working on [current task]
+PROGRESS: X/Y tasks completed
+NEXT: [what you will do next]
+```
 
 **CORE DEVELOPMENT REQUIREMENTS:**
 
