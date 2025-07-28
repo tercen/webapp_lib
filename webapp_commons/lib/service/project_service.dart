@@ -94,13 +94,17 @@ class ProjectService {
     }
 
     final factory = tercen.ServiceFactory();
-    var projects = await factory.projectService.findByTeamAndIsPublicAndLastModifiedDate(
+    var projectsResult = await factory.projectService.findByTeamAndIsPublicAndLastModifiedDate(
             startKey: [teamName, true, '0000'],
             endKey: [teamName, false, '9999'],
           );
     
+    // Create a mutable list from the result
+    List<dynamic> projects;
     if (filterByOwner) {
-      projects = projects.where((project) => project.acl.owner == teamName).toList();
+      projects = projectsResult.where((project) => project.acl.owner == teamName).toList();
+    } else {
+      projects = List.from(projectsResult);
     }
 
     var projectList = projects.map((project) => IdLabel(
