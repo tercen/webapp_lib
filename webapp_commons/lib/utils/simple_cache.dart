@@ -2,7 +2,7 @@ import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:webapp_commons/utils/logger.dart';
 
 class SimpleCache {
-  static const Map<String, dynamic> _cacheMap = {};
+  static  Map<String, dynamic> _cacheMap = {};
 
 
   static dynamic getCachedValue(String key){
