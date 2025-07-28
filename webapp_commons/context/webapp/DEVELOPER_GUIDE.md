@@ -1,3 +1,11 @@
+**MANDATORY FIRST STEPS - DO THESE BEFORE ANYTHING ELSE:**
+
+1 **USE WebFetch to analyze webapp_commons/lib/snippets/**
+2 **COPY the main.dart content and create lib/main.dart**
+3 **COPY and modify all relevant snippets/ files**
+4 **CREATE pubspec.yaml with required dependencies**
+5 **ANALYZE Service functions contained in the sci_tercen_client package as well as examples of it in the snippets folder**
+
 **CORE DEVELOPMENT REQUIREMENTS:**
 
 ✓ **Code Quality**: Code MUST compile without errors and pass `flutter analyze`
@@ -10,21 +18,19 @@
 ✓ **File Organization**: Each screen in separate file, widgets >100 lines separated
 ✓ **State Management**: Avoid nested StatefulBuilder, implement proper disposal
 ✓ **Component Integration**: Use webapp_commons library patterns
-✓ **Template Guide**: Use webapp_commons/lib as a foundational example
-✓ **Model Usage**: Use sci_tercen_client models (Project, ProjectDocument, User, Team, etc.) - DO NOT redefine them
+✓ **Template Guide**: COPY files from webapp_commons/lib/snippets/ as starting templates
+✓ **Model Usage**: Use sci_tercen_client as webapp_commons models. NEVER create view models.
 ✓ **Package Imports**: Import sci_client models with `import 'package:sci_tercen_client/sci_client.dart' as sci;`
+
 
 **CLOUD & SERVICE INTEGRATION REQUIREMENTS**
 ✓ All service calls must include timeout configurations
 ✓ Implement retry logic with exponential backoff for network failures
-✓ Use environment variables for service endpoint configuration
-✓ Implement proper error mapping from platform services to Flutter exceptions
+✓ Use sci.ServiceError for all errors
 ✓ All file uploads must show progress indicators
 ✓ Long-running operations must be cancellable by user
 ✓ Connection pooling and resource management when possible
-✓ Implement health checks for platform services
-✓ Use secure channels (TLS) for all service communications
-✓ Authentication tokens must be securely stored and refreshed
+
 
 **SCIENTIFIC USER EXPERIENCE**
 ✓ Provide clear feedback for long-running analysis workflows
@@ -33,9 +39,6 @@
 ✓ Tooltips for technical terms and scientific concepts
 ✓ Graceful degradation for slow network connections
 ✓ User-friendly error messages (avoid technical jargon)
-✓ Workflow cancellation with clear confirmation dialogs
-✓ Result persistence across browser sessions
-✓ Export functionality for analysis results
 ✓ Accessibility features for users with disabilities
 
 **STATE MANAGEMENT BEST PRACTICES**
@@ -52,17 +55,7 @@
 ✓ Code MUST compile without errors before submission
 ✓ All Flutter widget properties must be valid (no non-existent properties like Axis.both)
 ✓ Run flutter analyze to check for static analysis issues
-✓ Test basic user interactions manually to ensure functionality works
 ✓ Verify all imports resolve correctly
 ✓ Check that all assets referenced actually exist or have proper fallbacks
 ✓ Ensure no runtime exceptions occur during normal operation
-✓ Validate that responsive layout works at different screen sizes
-
-**DEVELOPER EVIDENCE REQUIREMENTS**
-Before submitting code to UIX_DESIGNER, provide:
-✓ Confirmation that code compiles successfully
-✓ Static analysis results (flutter analyze output)
-✓ Manual testing verification of key functionality
-✓ Screenshot evidence of working UI components
-✓ Documentation of any known limitations or TODOs
 

@@ -13,7 +13,7 @@ The person providing requirements and screen descriptions for code generation.
 - Coordinate between DEVELOPER and REVIEWER
 - Validate final deliverables against original requirements
 - Request clarification on ambiguous requirements
-- Ensure project timeline and quality standards
+
 
 **Key Activities:**
 - Break down screen descriptions into development tasks
@@ -28,18 +28,9 @@ The person providing requirements and screen descriptions for code generation.
 - Follow webapp_components library patterns and conventions
 - Implement basic testing and validation
 
-**Mandatory Requirements:**
-- Code MUST compile without errors before submission
-- Follow DEVELOPER_GUIDE.md conventions strictly
-- Provide compilation evidence and basic functionality screenshots
-- Use webapp_components library patterns
-- Implement proper error handling and state management
-
 **Key Activities:**
-- Write clean, maintainable Flutter code
+- Write clean, maintainable, correct Flutter code
 - Ensure responsive design and proper constraints
-- Integrate with TercenService singleton pattern
-- Test basic functionality manually
 
 ##### REVIEWER
 
@@ -50,18 +41,11 @@ The person providing requirements and screen descriptions for code generation.
 - Verify security best practices
 - Final approval before delivery
 
-**Mandatory Requirements:**
-- Verify code compiles and functions as specified
-- Validate UI/UX matches screen requirements
-- Check security and performance considerations
-- Ensure documentation is complete
-- Test all interactive elements work correctly
 
 **Key Activities:**
 - Review code quality and architecture compliance
-- Test user workflows end-to-end
 - Validate against requirements
-- Provide feedback for improvements
+- Provide feedback to developer and manager for improvements
 
 
 

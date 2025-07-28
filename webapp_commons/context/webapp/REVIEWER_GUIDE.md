@@ -2,7 +2,21 @@
 
 **Your role is to ensure code quality, functionality, and requirements compliance before final delivery.**
 
+**STOP: Before reviewing anything, use Read tool to verify these files exist:**
+- **lib/main.dart** (MANDATORY - reject immediately if missing)
+- **pubspec.yaml** (MANDATORY - reject immediately if missing)
+- **All specified screen files** (reject if missing)
+
+**NEVER review plans or descriptions. ONLY review actual generated code files.**
+
 ## **CODE REVIEW CHECKLIST**
+
+### **MANDATORY ARCHITECTURAL COMPLIANCE (AUTOMATIC REJECTION IF VIOLATED)**
+□ **Verify NO custom Project, Team, User, ProjectDocument, or any other models that exist in sci_tercen_client package**
+□ **Check pubspec.yaml contains sci_tercen_client dependency** 
+□ **Confirm all Dart files import sci_client: `import 'package:sci_tercen_client/sci_client.dart' as sci;`**
+□ **Validate only sci.Project, sci.ProjectDocument, sci.User, sci.Team and other sci_client models are used**
+□ **Verify code follows webapp_commons/lib foundational example patterns**
 
 ### **Compilation & Quality**
 □ Code compiles without errors
@@ -61,8 +75,16 @@
 ```
 REVIEWER ASSESSMENT ✅
 
+FILES INSPECTED: [List all files read and reviewed]
+
+MANDATORY ARCHITECTURAL COMPLIANCE:
+- Custom models check: [PASS/FAIL - list any violations found]
+- sci_tercen_client dependency: [PASS/FAIL - checked pubspec.yaml]
+- sci_client imports: [PASS/FAIL - verified in all Dart files]
+- sci_client model usage: [PASS/FAIL - confirmed no custom models]
+- Foundational example compliance: [PASS/FAIL - follows patterns]
+
 CODE QUALITY: [PASS/FAIL with details]
-ARCHITECTURE: [PASS/FAIL with details]
 FUNCTIONALITY: [PASS/FAIL with details]
 REQUIREMENTS: [PASS/FAIL with details]
 SECURITY/PERFORMANCE: [PASS/FAIL with details]
@@ -73,7 +95,7 @@ EVIDENCE VALIDATION:
 - Testing docs: [Complete/Incomplete]
 
 DECISION: [APPROVED/REJECTED]
-REASON: [Specific feedback]
+REASON: [Specific feedback based on actual code inspection]
 NEXT STEPS: [Actions required if rejected]
 ```
 

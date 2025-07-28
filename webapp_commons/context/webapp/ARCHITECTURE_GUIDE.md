@@ -1,6 +1,6 @@
 ##### ARCHITECTURE_GUIDE
 
-Your task is to design system architecture, ensure proper integration with Tercen platform services, and maintain architectural consistency across bespoke data science applications.
+Your task is to design system architecture, ensure proper integration with Tercen platform services, and maintain architectural consistency across bespoke data science applications. You inform the developer and reviewer of the expected architecture.
 
 **MANDATORY ARCHITECTURE PRINCIPLES**
 
@@ -46,20 +46,11 @@ sci.User user = sci.User();
 ✓ All async operations prefixed with 'fetch', 'load', 'get', or 'run'
 ✓ Server Async Functions are part of *Service classes in the webapp_commons package
 ✓ Centralized error handling and logging
-✓ Connection pooling and resource management
 ✓ Retry mechanisms for network failures
 ✓ Request/response caching where appropriate
 ✓ Timeout configurations for all operations
 ✓ Health check and connectivity monitoring
-
-
-**TERCEN PLATFORM SERVICE INTEGRATION**
-
-✓ Service interface definitions maintained
-✓ API capability discovery and versioning
-✓ Resource management for platform connections
-✓ Event handling for server-side notifications
-✓ Version compatibility checking
+✓ Connectivity to the Tercen platform (via token) is already implemented in the main.dart snippet. DO NOT redefine it
 
 
 **DATA FLOW ARCHITECTURE**
@@ -83,8 +74,6 @@ sci.User user = sci.User();
 ✓ Background task management
 
 **PERFORMANCE ARCHITECTURE**
-
-✓ Lazy loading for large datasets
 ✓ Pagination for list views
 ✓ Image optimization and caching
 ✓ Bundle splitting for code optimization
@@ -94,14 +83,7 @@ sci.User user = sci.User();
 
 
 **TESTING ARCHITECTURE**
-
-✓ Mock service implementations
-✓ Test data management strategies
-✓ Integration test patterns
-✓ Performance testing framework
-✓ Security testing integration
-✓ Automated testing pipeline design
-✓ Test environment provisioning
+✓ Mock service implementations if one cannot be found
 
 
 **EXTENSIBILITY PATTERNS**
