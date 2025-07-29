@@ -71,12 +71,19 @@ class ProjectService {
       parent.children.addAll(newNodes);
       print("Successfully added nodes to parent.children");
 
-      parent.children.forEach((child) {
+      for (final child in parent.children) {
         if (child.value.subKind == "FolderDocument" && child.value.id.isNotEmpty) {
           print("Processing folder: ${child.value.name} (id: ${child.value.id})");
-          child.children.addAll(_buildTree(child, docList, folderId: child.value.id));  
+          try {
+            // Build the subtree - this modifies child.children directly
+            _buildTree(child, docList, folderId: child.value.id);
+            print("Successfully processed folder ${child.value.name} with ${child.children.length} children");
+          } catch (e) {
+            print("Error processing folder ${child.value.name}: $e");
+            rethrow;
+          }
         }
-      });
+      }
 
       print("Built tree node with ${parent.children.length} children");
       return parent.children;
