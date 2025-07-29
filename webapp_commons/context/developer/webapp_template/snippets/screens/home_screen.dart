@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:webapp_commons/model/id_label.dart';
-import 'package:webapp_commons/widgets/tooltip_widget.dart';
-import 'package:webapp_commons/service/api_service.dart';
-import 'package:webapp_commons/service/project_service.dart';
-import 'package:webapp_commons/snippets/styles.dart';
+import '../../model/id_label.dart';
+import '../../widgets/tooltip_widget.dart';
+import '../../service/api_service.dart';
+import '../../service/project_service.dart';
+import '../styles.dart';
 
 
 class HomeScreen extends StatefulWidget {

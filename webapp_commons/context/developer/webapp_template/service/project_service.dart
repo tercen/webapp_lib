@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:webapp_commons/model/id_label.dart';
-import 'package:webapp_commons/utils/logger.dart';
-import 'package:webapp_commons/utils/simple_cache.dart';
-import 'package:webapp_commons/model/tree_node.dart';
+import '../model/id_label.dart';
+import '../utils/logger.dart';
+import '../utils/simple_cache.dart';
+import '../model/tree_node.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 class ProjectService {

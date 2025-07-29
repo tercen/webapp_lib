@@ -1,5 +1,5 @@
 import 'package:sci_tercen_client/sci_client.dart' as sci;
-import 'package:webapp_commons/utils/logger.dart';
+import 'logger.dart';
 
 class SimpleCache {
   static  Map<String, dynamic> _cacheMap = {};

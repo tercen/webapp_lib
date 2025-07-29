@@ -8,9 +8,9 @@ import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'dart:html' as html;
 import 'package:sci_http_client/http_auth_client.dart' as auth_http;
-import 'package:webapp_commons/model/id_label.dart';
-import 'package:webapp_commons/utils/logger.dart';
-import 'package:webapp_commons/service/project_service.dart';
+import '../model/id_label.dart';
+import '../utils/logger.dart';
+import 'project_service.dart';
 
 class ApiService {
   static final ApiService _singleton = ApiService._internal();
