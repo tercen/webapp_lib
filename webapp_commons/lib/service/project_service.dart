@@ -32,72 +32,30 @@ class ProjectService {
   var projectUpdate = ValueNotifier<String>("");
 
 
-  List<TreeNode<sci.ProjectDocument>> _buildTree(TreeNode<sci.ProjectDocument> parent, List<sci.ProjectDocument> docList, {String folderId = ""}) {
-    try {
-      print("Building tree for folderId: '$folderId', docList length: ${docList.length}");
-      
-      final objects = docList.where((obj) => obj.folderId == folderId);
-      print("Found ${objects.length} objects with folderId '$folderId'");
-      
-      // Add null safety checks
-      final validObjects = objects.where((doc) => 
-        doc.id.isNotEmpty && 
-        doc.name.isNotEmpty
+  void _buildTree(TreeNode<sci.ProjectDocument> parent, List<sci.ProjectDocument> allDocs, String parentFolderId) {
+    // Find documents that belong to this folder
+    final childDocs = allDocs
+        .where((doc) => doc.folderId == parentFolderId)
+        .where((doc) => doc.id.isNotEmpty && doc.name.isNotEmpty);
+    
+    // Create TreeNode for each document and add to parent
+    for (final doc in childDocs) {
+      final node = TreeNode<sci.ProjectDocument>(
+        id: doc.id,
+        label: doc.name,
+        value: doc,
+        children: [],
       );
-      print("${validObjects.length} objects passed validation");
+      parent.children.add(node);
       
-      // Create tree nodes one by one to isolate the failure
-      final newNodes = <TreeNode<sci.ProjectDocument>>[];
-      var index = 0;
-      for (final doc in validObjects) {
-        try {
-          print("Creating TreeNode $index for doc: id='${doc.id}', name='${doc.name}', subKind='${doc.subKind}'");
-          final node = TreeNode<sci.ProjectDocument>(
-            id: doc.id,
-            label: doc.name,
-            value: doc,
-            children: [],
-          );
-          newNodes.add(node);
-          print("Successfully created TreeNode $index");
-          index++;
-        } catch (e) {
-          print("Error creating TreeNode for doc ${doc.id}: $e");
-          rethrow;
-        }
+      // If it's a folder, recursively build its children
+      if (doc.subKind == "FolderDocument") {
+        _buildTree(node, allDocs, doc.id);
       }
-      
-      print("About to add ${newNodes.length} nodes to parent.children");
-      parent.children.addAll(newNodes);
-      print("Successfully added nodes to parent.children");
-
-      for (final child in parent.children) {
-        if (child.value.subKind == "FolderDocument" && child.value.id.isNotEmpty) {
-          print("Processing folder: ${child.value.name} (id: ${child.value.id})");
-          try {
-            // Build the subtree - this modifies child.children directly
-            _buildTree(child, docList, folderId: child.value.id);
-            print("Successfully processed folder ${child.value.name} with ${child.children.length} children");
-          } catch (e) {
-            print("Error processing folder ${child.value.name}: $e");
-            rethrow;
-          }
-        }
-      }
-
-      print("Built tree node with ${parent.children.length} children");
-      return parent.children;
-    } catch (e) {
-      print("Error in _buildTree: $e");
-      Logger().log(
-        level: Logger.ERROR,
-        message: "Error in _buildTree for folderId '$folderId': $e"
-      );
-      rethrow;
     }
   }
 
-  Future<void> loadProjectFiles(String projectId, {TreeNode? reloadRoot, bool includeHidden = false}) async {
+  Future<void> loadProjectFiles(String projectId, {TreeNode<sci.ProjectDocument>? reloadRoot, bool includeHidden = false}) async {
     final factory = tercen.ServiceFactory();
     try {
       _currentProject = await factory.projectService.get(projectId);  
@@ -119,12 +77,12 @@ class ProjectService {
 
     if( reloadRoot == null ){
       _projectRoot.children.clear();
-      _projectRoot.children.addAll( _buildTree(_projectRoot, projectObjectList.toList()));
+      _buildTree(_projectRoot, projectObjectList.toList(), "");
     }else{
       final node = _projectRoot.getDescendantById(reloadRoot.id);
       if( node != null ) {
         node.children.clear();
-        node.children.addAll( _buildTree(node, projectObjectList.toList(), folderId: reloadRoot.id));
+        _buildTree(node, projectObjectList.toList(), reloadRoot.id);
       } else {
         Logger().log(
           level: Logger.WARN, 
