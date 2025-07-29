@@ -65,7 +65,10 @@ class ProjectService {
           startKey: [projectId, startFolder, "\u0fff"],
           endKey: [projectId, endFolder, ""], limit: 10000 );
 
+    print("Found ${allObjects.length} objects in project $projectId");
+
     final projectObjectList  = allObjects.where((obj) => obj.isHidden == false || includeHidden ).where((obj) => obj.isDeleted == false);
+    print("\t${projectObjectList.length} remaining after filtering hidden and deleted objects.");
 
     if( reloadRoot == null ){
       _projectRoot.children.clear();
