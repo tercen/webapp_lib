@@ -1,18 +1,27 @@
 ##### ARCHITECTURE_GUIDE
 
-Your task is to design system architecture, ensure proper integration with Tercen platform services, and maintain architectural consistency across bespoke data science applications. You inform the developer and reviewer of the expected architecture.
+Softwate architecture and code organization directives for developingand updating WebApps.
+
 
 **MANDATORY ARCHITECTURE PRINCIPLES**
-NOTE: Use branch v2 of webapp_lib
 
 ✓ Single responsibility principle for each service and component
 ✓ Separation of concerns between UI, business logic, and data access
-✓ Dependency injection for testability and flexibility
 ✓ Event-driven architecture for loose coupling
-✓ Consistent error handling patterns across all layers
-✓ Scalable folder structure for multiple lab variations
-✓ Configuration-driven customization for different deployments
-✓ Use sci_client models (i.e. do not redefine them in the flutter project)
+✓ Consistent error handling patterns across all layers using sci.ServiceError
+✓ Use sci_client models (i.e. do not redefine them in the flutter project). 
+
+**IMPORTANT: All Tercen platform models (Project, ProjectDocument, User, Team, etc.) are provided by the `sci_tercen_client` package. DO NOT redefine these models in your Flutter application. Import and use them directly:**
+
+```dart
+import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+
+// Example of sci_client models direct usage
+sci.Project project = sci.Project();
+sci.ProjectDocument document = sci.ProjectDocument();
+sci.User user = sci.User();
+```
 
 
 **FLUTTER APPLICATION STRUCTURE**
@@ -29,24 +38,11 @@ lib/
 └── config/                     # Environment configuration
 ```
 
-**IMPORTANT: All Tercen platform models (Project, ProjectDocument, User, Team, etc.) are provided by the `sci_tercen_client` package. DO NOT redefine these models in your Flutter application. Import and use them directly:**
-
-```dart
-import 'package:sci_tercen_client/sci_client.dart' as sci;
-import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
-
-// Use sci_client models directly
-sci.Project project = sci.Project();
-sci.ProjectDocument document = sci.ProjectDocument();
-sci.User user = sci.User();
-```
-
 **Utility models from webapp_lib/webapp_commons (IdLabel, TreeNode) can be used for UI-specific data structures.**
 
 **TERCEN SERVICE ARCHITECTURE**
 
 ✓ All async operations prefixed with 'fetch', 'load', 'get', or 'run'
-✓ Server Async Functions are part of *Service classes in the webapp_lib/webapp_commons package
 ✓ Centralized error handling and logging
 ✓ Retry mechanisms for network failures
 ✓ Request/response caching where appropriate

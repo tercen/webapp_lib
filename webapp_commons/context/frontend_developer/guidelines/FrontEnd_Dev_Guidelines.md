@@ -1,42 +1,3 @@
-**MANDATORY FIRST STEPS - DO THESE BEFORE ANYTHING ELSE:**
-
-NOTE: Use branch v2 of webapp_lib
-
-**STEP 0: SINGLE TASK FOCUS**
-You will receive ONE SPECIFIC TASK at a time from the PROJECT_MANAGER. You MUST:
-- Focus ONLY on the specific task provided (no additional work)
-- Read GitHub repositories using WebFetch before starting the task
-- Complete the task fully before responding
-- Provide clear confirmation when the task is completed
-- Build upon any work from previously completed tasks
-
-Example response format:
-```
-TASK ACKNOWLEDGMENT: I will complete the specific task: [task description]
-
-[Implementation work here]
-
-TASK COMPLETED: ✅ [Brief confirmation of what was accomplished]
-```
-
-**IMPLEMENTATION STEPS:**
-1 **USE WebFetch to analyze webapp_lib/webapp_commons/lib/snippets/**
-2 **COPY the main.dart content and create lib/main.dart**
-3 **COPY the pubspec.yaml content and create pubspec.yaml**
-4 **COPY and modify all relevant snippets/ files, including the snippets/assets folder files**
-5 **CREATE pubspec.yaml with required dependencies**
-6 **ANALYZE Service functions contained in the sci_tercen_client package as well as examples of it in the snippets folder**
-
-**IMPORTANT** DO NOT modify the ci_tercen_client not webapp_commons import in the pubspec file
-
-**TASK COMPLETION CONFIRMATION:**
-When you finish the assigned task, provide confirmation using this format:
-```
-TASK COMPLETED: ✅ [What was accomplished]
-FILES CREATED/MODIFIED: [List of files changed]
-NEXT STEPS: Ready for next task from PROJECT_MANAGER
-```
-
 **CORE DEVELOPMENT REQUIREMENTS:**
 
 ✓ **Code Quality**: Code MUST compile without errors and pass `flutter analyze`
@@ -49,18 +10,10 @@ NEXT STEPS: Ready for next task from PROJECT_MANAGER
 ✓ **File Organization**: Each screen in separate file, widgets >100 lines separated
 ✓ **State Management**: Avoid nested StatefulBuilder, implement proper disposal
 ✓ **Component Integration**: Use  webapp_lib/webapp_commons library patterns
-✓ **Template Guide**: COPY files from  webapp_lib/webapp_commons/lib/snippets/ as starting templates
 ✓ **Model Usage**: Use sci_tercen_client as  webapp_lib/webapp_commons models. NEVER create view models.
 ✓ **Package Imports**: Import sci_client models with `import 'package:sci_tercen_client/sci_client.dart' as sci;`
+✓ **Annotation**: Annotate/comment methods that contain mockup of Tercen service call . They should indicate exactly what is expected there. These comments MUST start with the //BACKDEV works.
 
-
-**CLOUD & SERVICE INTEGRATION REQUIREMENTS**
-✓ All service calls must include timeout configurations
-✓ Implement retry logic with exponential backoff for network failures
-✓ Use sci.ServiceError for all errors
-✓ All file uploads must show progress indicators
-✓ Long-running operations must be cancellable by user
-✓ Connection pooling and resource management when possible
 
 
 **SCIENTIFIC USER EXPERIENCE**
