@@ -11,7 +11,7 @@ class TreeNode<T> {
       {required this.id,
       this.label = "",
       required this.value,
-      this.children = const [],
+      this.children = const <TreeNode<T>>[],
       this.parent});
 
   List<TreeNode<T>> getDescendants() {

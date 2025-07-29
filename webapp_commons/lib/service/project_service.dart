@@ -32,7 +32,7 @@ class ProjectService {
   var projectUpdate = ValueNotifier<String>("");
 
 
-  List<TreeNode> _buildTree( TreeNode parent, List<sci.ProjectDocument> docList, {String folderId = ""} ) {
+  List<TreeNode<sci.ProjectDocument>> _buildTree(TreeNode<sci.ProjectDocument> parent, List<sci.ProjectDocument> docList, {String folderId = ""}) {
     final objects = docList.where((obj) => obj.folderId == folderId);
     parent.children.addAll(objects.map((doc) => TreeNode<sci.ProjectDocument>(
       id: doc.id,
@@ -41,9 +41,9 @@ class ProjectService {
       children: [],
     )));
 
-    parent.children.forEach((child){
-      if( child.value.get("subKind") == "FolderDocument" ) {
-        child.children.addAll(_buildTree(child, docList, folderId: child.value.get("id")));  
+    parent.children.forEach((child) {
+      if (child.value.subKind == "FolderDocument") {
+        child.children.addAll(_buildTree(child, docList, folderId: child.value.id));  
       }
     });
 
