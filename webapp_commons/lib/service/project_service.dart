@@ -46,12 +46,30 @@ class ProjectService {
       );
       print("${validObjects.length} objects passed validation");
       
-      parent.children.addAll(validObjects.map((doc) => TreeNode<sci.ProjectDocument>(
-        id: doc.id,
-        label: doc.name,
-        value: doc,
-        children: [],
-      )));
+      // Create tree nodes one by one to isolate the failure
+      final newNodes = <TreeNode<sci.ProjectDocument>>[];
+      var index = 0;
+      for (final doc in validObjects) {
+        try {
+          print("Creating TreeNode $index for doc: id='${doc.id}', name='${doc.name}', subKind='${doc.subKind}'");
+          final node = TreeNode<sci.ProjectDocument>(
+            id: doc.id,
+            label: doc.name,
+            value: doc,
+            children: [],
+          );
+          newNodes.add(node);
+          print("Successfully created TreeNode $index");
+          index++;
+        } catch (e) {
+          print("Error creating TreeNode for doc ${doc.id}: $e");
+          rethrow;
+        }
+      }
+      
+      print("About to add ${newNodes.length} nodes to parent.children");
+      parent.children.addAll(newNodes);
+      print("Successfully added nodes to parent.children");
 
       parent.children.forEach((child) {
         if (child.value.subKind == "FolderDocument" && child.value.id.isNotEmpty) {
