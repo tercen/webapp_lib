@@ -15,7 +15,7 @@ class ProjectService {
 
   ProjectService._internal();
 
-  TreeNode _projectRoot = TreeNode<sci.ProjectDocument>(
+  TreeNode<sci.ProjectDocument> _projectRoot = TreeNode<sci.ProjectDocument>(
     id: 'root',
     label: "",
     value: sci.ProjectDocument(),
@@ -27,7 +27,7 @@ class ProjectService {
   String get projectId => _currentProject.id;
   String get projectName => _currentProject.name.isEmpty ? "No Project Loaded" : _currentProject.name;
   String get projectOwner => _currentProject.acl.owner;
-  TreeNode get root => _projectRoot;
+  TreeNode<sci.ProjectDocument> get root => _projectRoot;
 
   var projectUpdate = ValueNotifier<String>("");
 
