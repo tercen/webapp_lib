@@ -33,21 +33,43 @@ class ProjectService {
 
 
   List<TreeNode<sci.ProjectDocument>> _buildTree(TreeNode<sci.ProjectDocument> parent, List<sci.ProjectDocument> docList, {String folderId = ""}) {
-    final objects = docList.where((obj) => obj.folderId == folderId);
-    parent.children.addAll(objects.map((doc) => TreeNode<sci.ProjectDocument>(
-      id: doc.id,
-      label: doc.name,
-      value: doc,
-      children: [],
-    )));
+    try {
+      print("Building tree for folderId: '$folderId', docList length: ${docList.length}");
+      
+      final objects = docList.where((obj) => obj.folderId == folderId);
+      print("Found ${objects.length} objects with folderId '$folderId'");
+      
+      // Add null safety checks
+      final validObjects = objects.where((doc) => 
+        doc.id.isNotEmpty && 
+        doc.name.isNotEmpty
+      );
+      print("${validObjects.length} objects passed validation");
+      
+      parent.children.addAll(validObjects.map((doc) => TreeNode<sci.ProjectDocument>(
+        id: doc.id,
+        label: doc.name,
+        value: doc,
+        children: [],
+      )));
 
-    parent.children.forEach((child) {
-      if (child.value.subKind == "FolderDocument") {
-        child.children.addAll(_buildTree(child, docList, folderId: child.value.id));  
-      }
-    });
+      parent.children.forEach((child) {
+        if (child.value.subKind == "FolderDocument" && child.value.id.isNotEmpty) {
+          print("Processing folder: ${child.value.name} (id: ${child.value.id})");
+          child.children.addAll(_buildTree(child, docList, folderId: child.value.id));  
+        }
+      });
 
-    return parent.children;
+      print("Built tree node with ${parent.children.length} children");
+      return parent.children;
+    } catch (e) {
+      print("Error in _buildTree: $e");
+      Logger().log(
+        level: Logger.ERROR,
+        message: "Error in _buildTree for folderId '$folderId': $e"
+      );
+      rethrow;
+    }
   }
 
   Future<void> loadProjectFiles(String projectId, {TreeNode? reloadRoot, bool includeHidden = false}) async {
