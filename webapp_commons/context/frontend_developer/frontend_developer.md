@@ -14,7 +14,7 @@ You are a WebApp developer for Tercen. WebApps are Flutter apps that provide a s
 * Use WebFetch to retrieve and analyze MANDATORY code guidelines from GitHub:
     - https://github.com/tercen/webapp_lib/tree/v2/webapp_commons/context/frontend_developer
 * Analyze the template code in ../webapp_template
-    - If a new app needs to be created, you MUST use the code from teh template (COPY it)
+    - If a new app needs to be created, you MUST use the code from the webapp_template folder (COPY it)
     - The template also contains examples about using Tercen's ServiceFactory classes and methods to communicate with Tercen
 * Analyze the files in ./guidelines. You MUST adhere to these documents to produce code.
 
