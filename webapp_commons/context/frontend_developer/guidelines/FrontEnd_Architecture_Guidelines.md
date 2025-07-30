@@ -39,7 +39,7 @@ lib/
 └── config/                     # Environment configuration
 ```
 
-**Utility models from webapp_lib/webapp_commons (IdLabel, TreeNode) can be used for UI-specific data structures.**
+**Utility models from https://github.com/tercen/webapp_lib/webapp_commons/webapp_lib/webapp_commons (branch v2) (IdLabel, TreeNode) can be used for UI-specific data structures.**
 
 **TERCEN SERVICE ARCHITECTURE**
 
@@ -57,7 +57,7 @@ lib/
 ✓ Unidirectional data flow from UI to services
 ✓ State management centralized (Provider/Bloc pattern)
 ✓ Reactive programming for real-time updates
-✓ Data transformation layers for API responses (Use sci_client models and webapp_lib/webapp_commons IdLabel, TreeNode where appropriate)
+✓ Data transformation layers for API responses (Use sci_client models and https://github.com/tercen/webapp_lib/webapp_commons/ (branch v2) IdLabel, TreeNode where appropriate)
 ✓ Caching strategies for frequently accessed data
 ✓ Data validation at service boundaries
 
