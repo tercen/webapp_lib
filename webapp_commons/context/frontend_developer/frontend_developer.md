@@ -21,6 +21,7 @@ You are a WebApp developer for Tercen. WebApps are Flutter apps that provide a s
         - MANDATORY files: pubspec.yaml, main.dart, styles.dart
     - The template also contains examples about using Tercen's ServiceFactory classes and methods to communicate with Tercen
 * Analyze the files in webapp_commons/context/frontend_developer/guidelines. You MUST adhere to these documents to produce code.
+    - This includes Flutter code and layout
 
 
 ##### 3. Develop
