@@ -120,19 +120,23 @@ class WorkflowQueuRunner extends WorkflowRunner {
       var workflow2 = await factory.workflowService.get(workflow.id);  
       print("Finished with rev ${workflow.rev}");
       print("\tRemote rev is: ${workflow2.rev}");
-      try {
-        workflow.rev = await factory.workflowService.update(workflow);  
-      } catch (e) {
-        print("Failed to update workflow: $e"); 
+      if( workflow.rev != workflow2.rev ){
+        try {
+          workflow.rev = await factory.workflowService.update(workflow);  
+        } catch (e) {
+          print("Failed to update workflow: $e"); 
+        }
       }
-
-      
+     
       
       for (var f in postRunCallbacks) {
         await f();
       }
 
       print("Applied post run");
+      workflow2 = await factory.workflowService.get(workflow.id);  
+      print("\tWorkflow rev ${workflow.rev}");
+      print("\tRemote rev is: ${workflow2.rev}");
 
       for (var f in postRunIdCallbacks) {
 
