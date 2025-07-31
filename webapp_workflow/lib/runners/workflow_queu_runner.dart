@@ -141,14 +141,16 @@ class WorkflowQueuRunner extends WorkflowRunner {
       print("Applied post run");
 
       for (var f in postRunIdCallbacks) {
+        try {
         await f(workflow);
         //In case function updates workflow
-        try {
+        
           workflow = await factory.workflowService.get(workflow.id);  
         } catch (e) {
+          print("Failed postRunIdCallback $f : $e");
           //Will generally trigger on task cancel
-          print("WORKFLOW ${workflow.id} not found");
-          return sci.Workflow();
+          // print("WORKFLOW ${workflow.id} not found");
+          // return sci.Workflow();
         }
       }
       
