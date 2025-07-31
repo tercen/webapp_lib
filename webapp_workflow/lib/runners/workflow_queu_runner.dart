@@ -122,6 +122,8 @@ class WorkflowQueuRunner extends WorkflowRunner {
       } catch (e) {
         print("Failed to update workflow: $e"); 
       }
+
+      workflow = await factory.workflowService.get(workflow.id);  
       
       for (var f in postRunCallbacks) {
         await f();
