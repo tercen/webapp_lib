@@ -17,7 +17,7 @@ import 'package:webapp_utils/services/workflow_data_service.dart';
 enum TimestampType { full, short }
 
 typedef PostRunCallback = Future<void> Function();
-typedef PostRunIdCallback = Future<void> Function(String workflowId);
+typedef PostRunIdCallback = Future<void> Function(sci.Workflow workflow);
 
 class FilterConfig {
   final String filterName;
@@ -139,10 +139,10 @@ class WorkflowRunner with ProgressDialog {
     yAxisCoord[stepId] = coord;
   }
 
-  Future<void> reEnableSteps(String workflowId) async {
+  Future<void> reEnableSteps(sci.Workflow wkf) async {
     if (doNotRunList.isNotEmpty) {
-      var wkf = await WorkflowDataService()
-          .findWorkflowById(workflowId, useCache: false);
+      // var wkf = await WorkflowDataService()
+          // .findWorkflowById(workflowId, useCache: false);
       for (var stepId in doNotRunList) {
         final stp = wkf.steps.where((step) => step is! sci.TableStep).firstWhere(
             (step) => step.id == stepId,
@@ -899,7 +899,7 @@ class WorkflowRunner with ProgressDialog {
         await f();
       }
       for (var f in postRunIdCallbacks) {
-        await f(workflow.id);
+        await f(workflow);
       }
     }
 

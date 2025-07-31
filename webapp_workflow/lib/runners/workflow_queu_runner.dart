@@ -141,7 +141,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       print("Applied post run");
 
       for (var f in postRunIdCallbacks) {
-        await f(workflow.id);
+        await f(workflow);
         //In case function updates workflow
         try {
           workflow = await factory.workflowService.get(workflow.id);  
