@@ -139,7 +139,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
       print("\tRemote rev is: ${workflow2.rev}");
 
       for (var f in postRunIdCallbacks) {
-
+        print("Running postRunIdCallback $f");
 
         await f(workflow);
         //In case function updates workflow
@@ -153,7 +153,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
       }
       
-print("Applied post run id");
+      print("Applied post run id");
 
       if( postRunCallbacks.isNotEmpty || postRunIdCallbacks.isNotEmpty ){
         
