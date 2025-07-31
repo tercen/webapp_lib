@@ -50,7 +50,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
   WorkflowTaskComponent(super.id, super.groupId, super.componentLabel,
       super.dataFetchCallback, super.actions, this.workflowActions,
       {super.excludeColumns, super.hideColumns, this.onEmptyQueu}) {
-    hideColumns = [".key", "IsWorkflowTask", "Workflow Name", "Workflow Id", "Id"];
+    hideColumns = [".key", "IsWorkflowTask", "Workflow Name", "Workflow Id", "Id", ...super.hideColumns ?? []];
   }
 
   @override
