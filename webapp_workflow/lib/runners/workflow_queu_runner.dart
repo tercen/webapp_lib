@@ -117,6 +117,9 @@ class WorkflowQueuRunner extends WorkflowRunner {
     // 
 
     if (!hasFailed) {
+      var workflow2 = await factory.workflowService.get(workflow.id);  
+      print("Finished with rev ${workflow.rev}");
+      print("\tRemote rev is: ${workflow2.rev}");
       try {
         workflow.rev = await factory.workflowService.update(workflow);  
       } catch (e) {
@@ -132,11 +135,11 @@ class WorkflowQueuRunner extends WorkflowRunner {
       print("Applied post run");
 
       for (var f in postRunIdCallbacks) {
-        try {
-        workflow = await factory.workflowService.get(workflow.id);  
+
+
         await f(workflow);
         //In case function updates workflow
-        
+        try {        
           workflow = await factory.workflowService.get(workflow.id);  
         } catch (e) {
           print("Failed postRunIdCallback $f : $e");
