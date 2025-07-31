@@ -114,10 +114,15 @@ class WorkflowQueuRunner extends WorkflowRunner {
     print("Workflow run done $hasFailed");
     //
     
-    // workflow = await factory.workflowService.get(workflow.id);
+    // 
 
     if (!hasFailed) {
-      workflow.rev = await factory.workflowService.update(workflow);
+      try {
+        workflow.rev = await factory.workflowService.update(workflow);  
+      } catch (e) {
+        print("Failed to update workflow: $e"); 
+      }
+      
       for (var f in postRunCallbacks) {
         await f();
         //In case function updates workflow
@@ -131,6 +136,8 @@ class WorkflowQueuRunner extends WorkflowRunner {
         
       }
 
+      print("Applied post run");
+
       for (var f in postRunIdCallbacks) {
         await f(workflow.id);
         //In case function updates workflow
@@ -143,8 +150,12 @@ class WorkflowQueuRunner extends WorkflowRunner {
         }
       }
       
+print("Applied post run id");
+
       if( postRunCallbacks.isNotEmpty || postRunIdCallbacks.isNotEmpty ){
+        
         workflow.rev = await factory.workflowService.update(workflow);
+        print("Updated workflow");
       }
       
     } else {
