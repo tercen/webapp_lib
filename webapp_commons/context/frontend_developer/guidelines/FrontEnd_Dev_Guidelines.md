@@ -18,10 +18,10 @@
 **PROJECT CREATION**
 When a new project must be created, follow the steps below:
 1. Create the folder that will contain the project
-2. Copy tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/main.dart@v2  to it
-3. Copy tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/pubspec.yaml@v2 to it
-4. Copy tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/screens/home_screen.dart@v2 to it
-5. DO NOT copy other tercen/webapp_lib files
+2. Fetch  tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/main.dart@v2  from Github and add to the project
+3. Fetch tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/pubspec.yaml@v2 from Github and add to the project
+4. Fetch tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/screens/home_screen.dart@v2 from Github and add to the project
+5. DO NOT copy other tercen/webapp_lib files. do not copy any local files.
 6. Proceed with the remaining user instructions as needed.
 
 
