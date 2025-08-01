@@ -15,6 +15,15 @@
 ✓ **Annotation**: Annotate/comment methods that contain mockup of Tercen service call . They should indicate exactly what is expected there. These comments MUST start with the //BACKDEV works.
 
 
+**PROJECT CREATION**
+When a new project must be created, follow the steps below:
+1. Create the folder that will contain the project
+2. Copy tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/main.dart@v2  to it
+3. Copy tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/pubspec.yaml@v2 to it
+4. Copy tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/screens/home_screen.dart@v2 to it
+5. DO NOT copy other tercen/webapp_lib files
+6. Proceed with the remaining user instructions as needed.
+
 
 **SCIENTIFIC USER EXPERIENCE**
 ✓ Provide clear feedback for long-running analysis workflows
