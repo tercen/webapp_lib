@@ -14,6 +14,10 @@
 - Use sci_client models - NEVER create view models
 - Import sci_client: `import 'package:sci_tercen_client/sci_client.dart' as sci;`
 
+# IMPORTANT CLARIFICATIONS
+
+* DO NOT redefine classes defined in any of the imports, including https://github.com/tercen/webapp_lib and https://github.com/tercen/sci_tercen_client
+
 ## Project Structure
 
 ```
@@ -52,22 +56,23 @@ lib/
 
 When a new project must be created, follow the steps below:
 1. Create the folder that will contain the project
-2. Fetch  tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/main.dart@v2  from Github and add to the project
-3. Fetch tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/pubspec.yaml@v2 from Github and add to the project
-4. Fetch tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/screens/home_screen.dart@v2 from Github and add to the project
-5. DO NOT copy other tercen/webapp_lib files. do not copy any local files.
+2. Fetch  https://github.com/tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/main.dart@v2  from Github and add to the project
+3. Fetch https://github.com/tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/pubspec.yaml@v2 from Github and add to the project
+4. Fetch https://github.com/tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/screens/home_screen.dart@v2 from Github and add to the project
+5. DO NOT copy other https://github.com/tercen/webapp_lib files. do not copy any local files.
 6. Proceed with the remaining user instructions as needed.
 
 
 ## Data Models
 
 **Tercen Platform Models**
-- Use sci_tercen_client package models directly
+- Use sci_tercen_client package models and services directly
 - DO NOT redefine Project, User, Team, etc.
 - Example: `sci.Project project = sci.Project();`
 
 **UI Utility Models**
-- Use tercen/webapp_lib/webapp_commons@v2 IdLabel, TreeNode for UI-specific data
+- Use tercen/webapp_lib/webapp_commons@v2 IdLabel, TreeNode models and services directly
+- DO NOT redefine IdNode, ApiService, etc
 - Connectivity to Tercen platform already implemented in main.dart
 
 ## Performance & Testing
@@ -77,3 +82,5 @@ When a new project must be created, follow the steps below:
 - Mock service implementations for testing
 - Use hardcoded data for UI development (simulate server timing)
 - Centralized error handling using sci.ServiceError
+
+
