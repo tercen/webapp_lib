@@ -11,3 +11,8 @@ When a new project must be created, follow the steps below:
 4. Clone https://github.com/tercen/template-R_operator/renv from Github into the new project
 5. Proceed with the remaining user instructions as needed.
 
+### Clarifications
+
+- Data is selected with the select function of context. Their names are in names 
+- Column pojections are selected with cselect. Their names are in cnames and are identified by column .ci
+- Row projections are selected with rselect. Their names are in rnames and are identified by column .ri
