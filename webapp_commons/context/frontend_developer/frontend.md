@@ -54,12 +54,13 @@ lib/
 
 ## Project Creation Steps
 
+    # dev_agent = ClaudeCodeAgent(model=args.model, role="frontend_dev")
 When a new project must be created, follow the steps below:
 1. Create the folder that will contain the project
-2. Fetch  https://github.com/tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/main.dart@v2  from Github and add to the project
-3. Fetch https://github.com/tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/pubspec.yaml@v2 from Github and add to the project
+2. Fetch  https://github.com/tercen/webapp_lib/blob/v2/webapp_commons/context/webapp_template/snippets/main.dart  from Github and add to the project
+3. Fetch https://github.com/tercen/webapp_lib/blob/v2/webapp_commons/context/webapp_template/snippets/pubspec.yaml from Github and add to the project
     3.1. This pubscpec file already contains the tercen_sci_client and webapp_lib dependencies.
-4. Fetch https://github.com/tercen/webapp_lib/webapp_commons/context/webapp_template/snippets/screens/home_screen.dart@v2 from Github and add to the project
+4. Fetch https://github.com/tercen/webapp_lib/blob/v2/webapp_commons/context/webapp_template/snippets/screens/home_screen.dart from Github and add to the project
 5. DO NOT copy other https://github.com/tercen/webapp_lib files. do not copy any local files.
 6. Proceed with the remaining user instructions as needed.
 
