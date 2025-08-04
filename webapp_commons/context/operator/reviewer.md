@@ -13,3 +13,5 @@ ANALYZE the following files to understand how an operator should behave
 - https://github.com/tercen/read_csv_operator/blob/master/main.R
 - https://github.com/tercen/report_table_operator/blob/main/main.R
 
+
+

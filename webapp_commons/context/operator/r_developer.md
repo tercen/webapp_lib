@@ -22,3 +22,5 @@ For further examples, fetch and analyze the following public URLs:
 - https://github.com/tercen/scale_operator/blob/master/main.R
 - https://github.com/tercen/read_csv_operator/blob/master/main.R
 - https://github.com/tercen/report_table_operator/blob/main/main.R
+
+In particular, analyze how data is read and saved.
