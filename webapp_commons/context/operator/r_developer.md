@@ -13,7 +13,7 @@ When a new project must be created, follow the steps below:
 
 ### Clarifications
 
-- Data is selected with the select function of context. Their names are in names 
+- Data is selected with the select function of context. Their names are in names. It will contain a .ci and .ri value to join with column and row projections
 - Column pojections are selected with cselect. Their names are in cnames and are identified by column .ci
 - Row projections are selected with rselect. Their names are in rnames and are identified by column .ri
 
