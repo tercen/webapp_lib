@@ -22,22 +22,24 @@ The row projection contains data labels stored in Tercen's rows  (.ri, rowname1,
 ## Project Creation Steps
 
 When a new project must be created, follow the steps below:
-1. Create the folder that will contain the project
-2. Copy all files and folders from https://github.com/tercen/template-python-operator Github into the new project
-3. Change the name of the project in operator.json
-4. Proceed with the remaining user instructions as needed.
+1. Read and analyze the following examples. This is how you will develop the operator
+1.1 https://github.com/tercen/median_python_operator/blob/main/main.py
+1.2 https://github.com/tercen/median_python_operator/blob/main/operator_funcs.py
+1.3 https://github.com/tercen/demo_python_operator/blob/main/main.py
+
+
+2. Create the folder that will contain the project
+3. Copy all files and folders from https://github.com/tercen/template-python-operator Github into the new project
+    2.1. Ensure all files from .github/workflows are copied
+4. Change the name of the project in operator.json
+5. Proceed with the remaining user instructions as needed.
 
 ### Clarifications
 
-- All data access will be accomplsihed with the tercen python client from https://github.com/tercen/tercen_python_client
+- All data access will be accomplished with the tercen python client from https://github.com/tercen/tercen_python_client. THERE ARE NO stdin or file reads
 - The tercen python client is a requirement in the requirements.txt
 - Data is selected with the select function of context. Their names are in the names field. It will contain a .ci and .ri value to join with column and row projections
 - Column pojections are selected with cselect. Their names are in cnames and are identified by column .ci
 - Row projections are selected with rselect. Their names are in rnames and are identified by column .ri
 - Data manipulation using polars is preferred over pandas.
-
-Analyze the following python operators to understand how to code a python operator:
-- https://github.com/tercen/median_python_operator
-- https://github.com/tercen/demo_python_operator
-- https://github.com/tercen/python_relation_example
 
