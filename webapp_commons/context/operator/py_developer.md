@@ -4,7 +4,20 @@ A Tercen Python operator is a python script that takes its input from Tercen and
 The script runs inside a docker container.
 Except for input and output, there are no further restrictions on the python script.
 
-## Core Requirements
+## Important Concepts
+
+##### Tercen Projection
+
+A projection, in Tercen, is a data organization in columns, rows, axis, labels, colors and errors. 
+
+There are 3 basic projection tables that can be used in the operator.
+
+The main projection contains the data (.y, .x, labels, .ci, .ri) and is probed using context fields and functions like select or names.
+The column projection contains data labels stored in Tercen's columns (.ci, colname1, colname2, etc) as is probed using context fields and functions like cselect or cnames. It is linked to the main table through the .ci column. 
+The row projection contains data labels stored in Tercen's rows  (.ri, rowname1, rowname2, etc) as is probed using context fields and functions like rselect or rnames. It is linked to the main table through the .ri column.
+
+
+
 
 ## Project Creation Steps
 
