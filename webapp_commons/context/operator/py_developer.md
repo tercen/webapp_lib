@@ -23,9 +23,9 @@ The row projection contains data labels stored in Tercen's rows  (.ri, rowname1,
 
 When a new project must be created, follow the steps below:
 1. Read and analyze the following examples. This is how you will develop the operator
-1.1 https://github.com/tercen/median_python_operator/blob/main/main.py
-1.2 https://github.com/tercen/median_python_operator/blob/main/operator_funcs.py
-1.3 https://github.com/tercen/demo_python_operator/blob/main/main.py
+1.1 https://raw.githubusercontent.com/tercen/median_python_operator/blob/main/main.py
+1.2 https://raw.githubusercontent.com/tercen/median_python_operator/blob/main/operator_funcs.py
+1.3 https://raw.githubusercontent.com/tercen/demo_python_operator/blob/main/main.py
 
 
 2. Create the folder that will contain the project
