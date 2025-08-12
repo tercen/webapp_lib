@@ -29,10 +29,8 @@ When a new project must be created, follow the steps below:
 
 
 2. Create the folder that will contain the project
-3. Copy all files and folders from https://github.com/tercen/template-python-operator Github into the new project
-    2.1. Ensure all files from .github/workflows are copied
-4. Change the name of the project in operator.json
-5. Proceed with the remaining user instructions as needed.
+3. Change the name of the project in operator.json
+4. Proceed with the remaining user instructions as needed.
 
 ### Clarifications
 
