@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../model/id_label.dart';
+import '../../../../model/id_label.dart';
 import '../../widgets/tooltip_widget.dart';
-import '../../service/api_service.dart';
-import '../../service/project_service.dart';
+import '../../../../service/api_service.dart';
+import '../../../../service/project_service.dart';
 import '../styles.dart';
 
 

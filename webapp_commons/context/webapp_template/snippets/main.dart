@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../service/api_service.dart';
-import '../service/project_service.dart';
+import '../../../service/api_service.dart';
+import '../../../service/project_service.dart';
 // import 'package:webapp_commons/snippets/screens/result_screen.dart';
-import '../utils/logger.dart';
+import '../../../utils/logger.dart';
 import 'screens/home_screen.dart';
 
 import 'styles.dart';
