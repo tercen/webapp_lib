@@ -759,17 +759,17 @@ class HierarchySelectableListComponent extends FetchComponent
   void setSelected(String value, String? column){
     if( isInit ){
 
-      _setSelected(value, column);
+      setSelectedByValue(value, column);
     }else{
-      delayedSelection =  () => _setSelected(value, column);
+      delayedSelection =  () => setSelectedByValue(value, column);
     }
   }
 
-  void _setSelected(String value, String? column){
+  void setSelectedByValue(String value, String? column){
     final node = hierarchyRoot.getDescendants().where((node) => column == null || node.selectionColumnName == column) .firstWhere((node) => node.id == value, orElse: () => hierarchyRoot);
 
     if( node.level == -1 ){
-      Logger().log(level: Logger.WARN, message: "_setSelected: Node with id $value not found in hierarchy.");
+      Logger().log(level: Logger.WARN, message: "setSelectedByValue: Node with id $value not found in hierarchy.");
       return;
     }
 
