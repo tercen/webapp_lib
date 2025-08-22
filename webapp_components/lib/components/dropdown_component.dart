@@ -18,6 +18,9 @@ class DropdownComponent extends FetchComponent
   final Future Function(WebappTable rowTable)? onChange;
   final Future<String> Function()? initValue;
 
+  get options => dataTable[displayColumn];
+   
+
   DropdownComponent(
       super.id, super.groupId, super.componentLabel, super.dataFetchFunc, this.displayColumn, 
       {infoBoxBuilder, this.initValue,
