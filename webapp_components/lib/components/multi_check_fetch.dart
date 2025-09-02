@@ -20,6 +20,7 @@ class MultiCheckComponentFetch
   final bool hasSelectAll;
   bool selectAll;
   late bool allSelected;
+  final bool singleSelect;
   double? columnWidth;
   final bool saveState;
   final Future Function(List<String> selected)? onChange;
@@ -27,6 +28,7 @@ class MultiCheckComponentFetch
       {this.columns = 5,
       this.hasSelectAll = false,
       this.selectAll = false,
+      this.singleSelect = false,
       this.columnWidth,
       this.saveState = true, super.onLoad, this.onChange}) {
     // super.id = id;
@@ -36,6 +38,8 @@ class MultiCheckComponentFetch
   }
 
   void select(String el) {
+
+
     if (!selected.contains(el)) {
       selected.add(el);
       if (options.where((e) => selected.contains(e)).length == options.length) {
@@ -65,11 +69,13 @@ class MultiCheckComponentFetch
 
 
   void onCheckClicked(Map<String, dynamic> params , bool newCheckValue ){
-    print("OnCloick: $params $newCheckValue $selected");
     var name = params["name"]!;
     var onClick = params["onClick"];
 
     if( newCheckValue == true ){
+      if (singleSelect) {
+        selected.clear();
+      }
       select(name);
     }else{
       deselect(name);

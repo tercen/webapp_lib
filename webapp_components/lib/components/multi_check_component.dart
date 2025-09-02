@@ -12,6 +12,7 @@ class MultiCheckComponent extends MultiCheckComponentFetch {
       super.hasSelectAll = false,
       super.selectAll = false,
       super.columnWidth,
+      super.singleSelect = false,
       super.saveState = true})
       : super(id, groupId, componentLabel, () async {
           return WebappTable();
