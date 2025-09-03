@@ -24,6 +24,7 @@ class FilterConfig {
   final String stepId;
   final List<String> keys;
   final List<dynamic> values;
+  final String boolOp;
   final List<sci.Pair> metas;
 
   FilterConfig(
@@ -31,6 +32,7 @@ class FilterConfig {
       required this.stepId,
       required this.keys,
       required this.values,
+      required this.boolOp,
       required this.metas});
 }
 
@@ -433,6 +435,7 @@ class WorkflowRunner with ProgressDialog {
       final stepId = fc.stepId;
       final keys = fc.keys;
       final values = fc.values;
+      final boolOp = fc.boolOp;
       final metas = fc.metas;
 
       var factors =
@@ -440,7 +443,7 @@ class WorkflowRunner with ProgressDialog {
       var filterKey = "$stepId$filterName";
 
       sci.Filter andFilter = sci.Filter()
-        ..logical = "and"
+        ..logical = boolOp
         ..not = false;
 
       for (var i = 0; i < factors.length; i++) {
@@ -472,6 +475,19 @@ class WorkflowRunner with ProgressDialog {
     }
   }
 
+  void addOrFilter(
+      String filterName, String stepId, List<String> keys, List<dynamic> values,
+      {List<sci.Pair> metas = const []}) {
+    final fc = FilterConfig(
+        filterName: filterName,
+        stepId: stepId,
+        keys: keys,
+        values: values,
+        boolOp: "or",
+        metas: metas);
+    filterConfigList.add(fc);
+  }
+
   void addAndFilter(
       String filterName, String stepId, List<String> keys, List<dynamic> values,
       {List<sci.Pair> metas = const []}) {
@@ -480,6 +496,7 @@ class WorkflowRunner with ProgressDialog {
         stepId: stepId,
         keys: keys,
         values: values,
+        boolOp: "and",
         metas: metas);
     filterConfigList.add(fc);
   }
