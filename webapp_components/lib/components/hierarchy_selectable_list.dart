@@ -734,7 +734,7 @@ class HierarchySelectableListComponent extends FetchComponent
                   } else {
                     expandedLevels.remove(node.id);
                   }
-                  notifyListeners(); // Trigger rebuild to update icons
+                  // notifyListeners(); // Trigger rebuild to update icons
                 },
                 title: nonLeafCallback(
                     context,
