@@ -460,38 +460,38 @@ packages:
     dependency: transitive
     description:
       path: sci_base
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.4.0"
+      resolved-ref: "850efb945a842c374c7dbc255d0cc968f4671401"
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.4.0"
   sci_http_client:
     dependency: transitive
     description:
       path: sci_http_client
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.4.0"
+      resolved-ref: "850efb945a842c374c7dbc255d0cc968f4671401"
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.4.0"
   sci_tercen_client:
     dependency: transitive
     description:
       path: sci_tercen_client
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.4.0"
+      resolved-ref: "850efb945a842c374c7dbc255d0cc968f4671401"
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.4.0"
   sci_tercen_model:
     dependency: transitive
     description:
       path: sci_tercen_model
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.4.0"
+      resolved-ref: "850efb945a842c374c7dbc255d0cc968f4671401"
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.4.0"
   shelf:
     dependency: transitive
     description:
@@ -617,6 +617,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "27.2.5"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      sha256: "69fe30f3a8b04a0be0c15ae6490fc859a78ef4c43ae2dd5e8a623d45bfcf9225"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.0+3"
   term_glyph:
     dependency: transitive
     description:
@@ -793,12 +801,12 @@ packages:
     source: path
     version: "0.1.0"
   webapp_utils:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../webapp_utils"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0"
   webkit_inspection_protocol:
     dependency: transitive
     description:

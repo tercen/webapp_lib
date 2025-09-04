@@ -811,17 +811,28 @@ class WorkflowRunner with ProgressDialog {
   }
 
   Future<sci.Workflow> runWorkflowTask(sci.Workflow workflow,
-      {String? runTitle, String? stepName}) async {
+      {String? runTitle, String? stepName, String? stepId}) async {
     var factory = tercen.ServiceFactory();
 
     runTitle ??= workflow.name;
-
+    //NEeds the steps2run, but only part of the sci_api_model, not client...
     sci.RunWorkflowTask workflowTask = sci.RunWorkflowTask()
       ..state = sci.InitState()
       ..owner = AppUser().teamname
       ..projectId = AppUser().projectId
       ..workflowId = workflow.id
       ..workflowRev = workflow.rev;
+
+    if( stepId != null ){
+      workflowTask.stepsToRun.add(stepId);
+      // workflowTask = sci.RunWorkflowTask()
+      // ..state = sci.InitState()
+      // ..stepsToRun.add(stepId)
+      // ..owner = AppUser().teamname
+      // ..projectId = AppUser().projectId
+      // ..workflowId = workflow.id
+      // ..workflowRev = workflow.rev;
+    }
 
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
@@ -888,6 +899,49 @@ class WorkflowRunner with ProgressDialog {
 
     workflow.rev = await factory.workflowService.update(workflow);
     workflowId = workflow.id;
+
+    return workflow;
+  }
+    Future<sci.Workflow> doRunStep2(
+      BuildContext? context, sci.Workflow workflow, String stepId) async {
+    if (context != null) {
+      openDialog(context);
+    }
+
+    var runTitle = getWorkflowName(workflow);
+
+    //-----------------------------------------
+    // Task preparation and running
+    //-----------------------------------------
+    workflow = await runWorkflowTask(workflow, stepId: stepId);
+
+    log("$stepProgressMessage\n\n \nRunning final updates",
+        dialogTitle: runTitle);
+
+    final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) =>
+        step.state.taskState.kind != "DoneState" &&
+        step.state.taskState.kind != "InitState");
+    if (!hasFailed) {
+      for (var f in postRunCallbacks) {
+        await f();
+      }
+      for (var f in postRunIdCallbacks) {
+        await f(workflow);
+      }
+    }
+
+    if (context != null) {
+      await Future.delayed(const Duration(milliseconds: 1000), () {
+        // status.value = RunStatus.finished;
+        closeLog();
+      });
+    }
+
+    workflowId = workflow.id;
+    // workflow = doneWorkflow;
+
+    final factory = tercen.ServiceFactory();
+    workflow = await factory.workflowService.get(workflow.id);
 
     return workflow;
   }

@@ -399,25 +399,25 @@
     },
     {
       "name": "sci_base",
-      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_base",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-850efb945a842c374c7dbc255d0cc968f4671401/sci_base",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "sci_http_client",
-      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_http_client",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-850efb945a842c374c7dbc255d0cc968f4671401/sci_http_client",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "sci_tercen_client",
-      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_tercen_client",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-850efb945a842c374c7dbc255d0cc968f4671401/sci_tercen_client",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "sci_tercen_model",
-      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_tercen_model",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-850efb945a842c374c7dbc255d0cc968f4671401/sci_tercen_model",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -704,7 +704,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2025-06-23T13:44:20.359400Z",
+  "generated": "2025-09-04T21:42:50.350771Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///usr/bin/flutter",
