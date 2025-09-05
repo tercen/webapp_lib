@@ -9,9 +9,10 @@ import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:tson/tson.dart' as tson;
 // import 'package:sci_base/value.dart';
 import 'package:uuid/uuid.dart';
-import 'package:webapp_utils/functions/string_utils.dart';
+
 import 'package:webapp_utils/model/step_setting.dart';
 import 'package:webapp_utils/services/app_user.dart';
+import 'package:webapp_workflow/config/workflow_folder.dart';
 
 enum TimestampType { full, short }
 
@@ -38,15 +39,13 @@ class FilterConfig {
 class WorkflowRunner with ProgressDialog {
   StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
   StreamSubscription? subscription;
-  String? folderName;
-  String? parentFolderId;
+
 
   final List<String> initStepIds = [];
   final List<sci.Pair> workflowMeta = [];
 
   final List<FilterConfig> filterConfigList = [];
 
-  final List<sci.Pair> folderMeta = [];
   final Map<String, sci.NamedFilter> filterMap = {};
   final Map<String, sci.Relation> tableMap = {};
   final Map<String, String> tableDocumentMap = {};
@@ -63,9 +62,6 @@ class WorkflowRunner with ProgressDialog {
 
   final List<String> doNotRunList = [];
 
-  String folderSuffix = "";
-  String folderPrefix = "";
-  String? folderId;
   String? workflowId;
   String workflowRename = "";
   String workflowIdentifier = "";
@@ -78,19 +74,78 @@ class WorkflowRunner with ProgressDialog {
   var addTimestampToFolder = true;
 
   var isInit = false;
+  final WorkflowFolder? workflowFolder;
 
   final List<String> stepsToRemove = [];
   final List<sci.Pair> settingsByName = [];
   late String timestamp;
   final Map<String, List<String>> removeFilters = {};
 
-  WorkflowRunner({var timestampType = TimestampType.full}) {
+  var currentRev = "";
+
+  WorkflowRunner({var timestampType = TimestampType.full, this.workflowFolder}) {
     if (timestampType == TimestampType.short) {
       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
     } else {
       timestamp = DateFormat("yyyy.MM.dd_HH:mm").format(DateTime.now());
     }
   }
+
+
+  Future<sci.Workflow> init(BuildContext? context, sci.Workflow template,
+      {bool inPlace = false, String folderId = ""}) async {
+    if (context != null) {
+      openDialog(context);
+    }
+    var factory = tercen.ServiceFactory();
+
+    var runTitle = getWorkflowName(template);
+
+    if (context != null) {
+      log("Initializing workflow", dialogTitle: runTitle);
+    }
+
+    //-----------------------------------------
+    var workflow = sci.Workflow();
+    // Copy template into project
+    //-----------------------------------------
+    if (inPlace) {
+      workflow = template;
+    } else {
+      workflow = await factory.workflowService
+          .copyApp(template.id, AppUser().projectId);
+    }
+
+
+    currentRev = workflow.rev;
+
+    //-----------------------------------------
+    // General workflow parameters
+    //-----------------------------------------
+
+    if (inPlace) {
+      await factory.workflowService.update(workflow);
+      // workflow = await factory.workflowService.get(workflow.id);
+    } else {
+      workflow.folderId = await workflowFolder?.getFolderId() ?? "";
+      workflow.name = getWorkflowName(workflow);
+      workflow.acl = sci.Acl()..owner = AppUser().teamname;
+      workflow.isHidden = false;
+      workflow.isDeleted = false;
+
+      workflow.id = "";
+      workflow.rev = "";
+
+      workflow = await factory.workflowService.create(workflow);
+    }
+
+    if (context != null) {
+      closeLog();
+    }
+
+    return workflow;
+  }
+
 
   void removedNamedFilter(String name, String stepId) {
     if (removeFilters.containsKey(stepId)) {
@@ -112,9 +167,7 @@ class WorkflowRunner with ProgressDialog {
     workflowMeta.add(sci.Pair.from(key, value));
   }
 
-  void addFolderMeta(String key, String value) {
-    folderMeta.add(sci.Pair.from(key, value));
-  }
+
 
   void addTimestampToFolderName(bool val) {
     addTimestampToFolder = val;
@@ -124,9 +177,7 @@ class WorkflowRunner with ProgressDialog {
     addTimestamp = val;
   }
 
-  void setParentFolderId(String folderId) {
-    parentFolderId = folderId;
-  }
+
 
   void doNotRun(String stepId) {
     doNotRunList.add(stepId);
@@ -182,13 +233,6 @@ class WorkflowRunner with ProgressDialog {
     settings.add(setting);
   }
 
-  void addFolderSuffix(String suf) {
-    folderSuffix = "$folderSuffix$suf";
-  }
-
-  void addFolderPrefix(String pref) {
-    folderPrefix = "$folderPrefix$pref";
-  }
 
   void addSettings(List<StepSetting> settings) {
     settings.addAll(settings);
@@ -211,9 +255,6 @@ class WorkflowRunner with ProgressDialog {
     workflowSuffix = suff;
   }
 
-  void setFolder(String id) {
-    folderId = id;
-  }
 
   sci.FilterExpr createFilterExpr(String factorName, dynamic factorValue) {
     var factorType = "string";
@@ -508,37 +549,6 @@ class WorkflowRunner with ProgressDialog {
     }
   }
 
-  Future<sci.FolderDocument> createFolder(
-      {String? namePrefix,
-      String? folderName,
-      String parentFolderId = "",
-      bool random = false,
-      int nameLength = 5}) async {
-    var factory = tercen.ServiceFactory();
-    String name = folderName ?? StringUtils.getRandomString(nameLength);
-
-    if (random == false && folderName == null) {
-      final DateFormat formatter = DateFormat('yyyyMMdd_hhmmss');
-
-      name = formatter.format(DateTime.now());
-    }
-
-    if (namePrefix != null) {
-      name = "$namePrefix$name";
-    }
-
-    sci.FolderDocument folder = sci.FolderDocument();
-    folder.name = getFolderName();
-    folder.acl.owner = AppUser().teamname;
-    folder.projectId = AppUser().projectId;
-    folder.folderId = parentFolderId;
-
-    for (var meta in folderMeta) {
-      folder.addMeta(meta.key, meta.value);
-    }
-
-    return await factory.folderService.create(folder);
-  }
 
   String getWorkflowName(sci.Workflow workflow) {
     final DateFormat formatter = DateFormat('yyyyMMdd_hhmmss');
@@ -604,171 +614,160 @@ class WorkflowRunner with ProgressDialog {
     return step;
   }
 
-  void setFolderName(String name) {
-    folderName = name;
-  }
-
-  String getFolderName() {
-    if (folderName != null && folderName != "") {
-      return folderName!;
-    }
-
-    var timeStr = addTimestampToFolder ? timestamp : "";
-    return "${folderPrefix}${timeStr}${folderSuffix}";
-  }
-
-  Future<sci.Workflow> doSetup(BuildContext? context, sci.Workflow template,
-      {bool inPlace = false}) async {
-    if (context != null) {
-      openDialog(context);
-    }
-    var factory = tercen.ServiceFactory();
-
-    var runTitle = getWorkflowName(template);
-
-    if (context != null) {
-      log("Set up", dialogTitle: runTitle);
-    }
-
-    for (var entry in tableDocumentMap.entries) {
-      tableMap[entry.key] = await loadDocumentInMemory(entry.value);
-    }
-
-    //-----------------------------------------
-    var workflow = sci.Workflow();
-    // Copy template into project
-    //-----------------------------------------
-    if (inPlace) {
-      workflow = template;
-    } else {
-      workflow = await factory.workflowService
-          .copyApp(template.id, AppUser().projectId);
-    }
-
-    setupFilters(workflow);
-
-    if (template.projectId == workflow.projectId) {
-      // await factory.workflowService.delete(template.id, template.rev);
-      // workflow.id = "";
-      // workflow.rev = "";
-    }
-
-    for (var stepToRemove in stepsToRemove) {
-      workflow = removeStepFromWorkflow(stepToRemove, workflow);
-    }
-
-    for (var meta in workflowMeta) {
-      workflow.addMeta(meta.key, meta.value);
-    }
-    // addIdPostRun(reEnableSteps);
-
-    print(xAxisCoord);
-    //-----------------------------------------
-    // Step-specific setup
-    //-----------------------------------------
-    for (var stp in workflow.steps) {
-      // print("Checking ${stp.name} (${stp.id})");
-      if (shouldResetStep(stp)) {
-        stp.state.taskState = sci.InitState();
-        stp.state.taskId = "";
-      }
-      if (stp.state.taskState.isFinal) {
-        continue;
-      }
-      if (stp.kind == "DataStep") {
-        stp = updateFilterValues(stp as sci.DataStep);
-        stp = updateOperatorSettings(stp, settings);
-        stp = updateOperatorSettingsByName(stp, settingsByName);
-
-        if (removeFilters.containsKey(stp.id)) {
-          for (var filterName in removeFilters[stp.id]!) {
-            var namedFilter =
-                List<sci.NamedFilter>.from(stp.model.filters.namedFilters);
-            namedFilter.removeWhere((filter) => filter.name == filterName);
-            stp.model.filters.namedFilters.setValues(namedFilter);
-          }
-        }
-
-        for (var mapEntry in filterMap.entries) {
-          if (mapEntry.key.contains(stp.id)) {
-            stp.model.filters.namedFilters.add(mapEntry.value);
-          }
-        }
-      }
 
 
-      if (doNotRunList.contains(stp.id)) {
-        stp.state.taskState = sci.DoneState();
-        stp.state.taskId = "";
-      }
+  // Future<sci.Workflow> init(BuildContext? context, sci.Workflow template,
+  //     {bool inPlace = false}) async {
+  //   if (context != null) {
+  //     openDialog(context);
+  //   }
+  //   var factory = tercen.ServiceFactory();
 
-      if (multiDsMap.containsKey(stp.id)) {
-        var tmpStp = stp as sci.DataStep;
-        tmpStp.parentDataStepId = multiDsMap[stp.id]!;
-      }
+  //   var runTitle = getWorkflowName(template);
 
-      if (tableMap.containsKey(stp.id)) {
-        sci.TableStep tmpStp = stp as sci.TableStep;
-        tmpStp.model.relation = tableMap[stp.id]!;
-        tmpStp.state.taskState = sci.DoneState();
+  //   if (context != null) {
+  //     log("Set up", dialogTitle: runTitle);
+  //   }
 
-        if (tableNameMap.containsKey(stp.id)) {
-          tmpStp.name = tableNameMap[stp.id]!;
-        }
+  //   for (var entry in tableDocumentMap.entries) {
+  //     tableMap[entry.key] = await loadDocumentInMemory(entry.value);
+  //   }
 
-        stp = tmpStp;
-      }
+  //   //-----------------------------------------
+  //   var workflow = sci.Workflow();
+  //   // Copy template into project
+  //   //-----------------------------------------
+  //   if (inPlace) {
+  //     workflow = template;
+  //   } else {
+  //     workflow = await factory.workflowService
+  //         .copyApp(template.id, AppUser().projectId);
+  //   }
 
-      if (gatherMap.containsKey(stp.id)) {
-        (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
-      }
+  //   setupFilters(workflow);
 
-      if( xAxisCoord.containsKey(stp.id)){
-        //TODO set it on the step
-        // print("Setting X axis coord for step ${stp.name} to ${xAxisCoord[stp.id]}");
-        // print((stp as sci.DataStep).model.toJson());
-        (stp as sci.DataStep).model.axis.xyAxis.first.xAxis.graphicalFactor.factor.name =
-            xAxisCoord[stp.id]!;
-      }
-      if( yAxisCoord.containsKey(stp.id)){
-        //TODO set it on the step
-        (stp as sci.DataStep).model.axis.xyAxis.first.yAxis.graphicalFactor.factor.name =
-            yAxisCoord[stp.id]!;
-      }
-    }
+  //   if (template.projectId == workflow.projectId) {
+  //     // await factory.workflowService.delete(template.id, template.rev);
+  //     // workflow.id = "";
+  //     // workflow.rev = "";
+  //   }
 
-    //-----------------------------------------
-    // General workflow parameters
-    //-----------------------------------------
+  //   for (var stepToRemove in stepsToRemove) {
+  //     workflow = removeStepFromWorkflow(stepToRemove, workflow);
+  //   }
 
-    if (inPlace) {
-      await factory.workflowService.update(workflow);
-      workflow = await factory.workflowService.get(workflow.id);
-    } else {
-      if (folderId == null) {
-        sci.FolderDocument folder = await createFolder(
-            folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
-        workflow.folderId = folder.id;
-      } else {
-        workflow.folderId = folderId!;
-      }
-      workflow.name = getWorkflowName(workflow);
-      workflow.acl = sci.Acl()..owner = AppUser().teamname;
-      workflow.isHidden = false;
-      workflow.isDeleted = false;
+  //   for (var meta in workflowMeta) {
+  //     workflow.addMeta(meta.key, meta.value);
+  //   }
+  //   // addIdPostRun(reEnableSteps);
 
-      workflow.id = "";
-      workflow.rev = "";
+  //   print(xAxisCoord);
+  //   //-----------------------------------------
+  //   // Step-specific setup
+  //   //-----------------------------------------
+  //   for (var stp in workflow.steps) {
+  //     // print("Checking ${stp.name} (${stp.id})");
+  //     if (shouldResetStep(stp)) {
+  //       stp.state.taskState = sci.InitState();
+  //       stp.state.taskId = "";
+  //     }
+  //     if (stp.state.taskState.isFinal) {
+  //       continue;
+  //     }
+  //     if (stp.kind == "DataStep") {
+  //       stp = updateFilterValues(stp as sci.DataStep);
+  //       stp = updateOperatorSettings(stp, settings);
+  //       stp = updateOperatorSettingsByName(stp, settingsByName);
 
-      workflow = await factory.workflowService.create(workflow);
-    }
+  //       if (removeFilters.containsKey(stp.id)) {
+  //         for (var filterName in removeFilters[stp.id]!) {
+  //           var namedFilter =
+  //               List<sci.NamedFilter>.from(stp.model.filters.namedFilters);
+  //           namedFilter.removeWhere((filter) => filter.name == filterName);
+  //           stp.model.filters.namedFilters.setValues(namedFilter);
+  //         }
+  //       }
 
-    if (context != null) {
-      closeLog();
-    }
+  //       for (var mapEntry in filterMap.entries) {
+  //         if (mapEntry.key.contains(stp.id)) {
+  //           stp.model.filters.namedFilters.add(mapEntry.value);
+  //         }
+  //       }
+  //     }
 
-    return workflow;
-  }
+
+  //     if (doNotRunList.contains(stp.id)) {
+  //       stp.state.taskState = sci.DoneState();
+  //       stp.state.taskId = "";
+  //     }
+
+  //     if (multiDsMap.containsKey(stp.id)) {
+  //       var tmpStp = stp as sci.DataStep;
+  //       tmpStp.parentDataStepId = multiDsMap[stp.id]!;
+  //     }
+
+  //     if (tableMap.containsKey(stp.id)) {
+  //       sci.TableStep tmpStp = stp as sci.TableStep;
+  //       tmpStp.model.relation = tableMap[stp.id]!;
+  //       tmpStp.state.taskState = sci.DoneState();
+
+  //       if (tableNameMap.containsKey(stp.id)) {
+  //         tmpStp.name = tableNameMap[stp.id]!;
+  //       }
+
+  //       stp = tmpStp;
+  //     }
+
+  //     if (gatherMap.containsKey(stp.id)) {
+  //       (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
+  //     }
+
+  //     if( xAxisCoord.containsKey(stp.id)){
+  //       //TODO set it on the step
+  //       // print("Setting X axis coord for step ${stp.name} to ${xAxisCoord[stp.id]}");
+  //       // print((stp as sci.DataStep).model.toJson());
+  //       (stp as sci.DataStep).model.axis.xyAxis.first.xAxis.graphicalFactor.factor.name =
+  //           xAxisCoord[stp.id]!;
+  //     }
+  //     if( yAxisCoord.containsKey(stp.id)){
+  //       //TODO set it on the step
+  //       (stp as sci.DataStep).model.axis.xyAxis.first.yAxis.graphicalFactor.factor.name =
+  //           yAxisCoord[stp.id]!;
+  //     }
+  //   }
+
+  //   //-----------------------------------------
+  //   // General workflow parameters
+  //   //-----------------------------------------
+
+  //   if (inPlace) {
+  //     await factory.workflowService.update(workflow);
+  //     workflow = await factory.workflowService.get(workflow.id);
+  //   } else {
+  //     if (folderId == null) {
+  //       sci.FolderDocument folder = await createFolder(
+  //           folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
+  //       workflow.folderId = folder.id;
+  //     } else {
+  //       workflow.folderId = folderId!;
+  //     }
+  //     workflow.name = getWorkflowName(workflow);
+  //     workflow.acl = sci.Acl()..owner = AppUser().teamname;
+  //     workflow.isHidden = false;
+  //     workflow.isDeleted = false;
+
+  //     workflow.id = "";
+  //     workflow.rev = "";
+
+  //     workflow = await factory.workflowService.create(workflow);
+  //   }
+
+  //   if (context != null) {
+  //     closeLog();
+  //   }
+
+  //   return workflow;
+  // }
 
   Future<sci.Workflow> runWorkflowTask(sci.Workflow workflow,
       {String? runTitle, String? stepName, String? stepId}) async {
