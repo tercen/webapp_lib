@@ -9,7 +9,7 @@ import 'package:webapp_utils/services/project_data_service.dart';
 
 enum TimestampPosition { prefix, suffix }
 
-class WorkflowFolder {
+class WorkflowFolderConfig {
   final String parentFolderId;
   final String? folderName;
   final String? folderId;
@@ -24,7 +24,7 @@ class WorkflowFolder {
 
   final int nRandomChars;
 
-  WorkflowFolder({
+  WorkflowFolderConfig({
     this.folderId,
     this.parentFolderId = "",
     this.folderName,

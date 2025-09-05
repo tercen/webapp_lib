@@ -12,29 +12,14 @@ import 'package:uuid/uuid.dart';
 
 import 'package:webapp_utils/model/step_setting.dart';
 import 'package:webapp_utils/services/app_user.dart';
-import 'package:webapp_workflow/config/workflow_folder.dart';
+import 'package:webapp_workflow/utils/workflow_folder_config.dart';
 
 enum TimestampType { full, short }
 
 typedef PostRunCallback = Future<void> Function();
 typedef PostRunIdCallback = Future<void> Function(sci.Workflow workflow);
 
-class FilterConfig {
-  final String filterName;
-  final String stepId;
-  final List<String> keys;
-  final List<dynamic> values;
-  final String boolOp;
-  final List<sci.Pair> metas;
 
-  FilterConfig(
-      {required this.filterName,
-      required this.stepId,
-      required this.keys,
-      required this.values,
-      required this.boolOp,
-      required this.metas});
-}
 
 class WorkflowRunner with ProgressDialog {
   StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
@@ -44,15 +29,13 @@ class WorkflowRunner with ProgressDialog {
   final List<String> initStepIds = [];
   final List<sci.Pair> workflowMeta = [];
 
-  final List<FilterConfig> filterConfigList = [];
 
-  final Map<String, sci.NamedFilter> filterMap = {};
   final Map<String, sci.Relation> tableMap = {};
   final Map<String, String> tableDocumentMap = {};
   final Map<String, String> tableNameMap = {};
   final Map<String, String> gatherMap = {};
   final Map<String, String> multiDsMap = {};
-  final Map<String, String> filterValueUpdate = {};
+  
 
   final Map<String, String> xAxisCoord = {};
   final Map<String, String> yAxisCoord = {};
@@ -71,15 +54,14 @@ class WorkflowRunner with ProgressDialog {
   String stepProgressMessage = "";
 
   var addTimestamp = true;
-  var addTimestampToFolder = true;
-
+  
   var isInit = false;
-  final WorkflowFolder? workflowFolder;
+  final WorkflowFolderConfig? workflowFolder;
 
   final List<String> stepsToRemove = [];
   final List<sci.Pair> settingsByName = [];
   late String timestamp;
-  final Map<String, List<String>> removeFilters = {};
+
 
   var currentRev = "";
 
@@ -147,13 +129,6 @@ class WorkflowRunner with ProgressDialog {
   }
 
 
-  void removedNamedFilter(String name, String stepId) {
-    if (removeFilters.containsKey(stepId)) {
-      removeFilters[stepId]!.add(name);
-    } else {
-      removeFilters[stepId] = [name];
-    }
-  }
 
   final List<PostRunIdCallback> postRunIdCallbacks = [];
 
@@ -167,11 +142,6 @@ class WorkflowRunner with ProgressDialog {
     workflowMeta.add(sci.Pair.from(key, value));
   }
 
-
-
-  void addTimestampToFolderName(bool val) {
-    addTimestampToFolder = val;
-  }
 
   void addTimestampToName(bool val) {
     addTimestamp = val;
@@ -191,23 +161,7 @@ class WorkflowRunner with ProgressDialog {
     yAxisCoord[stepId] = coord;
   }
 
-  // Future<void> reEnableSteps(sci.Workflow wkf) async {
-  //   if (doNotRunList.isNotEmpty) {
-  //     // var wkf = await WorkflowDataService()
-  //         // .findWorkflowById(workflowId, useCache: false);
-  //     for (var stepId in doNotRunList) {
-  //       final stp = wkf.steps.where((step) => step is! sci.TableStep).firstWhere(
-  //           (step) => step.id == stepId,
-  //           orElse: () => sci.DataStep());
-  //       if (stp.id != "") {
-  //         stp.state.taskState = sci.InitState();
-  //       }
-  //     }
 
-  //     final factory = tercen.ServiceFactory();
-  //     await factory.workflowService.update(wkf);
-  //   }
-  // }
 
   /// Setting by name will search through the steps in a workflow looking for a matching name
   /// If it finds, then the value is set.
@@ -216,10 +170,7 @@ class WorkflowRunner with ProgressDialog {
     settingsByName.add(sci.Pair.from(settingName, settingValue));
   }
 
-  void changeFilterValue(String filterName, String factor, String newValue) {
-    var key = "$filterName|@|$factor";
-    filterValueUpdate[key] = newValue;
-  }
+
 
   void setNewWorkflowName(String name) {
     workflowRename = name;
@@ -256,30 +207,6 @@ class WorkflowRunner with ProgressDialog {
   }
 
 
-  sci.FilterExpr createFilterExpr(String factorName, dynamic factorValue) {
-    var factorType = "string";
-    if( factorValue is int){
-      factorType = "int";
-    }
-    if( factorValue is double){
-      factorType = "double";
-    }
-
-    sci.Factor filterFactor = sci.Factor()
-      ..type = factorType
-      ..name = factorName;
-    var filterExpr = sci.FilterExpr()
-      ..filterOp = "equals"
-      ..stringValue = factorValue
-      ..factor = filterFactor;
-
-    // sci.Filter andFilter = sci.Filter()
-    // ..logical = "and"
-    // ..not = false;
-    // andFilter.filterExprs.add(filterExpr);
-
-    return filterExpr;
-  }
 
   sci.RenameRelation createDocumentRelation(String documentId) {
     var uuid = const Uuid();
@@ -469,85 +396,7 @@ class WorkflowRunner with ProgressDialog {
     return factors;
   }
 
-  void setupFilters(sci.Workflow workflow) {
-    for (var fc in filterConfigList) {
-      final filterName = fc.filterName;
-      final stepId = fc.stepId;
-      final keys = fc.keys;
-      final values = fc.values;
-      final boolOp = fc.boolOp;
-      final metas = fc.metas;
 
-      var factors =
-          convertToStepFactors(keys, getFactorNames(workflow, stepId));
-      var filterKey = "$stepId$filterName";
-
-      sci.Filter andFilter = sci.Filter()
-        ..logical = boolOp
-        ..not = false;
-
-      for (var i = 0; i < factors.length; i++) {
-        for (var j = 0; j < values[i].length; j++) {
-          andFilter.filterExprs
-              .add(createFilterExpr(factors[i], values[i][j]));
-        }
-      }
-
-      if (!filterMap.containsKey(filterKey)) {
-        sci.NamedFilter namedFilter = sci.NamedFilter()
-          ..logical = "or"
-          ..not = false
-          ..name = filterName;
-        namedFilter.filterExprs.add(andFilter);
-
-        for (var meta in metas) {
-          namedFilter.meta.add(meta);
-        }
-
-        sci.Filters filters = sci.Filters()..removeNaN = true;
-        filters.namedFilters.add(namedFilter);
-        filterMap[filterKey] = namedFilter; //filters;
-      } else {
-        sci.NamedFilter namedFilter = filterMap[filterKey]!;
-        namedFilter.filterExprs.add(andFilter);
-        filterMap[filterKey] = namedFilter;
-      }
-    }
-  }
-
-  void addOrFilter(
-      String filterName, String stepId, List<String> keys, List<dynamic> values,
-      {List<sci.Pair> metas = const []}) {
-    final fc = FilterConfig(
-        filterName: filterName,
-        stepId: stepId,
-        keys: keys,
-        values: values,
-        boolOp: "or",
-        metas: metas);
-    filterConfigList.add(fc);
-  }
-
-  void addAndFilter(
-      String filterName, String stepId, List<String> keys, List<dynamic> values,
-      {List<sci.Pair> metas = const []}) {
-    final fc = FilterConfig(
-        filterName: filterName,
-        stepId: stepId,
-        keys: keys,
-        values: values,
-        boolOp: "and",
-        metas: metas);
-    filterConfigList.add(fc);
-  }
-
-  bool shouldResetStep(sci.Step step) {
-    if (initStepIds.isEmpty) {
-      return step.kind == "DataStep";
-    } else {
-      return initStepIds.contains(step.id);
-    }
-  }
 
 
   String getWorkflowName(sci.Workflow workflow) {
@@ -584,34 +433,6 @@ class WorkflowRunner with ProgressDialog {
     rrel.relation = sci.SimpleRelation()..id = sch.id;
 
     return rrel;
-  }
-
-  sci.DataStep updateFilterValues(sci.DataStep step) {
-    // var key = "$filterName|@|$factor";
-    // print("Updating filter values");
-    for (var filter in step.model.filters.namedFilters) {
-      var filters = filterValueUpdate.entries
-          .where((e) => e.key.contains(filter.name))
-          .toList();
-
-      if (filters.isNotEmpty) {
-        // print("\tWill update ${filters.length} filter on step ${step.name}");
-        for (var f in filter.filterExprs) {
-          var fExpr = f as sci.FilterExpr;
-          // print("\t\t${fExpr.factor.name}");
-          var filterExprs =
-              filters.where((e) => e.key.contains(f.factor.name)).toList();
-          if (filterExprs.isNotEmpty) {
-            // print("\t\tUpdating");
-            for (var fe in filterExprs) {
-              // print("updating filter ${filter.name} value of step ${step.name}");
-              fExpr.stringValue = fe.value;
-            }
-          }
-        }
-      }
-    }
-    return step;
   }
 
 
