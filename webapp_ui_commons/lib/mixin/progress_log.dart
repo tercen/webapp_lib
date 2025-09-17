@@ -23,6 +23,10 @@ mixin ProgressDialog {
   Completer<void> _operationMutex = Completer<void>()..complete();
   String? _queuedMessage;
   String? _queuedTitle;
+  
+  // Close request queue - ensures close always happens
+  final List<Completer<void>> _closeRequestQueue = [];
+  bool _processingCloseQueue = false;
 
   final ProgressMessage _message = ProgressMessage();
   // final Value<String> _message = ValueHolder("");
@@ -196,10 +200,61 @@ mixin ProgressDialog {
   }
 
   Future<void> closeLog() async {
-    if (_dialogState != DialogState.open) {
-      return;
+    // Always queue the close request - this ensures close WILL happen
+    final closeCompleter = Completer<void>();
+    _closeRequestQueue.add(closeCompleter);
+    
+    // Start processing queue if not already processing
+    if (!_processingCloseQueue) {
+      _processCloseQueue();
     }
     
+    // Wait for this close request to complete
+    return closeCompleter.future;
+  }
+  
+  Future<void> _processCloseQueue() async {
+    if (_processingCloseQueue) return;
+    
+    _processingCloseQueue = true;
+    
+    try {
+      while (_closeRequestQueue.isNotEmpty) {
+        // Get all pending close requests
+        final currentRequests = List<Completer<void>>.from(_closeRequestQueue);
+        _closeRequestQueue.clear();
+        
+        // Only execute close if dialog is actually open
+        if (_dialogState == DialogState.open) {
+          await _executeClose();
+        }
+        
+        // Complete all pending requests (they all wanted to close)
+        for (final completer in currentRequests) {
+          if (!completer.isCompleted) {
+            completer.complete();
+          }
+        }
+        
+        // Check if more requests came in while we were processing
+        if (_closeRequestQueue.isEmpty) {
+          break;
+        }
+      }
+    } catch (e) {
+      // If something goes wrong, complete all pending requests with error
+      for (final completer in _closeRequestQueue) {
+        if (!completer.isCompleted) {
+          completer.completeError(e);
+        }
+      }
+      _closeRequestQueue.clear();
+    } finally {
+      _processingCloseQueue = false;
+    }
+  }
+  
+  Future<void> _executeClose() async {
     // Wait for any ongoing operation to complete
     await _operationMutex.future;
     
@@ -241,6 +296,7 @@ mixin ProgressDialog {
       // Ensure state is reset even if closing fails
       _dialogState = DialogState.closed;
       _isOpen = false;
+      rethrow;
     } finally {
       newMutex.complete();
     }
@@ -248,27 +304,49 @@ mixin ProgressDialog {
   
   // Legacy synchronous close method for backward compatibility
   void closeLogSync() {
-    if (_dialogState == DialogState.open) {
-      _dialogState = DialogState.closing;
-      _isOpen = false;
+    // Add to queue even for sync calls to ensure consistency
+    final closeCompleter = Completer<void>();
+    _closeRequestQueue.add(closeCompleter);
+    
+    // Start processing queue if not already processing
+    if (!_processingCloseQueue) {
+      _processCloseQueue();
+    }
+    
+    // Don't wait for completion in sync version
+  }
+  
+  // Emergency cleanup method for widget disposal
+  void disposeDialog() {
+    try {
+      // Force complete all pending close requests
+      for (final completer in _closeRequestQueue) {
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+      }
+      _closeRequestQueue.clear();
       
+      // Clean up listeners
       if (_currentListener != null) {
         _message.removeListener(_currentListener!);
         _currentListener = null;
       }
       
+      // Reset state
+      _dialogState = DialogState.closed;
+      _isOpen = false;
+      _processingCloseQueue = false;
       _queuedMessage = null;
       _queuedTitle = null;
       
-      if (dialogContext.mounted) {
-        try {
-          Navigator.of(dialogContext, rootNavigator: true).pop();
-        } catch (e) {
-          // Handle case where dialog was already closed externally
-        }
+      // Complete any pending mutex
+      if (!_operationMutex.isCompleted) {
+        _operationMutex.complete();
       }
       
-      _dialogState = DialogState.closed;
+    } catch (e) {
+      // Ignore errors during cleanup
     }
   }
 }
