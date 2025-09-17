@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
+
+enum DialogState { closed, opening, open, closing }
 
 class ProgressMessage with ChangeNotifier {
   String _msg = "";
@@ -16,6 +19,10 @@ class ProgressMessage with ChangeNotifier {
 
 mixin ProgressDialog {
   bool _isOpen = false;
+  DialogState _dialogState = DialogState.closed;
+  Completer<void> _operationMutex = Completer<void>()..complete();
+  String? _queuedMessage;
+  String? _queuedTitle;
 
   final ProgressMessage _message = ProgressMessage();
   // final Value<String> _message = ValueHolder("");
@@ -27,13 +34,33 @@ mixin ProgressDialog {
     setState(() {});
   }
 
-  void openDialog(BuildContext context) {
-    dialogContext = context;
+  Future<void> openDialog(BuildContext context) async {
+    // Ignore if dialog is already open or opening
+    if (_dialogState == DialogState.open || _dialogState == DialogState.opening) {
+      return;
+    }
     
+    // Wait for any ongoing operation to complete
+    await _operationMutex.future;
     
-    if( !_isOpen ){
-    showDialog(
-
+    // Double-check state after waiting
+    if (_dialogState == DialogState.open || _dialogState == DialogState.opening) {
+      return;
+    }
+    
+    // Create new operation mutex
+    final newMutex = Completer<void>();
+    _operationMutex = newMutex;
+    
+    try {
+      _dialogState = DialogState.opening;
+      dialogContext = context;
+      
+      if (!context.mounted) {
+        return;
+      }
+      
+      showDialog(
         useRootNavigator: true,
         barrierDismissible: false,
         context: dialogContext,
@@ -52,20 +79,44 @@ mixin ProgressDialog {
             };
             _message.addListener(_currentListener!);
 
-            // _message.onChange.listen((onData) {
-            //   if (context.mounted) {
-            //     setState(() {});
-            //   }
-            // });
             return AlertDialog(
               title: Text(title, style: Styles()["textH2"],),
               content:   _buildMessageWidget(),
             );
           });
+        }).then((_) {
+          // Dialog was dismissed externally
+          _handleDialogDismissed();
         });
+      
+      _dialogState = DialogState.open;
+      _isOpen = true;
+      
+      // Process any queued message
+      if (_queuedMessage != null) {
+        _message.update(_queuedMessage!);
+        if (_queuedTitle != null) {
+          title = _queuedTitle!;
+        }
+        _queuedMessage = null;
+        _queuedTitle = null;
       }
-
-        _isOpen = true;
+      
+    } catch (e) {
+      _dialogState = DialogState.closed;
+      _isOpen = false;
+    } finally {
+      newMutex.complete();
+    }
+  }
+  
+  void _handleDialogDismissed() {
+    _dialogState = DialogState.closed;
+    _isOpen = false;
+    if (_currentListener != null) {
+      _message.removeListener(_currentListener!);
+      _currentListener = null;
+    }
   }
 
   Widget _buildMessageWidget() {
@@ -101,15 +152,68 @@ mixin ProgressDialog {
       children: [wdg]);
   }
 
-  void log(String message,{String dialogTitle= ""}) {
-    title = dialogTitle;
-    _message.update(message);
-    // _message.up = message;
-    
+  Future<void> log(String message, {String dialogTitle = "", BuildContext? context}) async {
+    if (_dialogState == DialogState.open) {
+      // Dialog is open - update immediately
+      if (dialogTitle.isNotEmpty) {
+        title = dialogTitle;
+      }
+      _message.update(message);
+    } else if (_dialogState == DialogState.opening || _dialogState == DialogState.closing) {
+      // Dialog is transitioning - queue the message
+      _queuedMessage = message;
+      if (dialogTitle.isNotEmpty) {
+        _queuedTitle = dialogTitle;
+      }
+    } else {
+      // Dialog is closed - we need to open it
+      if (dialogTitle.isNotEmpty) {
+        title = dialogTitle;
+      }
+      _message.update(message);
+      
+      // Try to open dialog if context provided
+      if (context != null && context.mounted) {
+        await openDialog(context);
+      }
+    }
+  }
+  
+  // Legacy synchronous log method for backward compatibility
+  void logSync(String message, {String dialogTitle = ""}) {
+    if (_dialogState == DialogState.open) {
+      if (dialogTitle.isNotEmpty) {
+        title = dialogTitle;
+      }
+      _message.update(message);
+    } else {
+      // Queue the message for when dialog opens
+      _queuedMessage = message;
+      if (dialogTitle.isNotEmpty) {
+        _queuedTitle = dialogTitle;
+      }
+    }
   }
 
-  void closeLog() {
-    if( _isOpen ){
+  Future<void> closeLog() async {
+    if (_dialogState != DialogState.open) {
+      return;
+    }
+    
+    // Wait for any ongoing operation to complete
+    await _operationMutex.future;
+    
+    // Double-check state after waiting
+    if (_dialogState != DialogState.open) {
+      return;
+    }
+    
+    // Create new operation mutex
+    final newMutex = Completer<void>();
+    _operationMutex = newMutex;
+    
+    try {
+      _dialogState = DialogState.closing;
       _isOpen = false;
       
       // Remove the listener before closing
@@ -118,8 +222,53 @@ mixin ProgressDialog {
         _currentListener = null;
       }
       
-      Navigator.of(dialogContext, rootNavigator: true).pop();
+      // Clear any queued operations
+      _queuedMessage = null;
+      _queuedTitle = null;
+      
+      // Safely close the dialog
+      if (dialogContext.mounted) {
+        try {
+          Navigator.of(dialogContext, rootNavigator: true).pop();
+        } catch (e) {
+          // Handle case where dialog was already closed externally
+        }
+      }
+      
+      _dialogState = DialogState.closed;
+      
+    } catch (e) {
+      // Ensure state is reset even if closing fails
+      _dialogState = DialogState.closed;
+      _isOpen = false;
+    } finally {
+      newMutex.complete();
     }
-    
+  }
+  
+  // Legacy synchronous close method for backward compatibility
+  void closeLogSync() {
+    if (_dialogState == DialogState.open) {
+      _dialogState = DialogState.closing;
+      _isOpen = false;
+      
+      if (_currentListener != null) {
+        _message.removeListener(_currentListener!);
+        _currentListener = null;
+      }
+      
+      _queuedMessage = null;
+      _queuedTitle = null;
+      
+      if (dialogContext.mounted) {
+        try {
+          Navigator.of(dialogContext, rootNavigator: true).pop();
+        } catch (e) {
+          // Handle case where dialog was already closed externally
+        }
+      }
+      
+      _dialogState = DialogState.closed;
+    }
   }
 }
