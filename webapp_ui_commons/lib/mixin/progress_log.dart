@@ -21,6 +21,7 @@ mixin ProgressDialog {
   // final Value<String> _message = ValueHolder("");
   String title = "";
   late BuildContext dialogContext;
+  VoidCallback? _currentListener;
 
   void refreshDialog(Function setState){
     setState(() {});
@@ -38,7 +39,18 @@ mixin ProgressDialog {
         context: dialogContext,
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
-            _message.addListener(() => refreshDialog(setState));
+            // Remove any existing listener first
+            if (_currentListener != null) {
+              _message.removeListener(_currentListener!);
+            }
+            
+            // Create and store the new listener
+            _currentListener = () {
+              if (context.mounted) {
+                refreshDialog(setState);
+              }
+            };
+            _message.addListener(_currentListener!);
 
             // _message.onChange.listen((onData) {
             //   if (context.mounted) {
@@ -99,6 +111,13 @@ mixin ProgressDialog {
   void closeLog() {
     if( _isOpen ){
       _isOpen = false;
+      
+      // Remove the listener before closing
+      if (_currentListener != null) {
+        _message.removeListener(_currentListener!);
+        _currentListener = null;
+      }
+      
       Navigator.of(dialogContext, rootNavigator: true).pop();
     }
     
