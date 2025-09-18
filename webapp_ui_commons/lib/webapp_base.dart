@@ -23,17 +23,10 @@ import 'package:webapp_utils/services/app_user.dart';
 
 class WebAppBase with ChangeNotifier {
   bool isInitialized = false;
-  // String projectId = "";
-  // String projectName = "";
-  // String projectHref = "";
-  // String serviceBase = "";
-  // String username = "";
-  // String teamname = "";
   String appName = "";
   String appVersion = "";
   bool isMenuCollapsed = false;
 
-  // String selectedScreen = "";
   final List<MenuItem> menuItems = [];
 
   final NavigationMenu navMenu = NavigationMenu();
@@ -59,7 +52,7 @@ class WebAppBase with ChangeNotifier {
     }
 
     var authClient =
-        auth_http.HttpAuthClient(token, io_http.HttpBrowserClient());
+    auth_http.HttpAuthClient(token, io_http.HttpBrowserClient());
 
     var factory = sci.ServiceFactory();
 
@@ -91,37 +84,7 @@ class WebAppBase with ChangeNotifier {
 
       http_api.HttpClient.setCurrent(io_http.HttpBrowserClient());
 
-      late sci.UserSession session;
-
-      if (isDev) {
-        var tok = Uri.base.queryParameters["token"] ?? '';
-        var decodedToken = JwtDecoder.decode(tok);
-        session = sci.UserSession()
-          ..user = (sci.User()..id = decodedToken['data']['u'])
-          ..token = (sci.Token()..token = tok);
-        // print("Running in DEV mode");
-        // var tok = Uri.base.queryParameters["token"] ?? '';
-        // Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
-        // username = decodedToken['data']['u'];
-        // projectId = devProjectId;
-        // session = sci.UserSession()
-        //   ..user = (sci.User()..id = decodedToken['data']['u'])
-        //   ..token = (sci.Token()..token = tok);
-
-        // var href = "${Uri.base.scheme}://";
-        // href = "$href${Uri.base.host}";
-        // var parentPort =
-        //     html.document.referrer.split(":").last.split("/").first;
-        // href = "$href:$parentPort";
-        // serviceBase = href;
-        // href = "$href/$username";
-        // href = "$href/p/$projectId";
-        // projectHref = href;
-      } else {
-        var auth = json.decode(html.window.localStorage['authorization'] ?? "");
-
-        session = sci.UserSession.json(auth);
-      }
+      var session = createUserSession();
 
       navMenu.addLink("Exit App", AppUser().projectUrl);
 
@@ -130,6 +93,50 @@ class WebAppBase with ChangeNotifier {
       var userService = factory.userService as sci.UserService;
 
       await userService.setSession(session);
+    }
+  }
+
+  sci.UserSession createUserSession() {
+    if (isDev) {
+      var tercenToken = String.fromEnvironment("TERCEN_TOKEN",
+          defaultValue: Uri.base.queryParameters["token"] ?? '');
+
+      if (tercenToken.isEmpty) {
+        throw 'Tercen token not found -- String.fromEnvironment("TERCEN_TOKEN" , defaultValue: Uri.base.queryParameters["token"] ?? "")';
+      }
+
+      var decodedToken = JwtDecoder.decode(tercenToken);
+      var session = sci.UserSession()
+        ..user = (sci.User()..id = decodedToken['data']['u'])
+        ..token = (sci.Token()..token = tercenToken);
+
+      // print("Running in DEV mode");
+      // var tok = Uri.base.queryParameters["token"] ?? '';
+      // Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
+      // username = decodedToken['data']['u'];
+      // projectId = devProjectId;
+      // session = sci.UserSession()
+      //   ..user = (sci.User()..id = decodedToken['data']['u'])
+      //   ..token = (sci.Token()..token = tok);
+
+      // var href = "${Uri.base.scheme}://";
+      // href = "$href${Uri.base.host}";
+      // var parentPort =
+      //     html.document.referrer.split(":").last.split("/").first;
+      // href = "$href:$parentPort";
+      // serviceBase = href;
+      // href = "$href/$username";
+      // href = "$href/p/$projectId";
+      // projectHref = href;
+
+      return session;
+    } else {
+      var authorization = html.window.localStorage['authorization'];
+      if (authorization == null) {
+        throw "Tercen token not found -- html.window.localStorage['authorization'] is null";
+      }
+
+      return sci.UserSession.json(json.decode(authorization));
     }
   }
 
