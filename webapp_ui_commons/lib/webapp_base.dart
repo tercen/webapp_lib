@@ -98,12 +98,18 @@ class WebAppBase with ChangeNotifier {
 
   sci.UserSession createUserSession() {
     if (isDev) {
-      var tercenToken = String.fromEnvironment("TERCEN_TOKEN",
-          defaultValue: Uri.base.queryParameters["token"] ?? '');
+      // Must be const
+      var tercenToken = const String.fromEnvironment("TERCEN_TOKEN",
+          defaultValue: '');
 
+      if (tercenToken.isEmpty) {
+        //Try to get from URL
+        tercenToken = Uri.base.queryParameters["token"] ?? '';
+      }
       if (tercenToken.isEmpty) {
         throw 'Tercen token not found -- String.fromEnvironment("TERCEN_TOKEN" , defaultValue: Uri.base.queryParameters["token"] ?? "")';
       }
+
 
       var decodedToken = JwtDecoder.decode(tercenToken);
       var session = sci.UserSession()
