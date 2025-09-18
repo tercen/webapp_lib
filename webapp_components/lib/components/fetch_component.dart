@@ -6,22 +6,18 @@ import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_utils/cache_object.dart';
 
-
-
-
-class FetchComponent with
-        ChangeNotifier,
-        ComponentBase,
-        StateComponent,
-        AsyncManager{
+class FetchComponent
+    with ChangeNotifier, ComponentBase, StateComponent, AsyncManager {
   WebappTable dataTable = WebappTable();
   final CacheObject cacheObj = CacheObject();
   bool isInit = false;
   bool useCache = true;
   Future<WebappTable> Function() dataFetchCallback;
   Future<void> Function(WebappTable)? onLoad;
+  DateTime? lastLoad;
 
-  FetchComponent(id, groupId, componentLabel, this.dataFetchCallback, {this.onLoad} ){
+  FetchComponent(id, groupId, componentLabel, this.dataFetchCallback,
+      {this.onLoad}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -38,9 +34,9 @@ class FetchComponent with
       super.init();
       loadTable();
       notifyListeners();
+      lastLoad = DateTime.now();
     }
   }
-
 
   @override
   void reset() {
@@ -49,7 +45,6 @@ class FetchComponent with
     isInit = false;
     init();
   }
-
 
   Future<bool> loadTable({bool force = false}) async {
     if (!isInit || force == true) {
@@ -65,32 +60,29 @@ class FetchComponent with
 
         dataTable = postLoad(dataTable);
 
-        if( onLoad != null ){
+        if (onLoad != null) {
           await onLoad!(dataTable);
         }
 
-        if( useCache ){
+        if (useCache) {
           cacheObj.addToCache(cacheKey, dataTable);
         }
-        
       }
       idle();
-
     }
     return true;
   }
 
-
   @Deprecated("Use the onLoad parameter instead")
-  WebappTable postLoad(WebappTable table){
+  WebappTable postLoad(WebappTable table) {
     return table;
   }
 
-  Widget createWidget(BuildContext context){
+  Widget createWidget(BuildContext context) {
     return Container();
   }
 
-  Widget buildEmptyTable(){
+  Widget buildEmptyTable() {
     return Container();
   }
 
@@ -108,5 +100,4 @@ class FetchComponent with
       }
     }
   }
-
 }
