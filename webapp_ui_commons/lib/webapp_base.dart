@@ -89,7 +89,7 @@ class WebAppBase with ChangeNotifier {
       late sci.UserSession session;
 
       if (isDev) {
-        var tok = String.fromEnvironment("TOKEN");
+        var tok = const String.fromEnvironment("TOKEN");
         if( tok.isEmpty ) {
           throw "A token is required";
         }
