@@ -83,8 +83,6 @@ class NavigationMenu with ChangeNotifier {
   }
 
   Widget _createExitButton(String label, String href) {
-    
-
     Widget btn = InkWell(
         onTap: () {
           //  launchUrl(url, webOnlyWindowName: "_self");
@@ -160,7 +158,7 @@ class NavigationMenu with ChangeNotifier {
 
   Widget createInfoWidgets() {
     List<Widget> infoEntries = [];
-    if ( AppUser().projectName != "") {
+    if (AppUser().projectName != "") {
       infoEntries.add(Text(
         "Project: ${AppUser().projectName}",
         style: Styles()["textGray"],

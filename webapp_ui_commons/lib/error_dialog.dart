@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:json_string/json_string.dart';
@@ -37,7 +36,7 @@ class ErrorScreen extends StatelessWidget {
         color: Colors.red,
       ),
       backgroundColor: const Color.fromARGB(255, 247, 194, 194),
-      title:  SelectableText(
+      title: SelectableText(
         "An Unexpected Error Occurred",
         style: Styles()["textH2"],
       ),
@@ -57,7 +56,8 @@ class ErrorScreen extends StatelessWidget {
               Uri tercenLink = Uri(
                   scheme: Uri.base.scheme,
                   host: Uri.base.host,
-                  path:  "${globals.States.projectUser}/p/${globals.States.loadedProject}");
+                  path:
+                      "${globals.States.projectUser}/p/${globals.States.loadedProject}");
               if (Uri.base.hasPort) {
                 tercenLink = Uri(
                     scheme: Uri.base.scheme,
@@ -69,7 +69,7 @@ class ErrorScreen extends StatelessWidget {
 
               launchUrl(tercenLink, webOnlyWindowName: "_self");
             },
-            child:  Center(
+            child: Center(
                 child: Text(
               "Exit",
               style: Styles()["textButton"],

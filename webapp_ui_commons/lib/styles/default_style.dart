@@ -15,9 +15,7 @@ class DefaultStyle extends StyleBase {
     styleMap["linkBlue"] = Color.fromARGB(255, 55, 22, 163);
     styleMap["red"] = Color.fromARGB(255, 255, 37, 37);
 
-    styleMap["buttonBgLight"] = Color.fromARGB(255,103,153,178);
-
-    
+    styleMap["buttonBgLight"] = Color.fromARGB(255, 103, 153, 178);
 
     styleMap["selectedBg"] = Color.fromARGB(255, 101, 155, 255);
     styleMap["selectedMenuBg"] = Color.fromARGB(255, 103, 153, 178);
@@ -28,7 +26,6 @@ class DefaultStyle extends StyleBase {
     styleMap["headerRow"] = Color.fromARGB(30, 80, 200, 255);
     styleMap["evenRow"] = Color.fromARGB(30, 255, 255, 255);
     styleMap["oddRow"] = Color.fromARGB(30, 120, 240, 255);
-
 
     styleMap["paddingSmall"] = 5;
     styleMap["paddingMedium"] = 15;

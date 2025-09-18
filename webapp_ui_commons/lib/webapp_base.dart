@@ -23,7 +23,12 @@ import 'package:webapp_utils/services/app_user.dart';
 
 class WebAppBase with ChangeNotifier {
   bool isInitialized = false;
-  
+  // String projectId = "";
+  // String projectName = "";
+  // String projectHref = "";
+  // String serviceBase = "";
+  // String username = "";
+  // String teamname = "";
   String appName = "";
   String appVersion = "";
   bool isMenuCollapsed = false;
@@ -47,6 +52,7 @@ class WebAppBase with ChangeNotifier {
   set footer(Widget footer) => footerContent = footer;
   set leftPanel(Widget leftPanel) => navPanelContent = leftPanel;
   set rightPanel(Widget rightPanel) => contentPanelContent = rightPanel;
+
 
   Future<bool> initFactory(String token) async {
     if (token.isEmpty) {
@@ -85,23 +91,39 @@ class WebAppBase with ChangeNotifier {
       await TercenWaitIndicator().init();
 
       http_api.HttpClient.setCurrent(io_http.HttpBrowserClient());
-
+      
       late sci.UserSession session;
 
-      if (isDev) {
-        var tok = const String.fromEnvironment("TOKEN");
-        if( tok.isEmpty ) {
-          throw "A token is required";
-        }
 
+      if (isDev) {
+        var tok = Uri.base.queryParameters["token"] ?? '';
         var decodedToken = JwtDecoder.decode(tok);
         session = sci.UserSession()
-          ..user = (sci.User()..id = decodedToken['data']['u'])
-          ..token = (sci.Token()..token = tok);
+      ..user = (sci.User()..id = decodedToken['data']['u'])
+      ..token = (sci.Token()..token = tok);
+        // print("Running in DEV mode");
+        // var tok = Uri.base.queryParameters["token"] ?? '';
+        // Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
+        // username = decodedToken['data']['u'];
+        // projectId = devProjectId;
+        // session = sci.UserSession()
+        //   ..user = (sci.User()..id = decodedToken['data']['u'])
+        //   ..token = (sci.Token()..token = tok);
+
+        // var href = "${Uri.base.scheme}://";
+        // href = "$href${Uri.base.host}";
+        // var parentPort =
+        //     html.document.referrer.split(":").last.split("/").first;
+        // href = "$href:$parentPort";
+        // serviceBase = href;
+        // href = "$href/$username";
+        // href = "$href/p/$projectId";
+        // projectHref = href;
       } else {
         var auth = json.decode(html.window.localStorage['authorization'] ?? "");
 
         session = sci.UserSession.json(auth);
+
       }
 
       navMenu.addLink("Exit App", AppUser().projectUrl);
@@ -111,11 +133,16 @@ class WebAppBase with ChangeNotifier {
       var userService = factory.userService as sci.UserService;
 
       await userService.setSession(session);
+
     }
   }
 
   Map<String, String> getPersistentData() {
-    return {"APP_selectedScreen": navMenu.getSelectedEntry().label};
+    return {
+      "APP_selectedScreen": 
+        navMenu.getSelectedEntry().label
+      
+    };
   }
 
   void loadPersistentData(Map<String, dynamic> stateMap) {
@@ -141,12 +168,15 @@ class WebAppBase with ChangeNotifier {
     return _menuKeys[menuLabel]!;
   }
 
+
   Widget getSelectedScreen() {
     var screen = navMenu.getSelectedEntry();
     _menuKeys[screen.label] = ValueKey<int>(Random().nextInt(1 << 32 - 1));
 
     return screen.screen;
   }
+
+  
 
   Widget buildMenu(Widget banner) {
     if (isMenuCollapsed) {
@@ -161,10 +191,7 @@ class WebAppBase with ChangeNotifier {
         color: Colors.white,
         child: Align(
           alignment: Alignment.topLeft,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-            child: navMenu.buildMenuWidget(banner: banner),
-          ),
+          child: Padding(padding: const EdgeInsets.fromLTRB(20, 0, 0, 0), child: navMenu.buildMenuWidget(banner: banner),) ,
         ),
       );
     }
@@ -195,7 +222,7 @@ class WebAppBase with ChangeNotifier {
         InkWell(
           onTap: () {
             isMenuCollapsed = !isMenuCollapsed;
-
+            
             navMenu.selectScreen(navMenu.selectedScreen); //Reload
             notifyListeners();
           },
@@ -224,6 +251,7 @@ class WebAppBase with ChangeNotifier {
     );
   }
 
+  
   Scaffold buildScaffoldPage() {
     Widget banner = Container(
       color: Colors.white,
