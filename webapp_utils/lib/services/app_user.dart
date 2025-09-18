@@ -39,40 +39,38 @@ class AppUser {
       _teamname = teamId ?? _getTeam();
       _projectName = project.name;
 
-      _username = _getUser();
+      _username = tercenSession.user.name;
     } else {
-      _username = _getUser();
+      _username = tercenSession.user.name;
       _teamname = teamId ?? _getTeam();
       _projectName = "";
     }
   }
 
   String _getTeam() {
-    
-    var team = _teamname; 
-    if( team == '' ){
+    var team = _teamname;
+    if (team == '') {
       team = Uri.base.queryParameters["teamId"] ?? '';
     }
     //If still empty
     if (team == '') {
-      return _getUser();
+      return tercenSession.user.name;
     } else {
       return team;
     }
   }
 
-  String _getUser() {
-    if (isDev) {
-      var tok = Uri.base.queryParameters["token"] ?? '';
-      Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
-      return decodedToken['data']['u'];
-    } else {
-      final factory = tercen.ServiceFactory();
-      var userService = factory.userService as sci.UserService;
+  sci.User _getUser() => tercenSession.user;
 
-      final session = userService.session;
-      return session!.user.name;
+  sci.UserSession get tercenSession {
+    final factory = tercen.ServiceFactory();
+    var userService = factory.userService as sci.UserService;
+
+    final session = userService.session;
+    if (session == null) {
+      throw "$this -- _getTercenSession -- session is null !!";
     }
+    return session;
   }
 
   String get teamname => _teamname;
@@ -100,9 +98,7 @@ class AppUser {
     Logger().log(level: Logger.FINE, message: "Running in DEV mode");
     String devProjectId = const String.fromEnvironment("PROJECT_ID");
 
-    var tok = Uri.base.queryParameters["token"] ?? '';
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
-    _username = decodedToken['data']['u'];
+    _username = tercenSession.user.name;
     _projectId = devProjectId;
 
     var href = "${Uri.base.scheme}://";

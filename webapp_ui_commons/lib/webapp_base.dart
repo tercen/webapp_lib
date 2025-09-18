@@ -52,7 +52,7 @@ class WebAppBase with ChangeNotifier {
     }
 
     var authClient =
-    auth_http.HttpAuthClient(token, io_http.HttpBrowserClient());
+        auth_http.HttpAuthClient(token, io_http.HttpBrowserClient());
 
     var factory = sci.ServiceFactory();
 
@@ -84,30 +84,38 @@ class WebAppBase with ChangeNotifier {
 
       http_api.HttpClient.setCurrent(io_http.HttpBrowserClient());
 
-      var session = createUserSession();
-
-      navMenu.addLink("Exit App", AppUser().projectUrl);
+      var session = _createUserSession();
 
       await initFactory(session.token.token);
-      var factory = tercen.ServiceFactory();
-      var userService = factory.userService as sci.UserService;
 
-      await userService.setSession(session);
+      await (tercen.ServiceFactory().userService as sci.UserService)
+          .setSession(session);
+
+      navMenu.addLink("Exit App", AppUser().projectUrl);
     }
   }
 
-  sci.UserSession createUserSession() {
+  String _getTercenToken() {
+    var tercenToken = const String.fromEnvironment("TERCEN_TOKEN");
+    if (tercenToken.isEmpty) {
+      tercenToken = Uri.base.queryParameters["token"] ?? '';
+    }
+    return tercenToken;
+  }
+
+  sci.UserSession _createUserSession() {
     if (isDev) {
-      var tercenToken = String.fromEnvironment("TERCEN_TOKEN",
-          defaultValue: Uri.base.queryParameters["token"] ?? '');
+      var tercenToken = _getTercenToken();
 
       if (tercenToken.isEmpty) {
-        throw 'Tercen token not found -- String.fromEnvironment("TERCEN_TOKEN" , defaultValue: Uri.base.queryParameters["token"] ?? "")';
+        throw 'Tercen token not found -- String.fromEnvironment("TERCEN_TOKEN")';
       }
 
       var decodedToken = JwtDecoder.decode(tercenToken);
       var session = sci.UserSession()
-        ..user = (sci.User()..id = decodedToken['data']['u'])
+        ..user = (sci.User()
+          ..id = decodedToken['data']['u']
+          ..name = decodedToken['data']['u'])
         ..token = (sci.Token()..token = tercenToken);
 
       // print("Running in DEV mode");
