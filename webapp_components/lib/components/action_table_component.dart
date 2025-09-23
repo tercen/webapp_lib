@@ -179,7 +179,7 @@ class ActionTableComponent extends FetchComponent
 
   TableRow createTableRow(BuildContext context, WebappTable rowEls, 
       String rowKey, List<ListAction> rowActions, 
-      {int rowIndex = -1}) {
+      {int rowIndex = -1, List<String> displayCols = const []}) {
     var rowDecoration = BoxDecoration(color: Styles()["white"]);
     if (rowIndex > -1) {
       if (rowKey == currentRowKey) {
@@ -193,12 +193,16 @@ class ActionTableComponent extends FetchComponent
 
     List<Widget> dataRow = [];
 
+    
+
     dataRow.add(TableCell(
         verticalAlignment: TableCellVerticalAlignment.middle,
         child: buildInfoBoxIcon(rowEls, context, iconCellWidth: 20)));
 
-    for (var ci = 0; ci < colNames.length; ci++) {
-      if (shouldDisplayColumn(colNames[ci])) {
+    final cols = displayCols.isEmpty ? colNames : displayCols;
+
+    for (var ci = 0; ci < cols.length; ci++) {
+      if (shouldDisplayColumn(cols[ci])) {
         var rowStyle = Styles()["text"];
         if (rowFormatter != null && rowFormatter!.shouldHighlight(rowEls)) {
           rowStyle = rowFormatter!.highlightStyle();
@@ -209,7 +213,7 @@ class ActionTableComponent extends FetchComponent
             child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  rowEls[colNames[ci]].first,
+                  rowEls[cols[ci]].first,
                   style: rowStyle,
                 ))));
       }
@@ -228,7 +232,7 @@ class ActionTableComponent extends FetchComponent
     TableRow row = TableRow(decoration: rowDecoration, children: [
       ...dataRow,
       Row(
-        children: actionWidgets,
+        children: actionWidgets.isEmpty ? [Container()] : actionWidgets,
       )
     ]);
 

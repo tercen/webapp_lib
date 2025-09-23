@@ -89,11 +89,12 @@ class WorkflowDataService {
     Logger().log(
         level: Logger.FINER, message: "\tFound ${libObjs.length} workflows");
 
-    // var workflows = await factory.workflowService.list(libObjs.map((o) => o.id).toList());
+    
     return libObjs;
   }
 
-  Future<sci.Step> fetchStep(String id, String stepId, {bool useCache = true}) async {
+  Future<sci.Step> fetchStep(String id, String stepId,
+      {bool useCache = true}) async {
     var cacheKey = "${id}_${stepId}_step";
     if (useCache && cache.hasCachedValue(cacheKey)) {
       return cache.getCachedValue(cacheKey);
@@ -102,12 +103,10 @@ class WorkflowDataService {
     final factory = tercen.ServiceFactory();
     final wkf = await factory.workflowService.get(id);
 
-
     final step = wkf.steps.firstWhere(
-        (step) => step.id == stepId,
-        orElse: () => sci.DataStep(),
+      (step) => step.id == stepId,
+      orElse: () => sci.DataStep(),
     );
-
 
     if (useCache) {
       cache.addToCache(cacheKey, step);
@@ -323,38 +322,38 @@ class WorkflowDataService {
       return cache.getCachedValue(key);
     }
 
-    final dStp = wkf.steps.firstWhere((step) => step.id == stepId, orElse: () => sci.Step()) as sci.DataStep;
-    if( dStp.id == ""){
+    final dStp = wkf.steps.firstWhere((step) => step.id == stepId,
+        orElse: () => sci.Step()) as sci.DataStep;
+    if (dStp.id == "") {
       return <WebappTable>[];
     }
 
     final relList = getSimpleRelations(dStp.computedRelation);
 
-    final schList =
-        await factory.tableSchemaService.list(relList.map((e) => e.id).toList());
+    final schList = await factory.tableSchemaService
+        .list(relList.map((e) => e.id).toList());
     final outList = <WebappTable>[];
     for (var sch in schList) {
-      final colNames  = sch.columns.map((e) => e.name).toList();
+      final colNames = sch.columns.map((e) => e.name).toList();
       final outTbl = WebappTable();
-      outTbl.addColumn(sch.name, data: colNames ) ;
+      outTbl.addColumn(sch.name, data: colNames);
       // final tbl = await factory.tableSchemaService.select(
       //       sch.id,
       //       colNames,
       //       0,
       //       sch.nRows);
-      
+
       // for( var colName in colNames ){
       //   outTbl.addColumn(colName, data: (tbl.columns.firstWhere((e) => e.name == colName).values as List).map((e) => e.toString()).toList() ) ;
       // }
       outList.add(outTbl);
     }
     if (useCache) {
-       cache.addToCache(key, outList);
+      cache.addToCache(key, outList);
     }
 
     return outList;
   }
-
 
   Future<List<WebappTable>> fetchStepResults(String workflowId, String stepId,
       {bool useCache = false}) async {
@@ -366,31 +365,33 @@ class WorkflowDataService {
       return cache.getCachedValue(key);
     }
 
-    final dStp = wkf.steps.firstWhere((step) => step.id == stepId, orElse: () => sci.Step()) as sci.DataStep;
-    if( dStp.id == ""){
+    final dStp = wkf.steps.firstWhere((step) => step.id == stepId,
+        orElse: () => sci.Step()) as sci.DataStep;
+    if (dStp.id == "") {
       return <WebappTable>[];
     }
 
     final relList = getSimpleRelations(dStp.computedRelation);
 
-    final schList =
-        await factory.tableSchemaService.list(relList.map((e) => e.id).toList());
+    final schList = await factory.tableSchemaService
+        .list(relList.map((e) => e.id).toList());
     final outList = <WebappTable>[];
     for (var sch in schList) {
-      final colNames  = sch.columns.map((e) => e.name).toList();
-      final tbl = await factory.tableSchemaService.select(
-            sch.id,
-            colNames,
-            0,
-            sch.nRows);
+      final colNames = sch.columns.map((e) => e.name).toList();
+      final tbl = await factory.tableSchemaService
+          .select(sch.id, colNames, 0, sch.nRows);
       final outTbl = WebappTable();
-      for( var colName in colNames ){
-        outTbl.addColumn(colName, data: (tbl.columns.firstWhere((e) => e.name == colName).values as List).map((e) => e.toString()).toList() ) ;
+      for (var colName in colNames) {
+        outTbl.addColumn(colName,
+            data: (tbl.columns.firstWhere((e) => e.name == colName).values
+                    as List)
+                .map((e) => e.toString())
+                .toList());
       }
       outList.add(outTbl);
     }
     if (useCache) {
-       cache.addToCache(key, outList);
+      cache.addToCache(key, outList);
     }
 
     return outList;
@@ -405,8 +406,6 @@ class WorkflowDataService {
       bool useCache = false}) async {
     var factory = tercen.ServiceFactory();
     var wkf = await factory.workflowService.get(workflowId);
-
-
 
     return fetchWorkflowImages(wkf,
         contentTypes: contentTypes,
@@ -701,9 +700,8 @@ class WorkflowDataService {
             level: Logger.FINE,
             message: "Workflow $workflowId already deleted");
       }
-
+    }
   }
-}
 
   Future<void> cancelWorkflowTask(String taskId,
       {bool deleteWorkflow = false}) async {
@@ -715,15 +713,28 @@ class WorkflowDataService {
         workflowId = task.workflowId;
       }
     }
-    await factory.taskService.cancelTask(taskId);
+    try {
+      await factory.taskService.cancelTask(taskId);
+    } catch (e) {
+      Logger().log(
+          level: Logger.WARN,
+          message:
+              "Could not stop task $taskId. Likely, the task has alredy finished");
+    }
+
     if (deleteWorkflow && workflowId != "") {
       try {
-        var workflow = await factory.workflowService.get(workflowId );
+        var workflow = await factory.workflowService.get(workflowId);
         await factory.workflowService.delete(workflow.id, workflow.rev);
 
-        final nodes = ProjectDataService().folderTreeRoot.getDescendants().where((node) => node.document.meta.any((m) => m.value == workflow.id));
-        for( var node in nodes ){
-          await factory.projectDocumentService.delete(node.document.id, node.document.rev);
+        final nodes = ProjectDataService()
+            .folderTreeRoot
+            .getDescendants()
+            .where((node) =>
+                node.document.meta.any((m) => m.value == workflow.id));
+        for (var node in nodes) {
+          await factory.projectDocumentService
+              .delete(node.document.id, node.document.rev);
         }
       } catch (e) {
         Logger().log(

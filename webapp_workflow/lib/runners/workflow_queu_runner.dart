@@ -10,7 +10,8 @@ import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
 
-
+import 'package:uuid/uuid.dart';
+//TODO Refactor PostRun callbacks to always receive and return a workflow
 class WorkflowQueuRunner extends WorkflowRunner {
   WorkflowQueuRunner(
       {super.timestampType = TimestampType.full});
@@ -28,8 +29,6 @@ class WorkflowQueuRunner extends WorkflowRunner {
   }
   Future<sci.Workflow> _doRun(BuildContext? context, sci.Workflow workflow) async {
     var factory = tercen.ServiceFactory();
-   
-
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
@@ -38,7 +37,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
       ..owner = AppUser().teamname
       ..projectId = AppUser().projectId
       ..workflowId = workflow.id
+      ..channelId = Uuid().v4()
       ..workflowRev = workflow.rev;
+
+    workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
 
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
@@ -68,28 +70,27 @@ class WorkflowQueuRunner extends WorkflowRunner {
     var errorInformation = {"error": "", "reason": ""};
     var hasFailed = false;
 
-    
     await for (var evt in taskStream) {
       if (evt is sci.PatchRecords) {
-        try {
-          workflow = evt.apply(workflow);  
-        } catch (e) {
-          print("Failed to apply: ");
-          print(evt.toJson());
-          continue;
-        }
+        // try {
+        workflow = evt.apply(workflow);  
+        // } catch (e) {
+          // print("Failed to apply: ");
+          // print(evt.toJson());
+          // continue;
+        // }
         
         for (var pr in evt.rs) {
           if(  pr.d.isEmpty){
             continue;
           }
-          try {
+          // try {
             var prMap = jsonDecode(pr.d);
             if (prMap is Map &&
                 prMap.keys.contains("kind") &&
                 prMap["kind"] == "FailedState") {
-              print(evt.toJson());
-              print("Workflow failed ###");
+              // print(evt.toJson());
+              // print("Workflow failed ###");
               errorInformation["error"] = prMap["error"] as String;
               errorInformation["reason"] = prMap["reason"] as String;
 
@@ -98,10 +99,10 @@ class WorkflowQueuRunner extends WorkflowRunner {
               hasFailed = true;
             }
             
-          } catch (e) {
-            print(evt.toJson());
-            print(e.toString());
-          }
+          // } catch (e) {
+            // print(evt.toJson());
+            // print(e.toString());
+          // }
         }
       }
       if (evt is sci.TaskStateEvent) {
@@ -111,49 +112,32 @@ class WorkflowQueuRunner extends WorkflowRunner {
       }
 
     }
-    print("Workflow run done $hasFailed");
-    //
-    
-    // 
 
     if (!hasFailed) {
-      var workflow2 = await factory.workflowService.get(workflow.id);  
-      print("Finished with rev ${workflow.rev}");
-      print("\tRemote rev is: ${workflow2.rev}");
-      if( workflow.rev != workflow2.rev ){
-        try {
-          workflow.rev = await factory.workflowService.update(workflow);  
-        } catch (e) {
-          print("Failed to update workflow: $e"); 
-        }
-      }
-     
+      // Save the workflow
+      workflow.rev = await factory.workflowService.update(workflow);  
       
       for (var f in postRunCallbacks) {
         await f();
       }
 
-      print("Applied post run");
-      workflow2 = await factory.workflowService.get(workflow.id);  
-      print("\tWorkflow rev ${workflow.rev}");
-      print("\tRemote rev is: ${workflow2.rev}");
+      workflow = await factory.workflowService.get(workflow.id);  
 
       for (var f in postRunIdCallbacks) {
-        print("Running postRunIdCallback $f");
 
         await f(workflow);
         //In case function updates workflow
-        try {        
+        // try {        
           workflow = await factory.workflowService.get(workflow.id);  
-        } catch (e) {
-          print("Failed postRunIdCallback $f : $e");
+        // } catch (e) {
+          // print("Failed postRunIdCallback $f : $e");
           //Will generally trigger on task cancel
           // print("WORKFLOW ${workflow.id} not found");
           // return sci.Workflow();
-        }
+        // }
       }
       
-      print("Applied post run id");
+      // print("Applied post run id");
 
       if( postRunCallbacks.isNotEmpty || postRunIdCallbacks.isNotEmpty ){
         

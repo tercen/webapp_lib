@@ -783,15 +783,11 @@ class WorkflowRunner with ProgressDialog {
       ..workflowId = workflow.id
       ..workflowRev = workflow.rev;
 
+    // workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
+
+
     if( stepId != null ){
       workflowTask.stepsToRun.add(stepId);
-      // workflowTask = sci.RunWorkflowTask()
-      // ..state = sci.InitState()
-      // ..stepsToRun.add(stepId)
-      // ..owner = AppUser().teamname
-      // ..projectId = AppUser().projectId
-      // ..workflowId = workflow.id
-      // ..workflowRev = workflow.rev;
     }
 
     workflowTask =

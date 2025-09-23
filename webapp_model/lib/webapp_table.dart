@@ -42,6 +42,7 @@ class WebappTable extends IterableBase<List<String>>{
     return colNames.indexOf(column);
   }
 
+
   static WebappTable fromData( List<String> colNames, List<List<String>> rowData){
     var outTbl = WebappTable();
     for( var colIdx = 0; colIdx < colNames.length; colIdx++ ){
@@ -75,10 +76,13 @@ class WebappTable extends IterableBase<List<String>>{
       })   ).toList();
     }
     
-    for (var col = 0; col < nCols; col++) {
+    if( rows.isNotEmpty ){
+      for (var col = 0; col < nCols; col++) {
       outTbl.addColumn(colNames[col],
           data: rows.map((row) => row[col]).toList());
+      }
     }
+    
     
     return outTbl;
   }
@@ -160,6 +164,13 @@ class WebappTable extends IterableBase<List<String>>{
       colNames.remove(colName);
     }
   }
+
+  WebappTable selectColumns( {List<String> colsToRemove = const [], List<String> colsToInclude = const []} ){
+    this.columns.removeWhere((key, values) => colsToRemove.any((col) => col == key) || !colsToInclude.any((col) => col == key));
+    this.colNames.removeWhere((key) => colsToRemove.any((col) => col == key) || !colsToInclude.any((col) => col == key));
+    return this;
+  }
+
 
   WebappTable select(List<int> rows, {List<String>? cols}){
     cols ??= colNames;
