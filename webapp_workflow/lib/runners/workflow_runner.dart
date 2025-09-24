@@ -815,12 +815,14 @@ class WorkflowRunner with ProgressDialog {
       print("Running ${stepName}");
     }
 
+
+    Timer? completionTimer;
+
     await for (var evt in taskStream) {
-      // Task is Done
 
       if (evt is sci.PatchRecords) {
-        // evt.rs.first.apply(rebuilt)
         try {
+          print("Received patchrecords");
           workflow = evt.apply(workflow);
         } catch (e) {
           print("Failed to apply: ");
@@ -836,6 +838,11 @@ class WorkflowRunner with ProgressDialog {
       }
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+          print("RECEIVED final event");
+          completionTimer = Timer(Duration(seconds: 5), () {
+            print("Task definitely complete - no delayed events");
+          });
+
           break;
         }
       }
