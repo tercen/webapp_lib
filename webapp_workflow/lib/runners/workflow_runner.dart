@@ -816,33 +816,25 @@ class WorkflowRunner with ProgressDialog {
     }
 
 
-    Timer? completionTimer;
-
     await for (var evt in taskStream) {
 
       if (evt is sci.PatchRecords) {
-        try {
-          print("Received patchrecords");
-          workflow = evt.apply(workflow);
-        } catch (e) {
-          print("Failed to apply: ");
-          print(evt.toJson());
-          print(e);
-          continue;
-        }
+        // try {
+        //   workflow = evt.apply(workflow);
+        // } catch (e) {
+        //   print("Failed to apply: ");
+        //   print(evt.toJson());
+        //   print(e);
+        //   continue;
+        // }
 
-        if (stepName == null) {
-          updateStepProgress(workflow);
-          log(stepProgressMessage, dialogTitle: runTitle);
-        }
+        // if (stepName == null) {
+        //   updateStepProgress(workflow);
+        //   log(stepProgressMessage, dialogTitle: runTitle);
+        // }
       }
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
-          print("RECEIVED final event");
-          completionTimer = Timer(Duration(seconds: 5), () {
-            print("Task definitely complete - no delayed events");
-          });
-
           break;
         }
       }
@@ -863,6 +855,13 @@ class WorkflowRunner with ProgressDialog {
               dialogTitle: runTitle);
         }
       }
+    }
+
+    final patches = await factory.patchRecordService.findByChannelIdAndSequence(startKey: [workflowTask.channelId, 0], endKey: [workflowTask.channelId, 9999]);
+
+    for( var patch in patches.reversed ){
+      print("Applying patch ${patch.toJson()}");
+      workflow = patch.apply(workflow);
     }
 
     workflow.rev = await factory.workflowService.update(workflow);
