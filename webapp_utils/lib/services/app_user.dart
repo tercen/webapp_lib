@@ -86,6 +86,9 @@ class AppUser {
     }
   }
 
+  String get devServiceUri => const String.fromEnvironment("SERVICE_URI");
+  String get devToken => const String.fromEnvironment("TERCEN_TOKEN");
+
   String _readProjectId() {
     if (isDev) {
       return const String.fromEnvironment("PROJECT_ID");

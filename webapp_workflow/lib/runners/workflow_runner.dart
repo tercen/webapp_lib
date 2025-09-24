@@ -25,6 +25,7 @@ class FilterConfig {
   final List<dynamic> values;
   final String boolOp;
   final List<sci.Pair> metas;
+  final String comp;
 
   FilterConfig(
       {required this.filterName,
@@ -32,7 +33,8 @@ class FilterConfig {
       required this.keys,
       required this.values,
       required this.boolOp,
-      required this.metas});
+      required this.metas,
+      this.comp = "equals"});
 }
 
 class WorkflowRunner with ProgressDialog {
@@ -215,7 +217,7 @@ class WorkflowRunner with ProgressDialog {
     folderId = id;
   }
 
-  sci.FilterExpr createFilterExpr(String factorName, dynamic factorValue) {
+  sci.FilterExpr createFilterExpr(String factorName, dynamic factorValue, {String comp = "equals"}) {
     var factorType = "string";
     if( factorValue is int){
       factorType = "int";
@@ -228,7 +230,7 @@ class WorkflowRunner with ProgressDialog {
       ..type = factorType
       ..name = factorName;
     var filterExpr = sci.FilterExpr()
-      ..filterOp = "equals"
+      ..filterOp = comp
       ..stringValue = factorValue
       ..factor = filterFactor;
 
@@ -436,6 +438,7 @@ class WorkflowRunner with ProgressDialog {
       final values = fc.values;
       final boolOp = fc.boolOp;
       final metas = fc.metas;
+      final comp = fc.comp;
 
       var factors =
           convertToStepFactors(keys, getFactorNames(workflow, stepId));
@@ -448,7 +451,7 @@ class WorkflowRunner with ProgressDialog {
       for (var i = 0; i < factors.length; i++) {
         for (var j = 0; j < values[i].length; j++) {
           andFilter.filterExprs
-              .add(createFilterExpr(factors[i], values[i][j]));
+              .add(createFilterExpr(factors[i], values[i][j], comp: comp));
         }
       }
 
@@ -476,27 +479,29 @@ class WorkflowRunner with ProgressDialog {
 
   void addOrFilter(
       String filterName, String stepId, List<String> keys, List<dynamic> values,
-      {List<sci.Pair> metas = const []}) {
+      {List<sci.Pair> metas = const [], String comp = "equals"}) {
     final fc = FilterConfig(
         filterName: filterName,
         stepId: stepId,
         keys: keys,
         values: values,
         boolOp: "or",
-        metas: metas);
+        metas: metas,
+        comp: comp);
     filterConfigList.add(fc);
   }
 
   void addAndFilter(
       String filterName, String stepId, List<String> keys, List<dynamic> values,
-      {List<sci.Pair> metas = const []}) {
+      {List<sci.Pair> metas = const [], String comp = "equals"}) {
     final fc = FilterConfig(
         filterName: filterName,
         stepId: stepId,
         keys: keys,
         values: values,
         boolOp: "and",
-        metas: metas);
+        metas: metas,
+        comp: comp);
     filterConfigList.add(fc);
   }
 
