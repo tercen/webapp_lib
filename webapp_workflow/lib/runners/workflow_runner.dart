@@ -860,7 +860,7 @@ class WorkflowRunner with ProgressDialog {
     final patches = await factory.patchRecordService.findByChannelIdAndSequence(startKey: [workflowTask.channelId, 0], endKey: [workflowTask.channelId, 9999]);
 
     for( var patch in patches.reversed ){
-      print("Applying patch ${patch.toJson()}");
+      print("Applying patch ${patch.oR}");
       workflow = patch.apply(workflow);
     }
 
