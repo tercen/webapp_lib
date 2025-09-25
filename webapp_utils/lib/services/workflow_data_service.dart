@@ -443,7 +443,7 @@ class WorkflowDataService {
 
     List<Relation> rels = [];
     Map<String, List<String>> stepRelationMap = {};
-    for (var stp in wkf.steps) {
+    for (var stp in wkf.steps.whereType<sci.DataStep>().where((stp) => stp.state.taskState.isFinal)) {
       var shouldIncludeStep =
           includeStepId.isEmpty || includeStepId.contains(stp.id);
       if (stp.kind == "DataStep" && shouldIncludeStep) {

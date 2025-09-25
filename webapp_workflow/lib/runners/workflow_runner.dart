@@ -775,8 +775,106 @@ class WorkflowRunner with ProgressDialog {
     return workflow;
   }
 
+  String _linkToId(String id){
+    var idParts = id.split("-");
+    idParts.removeLast();
+    idParts.removeLast();
+    return idParts.join("-");
+  }
+  List<String> _stepsToReset(sci.Workflow workflow, String currentStep, List<String> addedSteps){
+    final stepsToReset = [currentStep];
+    final outLinks = workflow.links.where((link) => link.outputId.contains(currentStep) ).where((link) => !addedSteps.contains(_linkToId(link.inputId)));
+    for( var link in outLinks ){
+      stepsToReset.add(_linkToId(link.inputId));
+      addedSteps.add(link.inputId);
+      stepsToReset.addAll(  _stepsToReset( workflow, _linkToId(link.inputId), addedSteps) );
+    }
+
+
+    return stepsToReset;
+  }
+
+  Future<sci.Workflow> doResetStep(BuildContext? context, sci.Workflow workflow,
+      {String? runTitle, String? stepName, required String stepId}) async {
+    
+
+    if (context != null) {
+      openDialog(context);
+    }
+
+    var runTitle = getWorkflowName(workflow);
+
+    //-----------------------------------------
+    // Task preparation and running
+    //-----------------------------------------
+
+    // for( var step in workflow.steps.whereType<sci.DataStep>() ){
+      // print("${step.name} :: ${step.state.taskState.kind}");
+    // }
+    // print("...........................................");
+    final idsToReset = _stepsToReset(workflow, stepId, []).toSet();
+    print("WILL RESET:");
+    for( var id in idsToReset ){
+      final stp = workflow.steps.firstWhere(
+        (step) =>
+            step.id == id,
+        orElse: () => sci.DataStep());
+      print("\t${stp.name} :: $id");
+    }
+    for( var id in idsToReset ){
+          final stp = workflow.steps.firstWhere(
+        (step) =>
+            step.id == id,
+        orElse: () => sci.DataStep());
+    if (stp.id != "") {
+      stp.state.taskState = sci.InitState();
+      stp.state.taskId = "";
+    }
+    }
+    // final factory = tercen.ServiceFactory();
+    // workflow = await factory.workflowService.get(workflow.id);
+    // workflow = await runWorkflowTask(workflow, stepsToReset: [stepId], stepsToRun: []);
+
+    // for( var step in workflow.steps.whereType<sci.DataStep>() ){
+      // print("${step.name} :: ${step.state.taskState.kind}");
+    // }
+
+    log("$stepProgressMessage\n\n \nRunning final updates",
+        dialogTitle: runTitle);
+
+    final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) =>
+        step.state.taskState.kind != "DoneState" &&
+        step.state.taskState.kind != "InitState");
+    if (!hasFailed) {
+      for (var f in postRunCallbacks) {
+        await f();
+      }
+      for (var f in postRunIdCallbacks) {
+        await f(workflow);
+      }
+    }
+
+    if (context != null) {
+      await Future.delayed(const Duration(milliseconds: 1000), () {
+        // status.value = RunStatus.finished;
+        closeLog();
+      });
+    }
+
+    workflowId = workflow.id;
+    // workflow = doneWorkflow;
+
+    // final factory = tercen.ServiceFactory();
+    // workflow = await factory.workflowService.get(workflow.id);
+
+
+    
+    return workflow;
+  }
+
   Future<sci.Workflow> runWorkflowTask(sci.Workflow workflow,
-      {String? runTitle, String? stepName, String? stepId}) async {
+      {String? runTitle, String? stepName, List<String>? stepsToRun, 
+      List<String>? stepsToReset}) async {
     var factory = tercen.ServiceFactory();
 
     runTitle ??= workflow.name;
@@ -791,8 +889,14 @@ class WorkflowRunner with ProgressDialog {
     // workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
 
 
-    if( stepId != null ){
-      workflowTask.stepsToRun.add(stepId);
+    if( stepsToRun != null){
+      // workflowTask.stepsToRun.clear();
+      workflowTask.stepsToRun.addAll(stepsToRun);
+    }
+
+    if( stepsToReset != null){
+      // workflowTask.stepsToReset.clear();
+      workflowTask.stepsToReset.addAll(stepsToReset);
     }
 
     workflowTask =
@@ -864,12 +968,15 @@ class WorkflowRunner with ProgressDialog {
       workflow = patch.apply(workflow);
     }
 
+    print("Patching done");
     workflow.rev = await factory.workflowService.update(workflow);
     workflowId = workflow.id;
 
     return workflow;
   }
-    Future<sci.Workflow> doRunStep(
+  
+  
+  Future<sci.Workflow> doRunStep(
       BuildContext? context, sci.Workflow workflow, String stepId) async {
     if (context != null) {
       openDialog(context);
@@ -880,7 +987,7 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
-    workflow = await runWorkflowTask(workflow, stepId: stepId);
+    workflow = await runWorkflowTask(workflow, stepsToRun: [stepId]);
 
     log("$stepProgressMessage\n\n \nRunning final updates",
         dialogTitle: runTitle);
