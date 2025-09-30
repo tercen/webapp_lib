@@ -627,9 +627,14 @@ class WorkflowRunner with ProgressDialog {
     if (context != null) {
       openDialog(context);
     }
+    Stopwatch stopwatch = Stopwatch()..start();
     var factory = tercen.ServiceFactory();
 
+
+
     var runTitle = getWorkflowName(template);
+    print("\t\tdoSetup :: getWorkflowName :: ${stopwatch.elapsedMilliseconds} ms");
+    stopwatch.reset();
 
     if (context != null) {
       log("Set up", dialogTitle: runTitle);
@@ -638,6 +643,9 @@ class WorkflowRunner with ProgressDialog {
     for (var entry in tableDocumentMap.entries) {
       tableMap[entry.key] = await loadDocumentInMemory(entry.value);
     }
+
+    print("\t\tdoSetup :: loadDocumentInMemory :: ${stopwatch.elapsedMilliseconds} ms");
+    stopwatch.reset();
 
     //-----------------------------------------
     var workflow = sci.Workflow();
@@ -649,6 +657,8 @@ class WorkflowRunner with ProgressDialog {
       workflow = await factory.workflowService
           .copyApp(template.id, AppUser().projectId);
     }
+    print("\t\tdoSetup :: copyApp :: ${stopwatch.elapsedMilliseconds} ms");
+    stopwatch.reset();
 
     setupFilters(workflow);
 
@@ -742,13 +752,16 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
+    print("\t\tdoSetup :: Step-specific setup :: ${stopwatch.elapsedMilliseconds} ms");
+    stopwatch.reset();    
+
     //-----------------------------------------
     // General workflow parameters
     //-----------------------------------------
 
     if (inPlace) {
-      await factory.workflowService.update(workflow);
-      workflow = await factory.workflowService.get(workflow.id);
+      workflow.rev = await factory.workflowService.update(workflow);
+      // workflow = await factory.workflowService.get(workflow.id);
     } else {
       if (folderId == null) {
         sci.FolderDocument folder = await createFolder(
@@ -766,6 +779,8 @@ class WorkflowRunner with ProgressDialog {
       workflow.rev = "";
 
       workflow = await factory.workflowService.create(workflow);
+      print("\t\tdoSetup :: createWorkflow :: ${stopwatch.elapsedMilliseconds} ms");
+      stopwatch.reset();
     }
 
     if (context != null) {
@@ -1005,14 +1020,12 @@ class WorkflowRunner with ProgressDialog {
     }
 
     if (context != null) {
-      await Future.delayed(const Duration(milliseconds: 1000), () {
-        // status.value = RunStatus.finished;
+      await Future.delayed(const Duration(milliseconds: 500), () {
         closeLog();
       });
     }
 
     workflowId = workflow.id;
-    // workflow = doneWorkflow;
 
     final factory = tercen.ServiceFactory();
     workflow = await factory.workflowService.get(workflow.id);
@@ -1058,8 +1071,8 @@ class WorkflowRunner with ProgressDialog {
     workflowId = workflow.id;
     // workflow = doneWorkflow;
 
-    final factory = tercen.ServiceFactory();
-    workflow = await factory.workflowService.get(workflow.id);
+    // final factory = tercen.ServiceFactory();
+    // workflow = await factory.workflowService.get(workflow.id);
 
     return workflow;
   }
