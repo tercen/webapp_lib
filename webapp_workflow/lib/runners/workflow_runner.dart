@@ -667,7 +667,7 @@ class WorkflowRunner with ProgressDialog {
     }
     // addIdPostRun(reEnableSteps);
 
-    print(xAxisCoord);
+    // print(xAxisCoord);
     //-----------------------------------------
     // Step-specific setup
     //-----------------------------------------
@@ -813,13 +813,13 @@ class WorkflowRunner with ProgressDialog {
     // }
     // print("...........................................");
     final idsToReset = _stepsToReset(workflow, stepId, []).toSet();
-    print("WILL RESET:");
+    // print("WILL RESET:");
     for( var id in idsToReset ){
       final stp = workflow.steps.firstWhere(
         (step) =>
             step.id == id,
         orElse: () => sci.DataStep());
-      print("\t${stp.name} :: $id");
+      // print("\t${stp.name} :: $id");
     }
     for( var id in idsToReset ){
           final stp = workflow.steps.firstWhere(
@@ -916,7 +916,7 @@ class WorkflowRunner with ProgressDialog {
       log(stepProgressMessage, dialogTitle: runTitle);
     } else {
       log("Running ${stepName}", dialogTitle: runTitle);
-      print("Running ${stepName}");
+      // print("Running ${stepName}");
     }
 
 
@@ -964,11 +964,11 @@ class WorkflowRunner with ProgressDialog {
     final patches = await factory.patchRecordService.findByChannelIdAndSequence(startKey: [workflowTask.channelId, 0], endKey: [workflowTask.channelId, 9999]);
 
     for( var patch in patches.reversed ){
-      print("Applying patch ${patch.oR}");
+      // print("Applying patch ${patch.oR}");
       workflow = patch.apply(workflow);
     }
 
-    print("Patching done");
+    // print("Patching done");
     workflow.rev = await factory.workflowService.update(workflow);
     workflowId = workflow.id;
 

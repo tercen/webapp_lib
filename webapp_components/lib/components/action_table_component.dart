@@ -266,7 +266,7 @@ class ActionTableComponent extends FetchComponent
     for (var si = 0; si < indices.length; si++) {
       var ri = indices[si];
       var key = table.columns[".key"]![ri];
-      var rowEls = colNames.map((col) => table.columns[col]![ri]).toList();
+      
       var displayEls = colNames
           .where((col) => col != "Id")
           .where((col) => col != ".key")

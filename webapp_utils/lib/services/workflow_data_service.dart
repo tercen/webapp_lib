@@ -66,6 +66,41 @@ class WorkflowDataService {
     return _installedWorkflows.values.toList();
   }
 
+  Future<WebappTable> fetcProjectWorkflowTable(
+      {bool useCache = true, bool fetchOnServer = false}) async {
+    final projectId = AppUser().projectId;
+    final key = "${projectId}_kumoWorkflowTable";
+    if (useCache && cache.hasCachedValue(key)) {
+      return cache.getCachedValue(key);
+    } else {
+      final workflows = (await WorkflowDataService().getProjectWorkflowList(
+              useCache: useCache, fetchOnServer: fetchOnServer))
+          .where((wkf) => wkf.getMeta("kumo.workflow") == "true")
+          .toList();
+      var res = WebappTable();
+
+      final status = <String>[];
+      final error = <String>[];
+
+      for (var w in workflows) {
+        var sw = await WorkflowDataService().getWorkflowStatus(w);
+
+        status.add(sw["status"]!);
+        error.add(sw["error"]!);
+      }
+
+      res.addColumn("Id", data: workflows.map((w) => w.id).toList());
+      res.addColumn("Name", data: workflows.map((w) => w.name).toList());
+      res.addColumn("Status", data: status);
+      res.addColumn("Last Update",
+          data: workflows
+              .map((w) => DateFormatter.formatShort(w.lastModifiedDate))
+              .toList());
+
+      return res;
+    }
+  }
+
   Workflow getWorkflow(String key) {
     if (!_installedWorkflows.containsKey(key)) {
       throw ServiceError(500, "Failed to find workflow with key '$key'");
@@ -89,7 +124,6 @@ class WorkflowDataService {
     Logger().log(
         level: Logger.FINER, message: "\tFound ${libObjs.length} workflows");
 
-    
     return libObjs;
   }
 
@@ -147,7 +181,7 @@ class WorkflowDataService {
       var workflowIds = projObjs
           .where((e) => e.isDeleted == false)
           .where((e) => e.isHidden == false)
-          .where((e) => e.subKind == "Workflow")
+          .where((e) => e.subKind == "Workflow" )
           .map((e) => e.id)
           .toList();
 
@@ -443,7 +477,9 @@ class WorkflowDataService {
 
     List<Relation> rels = [];
     Map<String, List<String>> stepRelationMap = {};
-    for (var stp in wkf.steps.whereType<sci.DataStep>().where((stp) => stp.state.taskState.isFinal)) {
+    for (var stp in wkf.steps
+        .whereType<sci.DataStep>()
+        .where((stp) => stp.state.taskState.isFinal)) {
       var shouldIncludeStep =
           includeStepId.isEmpty || includeStepId.contains(stp.id);
       if (stp.kind == "DataStep" && shouldIncludeStep) {
@@ -786,12 +822,14 @@ class WorkflowDataService {
     return results;
   }
 
-  Future<WebappTable> fetchWorkflowTable() async {
+  Future<WebappTable> fetchWorkflowTable(
+      {bool useCache = false, bool fetchOnServer = true}) async {
     var key = AppUser().projectId;
-    if (cache.hasCachedValue(key)) {
+    if (useCache && cache.hasCachedValue(key)) {
       return cache.getCachedValue(key);
     } else {
-      var workflows = await getProjectWorkflowList(fetchOnServer: true);
+      var workflows = await getProjectWorkflowList(
+          fetchOnServer: fetchOnServer, useCache: useCache);
 
       var res = WebappTable();
 
@@ -799,7 +837,6 @@ class WorkflowDataService {
       List<String> error = [];
 
       for (var w in workflows) {
-        // var sw = await workflowService.getWorkflowStatus(w);
         var sw = await getWorkflowStatus(w);
 
         status.add(sw["status"]!);
@@ -851,5 +888,12 @@ class WorkflowDataService {
           Stream.fromIterable(Iterable.castFrom([utf8.encode(readmeTxt)]));
       factory.fileService.upload(doc, dataStream);
     }
+  }
+
+  bool hasRunStep({required sci.Workflow workflow, required String stepId}) {
+    final taskState =  workflow.steps
+        .firstWhere((step) => step.id == stepId).state.taskState;
+
+    return taskState.isFinal && taskState.kind != "FailedState";
   }
 }

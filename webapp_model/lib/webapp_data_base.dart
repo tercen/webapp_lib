@@ -242,16 +242,19 @@ class WebAppDataBase with ChangeNotifier {
     
   }
 
-  Future<void> projectFilesUpdated() async {
-    projectService
-        .loadFolderStructure()
-        .then((value) => notifyListeners());
-  }
+  // Future<String> _analysisFolderId() async{
+  //   final anaFolder = ProjectDataService().getFolder("Analyses");
+
+  //   return anaFolder?.id ?? "";
+  // }
 
   Future<void> reloadProjectFiles() async {
     await projectService
-        .loadFolderStructure()
+        .loadFolderStructure( )
         .then((value) => notifyListeners());
+    // await projectService
+    //     .loadFolderStructure( folderId: await _analysisFolderId())
+    //     .then((value) => notifyListeners());
 
 
     workflowService.cache.clearCache();

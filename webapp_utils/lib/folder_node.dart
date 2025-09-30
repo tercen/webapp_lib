@@ -186,7 +186,7 @@ class FolderNode {
       docType = "[F]";
     }
 
-    print("$tab * $docType ${node.document.name}");
+    print("$tab * $docType ${node.document.name} (${node.document.kind}/${node.document.subKind})");
 
     for( var c in node.children ){
       node.printStructure(root: c, level: level+1);

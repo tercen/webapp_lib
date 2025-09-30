@@ -1,6 +1,6 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:synchronized/synchronized.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:webapp_components/components/action_table_component.dart';
 
@@ -13,44 +13,36 @@ import 'package:webapp_utils/functions/list_utils.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_model/sci_model.dart' as sci;
-import 'package:webapp_utils/functions/logger.dart';
-import 'package:webapp_utils/services/project_data_service.dart';
-import 'package:webapp_utils/services/workflow_data_service.dart';
+
 import 'package:async/async.dart';
 
-class RunningTask {
-  String taskId;
-  String workflowId;
-  RunningTask(this.taskId, this.workflowId);
-
-  @override
-  int get hashCode => taskId.hashCode;
-
-  @override
-  bool operator ==(Object other) {
-    final eqObject = other is RunningTask;
-    final otherR = other as RunningTask;
-    final eqTask = taskId == otherR.taskId;
-    final eqWorkflow = workflowId == otherR.workflowId;
-    return eqObject && eqTask && eqWorkflow;
-  }
-}
-
 class WorkflowTaskComponent extends ActionTableComponent {
-  List<RunningTask> runningTasks = [];
-
   Future Function()? onEmptyQueu;
   final List<ListAction> workflowActions;
   bool firstEmpty = true;
-  final _lock = Lock();
 
   List<CancelableOperation> futures = [];
-  CacheObject workflowCache = CacheObject();
+  CancelableOperation? _reloadOp;
+  bool markedForReload = false;
+
+  final Set<String> _channelsOnListen = {};
+  final List<String> _processedEvents = [];
+  final List<String> _closedChannels = [];
+  final List<double> widths;
 
   WorkflowTaskComponent(super.id, super.groupId, super.componentLabel,
       super.dataFetchCallback, super.actions, this.workflowActions,
-      {super.excludeColumns, super.hideColumns, this.onEmptyQueu}) {
-    hideColumns = [".key", "IsWorkflowTask", "Workflow Name", "Workflow Id", "Id", ...super.hideColumns ?? []];
+      {super.excludeColumns, super.hideColumns, this.onEmptyQueu, this.widths = const []}) {
+    super.useCache = false;
+    hideColumns = [
+      "TaskId",
+      "WorkflowId",
+      "WorkflowName",
+      "ChannelId",
+      "ProjectId",
+      "ProjectName",
+      ...super.hideColumns ?? []
+    ];
   }
 
   @override
@@ -76,124 +68,139 @@ class WorkflowTaskComponent extends ActionTableComponent {
     );
   }
 
-  @override
-  Widget createWidget(BuildContext context) {
-    firstEmpty = true;
-    var table = dataTable;
+  // @override
+  // void reset() {
+  //   super.reset();
+  //   selected.clear();
+  // }
 
-    List<Widget> tableRows = [];
-
-    final wkfTaskTable = table.selectByColValue(["Type"], ["Workflow"]);
-
-    for (var ri = 0; ri < wkfTaskTable.nRows; ri++) {
-      final row = wkfTaskTable.select([ri]);
-      final assocTasksTable =
-          table.selectByColValue(["Workflow Id"], [row["Workflow Id"].first]);
-
-      final workflowName = row["Workflow Name"].first;
-      final projectName = row["Project Name"].first;
-      final tableLabel = Align(
-        alignment: Alignment.centerLeft,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Tasks for $workflowName",
-                  style: Styles()["textH2"],
-                ),
-                
-                Text(
-                  "In: $projectName",
-                  style: Styles()["text"],
-                ),
-                SizedBox(height: 5,),
-
-              ],
-            )
-            ,
-            const SizedBox(
-              width: 10,
-            ),
-            IconButton(
-                onPressed: () {
-                  workflowActions.first
-                      .callAction(row, context: context);
-                },
-                icon: workflowActions.first.getIcon())
-          ],
-        ),
-      );
-
-      tableRows.add(const SizedBox(
-        height: 20,
-      ));
-      tableRows.add(tableLabel);
-      tableRows.add(buildWorkflowTable(assocTasksTable, context));
-      tableRows.add(const SizedBox(
-        height: 20,
-      ));
-    }
-
-
-
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: tableRows);
+  Future reload() async {
+    dataTable = await dataFetchCallback();
+    markedForReload = false;
+    notifyListeners();
   }
 
-  Widget buildWorkflowTable(WebappTable table, BuildContext context) {
-    var nRows = table.nRows;
+  @override
+  Widget build(BuildContext context) {
+    if (dataTable.nRows == 0 && _channelsOnListen.isEmpty) {
+      return buildEmptyTable();
+    } else {
+      return createWidget(context);
+    }
+  }
 
-    colNames = table.colNames
-        .where((colName) => shouldIncludeColumn(colName))
-        .toList();
-
-    var colNamesWithStatus =
-        colNames.where((colName) => shouldDisplayColumn(colName)).toList();
-
-    List<TableRow> rows = [];
-    rows.add(createTableHeader(colNamesWithStatus));
-
-    var indices = List<int>.generate(nRows, (i) => i);
-    if (sortDirection != "" && sortingCol != "") {
-      indices = ListUtils.getSortedIndices(table[sortingCol]);
-
-      if (sortDirection == "desc") {
-        indices = indices.reversed.toList();
-      }
+  List<String> get _uniqueWorkflowIds {
+    if (dataTable.isEmpty) {
+      // Should never be the case
+      return [];
     }
 
-    var widths = <double>[];
-    for (var si = 0; si < indices.length; si++) {
-      var ri = indices[si];
-      var key = table[".key"][ri];
+    final wkfTbl = dataTable.selectByColValue(["TaskType"], ["Workflow Task"]);
 
-      rows.add(createTableRow(context, table.select([ri]), key, actions,  rowIndex: si));
-      var displayEls = colNames
-          .where((col) => col != "Id")
-          .where((col) => col != ".key")
-          .where((col) => hideColumns == null || !hideColumns!.contains(col) )
-          .map((col) => table[col][ri])
-          .toList();
-      if (widths.isEmpty) {
-        widths.addAll(displayEls.map((el) => el.length as double));
+    return wkfTbl["WorkflowId"].toSet().where((e) => e.isNotEmpty).toList();
+  }
 
-      } else {
-        var tmp = displayEls.map((el) => el.length as double).toList();
+  void _updateTaskState(String taskId, String newState){
+    for( var ri = 0; ri < 0; ri++){
+      if(dataTable["TaskId"][ri] == taskId){
+        dataTable["TaskState"][ri] = newState;
+        notifyListeners();
+        break;
+      }
+    }
+  }
 
-        for (var k = 0; k < widths.length; k++) {
-          widths[k] = widths[k] + tmp[k];
+  Future<void> _listenToChannel(
+      {required String channelId, required String taskType, required taskId}) async {
+    if (_channelsOnListen.contains(channelId) || _closedChannels.contains(channelId)) {
+      return;
+    }
+    var factory = tercen.ServiceFactory();
+    var taskStream = factory.eventService.channel(channelId);
+    await for (var evt in taskStream) {
+      if (evt is sci.TaskStateEvent) {
+        final evtId = "${evt.id}_${evt.date.value}_${evt.state.kind}";
+        if( !_processedEvents.contains(evtId)){
+        // _updateTaskState(taskId, evt.state.kind);
+        if (evt.state.isFinal ) {
+
+          _channelsOnListen.remove(channelId);
+          _closedChannels.add(channelId);
+          if (taskType == "RunWorkflowTask") {
+            // onEmptyQueu!();
+          }
+        }
+          _processedEvents.add(evtId);
+          markedForReload = true;
+        
+
+        
+        
+        
+          // print("Triggering reload for $evtId");
+          
+          // reload();
+          // await _reloadOp?.cancel();
+          // _reloadOp = CancelableOperation.fromFuture(reload(), onCancel: () => print("Cancelling previous reload"),);
         }
       }
     }
+  }
 
-    var totalWidth = widths.reduce((a, b) => a + b);
-    final relativeWidth = widths.map((w) => (w / totalWidth) * 0.96).toList();
+  List<double> _updateColumnWidths(
+      {required List<double> widths, required List<String> displayEls}) {
+    if (widths.isEmpty) {
+      widths.addAll(displayEls.map((el) => el.length as double));
+    } else {
+      var tmp = displayEls.map((el) => el.length as double).toList();
+
+      for (var k = 0; k < widths.length; k++) {
+        widths[k] = widths[k] + tmp[k];
+      }
+    }
+
+    return widths;
+  }
+
+  Widget _buildTaskList(BuildContext context, WebappTable taskTable) {
+    // final wdgList = <Widget>[];
+    if (taskTable.nRows == 0) {
+      return Container();
+    }
+    List<TableRow> rows = [];
+
+    var colNames = taskTable.colNames
+        .where((colName) => shouldIncludeColumn(colName))
+        .where((col) => hideColumns == null || !hideColumns!.contains(col));
+
+    rows.add(createTableHeader(colNames.toList()));
+
+    var cWidths = List<double>.from(widths);
+
+    for (var ri = 0; ri < taskTable.nRows; ri++) {
+      var tableRow = taskTable.select([ri]);
+      _listenToChannel(
+          channelId: tableRow["ChannelId"].first,
+          taskType: tableRow["TaskType"].first,
+          taskId: tableRow["TaskId"].first);
+      if (tableRow["TaskType"].first == "RunWorkflowTask") {
+        continue;
+      }
+
+      var tr = createTableRow(context, tableRow, "not_used", actions,
+          displayCols: colNames.toList(), rowIndex: ri);
+      rows.add(tr);
+
+      var displayEls = colNames.map((col) => taskTable[col][ri]).toList();
+
+      if( cWidths.isEmpty ){
+        cWidths = _updateColumnWidths(widths: cWidths, displayEls: displayEls);
+      }
+      
+    }
+
+    var totalWidth = cWidths.reduce((a, b) => a + b);
+    final relativeWidth = cWidths.map((w) => (w / totalWidth) * 0.95).toList(); 
 
     Map<int, TableColumnWidth> colWidths = infoBoxBuilder == null
         ? {0: const FixedColumnWidth(5)}
@@ -203,201 +210,92 @@ class WorkflowTaskComponent extends ActionTableComponent {
       colWidths[k + 1] = FractionColumnWidth(relativeWidth[k]);
     }
 
-    colWidths[relativeWidth.length+1]=FractionColumnWidth(0.03); // Actions
+    colWidths[relativeWidth.length + 1] =
+        const FractionColumnWidth(0.03); // Actions
+
     var tableWidget = Table(
       columnWidths: colWidths,
       children: rows,
     );
-
     return tableWidget;
   }
 
-  Future<void> processTaskEvent(String channelId, String workflowId) async {
-    var factory = tercen.ServiceFactory();
-    var taskStream = factory.eventService.channel(channelId);
-    await for (var evt in taskStream) {
-      if (evt is sci.TaskStateEvent) {
-        await _lock.synchronized(() async{
-          if (evt.state.isFinal) {
-            runningTasks.remove(RunningTask(evt.taskId, workflowId));
-          } else {
-            if (!runningTasks.contains(RunningTask(evt.taskId, workflowId))) {
-              runningTasks.add(RunningTask(evt.taskId, workflowId));
-            }
-          }
+  Widget _buildWorkflowTaskTable(BuildContext context, String workflowId) {
+    final wkfTbl = dataTable.selectByColValue(["WorkflowId"], [workflowId]);
+    final tbl =
+        wkfTbl.selectBySingleColValues("TaskType", ["Setup", "Computing"]);
 
-          try {
-            final unique = <RunningTask>{};
-            runningTasks.retainWhere(unique.add);
-            await loadTaskTable();
-            notifyListeners();  
-          } catch (e) {
-            Logger().log(
-                level: Logger.WARN,
-                message: "Failed to update task table: $e\n\nWORKFLOW ID: $workflowId");
-          }
-          
-        });
-      }
+    return Column(
+      children: [
+        _buildWorkflowTableTop(context, row: wkfTbl),
+        tbl.nRows > 0 ? _buildTaskList(context, tbl) : Container(),
+        const SizedBox(
+          height: 25,
+        )
+      ],
+    );
+  }
+
+  Widget _buildWorkflowTableTop(BuildContext context,
+      {required WebappTable row}) {
+    final workflowName = row["WorkflowName"].first;
+    final projectName = row["ProjectName"].first;
+
+    final workflowTableTop = Align(
+      alignment: Alignment.centerLeft,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Tasks for $workflowName",
+                  style: Styles()["textH2"],
+                ),
+                Text(
+                  "In: $projectName",
+                  style: Styles()["text"],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+              ]),
+          const SizedBox(
+            width: 10,
+          ),
+          IconButton(
+              onPressed: () {
+                workflowActions.first.callAction(row, context: context);
+              },
+              icon: workflowActions.first.getIcon())
+        ],
+      ),
+    );
+
+    return workflowTableTop;
+  }
+
+  @override
+  Widget createWidget(BuildContext context) {
+    firstEmpty = true;
+    final workflowIds = _uniqueWorkflowIds;
+    var taskTables = <Widget>[];
+    for (var workflowId in workflowIds) {
+      taskTables.add(_buildWorkflowTaskTable(context, workflowId));
     }
+
+    return Column(
+      children: taskTables,
+    );
   }
 
   @override
   Future<void> init() async {
     await super.init();
     await loadTable();
-    // await loadTaskTable();
 
     notifyListeners();
-  }
-
-  Future<sci.Workflow> getCachedWorkflow(String workflowId) async {
-    if (workflowCache.hasCachedValue(workflowId)) {
-      return workflowCache.getCachedValue(workflowId);
-    } else {
-      var workflowService = WorkflowDataService();
-      var workflow = await workflowService.findWorkflowById(workflowId);
-
-      // var workflow = await workflowService.findWorkflowById(workflowId);
-      workflowCache.addToCache(workflowId, workflow);
-      return workflow;
-    }
-  }
-
-  String getStepName(String taskId, List<sci.Workflow> workflowList) {
-    var stepName = "";
-
-    for (var w in workflowList) {
-      stepName = w.steps
-          .whereType<sci.DataStep>()
-          .firstWhere((step) => step.state.taskId == taskId,
-              orElse: () => sci.DataStep())
-          .name;
-      if (stepName.isNotEmpty) {
-        break;
-      }
-    }
-
-    return stepName;
-  }
-
-  Future<void> loadTaskTable() async {
-    final currentTasks = List<RunningTask>.from(runningTasks);
-    var factory = tercen.ServiceFactory();
-    List<String> keys = [];
-    List<String> taskId = [];
-    List<String> taskType = [];
-    List<String> taskDuration = [];
-    List<String> taskStatus = [];
-    List<String> taskStep = [];
-    List<String> workflowIds = [];
-    List<String> workflowNames = [];
-    List<String> projectNames = [];
-
-    if (currentTasks.isNotEmpty) {
-      var tasks = await factory.taskService
-          .list(currentTasks.map((e) => e.taskId).toList());
-
-      for (var taskIdInfo in currentTasks) {
-        final ct = tasks.firstWhere((task) => task.id == taskIdInfo.taskId,
-            orElse: () => sci.Task());
-        if (ct.id == "") {
-          continue;
-        }
-
-        var workflowId = taskIdInfo.workflowId;
-        
-        var wkf = await getCachedWorkflow(workflowId);
-        var project = await ProjectDataService().fetchProject(wkf.projectId);
-        keys.add(const Uuid().v4());
-        taskStep.add("");
-        taskId.add(ct.id);
-        taskType.add(formatTaskType(ct.kind));
-        taskDuration.add(
-            DateFormatter.formatLong(ct.lastModifiedDate, shortYear: true));
-        taskStatus.add(formatState(ct.state.kind));
-        workflowIds.add(workflowId);
-        workflowNames.add(wkf.name);
-        projectNames.add(project.name);
-      }
-    }
-
-    dataTable = WebappTable();
-    dataTable.addColumn(".key", data: keys);
-    dataTable.addColumn("Name", data: workflowNames);
-    dataTable.addColumn("Id", data: taskId);
-    dataTable.addColumn("Type", data: taskType);
-    dataTable.addColumn("IsWorkflowTask",
-        data: taskType
-            .map((t) => t == "Workflow")
-            .map((e) => e.toString())
-            .toList());
-    // Only "workflow" steps have meta information about the step
-    // dataTable.addColumn("Step", data: taskStep);
-    dataTable.addColumn("Status", data: taskStatus);
-    dataTable.addColumn("Last Modified", data: taskDuration);
-    dataTable.addColumn("Workflow Id", data: workflowIds);
-    dataTable.addColumn("Workflow Name", data: workflowNames);
-    dataTable.addColumn("Project Name", data: projectNames);
-  }
-
-  String formatTaskId(String id) {
-    return "...${id.substring(id.length - 5)}";
-  }
-
-  String formatTaskType(String task) {
-    switch (task) {
-      case 'RunWorkflowTask':
-        return "Workflow";
-      case 'RunComputationTask':
-        return "Step Task";
-      case 'CubeQueryTask':
-        return "Step Setup";
-      default:
-        return task;
-    }
-  }
-
-  String formatState(String state) {
-    return state.replaceAll("State", "");
-  }
-
-  @override
-  void reset() async {
-    for (var f in futures) {
-      await f.cancel();
-    }
-
-    runningTasks.clear();
-    super.reset();
-  }
-
-  @override
-  Future<bool> loadTable({bool force = false}) async {
-    if (!isInit || force ==   true) {
-      runningTasks.clear();
-      var factory = tercen.ServiceFactory();
-
-      final initTable = await dataFetchCallback();
-      final taskIds = initTable["Id"].where((e) => e != "").toList();
-
-      var tasks = await factory.taskService.list(taskIds);
-
-      runningTasks.addAll(tasks
-          .whereType<sci.RunWorkflowTask>()
-          .map((el) => RunningTask(el.id, el.workflowId)));
-      runningTasks = runningTasks.toSet().toList();
-
-      //Start listening to worklfow task channel
-      for (var task in tasks.whereType<sci.RunWorkflowTask>()) {
-        futures.add(CancelableOperation.fromFuture(
-            processTaskEvent(task.channelId, task.workflowId),
-            onCancel: () => Logger().log(
-                level: Logger.FINER, message: "Process task was cancelled")));
-      }
-
-      await loadTaskTable();
-    }
-    return true;
   }
 }

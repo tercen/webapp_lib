@@ -6,7 +6,6 @@ import 'package:webapp_components/abstract/serializable_component.dart';
 import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/extra/infobox.dart';
 
-import 'package:webapp_components/mixins/infobox_component.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
@@ -18,7 +17,7 @@ typedef TileBuilderCallback = Widget Function(
     {bool isEven, bool bold});
 
 enum SelectionBehavior { none, single, multiLeaf, multi }
- 
+
 class SelectionNode {
   int level;
   String value;
@@ -56,7 +55,6 @@ class SelectionNode {
   }
 }
 
-
 class HierarchyNode {
   final String id;
   final String label;
@@ -66,7 +64,9 @@ class HierarchyNode {
   final HierarchyNode? parent;
   final List<HierarchyNode> children = [];
 
-  HierarchyNode(this.id, this.label, this.level, this.columnName, this.selectionColumnName, {this.parent});
+  HierarchyNode(this.id, this.label, this.level, this.columnName,
+      this.selectionColumnName,
+      {this.parent});
 
   void addChild(HierarchyNode child) {
     children.add(child);
@@ -80,88 +80,98 @@ class HierarchyNode {
   @override
   String toString() {
     var s = "ROOT";
-    for( var child in children ){
+    for (var child in children) {
       s = "$s\n${printNode(child)}";
     }
     return s;
   }
 
   String printNode(node) {
-    
     var tab = "";
     for (var i = 0; i < node.level; i++) {
       tab += "....";
     }
     var s = "$tab${node.label} (${node.id})";
-    for( var child in node.children ){
+    for (var child in node.children) {
       s = "$s\n${printNode(child)}";
     }
     return s;
   }
 
-  List<HierarchyNode> getDescendants(){
+  List<HierarchyNode> getDescendants() {
     final descendants = <HierarchyNode>[];
-    for( var child in children ){
+    for (var child in children) {
       descendants.add(child);
       descendants.addAll(child.getDescendants());
     }
     return descendants;
   }
 
-  WebappTable selectTableRow( WebappTable table,  List<String> vals, List<String> columns){
+  WebappTable selectTableRow(
+      WebappTable table, List<String> vals, List<String> columns) {
     final selColumns = <String>[];
     final selVals = <String>[];
 
-    for( var i =0; i < vals.length; i++ ){
+    for (var i = 0; i < vals.length; i++) {
       selColumns.add(columns[i]);
       selVals.add(vals[i]);
     }
-    return table.selectByColValue(
-      selColumns,
-      selVals
-    );
+    return table.selectByColValue(selColumns, selVals);
   }
 
-
-  List<HierarchyNode> createLevelNodes( int level, WebappTable table, List<String> columnHierarchy, List<String> selectionHierarchy, {HierarchyNode? parent}  ){
-    if( level >= columnHierarchy.length ){
+  List<HierarchyNode> createLevelNodes(int level, WebappTable table,
+      List<String> columnHierarchy, List<String> selectionHierarchy,
+      {HierarchyNode? parent}) {
+    if (level >= columnHierarchy.length) {
       return [];
     }
 
-    final selectionCols = selectionHierarchy.isEmpty ? columnHierarchy : selectionHierarchy;
+    final selectionCols =
+        selectionHierarchy.isEmpty ? columnHierarchy : selectionHierarchy;
     final levelNodes = <HierarchyNode>[];
     final addedIds = <String>[];
 
     var pNode = parent;
     final vals = <String>[];
     while (pNode != null) {
-      if (pNode.level >= 0) {  // Only collect IDs from valid data levels
-        vals.insert(0, pNode.id);  // Maintain order: root to current
+      if (pNode.level >= 0) {
+        // Only collect IDs from valid data levels
+        vals.insert(0, pNode.id); // Maintain order: root to current
       }
       pNode = pNode.parent;
     }
-    final levelTable = parent == null ? table : selectTableRow( table,  vals, selectionCols.getRange(0, level+1).toList());// table.selectByColValue([selectionHierarchy[level-1]], [parent.id]);
+    final levelTable = parent == null
+        ? table
+        : selectTableRow(
+            table,
+            vals,
+            selectionCols
+                .getRange(0, level + 1)
+                .toList()); // table.selectByColValue([selectionHierarchy[level-1]], [parent.id]);
 
-    for( var i = 0; i < levelTable.nRows; i++ ){
+    for (var i = 0; i < levelTable.nRows; i++) {
       final row = levelTable.select([i]);
       final id = row[selectionCols[level]].first;
       final label = row[columnHierarchy[level]].first;
-      
-      if( !addedIds.contains(id) ){
+
+      if (!addedIds.contains(id)) {
         addedIds.add(id);
-        final newNode = HierarchyNode(id, label, level, columnHierarchy[level], selectionCols[level], parent: parent);
-        newNode.children.addAll(
-          newNode.createLevelNodes(level + 1, table, columnHierarchy, selectionHierarchy, parent: newNode)
-        );
+        final newNode = HierarchyNode(
+            id, label, level, columnHierarchy[level], selectionCols[level],
+            parent: parent);
+        newNode.children.addAll(newNode.createLevelNodes(
+            level + 1, table, columnHierarchy, selectionHierarchy,
+            parent: newNode));
         levelNodes.add(newNode);
       }
-
     }
 
     return levelNodes;
   }
 
-  static HierarchyNode fromTable(WebappTable table, List<String> columnHierarchy, {List<String>? selectionHierarchy} ){
+  static HierarchyNode fromTable(
+      WebappTable table, List<String> columnHierarchy,
+      {List<String>? selectionHierarchy}) {
     final selectionCols = selectionHierarchy ?? columnHierarchy;
     final rootNode = HierarchyNode("root", "root", -1, "", "");
 
@@ -174,12 +184,11 @@ class HierarchyNode {
 
     return rootNode;
   }
-  
+
   @override
   int get hashCode => id.hashCode;
-  
 
-  String toStringMap(){
+  String toStringMap() {
     return "{'id':'$id', 'label':'$label', 'level':$level, 'columnName':'$columnName', 'selectionColumnName':'$selectionColumnName', 'parent':${parent?.id ?? "null"}}";
   }
 
@@ -191,10 +200,11 @@ class HierarchyNode {
       valMap['level'],
       valMap['columnName'],
       valMap['selectionColumnName'],
-      parent: valMap['parent'] != null ? HierarchyNode.fromMapString(valMap['parent']) : null,
+      parent: valMap['parent'] != null
+          ? HierarchyNode.fromMapString(valMap['parent'])
+          : null,
     );
   }
-
 }
 
 class HierarchySelectableListComponent extends FetchComponent
@@ -244,17 +254,18 @@ class HierarchySelectableListComponent extends FetchComponent
 
     maxLevel = columnHierarchy.length - 1;
 
-    if( infoBoxCols.isEmpty && infoBoxBuilderList.length == 1 ){
+    if (infoBoxCols.isEmpty && infoBoxBuilderList.length == 1) {
       infoBoxCols = [columnHierarchy.last];
     }
 
-    if( infoBoxBuilderList.length != infoBoxCols.length ){
+    if (infoBoxBuilderList.length != infoBoxCols.length) {
       throw sci.ServiceError(500,
           "The infoBoxBuilderList must have the same length as the infoBoxCols.");
     }
 
-    if( infoBoxBuilderList.isNotEmpty &&  infoBoxBuilderList.length < columnHierarchy.length){
-      for( var i = infoBoxBuilderList.length; i < columnHierarchy.length; i++ ){
+    if (infoBoxBuilderList.isNotEmpty &&
+        infoBoxBuilderList.length < columnHierarchy.length) {
+      for (var i = infoBoxBuilderList.length; i < columnHierarchy.length; i++) {
         infoBoxBuilderList.insert(0, null);
         infoBoxCols.insert(0, "");
       }
@@ -274,7 +285,8 @@ class HierarchySelectableListComponent extends FetchComponent
       nonLeafCallback = nonSelectableRowBuilder;
     }
 
-    if( selectionHierarchy != null && selectionHierarchy!.length != columnHierarchy.length ){
+    if (selectionHierarchy != null &&
+        selectionHierarchy!.length != columnHierarchy.length) {
       throw sci.ServiceError(500,
           "The selection hierarchy must have the same length as the column hierarchy.");
     }
@@ -284,13 +296,19 @@ class HierarchySelectableListComponent extends FetchComponent
   //TODO Add reset
 
   List<HierarchyNode> getLevelNodes(int level, {String? parentId}) {
-    return hierarchyRoot.getDescendants().where((node) => node.level == level).where((node) => parentId == null || node.parent?.id == parentId ).toList();
+    return hierarchyRoot
+        .getDescendants()
+        .where((node) => node.level == level)
+        .where((node) => parentId == null || node.parent?.id == parentId)
+        .toList();
   }
 
-  Widget infoBoxIcon(InfoBoxBuilder infoBoxBuilder, dynamic value, BuildContext context, {String? title}) {
+  Widget infoBoxIcon(
+      InfoBoxBuilder infoBoxBuilder, dynamic value, BuildContext context,
+      {String? title}) {
     return IconButton(
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(0),
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(0),
         onPressed: () async {
           showDialog(
               context: context,
@@ -299,21 +317,23 @@ class HierarchySelectableListComponent extends FetchComponent
                   infoBoxBuilder.notifier.addListener(() {
                     stfSetState(() {});
                   });
-                  return infoBoxBuilder.build(context, value, titleOverride: title);
+                  return infoBoxBuilder.build(context, value,
+                      titleOverride: title);
                 });
               });
         },
         icon: const Icon(Icons.info_outline));
   }
 
-  Widget buildInfoBoxIcon(InfoBoxBuilder infoBoxBuilder, dynamic value, BuildContext context,
+  Widget buildInfoBoxIcon(
+      InfoBoxBuilder infoBoxBuilder, dynamic value, BuildContext context,
       {String? title, double iconCellWidth = 50}) {
     Widget infoBoxWidget = Container();
     double infoBoxWidth = 5;
-    
+
     infoBoxWidget = infoBoxIcon(infoBoxBuilder, value, context, title: title);
-    infoBoxWidth =iconCellWidth ;
-    
+    infoBoxWidth = iconCellWidth;
+
     return SizedBox(
       width: infoBoxWidth,
       child: infoBoxWidget,
@@ -321,24 +341,22 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   @override
-  WebappTable postLoad(WebappTable table){
-    if( table.nRows > 0 ){
+  WebappTable postLoad(WebappTable table) {
+    if (table.nRows > 0) {
       hierarchyRoot = HierarchyNode.fromTable(
         table,
         columnHierarchy,
         selectionHierarchy: selectionHierarchy,
       );
 
-      
-      if(selectFirst &&  delayedSelection == null){
+      if (selectFirst && delayedSelection == null) {
         select(hierarchyRoot.children.first);
         notifyListeners();
       }
-      
-    }else{
+    } else {
       hierarchyRoot.children.clear();
     }
-    if( delayedSelection != null ){
+    if (delayedSelection != null) {
       delayedSelection!();
       delayedSelection = null;
     }
@@ -383,7 +401,6 @@ class HierarchySelectableListComponent extends FetchComponent
         },
       );
     }
-
   }
 
   @override
@@ -409,33 +426,33 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   Widget nonSelectableRowBuilder(
-      BuildContext context,HierarchyNode node, WebappTable rowEls,
+      BuildContext context, HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
     var offset = node.level * 25 as double;
-    
+
     // Check if this node has children to show chevron
     bool hasChildren = node.children.isNotEmpty;
-    
+
     return Container(
       color: clr,
       width: double.infinity,
       height: 30,
       child: Padding(
-        padding: EdgeInsets.only(left:  offset),
+        padding: EdgeInsets.only(left: offset),
         child: Row(
           children: [
             // Chevron icon next to content (only if has children)
             if (hasChildren)
               Icon(
-                expandedLevels.contains(node.id) 
-                    ? Icons.remove 
-                    : Icons.add,
+                expandedLevels.contains(node.id) ? Icons.remove : Icons.add,
                 size: 16,
               ),
             if (hasChildren) SizedBox(width: 4),
-            infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
-                ? infoBoxIcon(infoBoxBuilderList[node.level]!, rowEls[infoBoxCols[node.level]].first, context)
+            infoBoxBuilderList.isNotEmpty &&
+                    infoBoxBuilderList[node.level] != null
+                ? infoBoxIcon(infoBoxBuilderList[node.level]!,
+                    rowEls[infoBoxCols[node.level]].first, context)
                 : Container(),
             Text(
               node.label,
@@ -462,10 +479,8 @@ class HierarchySelectableListComponent extends FetchComponent
     selectedNodes.remove(node);
   }
 
-  
-
   void selectChildren(HierarchyNode node) {
-    for( var child in node.children ){
+    for (var child in node.children) {
       select(child);
       selectChildren(child);
     }
@@ -485,7 +500,7 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   void deselectChildren(HierarchyNode node) {
-    for( var child in node.children ){
+    for (var child in node.children) {
       deselect(child);
       deselectChildren(child);
     }
@@ -493,25 +508,23 @@ class HierarchySelectableListComponent extends FetchComponent
 
   void selectFather(HierarchyNode node) {
     // if (level > 0) {
-      // var parentVal = clickedRow[columns[level - 1]].first;
-      // var parentNode = SelectionNode(level - 1, parentVal);
-      if( node.parent != null ){
-        select(node.parent!);
-        selectFather(node.parent!);
-      }
-      
-      
+    // var parentVal = clickedRow[columns[level - 1]].first;
+    // var parentNode = SelectionNode(level - 1, parentVal);
+    if (node.parent != null) {
+      select(node.parent!);
+      selectFather(node.parent!);
+    }
+
     // }
   }
 
   void checkSiblings(HierarchyNode node) {
     final parentNode = node.parent;
-    if( parentNode != null ){
-      if(!parentNode.children.any((child) => isSelected(child))){
+    if (parentNode != null) {
+      if (!parentNode.children.any((child) => isSelected(child))) {
         deselect(parentNode);
       }
     }
-
   }
 
   Widget buildSelectableEntry(
@@ -521,12 +534,10 @@ class HierarchySelectableListComponent extends FetchComponent
     // var clickedRow = dataTable.selectByColValue([colName], row[colName] );
     // var selectedNode = SelectionNode(level, row[colName].first);
 
-    
     var textWdg = Text(
       node.label,
       style: bold ? Styles()["textH2"] : Styles()["text"],
     );
-
 
     // Check if this node has children to show chevron
     bool hasChildren = node.children.isNotEmpty;
@@ -540,9 +551,7 @@ class HierarchySelectableListComponent extends FetchComponent
           // Chevron icon next to checkbox (only if has children)
           if (hasChildren)
             Icon(
-              expandedLevels.contains(node.id) 
-                  ? Icons.remove 
-                  : Icons.add,
+              expandedLevels.contains(node.id) ? Icons.remove : Icons.add,
               size: 16,
             ),
           if (hasChildren) SizedBox(width: 4),
@@ -569,11 +578,10 @@ class HierarchySelectableListComponent extends FetchComponent
                     selectFather(node);
                     selectChildren(node);
                   }
-                  if( onChange != null ){
+                  if (onChange != null) {
                     // dataTable.selectByColValue([columns[node.level]], dataTable[columns[node.level]]);
                     onChange!(selectTableRow(node), true);
                   }
-                  
                 } else {
                   deselect(node);
 
@@ -581,7 +589,7 @@ class HierarchySelectableListComponent extends FetchComponent
                     checkSiblings(node);
                     deselectChildren(node);
                   }
-                  if( onChange != null ){
+                  if (onChange != null) {
                     onChange!(selectTableRow(node), false);
                   }
                 }
@@ -590,8 +598,10 @@ class HierarchySelectableListComponent extends FetchComponent
           const SizedBox(
             width: 5,
           ),
-          infoBoxBuilderList.isNotEmpty && infoBoxBuilderList[node.level] != null
-              ? infoBoxIcon(infoBoxBuilderList[node.level]!, row[infoBoxCols[node.level]].first, context)
+          infoBoxBuilderList.isNotEmpty &&
+                  infoBoxBuilderList[node.level] != null
+              ? infoBoxIcon(infoBoxBuilderList[node.level]!,
+                  row[infoBoxCols[node.level]].first, context)
               : Container(),
           textWdg
         ],
@@ -599,52 +609,48 @@ class HierarchySelectableListComponent extends FetchComponent
     );
   }
 
-  WebappTable selectTableRow( HierarchyNode node ){
+  WebappTable selectTableRow(HierarchyNode node) {
     final selColumns = <String>[];
     final selVals = <String>[];
 
-
-    
     var lvlNode = node;
-    while( lvlNode.level >= 0){
+    while (lvlNode.level >= 0) {
       selColumns.add(lvlNode.selectionColumnName);
       selVals.add(lvlNode.id);
       lvlNode = lvlNode.parent ?? HierarchyNode("root", "root", -1, "", "");
     }
 
-    return dataTable.selectByColValue(
-      selColumns,
-      selVals
-    );
+    return dataTable.selectByColValue(selColumns, selVals);
   }
 
   WebappTable selectedAsTable() {
     final tbl = WebappTable();
-    if( selectedNodes.isEmpty ){
+    if (selectedNodes.isEmpty) {
       return tbl;
     }
-    final maxLevel = selectedNodes.map((node) => node.level).reduce((a, b) => a > b ? a : b);
-    final selection = selectedNodes.where((node) => node.level == maxLevel).toList();
+    final maxLevel =
+        selectedNodes.map((node) => node.level).reduce((a, b) => a > b ? a : b);
+    final selection =
+        selectedNodes.where((node) => node.level == maxLevel).toList();
 
-    for( var col in dataTable.colNames ){
+    for (var col in dataTable.colNames) {
       tbl.addColumn(col, data: <String>[]);
     }
-    
-    for( var node in selection ){
+
+    for (var node in selection) {
       final row = selectTableRow(node);
-      if( row.nRows > 0 ){
-        for( var col in dataTable.colNames ){
+      if (row.nRows > 0) {
+        for (var col in dataTable.colNames) {
           tbl[col].add(row[col].first);
         }
       }
-      
     }
 
     return tbl;
   }
 
   Widget selectableLeafRowBuilder(
-      BuildContext context,  HierarchyNode node, WebappTable rowVals,
+      BuildContext context, HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
     var offset = node.level * 25 as double;
@@ -685,7 +691,7 @@ class HierarchySelectableListComponent extends FetchComponent
   List<Widget> createWidgets(BuildContext context, int level,
       {String? parentId, Map<String, int>? globalCounter}) {
     List<Widget> wdg = [];
-    final levelNodes = getLevelNodes(level, parentId: parentId );
+    final levelNodes = getLevelNodes(level, parentId: parentId);
     globalCounter ??= {"count": 0};
 
     for (var ri = 0; ri < levelNodes.length; ri++) {
@@ -693,7 +699,8 @@ class HierarchySelectableListComponent extends FetchComponent
       final currentIndex = globalCounter["count"]!;
       globalCounter["count"] = currentIndex + 1;
 
-      if (node.children.isEmpty && level == maxLevel) { //Leaf
+      if (node.children.isEmpty && level == maxLevel) {
+        //Leaf
         wdg.add(createTabulatedEntry(
             level,
             leafCallback(
@@ -735,11 +742,10 @@ class HierarchySelectableListComponent extends FetchComponent
                     expandedLevels.remove(node.id);
                   }
                   // notifyListeners(); // Trigger rebuild to update icons
-                      // Trigger local rebuild without notifying parents
+                  // Trigger local rebuild without notifying parents
                   if (context is StatefulElement) {
-                    (context as StatefulElement).state.setState(() {});
+                    context.state.setState(() {});
                   }
-
                 },
                 title: nonLeafCallback(
                     context,
@@ -747,8 +753,8 @@ class HierarchySelectableListComponent extends FetchComponent
                     isEven: currentIndex % 2 == 0,
                     selectTableRow(node),
                     bold: true),
-                children:
-                    createWidgets(context, level + 1, parentId: node.id, globalCounter: globalCounter),
+                children: createWidgets(context, level + 1,
+                    parentId: node.id, globalCounter: globalCounter),
               ),
             ),
             isEven: currentIndex % 2 == 0));
@@ -758,27 +764,29 @@ class HierarchySelectableListComponent extends FetchComponent
     return wdg;
   }
 
-
-  
-
-  void setSelected(String value, String? column){
-    if( isInit ){
-
+  void setSelected(String value, String? column) {
+    if (isInit) {
       setSelectedByValue(value, column);
-    }else{
-      delayedSelection =  () => setSelectedByValue(value, column);
+    } else {
+      delayedSelection = () => setSelectedByValue(value, column);
     }
   }
 
-  void setSelectedByValue(String value, String? column){
-    final node = hierarchyRoot.getDescendants().where((node) => column == null || node.selectionColumnName == column) .firstWhere((node) => node.id == value, orElse: () => hierarchyRoot);
+  void setSelectedByValue(String value, String? column) {
+    final node = hierarchyRoot
+        .getDescendants()
+        .where((node) => column == null || node.selectionColumnName == column)
+        .firstWhere((node) => node.id == value, orElse: () => hierarchyRoot);
 
-    if( node.level == -1 ){
-      Logger().log(level: Logger.WARN, message: "setSelectedByValue: Node with id $value not found in hierarchy.");
+    if (node.level == -1) {
+      Logger().log(
+          level: Logger.WARN,
+          message:
+              "setSelectedByValue: Node with id $value not found in hierarchy.");
       return;
     }
 
-    if( selectionBehavior == SelectionBehavior.single) {
+    if (selectionBehavior == SelectionBehavior.single) {
       selectedNodes.clear();
     }
 

@@ -78,7 +78,6 @@ class UploadTableComponent extends UploadFileComponent {
       dataType = "double"; //checkAll(values, isInt) ? "int32" : "double";
     }
 
-    print("Adding column $colName of type $dataType ($values)");
 
     return ColumnSchema(  )
         ..name = colName

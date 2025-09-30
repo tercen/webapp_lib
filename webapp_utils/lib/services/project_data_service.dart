@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart';
 import 'package:webapp_utils/cache_object.dart';
@@ -20,7 +20,43 @@ class ProjectDataService {
   bool structureLoaded = false;
   final FolderNode folderTreeRoot = FolderNode(FolderDocument(), true);
 
-  Future<void> loadFolderStructure() async {
+
+
+
+  Future<void> loadFolderStructure({String? folderId}) async {
+    if (AppUser().projectId != "") {
+      List<sci.ProjectDocument> allObjects = await _fetchProjectObjects(reloadRoot: folderId);
+      
+      List<FolderDocument> allFolders = [];
+      List<ProjectDocument> allDocs = [];
+      
+      for (var obj in allObjects) {
+
+        if (obj.kind == "FolderDocument") {
+          
+          allFolders.add(obj as FolderDocument);
+        } else {
+          // print("\t${obj.name}");
+          allDocs.add(obj as ProjectDocument);
+        }
+      }
+
+      if (folderId == null) {
+        folderTreeRoot.children.clear();
+        folderTreeRoot.children =
+            _buildChildrenList(folderTreeRoot, allFolders, true);
+        folderTreeRoot.children =
+            _buildChildrenList(folderTreeRoot, allDocs, false);
+        structureLoaded = true;
+        
+      } else {
+        _updatePartialTree(folderId, allFolders, allDocs);
+      }
+    }
+  }
+
+
+  Future<void> loadFolderStructureOLD() async {
     if (AppUser().projectId != "") {
       List<dynamic> results = await Future.wait([
         _fetchRemoteFolderDocuments("", recursive: true),
@@ -38,6 +74,36 @@ class ProjectDataService {
     }
   }
 
+  Future<List<sci.ProjectDocument>> _fetchProjectObjects({String? reloadRoot}) async {
+    final startFolder = reloadRoot == null ? "\ufff0" : reloadRoot;
+    final endFolder = reloadRoot == null ? "" : reloadRoot;
+
+    return  await tercen.ServiceFactory().projectDocumentService.findProjectObjectsByFolderAndName( 
+          startKey: [AppUser().projectId, startFolder, "\ufff0"],
+          endKey: [AppUser().projectId, endFolder, ""], limit: 10000, useFactory: true);
+  }
+
+  void _updatePartialTree(String folderId, List<FolderDocument> allFolders, List<ProjectDocument> allDocs) {
+    FolderNode? targetNode = _findNodeById(folderTreeRoot, folderId);
+    if (targetNode != null) {
+      targetNode.children.clear();
+      targetNode.children = _buildChildrenList(targetNode, allFolders, true);
+      targetNode.children = _buildChildrenList(targetNode, allDocs, false);
+    }
+  }
+
+  FolderNode? _findNodeById(FolderNode node, String id) {
+    if (node.document.id == id) {
+      return node;
+    }
+    for (var child in node.children) {
+      var found = _findNodeById(child, id);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
   FolderDocument? getFolder(String name, {String? parentId}) {
     var candidateFolders = _getDocuments(name, true, parentId: parentId);
 
@@ -164,17 +230,21 @@ class ProjectDataService {
       FolderNode node, List<Document> docs, bool isFolder) {
     List<FolderNode> children = node.children;
     if (isFolder) {
+      
       children.addAll(docs
           .cast<FolderDocument>()
           .where((e) => e.folderId == node.document.id)
           .map((e) => FolderNode(e, isFolder)));
     } else {
+      // print("ADDING DOCS TO ${node.document.name}");
       children.addAll(docs
           .cast<ProjectDocument>()
           .where((e) => e.folderId == node.document.id)
           .map((e) => FolderNode(e, isFolder)));
     }
-
+    // for( var d in docs){
+    //     print("\t${d.name} ");
+    //   }
     for (var child in children) {
       child.parent = node;
       child.children = _buildChildrenList(child, docs, isFolder);
@@ -235,13 +305,13 @@ class ProjectDataService {
     return fileDoc;
   }
 
-  Future<Project> fetchProject(String id) async{
-    if( cache.hasCachedValue(id)){
-      return cache.getCachedValue(id);
+  Future<Project> fetchProject({required String projectId}) async{
+    if( cache.hasCachedValue(projectId)){
+      return cache.getCachedValue(projectId);
     }else{
       final factory = tercen.ServiceFactory();
-      final proj = await factory.projectService.get(id);
-      cache.addToCache(id, proj);
+      final proj = await factory.projectService.get(projectId);
+      cache.addToCache(projectId, proj);
       return proj;
     }
     

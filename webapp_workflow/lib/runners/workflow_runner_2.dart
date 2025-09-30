@@ -631,7 +631,7 @@ class WorkflowRunner with ProgressDialog {
       log(stepProgressMessage, dialogTitle: runTitle);
     } else {
       log("Running ${stepName}", dialogTitle: runTitle);
-      print("Running ${stepName}");
+      // print("Running ${stepName}");
     }
 
     await for (var evt in taskStream) {
