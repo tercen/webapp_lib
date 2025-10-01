@@ -181,7 +181,7 @@ class WorkflowDataService {
       var workflowIds = projObjs
           .where((e) => e.isDeleted == false)
           .where((e) => e.isHidden == false)
-          .where((e) => e.subKind == "Workflow" )
+          .where((e) => e.kind == "Workflow" )
           .map((e) => e.id)
           .toList();
 
@@ -191,7 +191,7 @@ class WorkflowDataService {
           .folderTreeRoot
           .getDescendants(folders: false, documents: true)
           .map((node) => node.document)
-          .where((doc) => doc.subKind == "Workflow")
+          .where((doc) => doc.kind == "Workflow")
           .map((doc) => doc.id)
           .toList();
       workflowList = await factory.workflowService.list(workflowIds);
