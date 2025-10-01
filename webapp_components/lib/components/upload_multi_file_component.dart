@@ -284,8 +284,8 @@ class UploadFileComponent
 
   Future<void> doUpload(BuildContext context) async {
     if (showUploadButton) {
-      openDialog(context);
-      log("File upload in progress. Please wait.",
+      openDialog(context, id: this.id);
+      log(this.id,"File upload in progress. Please wait.",
           dialogTitle: "File Uploading");
     }
 
@@ -295,7 +295,7 @@ class UploadFileComponent
       DropzoneFileInterface file = htmlFileList[i];
 
       if (showUploadButton) {
-        log("Uploading ${file.name}", dialogTitle: "File Uploading");
+        log(this.id,"Uploading ${file.name}", dialogTitle: "File Uploading");
       }
       var bytes = await dvController.getFileData(file);
       var fileId = await fileService.uploadFile(
@@ -309,7 +309,7 @@ class UploadFileComponent
       PlatformFile file = platformFileList[i];
       var bytes = file.bytes!;
       if (showUploadButton) {
-        log("Uploading ${file.name}", dialogTitle: "File Uploading");
+        log(this.id,"Uploading ${file.name}", dialogTitle: "File Uploading");
       }
 
       var fileId = await fileService.uploadFile(
@@ -320,7 +320,7 @@ class UploadFileComponent
     }
 
     if (showUploadButton) {
-      closeLog();
+      closeLog(id: this.id);
     }
   }
 

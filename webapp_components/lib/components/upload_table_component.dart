@@ -23,13 +23,13 @@ class UploadTableComponent extends UploadFileComponent {
 
   @override
   Future<void> doUpload(BuildContext context) async{
-    openDialog(context);
-    log("File upload in progress. Please wait.", dialogTitle: "File Uploading");
+    openDialog(context, id: this.id);
+    log(this.id,"File upload in progress. Please wait.", dialogTitle: "File Uploading");
 
     for( int i = 0; i < htmlFileList.length; i++ ){
       DropzoneFileInterface file = htmlFileList[i];
       
-      log("Uploading ${file.name}", dialogTitle: "File Uploading");
+      log(this.id,"Uploading ${file.name}", dialogTitle: "File Uploading");
       var bytes = await dvController.getFileData(file);
       var fileId = await uploadFileAsTable(file.name, projectId, fileOwner, bytes, folderId: folderId);
       uploadedFileIds.add(fileId);
@@ -39,7 +39,7 @@ class UploadTableComponent extends UploadFileComponent {
     for( int i = 0; i < platformFileList.length; i++ ){
       PlatformFile file = platformFileList[i];
       var bytes = file.bytes!;
-      log("Uploading ${file.name}", dialogTitle: "File Uploading");
+      log(this.id,"Uploading ${file.name}", dialogTitle: "File Uploading");
 
       var fileId = await uploadFileAsTable(file.name, projectId, fileOwner, bytes, folderId: folderId);
       uploadedFileIds.add(fileId);
@@ -47,7 +47,7 @@ class UploadTableComponent extends UploadFileComponent {
     }
 
 
-    closeLog();
+    closeLog(id: this.id);
 
   }
 

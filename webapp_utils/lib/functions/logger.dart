@@ -1,5 +1,7 @@
 class Logger {
+  //TODO REfactor the names here
   static const NONE = 0;
+  static const ERROR = 25;
   static const WARN = 50;
   static const FINER = 100;
   static const FINE = 250;
@@ -25,6 +27,8 @@ class Logger {
         return "[FINER] ";
       case Logger.WARN:
         return "[WARN] ";
+      case Logger.ERROR:
+        return "[ERROR] ";
       case Logger.ALL:
         return "[INFO] ";
       default:

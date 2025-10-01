@@ -67,9 +67,13 @@ class LinkedAppComponent
         .cast<sci.GenericEvent>()
         .listen((evt) async {
       if (evt.type == "quit") {
+        print("Received quit event: $dialogContext");
         if (dialogContext != null) {
+          
           await onClose(isCancel: false);
           Navigator.of(dialogContext!).pop();
+
+
           dialogContext = null;
           notifyListeners();
         }

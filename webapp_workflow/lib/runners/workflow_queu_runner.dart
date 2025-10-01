@@ -19,7 +19,7 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
 
   @override
-  Future<sci.Workflow> doRun(BuildContext? context, sci.Workflow workflow) async {
+  Future<sci.Workflow> doRun(BuildContext? context, sci.Workflow workflow, {String? runId}) async {
     try {
       return _doRun(context, workflow);
     } catch (e) {
@@ -53,9 +53,9 @@ class WorkflowQueuRunner extends WorkflowRunner {
     await factory.taskService.runTask(workflowTask.id);
 
 
-    if( context != null ){
-      closeLog();
-    }
+    // if( context != null ){
+      // closeLog(id: this.id);
+    // }
     Fluttertoast.showToast(
         msg: "Workflow ${workflow.name} sent to the queu",
         toastLength: Toast.LENGTH_LONG,

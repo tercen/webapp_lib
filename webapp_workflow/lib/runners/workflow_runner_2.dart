@@ -1,913 +1,913 @@
-import 'dart:async';
+// import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:webapp_ui_commons/mixin/progress_log.dart';
+// import 'package:flutter/material.dart';
+// import 'package:intl/intl.dart';
+// import 'package:webapp_ui_commons/mixin/progress_log.dart';
 
-import 'package:sci_tercen_client/sci_client.dart' as sci;
-import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
-import 'package:tson/tson.dart' as tson;
-// import 'package:sci_base/value.dart';
-import 'package:uuid/uuid.dart';
+// import 'package:sci_tercen_client/sci_client.dart' as sci;
+// import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+// import 'package:tson/tson.dart' as tson;
+// // import 'package:sci_base/value.dart';
+// import 'package:uuid/uuid.dart';
 
-import 'package:webapp_utils/model/step_setting.dart';
-import 'package:webapp_utils/services/app_user.dart';
-import 'package:webapp_workflow/utils/workflow_folder_config.dart';
+// import 'package:webapp_utils/model/step_setting.dart';
+// import 'package:webapp_utils/services/app_user.dart';
+// import 'package:webapp_workflow/utils/workflow_folder_config.dart';
 
-enum TimestampType { full, short }
+// enum TimestampType { full, short }
 
-typedef PostRunCallback = Future<void> Function();
-typedef PostRunIdCallback = Future<void> Function(sci.Workflow workflow);
-
-
-
-class WorkflowRunner with ProgressDialog {
-  StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
-  StreamSubscription? subscription;
+// typedef PostRunCallback = Future<void> Function();
+// typedef PostRunIdCallback = Future<void> Function(sci.Workflow workflow);
 
 
-  final List<String> initStepIds = [];
-  final List<sci.Pair> workflowMeta = [];
+
+// class WorkflowRunner with ProgressDialog {
+//   StreamSubscription<sci.TaskEvent>? workflowTaskSubscription;
+//   StreamSubscription? subscription;
 
 
-  final Map<String, sci.Relation> tableMap = {};
-  final Map<String, String> tableDocumentMap = {};
-  final Map<String, String> tableNameMap = {};
-  final Map<String, String> gatherMap = {};
-  final Map<String, String> multiDsMap = {};
+//   final List<String> initStepIds = [];
+//   final List<sci.Pair> workflowMeta = [];
+
+
+//   final Map<String, sci.Relation> tableMap = {};
+//   final Map<String, String> tableDocumentMap = {};
+//   final Map<String, String> tableNameMap = {};
+//   final Map<String, String> gatherMap = {};
+//   final Map<String, String> multiDsMap = {};
   
 
-  final Map<String, String> xAxisCoord = {};
-  final Map<String, String> yAxisCoord = {};
+//   final Map<String, String> xAxisCoord = {};
+//   final Map<String, String> yAxisCoord = {};
 
-  final List<StepSetting> settings = [];
-  final List<PostRunCallback> postRunCallbacks = [];
+//   final List<StepSetting> settings = [];
+//   final List<PostRunCallback> postRunCallbacks = [];
 
-  final List<String> doNotRunList = [];
+//   final List<String> doNotRunList = [];
 
-  String? workflowId;
-  String workflowRename = "";
-  String workflowIdentifier = "";
-  String workflowSuffix = "";
-  bool isRunningStep = false;
+//   String? workflowId;
+//   String workflowRename = "";
+//   String workflowIdentifier = "";
+//   String workflowSuffix = "";
+//   bool isRunningStep = false;
 
-  String stepProgressMessage = "";
+//   String stepProgressMessage = "";
 
-  var addTimestamp = true;
+//   var addTimestamp = true;
   
-  var isInit = false;
-  final WorkflowFolderConfig? workflowFolder;
+//   var isInit = false;
+//   final WorkflowFolderConfig? workflowFolder;
 
-  final List<String> stepsToRemove = [];
-  final List<sci.Pair> settingsByName = [];
-  late String timestamp;
+//   final List<String> stepsToRemove = [];
+//   final List<sci.Pair> settingsByName = [];
+//   late String timestamp;
 
 
-  var currentRev = "";
+//   var currentRev = "";
 
-  WorkflowRunner({var timestampType = TimestampType.full, this.workflowFolder}) {
-    if (timestampType == TimestampType.short) {
-      timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
-    } else {
-      timestamp = DateFormat("yyyy.MM.dd_HH:mm").format(DateTime.now());
-    }
-  }
+//   WorkflowRunner({var timestampType = TimestampType.full, this.workflowFolder}) {
+//     if (timestampType == TimestampType.short) {
+//       timestamp = DateFormat("yyyy.MM.dd").format(DateTime.now());
+//     } else {
+//       timestamp = DateFormat("yyyy.MM.dd_HH:mm").format(DateTime.now());
+//     }
+//   }
 
 
-  Future<sci.Workflow> init(BuildContext? context, sci.Workflow template,
-      {bool inPlace = false, String folderId = ""}) async {
-    if (context != null) {
-      openDialog(context);
-    }
-    var factory = tercen.ServiceFactory();
+//   Future<sci.Workflow> init(BuildContext? context, sci.Workflow template,
+//       {bool inPlace = false, String folderId = ""}) async {
+//     if (context != null) {
+//       openDialog(context);
+//     }
+//     var factory = tercen.ServiceFactory();
 
-    var runTitle = getWorkflowName(template);
+//     var runTitle = getWorkflowName(template);
 
-    if (context != null) {
-      log("Initializing workflow", dialogTitle: runTitle);
-    }
+//     if (context != null) {
+//       log("Initializing workflow", dialogTitle: runTitle);
+//     }
 
-    //-----------------------------------------
-    var workflow = sci.Workflow();
-    // Copy template into project
-    //-----------------------------------------
-    if (inPlace) {
-      workflow = template;
-    } else {
-      workflow = await factory.workflowService
-          .copyApp(template.id, AppUser().projectId);
-    }
+//     //-----------------------------------------
+//     var workflow = sci.Workflow();
+//     // Copy template into project
+//     //-----------------------------------------
+//     if (inPlace) {
+//       workflow = template;
+//     } else {
+//       workflow = await factory.workflowService
+//           .copyApp(template.id, AppUser().projectId);
+//     }
 
 
-    currentRev = workflow.rev;
+//     currentRev = workflow.rev;
 
-    //-----------------------------------------
-    // General workflow parameters
-    //-----------------------------------------
+//     //-----------------------------------------
+//     // General workflow parameters
+//     //-----------------------------------------
 
-    if (inPlace) {
-      await factory.workflowService.update(workflow);
-      // workflow = await factory.workflowService.get(workflow.id);
-    } else {
-      workflow.folderId = await workflowFolder?.getFolderId() ?? "";
-      workflow.name = getWorkflowName(workflow);
-      workflow.acl = sci.Acl()..owner = AppUser().teamname;
-      workflow.isHidden = false;
-      workflow.isDeleted = false;
+//     if (inPlace) {
+//       await factory.workflowService.update(workflow);
+//       // workflow = await factory.workflowService.get(workflow.id);
+//     } else {
+//       workflow.folderId = await workflowFolder?.getFolderId() ?? "";
+//       workflow.name = getWorkflowName(workflow);
+//       workflow.acl = sci.Acl()..owner = AppUser().teamname;
+//       workflow.isHidden = false;
+//       workflow.isDeleted = false;
 
-      workflow.id = "";
-      workflow.rev = "";
+//       workflow.id = "";
+//       workflow.rev = "";
 
-      workflow = await factory.workflowService.create(workflow);
-    }
+//       workflow = await factory.workflowService.create(workflow);
+//     }
 
-    if (context != null) {
-      closeLog();
-    }
+//     if (context != null) {
+//       closeLog();
+//     }
 
-    return workflow;
-  }
+//     return workflow;
+//   }
 
 
 
-  final List<PostRunIdCallback> postRunIdCallbacks = [];
+//   final List<PostRunIdCallback> postRunIdCallbacks = [];
 
-  // Function callback called after workflow is done. Workflow id is passed
-  // TODO Make this the default. Always pass the workflow id
-  void addIdPostRun(PostRunIdCallback callback) {
-    postRunIdCallbacks.add(callback);
-  }
+//   // Function callback called after workflow is done. Workflow id is passed
+//   // TODO Make this the default. Always pass the workflow id
+//   void addIdPostRun(PostRunIdCallback callback) {
+//     postRunIdCallbacks.add(callback);
+//   }
 
-  void addWorkflowMeta(String key, String value) {
-    workflowMeta.add(sci.Pair.from(key, value));
-  }
+//   void addWorkflowMeta(String key, String value) {
+//     workflowMeta.add(sci.Pair.from(key, value));
+//   }
 
 
-  void addTimestampToName(bool val) {
-    addTimestamp = val;
-  }
+//   void addTimestampToName(bool val) {
+//     addTimestamp = val;
+//   }
 
 
 
-  void doNotRun(String stepId) {
-    doNotRunList.add(stepId);
-  }
+//   void doNotRun(String stepId) {
+//     doNotRunList.add(stepId);
+//   }
 
-  void addXAxisCoord(String stepId, String coord) {
-    xAxisCoord[stepId] = coord;
-  }
-
-  void addYAxisCoord(String stepId, String coord) {
-    yAxisCoord[stepId] = coord;
-  }
-
-
-
-  /// Setting by name will search through the steps in a workflow looking for a matching name
-  /// If it finds, then the value is set.
-  /// Useful when the same setting repeats across steps (e.g. seed)
-  void addSettingByName(String settingName, String settingValue) {
-    settingsByName.add(sci.Pair.from(settingName, settingValue));
-  }
-
-
+//   void addXAxisCoord(String stepId, String coord) {
+//     xAxisCoord[stepId] = coord;
+//   }
+
+//   void addYAxisCoord(String stepId, String coord) {
+//     yAxisCoord[stepId] = coord;
+//   }
+
+
+
+//   /// Setting by name will search through the steps in a workflow looking for a matching name
+//   /// If it finds, then the value is set.
+//   /// Useful when the same setting repeats across steps (e.g. seed)
+//   void addSettingByName(String settingName, String settingValue) {
+//     settingsByName.add(sci.Pair.from(settingName, settingValue));
+//   }
+
+
 
-  void setNewWorkflowName(String name) {
-    workflowRename = name;
-  }
+//   void setNewWorkflowName(String name) {
+//     workflowRename = name;
+//   }
 
-  String getWorkflowId() {
-    return workflowId ?? "";
-  }
+//   String getWorkflowId() {
+//     return workflowId ?? "";
+//   }
 
-  void addSetting(StepSetting setting) {
-    settings.add(setting);
-  }
+//   void addSetting(StepSetting setting) {
+//     settings.add(setting);
+//   }
 
-
-  void addSettings(List<StepSetting> settings) {
-    settings.addAll(settings);
-  }
-
-  void setMultiDataStep(String leftStepId, String rightStepId) {
-    multiDsMap[leftStepId] = rightStepId;
-  }
-
-  void resetSteps(List<String> ids) {
-    initStepIds.clear();
-    initStepIds.addAll(ids);
-  }
-
-  void setWorkflowIdentifier(String id) {
-    workflowIdentifier = id;
-  }
-
-  void setWorkflowSuffix(String suff) {
-    workflowSuffix = suff;
-  }
-
-
-
-  sci.RenameRelation createDocumentRelation(String documentId) {
-    var uuid = const Uuid();
-    sci.Table tbl = sci.Table()..nRows = 1;
-    sci.Column col = sci.Column()
-      ..name = "documentId"
-      ..type = "string"
-      ..id = "documentId"
-      ..nRows = 1
-      ..size = -1
-      ..values = tson.CStringList.fromList([uuid.v4()]);
-
-    tbl.columns.add(col);
-
-    col = sci.Column()
-      ..name = ".documentId"
-      ..type = "string"
-      ..id = ".documentId"
-      ..nRows = 1
-      ..size = -1
-      ..values = tson.CStringList.fromList([documentId]);
-
-    tbl.columns.add(col);
-
-    sci.InMemoryRelation rel = sci.InMemoryRelation()
-      ..id = uuid.v4()
-      ..inMemoryTable = tbl;
-    sci.RenameRelation rr = sci.RenameRelation();
-    rr.inNames.addAll(["documentId", ".documentId"]);
-    rr.outNames.addAll(["documentId", ".documentId"]);
-    rr.relation = rel;
-    rr.id = "rename_${rel.id}";
-    return rr;
-  }
-
-  void addTableFromRelation(String stepId, sci.Relation relation,
-      {String? name}) {
-    tableMap[stepId] = relation;
-
-    if (name != null && name != "") {
-      tableNameMap[stepId] = name;
-    }
-  }
-
-  void addTable(String stepId, sci.Table table, {String? name}) {
-    var uuid = const Uuid();
-    sci.InMemoryRelation rel = sci.InMemoryRelation()
-      ..id = uuid.v4()
-      ..inMemoryTable = table;
-    tableMap[stepId] = rel;
-
-    if (name != null && name != "") {
-      tableNameMap[stepId] = name;
-    }
-  }
-
-  void addTableDocument(String stepId, String documentId) {
-    tableDocumentMap[stepId] = documentId;
-  }
-
-  void addDocument(String stepId, String documentId) {
-    tableMap[stepId] = createDocumentRelation(documentId);
-  }
-
-  void addGatherStepPattern(String stepId, String pattern) {
-    gatherMap[stepId] = pattern;
-  }
-
-  void removeStep(String id) {
-    stepsToRemove.add(id);
-  }
-
-  sci.Workflow removeStepFromWorkflow(String stepId, sci.Workflow workflow) {
-    List<sci.Step> steps = List.from(workflow.steps);
-    List<String> toRemoveIds = [stepId];
-
-    while (toRemoveIds.isNotEmpty) {
-      for (var id in toRemoveIds) {
-        var idx = steps.indexWhere((stp) => stp.id == id);
-        if (idx > -1) {
-          steps.removeAt(idx);
-        }
-      }
-
-      workflow.steps.clear();
-      workflow.steps.addAll(steps);
-
-      var links = workflow.links.toList();
-      var idxToRemoveLinks = [];
-      for (var i = 0; i < links.length; i++) {
-        if (toRemoveIds.contains(links[i].inputId.split("-i-")[0])) {
-          idxToRemoveLinks.add(i);
-        }
-        if (toRemoveIds.contains(links[i].outputId.split("-o-")[0])) {
-          idxToRemoveLinks.add(i);
-        }
-      }
-      for (var i in idxToRemoveLinks.reversed) {
-        links.removeAt(i);
-      }
-      workflow.links.clear();
-      workflow.links.addAll(links);
-      toRemoveIds.clear();
-      for (var step in steps) {
-        var l = links.indexWhere((e) => e.inputId.contains(step.id));
-        if (l == -1 && step.kind != "TableStep") {
-          toRemoveIds.add(step.id);
-        }
-      }
-    }
-
-    return workflow;
-  }
-
-  List<String> getTableFactorNames(sci.CrosstabTable table) {
-    List<String> factors = [];
-
-    factors.addAll(
-        table.graphicalFactors.map((e) => e.factor.name).where((e) => e != ""));
-
-    return factors;
-  }
-
-  List<String> getFactorNames(sci.Workflow workflow, String stepId) {
-    List<String> factors = [];
-    for (var stp in workflow.steps) {
-      if (stp.id == stepId) {
-        sci.DataStep dataStp = stp as sci.DataStep;
-        for (var axis in dataStp.model.axis.xyAxis) {
-          // Factors used in X and Y axes
-          var facName = axis.xAxis.graphicalFactor.factor.name;
-          if (facName != "") {
-            factors.add(facName);
-          }
-          facName = axis.yAxis.graphicalFactor.factor.name;
-          if (facName != "") {
-            factors.add(facName);
-          }
-        }
-
-        factors.addAll(getTableFactorNames(dataStp.model.columnTable));
-        factors.addAll(getTableFactorNames(dataStp.model.rowTable));
-      }
-    }
-    return factors;
-  }
-
-  List<String> convertToStepFactors(
-      List<String> reqFactors, List<String> stepFactors) {
-    List<String> factors = [];
-
-    for (var reqFactor in reqFactors) {
-      if (!reqFactor.contains("*")) {
-        factors.add(reqFactor);
-      } else {
-        if (reqFactor.startsWith("*") && reqFactor.endsWith("*")) {
-          var fac = reqFactor.replaceAll("*", "");
-          var convFac =
-              stepFactors.firstWhere((e) => e.contains(fac), orElse: () => "");
-          if (convFac != "") {
-            factors.add(convFac);
-          } else {
-            factors.add(reqFactor);
-          }
-        } else if (reqFactor.startsWith("*")) {
-          var fac = reqFactor.replaceAll("*", "");
-          var convFac =
-              stepFactors.firstWhere((e) => e.endsWith(fac), orElse: () => "");
-          if (convFac != "") {
-            factors.add(convFac);
-          } else {
-            factors.add(reqFactor);
-          }
-        } else {
-          var fac = reqFactor.replaceAll("*", "");
-          var convFac = stepFactors.firstWhere((e) => e.startsWith(fac),
-              orElse: () => "");
-          if (convFac != "") {
-            factors.add(convFac);
-          } else {
-            factors.add(reqFactor);
-          }
-        }
-      }
-    }
-
-    return factors;
-  }
-
-
-
-
-  String getWorkflowName(sci.Workflow workflow) {
-    final DateFormat formatter = DateFormat('yyyyMMdd_hhmmss');
-    workflowIdentifier = workflowIdentifier == "" ? "" : "$workflowIdentifier";
-
-    workflowSuffix = workflowSuffix == "" ? "" : "_$workflowSuffix";
-
-    var basename = workflowRename == "" ? workflow.name : workflowRename;
-
-    var dateString = addTimestamp ? "_${formatter.format(DateTime.now())}" : "";
-    return "$basename${workflowIdentifier}$dateString$workflowSuffix";
-  }
-
-  void addPostRun(PostRunCallback callback) {
-    postRunCallbacks.add(callback);
-  }
-
-  Future<sci.Relation> loadDocumentInMemory(String docId) async {
-    var factory = tercen.ServiceFactory();
-    print("Checking: $docId");
-
-    var sch = await factory.tableSchemaService.get(docId);
-    var table = await factory.tableSchemaService.select(
-        sch.id,
-        sch.columns.where((e) => e != ".ci").map((e) => e.name).toList(),
-        0,
-        sch.nRows);
-
-    // var uuid = const Uuid();
-    var rrel = sci.RenameRelation();
-    rrel.inNames.addAll(table.columns.map((e) => e.name).toList());
-    rrel.outNames.addAll(table.columns.map((e) => e.name).toList());
-    rrel.relation = sci.SimpleRelation()..id = sch.id;
-
-    return rrel;
-  }
-
-
-
-  // Future<sci.Workflow> init(BuildContext? context, sci.Workflow template,
-  //     {bool inPlace = false}) async {
-  //   if (context != null) {
-  //     openDialog(context);
-  //   }
-  //   var factory = tercen.ServiceFactory();
-
-  //   var runTitle = getWorkflowName(template);
-
-  //   if (context != null) {
-  //     log("Set up", dialogTitle: runTitle);
-  //   }
-
-  //   for (var entry in tableDocumentMap.entries) {
-  //     tableMap[entry.key] = await loadDocumentInMemory(entry.value);
-  //   }
-
-  //   //-----------------------------------------
-  //   var workflow = sci.Workflow();
-  //   // Copy template into project
-  //   //-----------------------------------------
-  //   if (inPlace) {
-  //     workflow = template;
-  //   } else {
-  //     workflow = await factory.workflowService
-  //         .copyApp(template.id, AppUser().projectId);
-  //   }
-
-  //   setupFilters(workflow);
-
-  //   if (template.projectId == workflow.projectId) {
-  //     // await factory.workflowService.delete(template.id, template.rev);
-  //     // workflow.id = "";
-  //     // workflow.rev = "";
-  //   }
-
-  //   for (var stepToRemove in stepsToRemove) {
-  //     workflow = removeStepFromWorkflow(stepToRemove, workflow);
-  //   }
-
-  //   for (var meta in workflowMeta) {
-  //     workflow.addMeta(meta.key, meta.value);
-  //   }
-  //   // addIdPostRun(reEnableSteps);
-
-  //   print(xAxisCoord);
-  //   //-----------------------------------------
-  //   // Step-specific setup
-  //   //-----------------------------------------
-  //   for (var stp in workflow.steps) {
-  //     // print("Checking ${stp.name} (${stp.id})");
-  //     if (shouldResetStep(stp)) {
-  //       stp.state.taskState = sci.InitState();
-  //       stp.state.taskId = "";
-  //     }
-  //     if (stp.state.taskState.isFinal) {
-  //       continue;
-  //     }
-  //     if (stp.kind == "DataStep") {
-  //       stp = updateFilterValues(stp as sci.DataStep);
-  //       stp = updateOperatorSettings(stp, settings);
-  //       stp = updateOperatorSettingsByName(stp, settingsByName);
-
-  //       if (removeFilters.containsKey(stp.id)) {
-  //         for (var filterName in removeFilters[stp.id]!) {
-  //           var namedFilter =
-  //               List<sci.NamedFilter>.from(stp.model.filters.namedFilters);
-  //           namedFilter.removeWhere((filter) => filter.name == filterName);
-  //           stp.model.filters.namedFilters.setValues(namedFilter);
-  //         }
-  //       }
-
-  //       for (var mapEntry in filterMap.entries) {
-  //         if (mapEntry.key.contains(stp.id)) {
-  //           stp.model.filters.namedFilters.add(mapEntry.value);
-  //         }
-  //       }
-  //     }
-
-
-  //     if (doNotRunList.contains(stp.id)) {
-  //       stp.state.taskState = sci.DoneState();
-  //       stp.state.taskId = "";
-  //     }
-
-  //     if (multiDsMap.containsKey(stp.id)) {
-  //       var tmpStp = stp as sci.DataStep;
-  //       tmpStp.parentDataStepId = multiDsMap[stp.id]!;
-  //     }
-
-  //     if (tableMap.containsKey(stp.id)) {
-  //       sci.TableStep tmpStp = stp as sci.TableStep;
-  //       tmpStp.model.relation = tableMap[stp.id]!;
-  //       tmpStp.state.taskState = sci.DoneState();
-
-  //       if (tableNameMap.containsKey(stp.id)) {
-  //         tmpStp.name = tableNameMap[stp.id]!;
-  //       }
-
-  //       stp = tmpStp;
-  //     }
-
-  //     if (gatherMap.containsKey(stp.id)) {
-  //       (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
-  //     }
-
-  //     if( xAxisCoord.containsKey(stp.id)){
-  //       //TODO set it on the step
-  //       // print("Setting X axis coord for step ${stp.name} to ${xAxisCoord[stp.id]}");
-  //       // print((stp as sci.DataStep).model.toJson());
-  //       (stp as sci.DataStep).model.axis.xyAxis.first.xAxis.graphicalFactor.factor.name =
-  //           xAxisCoord[stp.id]!;
-  //     }
-  //     if( yAxisCoord.containsKey(stp.id)){
-  //       //TODO set it on the step
-  //       (stp as sci.DataStep).model.axis.xyAxis.first.yAxis.graphicalFactor.factor.name =
-  //           yAxisCoord[stp.id]!;
-  //     }
-  //   }
-
-  //   //-----------------------------------------
-  //   // General workflow parameters
-  //   //-----------------------------------------
-
-  //   if (inPlace) {
-  //     await factory.workflowService.update(workflow);
-  //     workflow = await factory.workflowService.get(workflow.id);
-  //   } else {
-  //     if (folderId == null) {
-  //       sci.FolderDocument folder = await createFolder(
-  //           folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
-  //       workflow.folderId = folder.id;
-  //     } else {
-  //       workflow.folderId = folderId!;
-  //     }
-  //     workflow.name = getWorkflowName(workflow);
-  //     workflow.acl = sci.Acl()..owner = AppUser().teamname;
-  //     workflow.isHidden = false;
-  //     workflow.isDeleted = false;
-
-  //     workflow.id = "";
-  //     workflow.rev = "";
-
-  //     workflow = await factory.workflowService.create(workflow);
-  //   }
-
-  //   if (context != null) {
-  //     closeLog();
-  //   }
-
-  //   return workflow;
-  // }
-
-  Future<sci.Workflow> runWorkflowTask(sci.Workflow workflow,
-      {String? runTitle, String? stepName, String? stepId}) async {
-    var factory = tercen.ServiceFactory();
-
-    runTitle ??= workflow.name;
-    //NEeds the steps2run, but only part of the sci_api_model, not client...
-    sci.RunWorkflowTask workflowTask = sci.RunWorkflowTask()
-      ..state = sci.InitState()
-      ..owner = AppUser().teamname
-      ..projectId = AppUser().projectId
-      ..workflowId = workflow.id
-      ..workflowRev = workflow.rev;
-
-    if( stepId != null ){
-      workflowTask.stepsToRun.add(stepId);
-      // workflowTask = sci.RunWorkflowTask()
-      // ..state = sci.InitState()
-      // ..stepsToRun.add(stepId)
-      // ..owner = AppUser().teamname
-      // ..projectId = AppUser().projectId
-      // ..workflowId = workflow.id
-      // ..workflowRev = workflow.rev;
-    }
-
-    workflowTask =
-        await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
+
+//   void addSettings(List<StepSetting> settings) {
+//     settings.addAll(settings);
+//   }
+
+//   void setMultiDataStep(String leftStepId, String rightStepId) {
+//     multiDsMap[leftStepId] = rightStepId;
+//   }
+
+//   void resetSteps(List<String> ids) {
+//     initStepIds.clear();
+//     initStepIds.addAll(ids);
+//   }
+
+//   void setWorkflowIdentifier(String id) {
+//     workflowIdentifier = id;
+//   }
+
+//   void setWorkflowSuffix(String suff) {
+//     workflowSuffix = suff;
+//   }
+
+
+
+//   sci.RenameRelation createDocumentRelation(String documentId) {
+//     var uuid = const Uuid();
+//     sci.Table tbl = sci.Table()..nRows = 1;
+//     sci.Column col = sci.Column()
+//       ..name = "documentId"
+//       ..type = "string"
+//       ..id = "documentId"
+//       ..nRows = 1
+//       ..size = -1
+//       ..values = tson.CStringList.fromList([uuid.v4()]);
+
+//     tbl.columns.add(col);
+
+//     col = sci.Column()
+//       ..name = ".documentId"
+//       ..type = "string"
+//       ..id = ".documentId"
+//       ..nRows = 1
+//       ..size = -1
+//       ..values = tson.CStringList.fromList([documentId]);
+
+//     tbl.columns.add(col);
+
+//     sci.InMemoryRelation rel = sci.InMemoryRelation()
+//       ..id = uuid.v4()
+//       ..inMemoryTable = tbl;
+//     sci.RenameRelation rr = sci.RenameRelation();
+//     rr.inNames.addAll(["documentId", ".documentId"]);
+//     rr.outNames.addAll(["documentId", ".documentId"]);
+//     rr.relation = rel;
+//     rr.id = "rename_${rel.id}";
+//     return rr;
+//   }
+
+//   void addTableFromRelation(String stepId, sci.Relation relation,
+//       {String? name}) {
+//     tableMap[stepId] = relation;
+
+//     if (name != null && name != "") {
+//       tableNameMap[stepId] = name;
+//     }
+//   }
+
+//   void addTable(String stepId, sci.Table table, {String? name}) {
+//     var uuid = const Uuid();
+//     sci.InMemoryRelation rel = sci.InMemoryRelation()
+//       ..id = uuid.v4()
+//       ..inMemoryTable = table;
+//     tableMap[stepId] = rel;
+
+//     if (name != null && name != "") {
+//       tableNameMap[stepId] = name;
+//     }
+//   }
+
+//   void addTableDocument(String stepId, String documentId) {
+//     tableDocumentMap[stepId] = documentId;
+//   }
+
+//   void addDocument(String stepId, String documentId) {
+//     tableMap[stepId] = createDocumentRelation(documentId);
+//   }
+
+//   void addGatherStepPattern(String stepId, String pattern) {
+//     gatherMap[stepId] = pattern;
+//   }
+
+//   void removeStep(String id) {
+//     stepsToRemove.add(id);
+//   }
+
+//   sci.Workflow removeStepFromWorkflow(String stepId, sci.Workflow workflow) {
+//     List<sci.Step> steps = List.from(workflow.steps);
+//     List<String> toRemoveIds = [stepId];
+
+//     while (toRemoveIds.isNotEmpty) {
+//       for (var id in toRemoveIds) {
+//         var idx = steps.indexWhere((stp) => stp.id == id);
+//         if (idx > -1) {
+//           steps.removeAt(idx);
+//         }
+//       }
+
+//       workflow.steps.clear();
+//       workflow.steps.addAll(steps);
+
+//       var links = workflow.links.toList();
+//       var idxToRemoveLinks = [];
+//       for (var i = 0; i < links.length; i++) {
+//         if (toRemoveIds.contains(links[i].inputId.split("-i-")[0])) {
+//           idxToRemoveLinks.add(i);
+//         }
+//         if (toRemoveIds.contains(links[i].outputId.split("-o-")[0])) {
+//           idxToRemoveLinks.add(i);
+//         }
+//       }
+//       for (var i in idxToRemoveLinks.reversed) {
+//         links.removeAt(i);
+//       }
+//       workflow.links.clear();
+//       workflow.links.addAll(links);
+//       toRemoveIds.clear();
+//       for (var step in steps) {
+//         var l = links.indexWhere((e) => e.inputId.contains(step.id));
+//         if (l == -1 && step.kind != "TableStep") {
+//           toRemoveIds.add(step.id);
+//         }
+//       }
+//     }
+
+//     return workflow;
+//   }
+
+//   List<String> getTableFactorNames(sci.CrosstabTable table) {
+//     List<String> factors = [];
+
+//     factors.addAll(
+//         table.graphicalFactors.map((e) => e.factor.name).where((e) => e != ""));
+
+//     return factors;
+//   }
+
+//   List<String> getFactorNames(sci.Workflow workflow, String stepId) {
+//     List<String> factors = [];
+//     for (var stp in workflow.steps) {
+//       if (stp.id == stepId) {
+//         sci.DataStep dataStp = stp as sci.DataStep;
+//         for (var axis in dataStp.model.axis.xyAxis) {
+//           // Factors used in X and Y axes
+//           var facName = axis.xAxis.graphicalFactor.factor.name;
+//           if (facName != "") {
+//             factors.add(facName);
+//           }
+//           facName = axis.yAxis.graphicalFactor.factor.name;
+//           if (facName != "") {
+//             factors.add(facName);
+//           }
+//         }
+
+//         factors.addAll(getTableFactorNames(dataStp.model.columnTable));
+//         factors.addAll(getTableFactorNames(dataStp.model.rowTable));
+//       }
+//     }
+//     return factors;
+//   }
+
+//   List<String> convertToStepFactors(
+//       List<String> reqFactors, List<String> stepFactors) {
+//     List<String> factors = [];
+
+//     for (var reqFactor in reqFactors) {
+//       if (!reqFactor.contains("*")) {
+//         factors.add(reqFactor);
+//       } else {
+//         if (reqFactor.startsWith("*") && reqFactor.endsWith("*")) {
+//           var fac = reqFactor.replaceAll("*", "");
+//           var convFac =
+//               stepFactors.firstWhere((e) => e.contains(fac), orElse: () => "");
+//           if (convFac != "") {
+//             factors.add(convFac);
+//           } else {
+//             factors.add(reqFactor);
+//           }
+//         } else if (reqFactor.startsWith("*")) {
+//           var fac = reqFactor.replaceAll("*", "");
+//           var convFac =
+//               stepFactors.firstWhere((e) => e.endsWith(fac), orElse: () => "");
+//           if (convFac != "") {
+//             factors.add(convFac);
+//           } else {
+//             factors.add(reqFactor);
+//           }
+//         } else {
+//           var fac = reqFactor.replaceAll("*", "");
+//           var convFac = stepFactors.firstWhere((e) => e.startsWith(fac),
+//               orElse: () => "");
+//           if (convFac != "") {
+//             factors.add(convFac);
+//           } else {
+//             factors.add(reqFactor);
+//           }
+//         }
+//       }
+//     }
+
+//     return factors;
+//   }
+
+
+
+
+//   String getWorkflowName(sci.Workflow workflow) {
+//     final DateFormat formatter = DateFormat('yyyyMMdd_hhmmss');
+//     workflowIdentifier = workflowIdentifier == "" ? "" : "$workflowIdentifier";
+
+//     workflowSuffix = workflowSuffix == "" ? "" : "_$workflowSuffix";
+
+//     var basename = workflowRename == "" ? workflow.name : workflowRename;
+
+//     var dateString = addTimestamp ? "_${formatter.format(DateTime.now())}" : "";
+//     return "$basename${workflowIdentifier}$dateString$workflowSuffix";
+//   }
+
+//   void addPostRun(PostRunCallback callback) {
+//     postRunCallbacks.add(callback);
+//   }
+
+//   Future<sci.Relation> loadDocumentInMemory(String docId) async {
+//     var factory = tercen.ServiceFactory();
+//     print("Checking: $docId");
+
+//     var sch = await factory.tableSchemaService.get(docId);
+//     var table = await factory.tableSchemaService.select(
+//         sch.id,
+//         sch.columns.where((e) => e != ".ci").map((e) => e.name).toList(),
+//         0,
+//         sch.nRows);
+
+//     // var uuid = const Uuid();
+//     var rrel = sci.RenameRelation();
+//     rrel.inNames.addAll(table.columns.map((e) => e.name).toList());
+//     rrel.outNames.addAll(table.columns.map((e) => e.name).toList());
+//     rrel.relation = sci.SimpleRelation()..id = sch.id;
+
+//     return rrel;
+//   }
+
+
+
+//   // Future<sci.Workflow> init(BuildContext? context, sci.Workflow template,
+//   //     {bool inPlace = false}) async {
+//   //   if (context != null) {
+//   //     openDialog(context);
+//   //   }
+//   //   var factory = tercen.ServiceFactory();
+
+//   //   var runTitle = getWorkflowName(template);
+
+//   //   if (context != null) {
+//   //     log("Set up", dialogTitle: runTitle);
+//   //   }
+
+//   //   for (var entry in tableDocumentMap.entries) {
+//   //     tableMap[entry.key] = await loadDocumentInMemory(entry.value);
+//   //   }
+
+//   //   //-----------------------------------------
+//   //   var workflow = sci.Workflow();
+//   //   // Copy template into project
+//   //   //-----------------------------------------
+//   //   if (inPlace) {
+//   //     workflow = template;
+//   //   } else {
+//   //     workflow = await factory.workflowService
+//   //         .copyApp(template.id, AppUser().projectId);
+//   //   }
+
+//   //   setupFilters(workflow);
+
+//   //   if (template.projectId == workflow.projectId) {
+//   //     // await factory.workflowService.delete(template.id, template.rev);
+//   //     // workflow.id = "";
+//   //     // workflow.rev = "";
+//   //   }
+
+//   //   for (var stepToRemove in stepsToRemove) {
+//   //     workflow = removeStepFromWorkflow(stepToRemove, workflow);
+//   //   }
+
+//   //   for (var meta in workflowMeta) {
+//   //     workflow.addMeta(meta.key, meta.value);
+//   //   }
+//   //   // addIdPostRun(reEnableSteps);
+
+//   //   print(xAxisCoord);
+//   //   //-----------------------------------------
+//   //   // Step-specific setup
+//   //   //-----------------------------------------
+//   //   for (var stp in workflow.steps) {
+//   //     // print("Checking ${stp.name} (${stp.id})");
+//   //     if (shouldResetStep(stp)) {
+//   //       stp.state.taskState = sci.InitState();
+//   //       stp.state.taskId = "";
+//   //     }
+//   //     if (stp.state.taskState.isFinal) {
+//   //       continue;
+//   //     }
+//   //     if (stp.kind == "DataStep") {
+//   //       stp = updateFilterValues(stp as sci.DataStep);
+//   //       stp = updateOperatorSettings(stp, settings);
+//   //       stp = updateOperatorSettingsByName(stp, settingsByName);
+
+//   //       if (removeFilters.containsKey(stp.id)) {
+//   //         for (var filterName in removeFilters[stp.id]!) {
+//   //           var namedFilter =
+//   //               List<sci.NamedFilter>.from(stp.model.filters.namedFilters);
+//   //           namedFilter.removeWhere((filter) => filter.name == filterName);
+//   //           stp.model.filters.namedFilters.setValues(namedFilter);
+//   //         }
+//   //       }
+
+//   //       for (var mapEntry in filterMap.entries) {
+//   //         if (mapEntry.key.contains(stp.id)) {
+//   //           stp.model.filters.namedFilters.add(mapEntry.value);
+//   //         }
+//   //       }
+//   //     }
+
+
+//   //     if (doNotRunList.contains(stp.id)) {
+//   //       stp.state.taskState = sci.DoneState();
+//   //       stp.state.taskId = "";
+//   //     }
+
+//   //     if (multiDsMap.containsKey(stp.id)) {
+//   //       var tmpStp = stp as sci.DataStep;
+//   //       tmpStp.parentDataStepId = multiDsMap[stp.id]!;
+//   //     }
+
+//   //     if (tableMap.containsKey(stp.id)) {
+//   //       sci.TableStep tmpStp = stp as sci.TableStep;
+//   //       tmpStp.model.relation = tableMap[stp.id]!;
+//   //       tmpStp.state.taskState = sci.DoneState();
+
+//   //       if (tableNameMap.containsKey(stp.id)) {
+//   //         tmpStp.name = tableNameMap[stp.id]!;
+//   //       }
+
+//   //       stp = tmpStp;
+//   //     }
+
+//   //     if (gatherMap.containsKey(stp.id)) {
+//   //       (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
+//   //     }
+
+//   //     if( xAxisCoord.containsKey(stp.id)){
+//   //       //TODO set it on the step
+//   //       // print("Setting X axis coord for step ${stp.name} to ${xAxisCoord[stp.id]}");
+//   //       // print((stp as sci.DataStep).model.toJson());
+//   //       (stp as sci.DataStep).model.axis.xyAxis.first.xAxis.graphicalFactor.factor.name =
+//   //           xAxisCoord[stp.id]!;
+//   //     }
+//   //     if( yAxisCoord.containsKey(stp.id)){
+//   //       //TODO set it on the step
+//   //       (stp as sci.DataStep).model.axis.xyAxis.first.yAxis.graphicalFactor.factor.name =
+//   //           yAxisCoord[stp.id]!;
+//   //     }
+//   //   }
+
+//   //   //-----------------------------------------
+//   //   // General workflow parameters
+//   //   //-----------------------------------------
+
+//   //   if (inPlace) {
+//   //     await factory.workflowService.update(workflow);
+//   //     workflow = await factory.workflowService.get(workflow.id);
+//   //   } else {
+//   //     if (folderId == null) {
+//   //       sci.FolderDocument folder = await createFolder(
+//   //           folderName: getFolderName(), parentFolderId: parentFolderId ?? "");
+//   //       workflow.folderId = folder.id;
+//   //     } else {
+//   //       workflow.folderId = folderId!;
+//   //     }
+//   //     workflow.name = getWorkflowName(workflow);
+//   //     workflow.acl = sci.Acl()..owner = AppUser().teamname;
+//   //     workflow.isHidden = false;
+//   //     workflow.isDeleted = false;
+
+//   //     workflow.id = "";
+//   //     workflow.rev = "";
+
+//   //     workflow = await factory.workflowService.create(workflow);
+//   //   }
+
+//   //   if (context != null) {
+//   //     closeLog();
+//   //   }
+
+//   //   return workflow;
+//   // }
+
+//   Future<sci.Workflow> runWorkflowTask(sci.Workflow workflow,
+//       {String? runTitle, String? stepName, String? stepId}) async {
+//     var factory = tercen.ServiceFactory();
+
+//     runTitle ??= workflow.name;
+//     //NEeds the steps2run, but only part of the sci_api_model, not client...
+//     sci.RunWorkflowTask workflowTask = sci.RunWorkflowTask()
+//       ..state = sci.InitState()
+//       ..owner = AppUser().teamname
+//       ..projectId = AppUser().projectId
+//       ..workflowId = workflow.id
+//       ..workflowRev = workflow.rev;
+
+//     if( stepId != null ){
+//       workflowTask.stepsToRun.add(stepId);
+//       // workflowTask = sci.RunWorkflowTask()
+//       // ..state = sci.InitState()
+//       // ..stepsToRun.add(stepId)
+//       // ..owner = AppUser().teamname
+//       // ..projectId = AppUser().projectId
+//       // ..workflowId = workflow.id
+//       // ..workflowRev = workflow.rev;
+//     }
+
+//     workflowTask =
+//         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
     
-    workflow.addMeta("run.workflow.task.id", workflowTask.id);
-    // workflow.addMeta("run.task.id", workflowTask.id);
-    workflow.rev = await factory.workflowService.update(workflow);
+//     workflow.addMeta("run.workflow.task.id", workflowTask.id);
+//     // workflow.addMeta("run.task.id", workflowTask.id);
+//     workflow.rev = await factory.workflowService.update(workflow);
 
-    var taskStream = factory.eventService.channel(workflowTask.channelId);
+//     var taskStream = factory.eventService.channel(workflowTask.channelId);
 
-    await factory.taskService.runTask(workflowTask.id);
+//     await factory.taskService.runTask(workflowTask.id);
 
-    if (stepName == null) {
-      updateStepProgress(workflow);
-      log(stepProgressMessage, dialogTitle: runTitle);
-    } else {
-      log("Running ${stepName}", dialogTitle: runTitle);
-      // print("Running ${stepName}");
-    }
+//     if (stepName == null) {
+//       updateStepProgress(workflow);
+//       log(stepProgressMessage, dialogTitle: runTitle);
+//     } else {
+//       log("Running ${stepName}", dialogTitle: runTitle);
+//       // print("Running ${stepName}");
+//     }
 
-    await for (var evt in taskStream) {
-      // Task is Done
+//     await for (var evt in taskStream) {
+//       // Task is Done
 
-      if (evt is sci.PatchRecords) {
-        // evt.rs.first.apply(rebuilt)
-        try {
-          workflow = evt.apply(workflow);
-        } catch (e) {
-          print("Failed to apply: ");
-          print(evt.toJson());
-          print(e);
-          continue;
-        }
+//       if (evt is sci.PatchRecords) {
+//         // evt.rs.first.apply(rebuilt)
+//         try {
+//           workflow = evt.apply(workflow);
+//         } catch (e) {
+//           print("Failed to apply: ");
+//           print(evt.toJson());
+//           print(e);
+//           continue;
+//         }
 
-        if (stepName == null) {
-          updateStepProgress(workflow);
-          log(stepProgressMessage, dialogTitle: runTitle);
-        }
-      }
-      if (evt is sci.TaskStateEvent) {
-        if (evt.state.isFinal && evt.taskId == workflowTask.id) {
-          break;
-        }
-      }
-      if (evt is sci.TaskProgressEvent) {
-        if (stepName == null || stepName == "") {
-          log("$stepProgressMessage\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        } else {
-          log("Running ${stepName}\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        }
-      } else if (evt is sci.TaskLogEvent) {
-        if (stepName == null || stepName == "") {
-          log("$stepProgressMessage\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        } else {
-          log("Running ${stepName}\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        }
-      }
-    }
+//         if (stepName == null) {
+//           updateStepProgress(workflow);
+//           log(stepProgressMessage, dialogTitle: runTitle);
+//         }
+//       }
+//       if (evt is sci.TaskStateEvent) {
+//         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
+//           break;
+//         }
+//       }
+//       if (evt is sci.TaskProgressEvent) {
+//         if (stepName == null || stepName == "") {
+//           log("$stepProgressMessage\n\nTask Log\n${evt.message}",
+//               dialogTitle: runTitle);
+//         } else {
+//           log("Running ${stepName}\n\nTask Log\n${evt.message}",
+//               dialogTitle: runTitle);
+//         }
+//       } else if (evt is sci.TaskLogEvent) {
+//         if (stepName == null || stepName == "") {
+//           log("$stepProgressMessage\n\nTask Log\n${evt.message}",
+//               dialogTitle: runTitle);
+//         } else {
+//           log("Running ${stepName}\n\nTask Log\n${evt.message}",
+//               dialogTitle: runTitle);
+//         }
+//       }
+//     }
 
-    workflow.rev = await factory.workflowService.update(workflow);
-    workflowId = workflow.id;
+//     workflow.rev = await factory.workflowService.update(workflow);
+//     workflowId = workflow.id;
 
-    return workflow;
-  }
-    Future<sci.Workflow> doRunStep(
-      BuildContext? context, sci.Workflow workflow, String stepId) async {
-    if (context != null) {
-      openDialog(context);
-    }
+//     return workflow;
+//   }
+//     Future<sci.Workflow> doRunStep(
+//       BuildContext? context, sci.Workflow workflow, String stepId) async {
+//     if (context != null) {
+//       openDialog(context);
+//     }
 
-    var runTitle = getWorkflowName(workflow);
+//     var runTitle = getWorkflowName(workflow);
 
-    //-----------------------------------------
-    // Task preparation and running
-    //-----------------------------------------
-    workflow = await runWorkflowTask(workflow, stepId: stepId);
+//     //-----------------------------------------
+//     // Task preparation and running
+//     //-----------------------------------------
+//     workflow = await runWorkflowTask(workflow, stepId: stepId);
 
-    log("$stepProgressMessage\n\n \nRunning final updates",
-        dialogTitle: runTitle);
+//     log("$stepProgressMessage\n\n \nRunning final updates",
+//         dialogTitle: runTitle);
 
-    final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) =>
-        step.state.taskState.kind != "DoneState" &&
-        step.state.taskState.kind != "InitState");
-    if (!hasFailed) {
-      for (var f in postRunCallbacks) {
-        await f();
-      }
-      for (var f in postRunIdCallbacks) {
-        await f(workflow);
-      }
-    }
+//     final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) =>
+//         step.state.taskState.kind != "DoneState" &&
+//         step.state.taskState.kind != "InitState");
+//     if (!hasFailed) {
+//       for (var f in postRunCallbacks) {
+//         await f();
+//       }
+//       for (var f in postRunIdCallbacks) {
+//         await f(workflow);
+//       }
+//     }
 
-    if (context != null) {
-      await Future.delayed(const Duration(milliseconds: 1000), () {
-        // status.value = RunStatus.finished;
-        closeLog();
-      });
-    }
+//     if (context != null) {
+//       await Future.delayed(const Duration(milliseconds: 1000), () {
+//         // status.value = RunStatus.finished;
+//         closeLog();
+//       });
+//     }
 
-    workflowId = workflow.id;
-    // workflow = doneWorkflow;
+//     workflowId = workflow.id;
+//     // workflow = doneWorkflow;
 
-    final factory = tercen.ServiceFactory();
-    workflow = await factory.workflowService.get(workflow.id);
+//     final factory = tercen.ServiceFactory();
+//     workflow = await factory.workflowService.get(workflow.id);
 
-    return workflow;
-  }
+//     return workflow;
+//   }
 
-  Future<sci.Workflow> doRun(
-      BuildContext? context, sci.Workflow workflow) async {
-    if (context != null) {
-      openDialog(context);
-    }
+//   Future<sci.Workflow> doRun(
+//       BuildContext? context, sci.Workflow workflow) async {
+//     if (context != null) {
+//       openDialog(context);
+//     }
 
-    var runTitle = getWorkflowName(workflow);
+//     var runTitle = getWorkflowName(workflow);
 
-    //-----------------------------------------
-    // Task preparation and running
-    //-----------------------------------------
-    workflow = await runWorkflowTask(workflow);
+//     //-----------------------------------------
+//     // Task preparation and running
+//     //-----------------------------------------
+//     workflow = await runWorkflowTask(workflow);
 
-    log("$stepProgressMessage\n\n \nRunning final updates",
-        dialogTitle: runTitle);
+//     log("$stepProgressMessage\n\n \nRunning final updates",
+//         dialogTitle: runTitle);
 
-    final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) =>
-        step.state.taskState.kind != "DoneState" &&
-        step.state.taskState.kind != "InitState");
-    if (!hasFailed) {
-      for (var f in postRunCallbacks) {
-        await f();
-      }
-      for (var f in postRunIdCallbacks) {
-        await f(workflow);
-      }
-    }
+//     final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) =>
+//         step.state.taskState.kind != "DoneState" &&
+//         step.state.taskState.kind != "InitState");
+//     if (!hasFailed) {
+//       for (var f in postRunCallbacks) {
+//         await f();
+//       }
+//       for (var f in postRunIdCallbacks) {
+//         await f(workflow);
+//       }
+//     }
 
-    if (context != null) {
-      await Future.delayed(const Duration(milliseconds: 1000), () {
-        // status.value = RunStatus.finished;
-        closeLog();
-      });
-    }
+//     if (context != null) {
+//       await Future.delayed(const Duration(milliseconds: 1000), () {
+//         // status.value = RunStatus.finished;
+//         closeLog();
+//       });
+//     }
 
-    workflowId = workflow.id;
-    // workflow = doneWorkflow;
+//     workflowId = workflow.id;
+//     // workflow = doneWorkflow;
 
-    final factory = tercen.ServiceFactory();
-    workflow = await factory.workflowService.get(workflow.id);
+//     final factory = tercen.ServiceFactory();
+//     workflow = await factory.workflowService.get(workflow.id);
 
-    return workflow;
-  }
+//     return workflow;
+//   }
 
-  Stream<sci.TaskEvent> workflowStream(String taskId) async* {
-    var factory = tercen.ServiceFactory();
-    bool startTask = true;
-    var task = await factory.taskService.get(taskId);
+//   Stream<sci.TaskEvent> workflowStream(String taskId) async* {
+//     var factory = tercen.ServiceFactory();
+//     bool startTask = true;
+//     var task = await factory.taskService.get(taskId);
 
-    while (!task.state.isFinal) {
-      var taskStream = factory.eventService
-          .listenTaskChannel(task.id, startTask)
-          .asBroadcastStream();
+//     while (!task.state.isFinal) {
+//       var taskStream = factory.eventService
+//           .listenTaskChannel(task.id, startTask)
+//           .asBroadcastStream();
 
-      startTask = false;
-      await for (var evt in taskStream) {
-        yield evt;
-      }
-      task = await factory.taskService.get(taskId);
-    }
-  }
+//       startTask = false;
+//       await for (var evt in taskStream) {
+//         yield evt;
+//       }
+//       task = await factory.taskService.get(taskId);
+//     }
+//   }
 
-  sci.DataStep updateOperatorSettingsByName(
-      sci.DataStep stp, List<sci.Pair> settingsList) {
-    for (var setting in settingsList) {
-      var nProps = stp.model.operatorSettings.operatorRef.propertyValues.length;
-      for (var i = 0; i < nProps; i++) {
-        if (stp.model.operatorSettings.operatorRef.propertyValues[i].name
-                .toLowerCase() ==
-            setting.key.toLowerCase()) {
-          stp.model.operatorSettings.operatorRef.propertyValues[i].value =
-              setting.value;
-        }
-      }
-    }
-    return stp;
-  }
+//   sci.DataStep updateOperatorSettingsByName(
+//       sci.DataStep stp, List<sci.Pair> settingsList) {
+//     for (var setting in settingsList) {
+//       var nProps = stp.model.operatorSettings.operatorRef.propertyValues.length;
+//       for (var i = 0; i < nProps; i++) {
+//         if (stp.model.operatorSettings.operatorRef.propertyValues[i].name
+//                 .toLowerCase() ==
+//             setting.key.toLowerCase()) {
+//           stp.model.operatorSettings.operatorRef.propertyValues[i].value =
+//               setting.value;
+//         }
+//       }
+//     }
+//     return stp;
+//   }
 
-  sci.DataStep updateOperatorSettings(
-      sci.DataStep stp, List<StepSetting> settingsList) {
-    for (var setting in settingsList) {
-      if (stp.id == setting.stepId) {
-        for (var i = 0;
-            i < stp.model.operatorSettings.operatorRef.propertyValues.length;
-            i++) {
-          if (stp.model.operatorSettings.operatorRef.propertyValues[i].name ==
-              setting.settingName) {
-            stp.model.operatorSettings.operatorRef.propertyValues[i].value =
-                setting.value;
-          }
-        }
-      }
-    }
-    return stp;
-  }
+//   sci.DataStep updateOperatorSettings(
+//       sci.DataStep stp, List<StepSetting> settingsList) {
+//     for (var setting in settingsList) {
+//       if (stp.id == setting.stepId) {
+//         for (var i = 0;
+//             i < stp.model.operatorSettings.operatorRef.propertyValues.length;
+//             i++) {
+//           if (stp.model.operatorSettings.operatorRef.propertyValues[i].name ==
+//               setting.settingName) {
+//             stp.model.operatorSettings.operatorRef.propertyValues[i].value =
+//                 setting.value;
+//           }
+//         }
+//       }
+//     }
+//     return stp;
+//   }
 
-  List<sci.Step> getTopSteps(List<sci.Step> steps) {
-    return steps.where((e) => e.inputs.isEmpty && e is! sci.GroupStep).toList();
-  }
+//   List<sci.Step> getTopSteps(List<sci.Step> steps) {
+//     return steps.where((e) => e.inputs.isEmpty && e is! sci.GroupStep).toList();
+//   }
 
-  List<sci.Step> getParents(sci.Step step, sci.Workflow workflow) {
-    List<sci.Step> parents = [];
-    var links = workflow.links;
+//   List<sci.Step> getParents(sci.Step step, sci.Workflow workflow) {
+//     List<sci.Step> parents = [];
+//     var links = workflow.links;
 
-    for (var link in links) {
-      if (step.inputs.map((e) => e.id).toList().contains(link.inputId)) {
-        for (var s in workflow.steps) {
-          if (s.outputs.map((e) => e.id).toList().contains(link.outputId)) {
-            parents.add(s);
-          }
-        }
-      }
-    }
+//     for (var link in links) {
+//       if (step.inputs.map((e) => e.id).toList().contains(link.inputId)) {
+//         for (var s in workflow.steps) {
+//           if (s.outputs.map((e) => e.id).toList().contains(link.outputId)) {
+//             parents.add(s);
+//           }
+//         }
+//       }
+//     }
 
-    return parents;
-  }
+//     return parents;
+//   }
 
-  String getStepStatus(sci.Step stp, sci.Workflow workflow) {
-    if (stp.state.taskState.kind == "DoneState") {
-      return "Done.......";
-    }
+//   String getStepStatus(sci.Step stp, sci.Workflow workflow) {
+//     if (stp.state.taskState.kind == "DoneState") {
+//       return "Done.......";
+//     }
 
-    var parents = getParents(stp, workflow);
+//     var parents = getParents(stp, workflow);
 
-    bool allParentsDone = true;
-    for (var parent in parents) {
-      if (parent.state.taskState.kind != "DoneState") {
-        allParentsDone = false;
-      }
-    }
+//     bool allParentsDone = true;
+//     for (var parent in parents) {
+//       if (parent.state.taskState.kind != "DoneState") {
+//         allParentsDone = false;
+//       }
+//     }
 
-    if (allParentsDone) {
-      return "Running..";
-    } else {
-      return "...............";
-    }
-  }
+//     if (allParentsDone) {
+//       return "Running..";
+//     } else {
+//       return "...............";
+//     }
+//   }
 
-  List<sci.Step> getChildren(sci.Step parent, sci.Workflow workflow) {
-    List<sci.Step> children = [];
-    var links = workflow.links;
+//   List<sci.Step> getChildren(sci.Step parent, sci.Workflow workflow) {
+//     List<sci.Step> children = [];
+//     var links = workflow.links;
 
-    for (var link in links) {
-      if (parent.outputs.map((e) => e.id).toList().contains(link.outputId)) {
-        for (var s in workflow.steps) {
-          if (s.inputs.map((e) => e.id).toList().contains(link.inputId)) {
-            children.add(s);
-          }
-        }
-      }
-    }
+//     for (var link in links) {
+//       if (parent.outputs.map((e) => e.id).toList().contains(link.outputId)) {
+//         for (var s in workflow.steps) {
+//           if (s.inputs.map((e) => e.id).toList().contains(link.inputId)) {
+//             children.add(s);
+//           }
+//         }
+//       }
+//     }
 
-    return children;
-  }
+//     return children;
+//   }
 
-  void updateStepProgress(sci.Workflow workflow, {sci.Step? step}) {
-    if (step == null) {
-      stepProgressMessage = "";
-      var topSteps = getTopSteps(workflow.steps);
-      for (var stp in topSteps) {
-        stepProgressMessage += getStepStatus(stp, workflow);
-        stepProgressMessage += "....";
-        stepProgressMessage += stp.name;
-        stepProgressMessage += "\n";
-      }
+//   void updateStepProgress(sci.Workflow workflow, {sci.Step? step}) {
+//     if (step == null) {
+//       stepProgressMessage = "";
+//       var topSteps = getTopSteps(workflow.steps);
+//       for (var stp in topSteps) {
+//         stepProgressMessage += getStepStatus(stp, workflow);
+//         stepProgressMessage += "....";
+//         stepProgressMessage += stp.name;
+//         stepProgressMessage += "\n";
+//       }
 
-      for (var stp in topSteps) {
-        var children = getChildren(stp, workflow);
-        for (var child in children) {
-          updateStepProgress(workflow, step: child);
-        }
-      }
-    } else {
-      stepProgressMessage += getStepStatus(step, workflow);
-      stepProgressMessage += "....";
-      stepProgressMessage += step.name;
-      stepProgressMessage += "\n";
+//       for (var stp in topSteps) {
+//         var children = getChildren(stp, workflow);
+//         for (var child in children) {
+//           updateStepProgress(workflow, step: child);
+//         }
+//       }
+//     } else {
+//       stepProgressMessage += getStepStatus(step, workflow);
+//       stepProgressMessage += "....";
+//       stepProgressMessage += step.name;
+//       stepProgressMessage += "\n";
 
-      var children = getChildren(step, workflow);
-      for (var child in children) {
-        updateStepProgress(workflow, step: child);
-      }
-    }
-  }
-}
+//       var children = getChildren(step, workflow);
+//       for (var child in children) {
+//         updateStepProgress(workflow, step: child);
+//       }
+//     }
+//   }
+// }
