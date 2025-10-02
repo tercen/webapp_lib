@@ -21,8 +21,9 @@ import 'package:webapp_utils/services/app_user.dart';
 // Uses a static shared iframe to embed external apps in modal dialogs,
 // avoiding PlatformViewRegistry conflicts by reusing a single iframe instance across all component instances 
 //and forcing reloads via src manipulation.
+
 class LinkedAppComponent
-    with ChangeNotifier, ComponentBase, ComponentInfoBox, ProgressDialog
+    with ChangeNotifier, ComponentBase, ComponentInfoBox
     implements Component {
   String lastSave = "";
 
@@ -32,7 +33,7 @@ class LinkedAppComponent
   String? workflowId;
   String? stepId;
   String channel = const Uuid().v4();
-  String? appTitle;
+  String? title;
 
   final String operatorId;
   AssetImage? appIcon;
@@ -41,13 +42,13 @@ class LinkedAppComponent
   StreamSubscription? sub;
   bool enabled = true;
 
-  BuildContext? appDialogContext;
+  BuildContext? dialogContext;
   static final IFrameElement _iframe = IFrameElement();
   static bool _iframeInitialized = false;
 
   LinkedAppComponent(id, groupId, componentLabel, this.baseUri, this.onOpen,
       this.operatorId, this.onClose,
-      {infoBoxBuilder, this.appIcon, this.appTitle}) {
+      {infoBoxBuilder, this.appIcon, this.title}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -69,13 +70,10 @@ class LinkedAppComponent
         .listen((evt) async {
       if (evt.type == "quit") {
         print("Received quit event: $dialogContext");
-        if (appDialogContext != null) {
-          await openDialog(context, id: "app_closing");
-          log( "app_closing", "Closing App", dialogTitle: appTitle ?? "Gating App");
-          Navigator.of(appDialogContext!).pop();
-          appDialogContext = null;
+        if (dialogContext != null) {
+          Navigator.of(dialogContext!).pop();
+          dialogContext = null;
           notifyListeners();
-          closeLog(id: "app_closing");
           await onClose(isCancel: false);
         }
       }
@@ -142,18 +140,18 @@ class LinkedAppComponent
             key: UniqueKey(),
           );
 
-          final titleAdjust = appTitle != null ? 0.9 : 0.92;
+          final titleAdjust = title != null ? 0.9 : 0.92;
           showDialog(
               context: context,
               useRootNavigator: false,
               builder: (context) {
-                appDialogContext = context;
+                dialogContext = context;
                 return AlertDialog(
                     content: Column(
                   children: [
-                    appTitle != null
+                    title != null
                         ? Text(
-                            appTitle!,
+                            title!,
                             style: Styles()["textH2"],
                           )
                         : Container(),
