@@ -71,7 +71,7 @@ class LinkedAppComponent
         if (dialogContext != null) {
           Navigator.of(dialogContext!).pop();
           Future.delayed(Duration(milliseconds: 100));
-          onClose(isCancel: false);
+          await onClose(isCancel: false);
           
 
 
