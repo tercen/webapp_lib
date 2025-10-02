@@ -675,6 +675,8 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
     if (inPlace) {
       workflow = template;
+      //nsure saved
+      workflow.rev = await factory.workflowService.update(workflow);
     } else {
       workflow = await factory.workflowService
           .copyApp(template.id, AppUser().projectId);
