@@ -51,6 +51,7 @@ mixin ProgressDialog {
     dialogMap[id] = LogObject(context: context);
 
     showDialog(
+        
         useRootNavigator: true,
         barrierDismissible: false,
         context: context,
