@@ -1123,8 +1123,8 @@ class WorkflowRunner with ProgressDialog {
     workflowId = workflow.id;
     // workflow = doneWorkflow;
 
-    // final factory = tercen.ServiceFactory();
-    // workflow = await factory.workflowService.get(workflow.id);
+    final factory = tercen.ServiceFactory();
+    workflow = await factory.workflowService.get(workflow.id);
 
     return workflow;
   }
