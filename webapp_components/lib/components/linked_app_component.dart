@@ -71,7 +71,7 @@ class LinkedAppComponent
         if (dialogContext != null) {
           Navigator.of(dialogContext!).pop();
           
-          await onClose(isCancel: false);
+          onClose(isCancel: false);
           
 
 
