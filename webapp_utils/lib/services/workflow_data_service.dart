@@ -181,7 +181,7 @@ class WorkflowDataService {
       var workflowIds = projObjs
           .where((e) => e.isDeleted == false)
           .where((e) => e.isHidden == false)
-          .where((e) => e.kind == "Workflow" )
+          .where((e) => e.subKind == "Workflow" )
           .map((e) => e.id)
           .toList();
 
