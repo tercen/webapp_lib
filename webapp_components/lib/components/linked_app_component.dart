@@ -71,10 +71,12 @@ class LinkedAppComponent
       if (evt.type == "quit") {
         print("Received quit event: $dialogContext");
         if (dialogContext != null) {
+          _iframe.src = 'about:blank';
           Navigator.of(dialogContext!).pop();
+          
           dialogContext = null;
           notifyListeners();
-          await onClose(isCancel: false);
+          onClose(isCancel: false);
         }
       }
     });
@@ -120,6 +122,7 @@ class LinkedAppComponent
             _iframe.style.width = "${MediaQuery.of(context).size.width * 0.95}";
             _iframe.src = src;
 
+
             _iframe.style.border = 'none';
             LinkedAppComponent._iframeInitialized = true;
 
@@ -143,7 +146,7 @@ class LinkedAppComponent
           final titleAdjust = title != null ? 0.9 : 0.92;
           showDialog(
               context: context,
-              useRootNavigator: false,
+              useRootNavigator: true,
               builder: (context) {
                 dialogContext = context;
                 return AlertDialog(
