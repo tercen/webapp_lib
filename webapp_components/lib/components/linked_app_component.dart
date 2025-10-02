@@ -12,6 +12,7 @@ import 'package:webapp_components/mixins/infobox_component.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:webapp_ui_commons/mixin/progress_log.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 import 'package:webapp_utils/services/app_user.dart';
@@ -21,7 +22,7 @@ import 'package:webapp_utils/services/app_user.dart';
 // avoiding PlatformViewRegistry conflicts by reusing a single iframe instance across all component instances 
 //and forcing reloads via src manipulation.
 class LinkedAppComponent
-    with ChangeNotifier, ComponentBase, ComponentInfoBox
+    with ChangeNotifier, ComponentBase, ComponentInfoBox, ProgressDialog
     implements Component {
   String lastSave = "";
 
@@ -31,7 +32,7 @@ class LinkedAppComponent
   String? workflowId;
   String? stepId;
   String channel = const Uuid().v4();
-  String? title;
+  String? appTitle;
 
   final String operatorId;
   AssetImage? appIcon;
@@ -40,13 +41,13 @@ class LinkedAppComponent
   StreamSubscription? sub;
   bool enabled = true;
 
-  BuildContext? dialogContext;
+  BuildContext? appDialogContext;
   static final IFrameElement _iframe = IFrameElement();
   static bool _iframeInitialized = false;
 
   LinkedAppComponent(id, groupId, componentLabel, this.baseUri, this.onOpen,
       this.operatorId, this.onClose,
-      {infoBoxBuilder, this.appIcon, this.title}) {
+      {infoBoxBuilder, this.appIcon, this.appTitle}) {
     super.id = id;
     super.groupId = groupId;
     super.componentLabel = componentLabel;
@@ -68,15 +69,14 @@ class LinkedAppComponent
         .listen((evt) async {
       if (evt.type == "quit") {
         print("Received quit event: $dialogContext");
-        if (dialogContext != null) {
-          Navigator.of(dialogContext!).pop();
-          Future.delayed(Duration(milliseconds: 100));
-          await onClose(isCancel: false);
-          
-
-
-          dialogContext = null;
+        if (appDialogContext != null) {
+          await openDialog(context, id: "app_closing");
+          log( "app_closing", "Closing App", dialogTitle: appTitle ?? "Gating App");
+          Navigator.of(appDialogContext!).pop();
+          appDialogContext = null;
           notifyListeners();
+          closeLog(id: "app_closing");
+          await onClose(isCancel: false);
         }
       }
     });
@@ -142,18 +142,18 @@ class LinkedAppComponent
             key: UniqueKey(),
           );
 
-          final titleAdjust = title != null ? 0.9 : 0.92;
+          final titleAdjust = appTitle != null ? 0.9 : 0.92;
           showDialog(
               context: context,
               useRootNavigator: false,
               builder: (context) {
-                dialogContext = context;
+                appDialogContext = context;
                 return AlertDialog(
                     content: Column(
                   children: [
-                    title != null
+                    appTitle != null
                         ? Text(
-                            title!,
+                            appTitle!,
                             style: Styles()["textH2"],
                           )
                         : Container(),
