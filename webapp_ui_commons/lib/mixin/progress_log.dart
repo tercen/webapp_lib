@@ -147,7 +147,7 @@ mixin ProgressDialog {
     }
 
     if( !dialogMap.containsKey(id) ) {
-      Logger().log(level:Logger.WARN, message: "Dialog with id $id not found. Cannot log message.");
+      Logger().log(level:Logger.WARN, message: "Dialog with id $id not found. Cannot log '$message'.");
       return;
     }
     // _message.update(message);
@@ -166,6 +166,7 @@ mixin ProgressDialog {
   // }
 
   Future<void> closeLog({required String id}) async {
+    await Future.delayed(Duration(milliseconds: 250));
     if( !dialogMap.containsKey(id) ) {
       Logger().log(level:Logger.WARN, message: "Dialog with id $id not found. Cannot close dialog.");
       return;

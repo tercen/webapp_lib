@@ -193,8 +193,8 @@ class WorkflowRunner with ProgressDialog {
     folderPrefix = "$folderPrefix$pref";
   }
 
-  void setStepRam( String stepId, double ramInGb) {
-    stepEnv["${stepId}|@|ram"] = (ramInGb*10e9).toStringAsFixed(0);
+  void setStepRam(String stepId, double ramInGb) {
+    stepEnv["${stepId}|@|ram"] = (ramInGb * 10e9).toStringAsFixed(0);
   }
 
   void addSettings(List<StepSetting> settings) {
@@ -222,12 +222,13 @@ class WorkflowRunner with ProgressDialog {
     folderId = id;
   }
 
-  sci.FilterExpr createFilterExpr(String factorName, dynamic factorValue, {String comp = "equals"}) {
+  sci.FilterExpr createFilterExpr(String factorName, dynamic factorValue,
+      {String comp = "equals"}) {
     var factorType = "string";
-    if( factorValue is int){
+    if (factorValue is int) {
       factorType = "int";
     }
-    if( factorValue is double){
+    if (factorValue is double) {
       factorType = "double";
     }
 
@@ -627,16 +628,16 @@ class WorkflowRunner with ProgressDialog {
     return "${folderPrefix}${timeStr}${folderSuffix}";
   }
 
-  sci.DataStep updateEnv(sci.DataStep step){
+  sci.DataStep updateEnv(sci.DataStep step) {
     final envList = stepEnv.entries.where((e) => e.key.contains(step.id));
-    if( envList.isNotEmpty){
-      for( var e in envList ){
-        if( e.key.endsWith("ram")){
+    if (envList.isNotEmpty) {
+      for (var e in envList) {
+        if (e.key.endsWith("ram")) {
           final ei = step.model.operatorSettings.environment.indexOf("ram");
-          step.model.operatorSettings.environment[ei] = sci.Pair.from("ram", e.value);
+          step.model.operatorSettings.environment[ei] =
+              sci.Pair.from("ram", e.value);
         }
       }
-      
     }
 
     return step;
@@ -646,15 +647,14 @@ class WorkflowRunner with ProgressDialog {
       {bool inPlace = false, String? runId}) async {
     runId = runId ?? template.name;
     if (context != null) {
-      openDialog(context, id: runId );
+      openDialog(context, id: runId);
     }
     Stopwatch stopwatch = Stopwatch()..start();
     var factory = tercen.ServiceFactory();
 
-
-
     var runTitle = getWorkflowName(template);
-    print("\t\tdoSetup :: getWorkflowName :: ${stopwatch.elapsedMilliseconds} ms");
+    print(
+        "\t\tdoSetup :: getWorkflowName :: ${stopwatch.elapsedMilliseconds} ms");
     stopwatch.reset();
 
     if (context != null) {
@@ -665,7 +665,8 @@ class WorkflowRunner with ProgressDialog {
       tableMap[entry.key] = await loadDocumentInMemory(entry.value);
     }
 
-    print("\t\tdoSetup :: loadDocumentInMemory :: ${stopwatch.elapsedMilliseconds} ms");
+    print(
+        "\t\tdoSetup :: loadDocumentInMemory :: ${stopwatch.elapsedMilliseconds} ms");
     stopwatch.reset();
 
     //-----------------------------------------
@@ -713,7 +714,7 @@ class WorkflowRunner with ProgressDialog {
       }
       if (stp.kind == "DataStep") {
         stp = updateFilterValues(stp as sci.DataStep);
-        stp = updateEnv(stp );
+        stp = updateEnv(stp);
         stp = updateOperatorSettings(stp, settings);
         stp = updateOperatorSettingsByName(stp, settingsByName);
 
@@ -732,7 +733,6 @@ class WorkflowRunner with ProgressDialog {
           }
         }
       }
-
 
       if (doNotRunList.contains(stp.id)) {
         stp.state.taskState = sci.DoneState();
@@ -760,22 +760,37 @@ class WorkflowRunner with ProgressDialog {
         (stp as sci.MeltStep).model.selectionPattern = gatherMap[stp.id]!;
       }
 
-      if( xAxisCoord.containsKey(stp.id)){
+      if (xAxisCoord.containsKey(stp.id)) {
         //TODO set it on the step
         // print("Setting X axis coord for step ${stp.name} to ${xAxisCoord[stp.id]}");
         // print((stp as sci.DataStep).model.toJson());
-        (stp as sci.DataStep).model.axis.xyAxis.first.xAxis.graphicalFactor.factor.name =
-            xAxisCoord[stp.id]!;
+        (stp as sci.DataStep)
+            .model
+            .axis
+            .xyAxis
+            .first
+            .xAxis
+            .graphicalFactor
+            .factor
+            .name = xAxisCoord[stp.id]!;
       }
-      if( yAxisCoord.containsKey(stp.id)){
+      if (yAxisCoord.containsKey(stp.id)) {
         //TODO set it on the step
-        (stp as sci.DataStep).model.axis.xyAxis.first.yAxis.graphicalFactor.factor.name =
-            yAxisCoord[stp.id]!;
+        (stp as sci.DataStep)
+            .model
+            .axis
+            .xyAxis
+            .first
+            .yAxis
+            .graphicalFactor
+            .factor
+            .name = yAxisCoord[stp.id]!;
       }
     }
 
-    print("\t\tdoSetup :: Step-specific setup :: ${stopwatch.elapsedMilliseconds} ms");
-    stopwatch.reset();    
+    print(
+        "\t\tdoSetup :: Step-specific setup :: ${stopwatch.elapsedMilliseconds} ms");
+    stopwatch.reset();
 
     //-----------------------------------------
     // General workflow parameters
@@ -801,7 +816,8 @@ class WorkflowRunner with ProgressDialog {
       workflow.rev = "";
 
       workflow = await factory.workflowService.create(workflow);
-      print("\t\tdoSetup :: createWorkflow :: ${stopwatch.elapsedMilliseconds} ms");
+      print(
+          "\t\tdoSetup :: createWorkflow :: ${stopwatch.elapsedMilliseconds} ms");
       stopwatch.reset();
     }
 
@@ -812,31 +828,37 @@ class WorkflowRunner with ProgressDialog {
     return workflow;
   }
 
-  String _linkToId(String id){
+  String _linkToId(String id) {
     var idParts = id.split("-");
     idParts.removeLast();
     idParts.removeLast();
     return idParts.join("-");
   }
-  List<String> _stepsToReset(sci.Workflow workflow, String currentStep, List<String> addedSteps){
+
+  List<String> _stepsToReset(
+      sci.Workflow workflow, String currentStep, List<String> addedSteps) {
     final stepsToReset = [currentStep];
-    final outLinks = workflow.links.where((link) => link.outputId.contains(currentStep) ).where((link) => !addedSteps.contains(_linkToId(link.inputId)));
-    for( var link in outLinks ){
+    final outLinks = workflow.links
+        .where((link) => link.outputId.contains(currentStep))
+        .where((link) => !addedSteps.contains(_linkToId(link.inputId)));
+    for (var link in outLinks) {
       stepsToReset.add(_linkToId(link.inputId));
       addedSteps.add(link.inputId);
-      stepsToReset.addAll(  _stepsToReset( workflow, _linkToId(link.inputId), addedSteps) );
+      stepsToReset
+          .addAll(_stepsToReset(workflow, _linkToId(link.inputId), addedSteps));
     }
-
 
     return stepsToReset;
   }
 
   Future<sci.Workflow> doResetStep(BuildContext? context, sci.Workflow workflow,
-      {String? runTitle, String? stepName, required String stepId, String? runId}) async {
-    
+      {String? runTitle,
+      String? stepName,
+      required String stepId,
+      String? runId}) async {
     runId = runId ?? workflow.name;
     if (context != null) {
-      openDialog(context, id: runId );
+      openDialog(context, id: runId);
     }
 
     var runTitle = getWorkflowName(workflow);
@@ -846,34 +868,30 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
 
     // for( var step in workflow.steps.whereType<sci.DataStep>() ){
-      // print("${step.name} :: ${step.state.taskState.kind}");
+    // print("${step.name} :: ${step.state.taskState.kind}");
     // }
     // print("...........................................");
     final idsToReset = _stepsToReset(workflow, stepId, []).toSet();
     // print("WILL RESET:");
-    for( var id in idsToReset ){
-      final stp = workflow.steps.firstWhere(
-        (step) =>
-            step.id == id,
-        orElse: () => sci.DataStep());
+    for (var id in idsToReset) {
+      final stp = workflow.steps
+          .firstWhere((step) => step.id == id, orElse: () => sci.DataStep());
       // print("\t${stp.name} :: $id");
     }
-    for( var id in idsToReset ){
-          final stp = workflow.steps.firstWhere(
-        (step) =>
-            step.id == id,
-        orElse: () => sci.DataStep());
-    if (stp.id != "") {
-      stp.state.taskState = sci.InitState();
-      stp.state.taskId = "";
-    }
+    for (var id in idsToReset) {
+      final stp = workflow.steps
+          .firstWhere((step) => step.id == id, orElse: () => sci.DataStep());
+      if (stp.id != "") {
+        stp.state.taskState = sci.InitState();
+        stp.state.taskId = "";
+      }
     }
     // final factory = tercen.ServiceFactory();
     // workflow = await factory.workflowService.get(workflow.id);
     // workflow = await runWorkflowTask(workflow, stepsToReset: [stepId], stepsToRun: []);
 
     // for( var step in workflow.steps.whereType<sci.DataStep>() ){
-      // print("${step.name} :: ${step.state.taskState.kind}");
+    // print("${step.name} :: ${step.state.taskState.kind}");
     // }
 
     log(runId, "$stepProgressMessage\n\n \nRunning final updates",
@@ -893,8 +911,8 @@ class WorkflowRunner with ProgressDialog {
 
     if (context != null) {
       // await Future.delayed(const Duration(milliseconds: 1000), () {
-        // status.value = RunStatus.finished;
-        closeLog(id: runId);
+      // status.value = RunStatus.finished;
+      closeLog(id: runId);
       // });
     }
 
@@ -904,14 +922,16 @@ class WorkflowRunner with ProgressDialog {
     // final factory = tercen.ServiceFactory();
     // workflow = await factory.workflowService.get(workflow.id);
 
-
-    
     return workflow;
   }
 
-  Future<sci.Workflow> runWorkflowTask(sci.Workflow workflow,
-      {String? runTitle, String? stepName, List<String>? stepsToRun, 
-      List<String>? stepsToReset, required String runId}) async {
+  Future<sci.Workflow> runWorkflowTask(
+      BuildContext? context, sci.Workflow workflow,
+      {String? runTitle,
+      String? stepName,
+      List<String>? stepsToRun,
+      List<String>? stepsToReset,
+      required String runId}) async {
     var factory = tercen.ServiceFactory();
 
     runTitle ??= workflow.name;
@@ -925,13 +945,12 @@ class WorkflowRunner with ProgressDialog {
 
     // workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
 
-
-    if( stepsToRun != null){
+    if (stepsToRun != null) {
       // workflowTask.stepsToRun.clear();
       workflowTask.stepsToRun.addAll(stepsToRun);
     }
 
-    if( stepsToReset != null){
+    if (stepsToReset != null) {
       // workflowTask.stepsToReset.clear();
       workflowTask.stepsToReset.addAll(stepsToReset);
     }
@@ -939,7 +958,6 @@ class WorkflowRunner with ProgressDialog {
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
-    
     workflow.addMeta("run.workflow.task.id", workflowTask.id);
     // workflow.addMeta("run.task.id", workflowTask.id);
     workflow.rev = await factory.workflowService.update(workflow);
@@ -950,15 +968,17 @@ class WorkflowRunner with ProgressDialog {
 
     if (stepName == null) {
       updateStepProgress(workflow);
-      log(runId, stepProgressMessage, dialogTitle: runTitle);
+      if (context != null) {
+        log(runId, stepProgressMessage, dialogTitle: runTitle);
+      }
     } else {
-      log(runId, "Running ${stepName}", dialogTitle: runTitle);
+      if (context != null) {
+        log(runId, "Running ${stepName}", dialogTitle: runTitle);
+      }
       // print("Running ${stepName}");
     }
 
-
     await for (var evt in taskStream) {
-
       if (evt is sci.PatchRecords) {
         // try {
         //   workflow = evt.apply(workflow);
@@ -980,27 +1000,33 @@ class WorkflowRunner with ProgressDialog {
         }
       }
       if (evt is sci.TaskProgressEvent) {
-        if (stepName == null || stepName == "") {
-          log(runId, "$stepProgressMessage\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        } else {
-          log(runId, "Running ${stepName}\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
+        if (context != null) {
+          if (stepName == null || stepName == "") {
+            log(runId, "$stepProgressMessage\n\nTask Log\n${evt.message}",
+                dialogTitle: runTitle);
+          } else {
+            log(runId, "Running ${stepName}\n\nTask Log\n${evt.message}",
+                dialogTitle: runTitle);
+          }
         }
       } else if (evt is sci.TaskLogEvent) {
-        if (stepName == null || stepName == "") {
-          log(runId, "$stepProgressMessage\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
-        } else {
-          log(runId, "Running ${stepName}\n\nTask Log\n${evt.message}",
-              dialogTitle: runTitle);
+        if (context != null) {
+          if (stepName == null || stepName == "") {
+            log(runId, "$stepProgressMessage\n\nTask Log\n${evt.message}",
+                dialogTitle: runTitle);
+          } else {
+            log(runId, "Running ${stepName}\n\nTask Log\n${evt.message}",
+                dialogTitle: runTitle);
+          }
         }
       }
     }
 
-    final patches = await factory.patchRecordService.findByChannelIdAndSequence(startKey: [workflowTask.channelId, 0], endKey: [workflowTask.channelId, 9999]);
+    final patches = await factory.patchRecordService.findByChannelIdAndSequence(
+        startKey: [workflowTask.channelId, 0],
+        endKey: [workflowTask.channelId, 9999]);
 
-    for( var patch in patches.reversed ){
+    for (var patch in patches.reversed) {
       // print("Applying patch ${patch.oR}");
       workflow = patch.apply(workflow);
     }
@@ -1011,13 +1037,12 @@ class WorkflowRunner with ProgressDialog {
 
     return workflow;
   }
-  
-  
-  Future<sci.Workflow> doRunStep(
-      BuildContext? context, sci.Workflow workflow, String stepId, String? runId) async {
+
+  Future<sci.Workflow> doRunStep(BuildContext? context, sci.Workflow workflow,
+      String stepId, String? runId) async {
     runId = runId ?? "${workflow.name}_${stepId}";
     if (context != null) {
-      openDialog(context, id: runId );
+      openDialog(context, id: runId);
     }
 
     var runTitle = getWorkflowName(workflow);
@@ -1025,10 +1050,13 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
-    workflow = await runWorkflowTask(workflow, stepsToRun: [stepId], runId: runId);
+    workflow =
+        await runWorkflowTask(context, workflow, stepsToRun: [stepId], runId: runId);
 
-    log(runId, "$stepProgressMessage\n\n \nRunning final updates",
-        dialogTitle: runTitle);
+    if (context != null) {
+      log(runId, "$stepProgressMessage\n\n \nRunning final updates",
+          dialogTitle: runTitle);
+    }
 
     final hasFailed = workflow.steps.whereType<sci.DataStep>().any((step) =>
         step.state.taskState.kind != "DoneState" &&
@@ -1044,7 +1072,7 @@ class WorkflowRunner with ProgressDialog {
 
     if (context != null) {
       // await Future.delayed(const Duration(milliseconds: 500), () {
-        closeLog(id: runId);
+      closeLog(id: runId);
       // });
     }
 
@@ -1056,11 +1084,11 @@ class WorkflowRunner with ProgressDialog {
     return workflow;
   }
 
-  Future<sci.Workflow> doRun(
-      BuildContext? context, sci.Workflow workflow, {String? runId}) async {
+  Future<sci.Workflow> doRun(BuildContext? context, sci.Workflow workflow,
+      {String? runId}) async {
     runId = runId ?? workflow.name;
     if (context != null) {
-      openDialog(context, id: runId );
+      openDialog(context, id: runId);
     }
 
     var runTitle = getWorkflowName(workflow);
@@ -1068,7 +1096,7 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
-    workflow = await runWorkflowTask(workflow, runId: runId);
+    workflow = await runWorkflowTask(context, workflow, runId: runId);
 
     log(runId, "$stepProgressMessage\n\n \nRunning final updates",
         dialogTitle: runTitle);
@@ -1087,8 +1115,8 @@ class WorkflowRunner with ProgressDialog {
 
     if (context != null) {
       // await Future.delayed(const Duration(milliseconds: 1000), () {
-        // status.value = RunStatus.finished;
-        closeLog(id: runId);
+      // status.value = RunStatus.finished;
+      closeLog(id: runId);
       // });
     }
 
