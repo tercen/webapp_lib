@@ -69,9 +69,11 @@ class LinkedAppComponent
       if (evt.type == "quit") {
         print("Received quit event: $dialogContext");
         if (dialogContext != null) {
-          onClose(isCancel: false);
           Navigator.of(dialogContext!).pop();
+          Future.delayed(Duration(milliseconds: 100));
+          onClose(isCancel: false);
           
+
 
           dialogContext = null;
           notifyListeners();
