@@ -413,7 +413,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
   Future<bool> _hasRunningTasks() async {
     _runningTasks = (await tercen.ServiceFactory()
         .taskService
-        .getTasks(["RunWorkflowTask", "RunComputationTask"]));
+        .getTasks(["RunWorkflowTask", "RunComputationTask", "CubeQueryTask"]));
 
     return _runningTasks.isNotEmpty;
   }
@@ -500,7 +500,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
         final eventList = eventsPerChannel[ci];
         final channelId = uniqueChannelIds[ci];
 
-        if (_offsetMaps.containsKey("channelId")) {
+        if (_offsetMaps.containsKey(channelId)) {
           _offsetMaps[channelId] = _offsetMaps[channelId]! + eventList.length;
         } else {
           _offsetMaps[channelId] = eventList.length;
