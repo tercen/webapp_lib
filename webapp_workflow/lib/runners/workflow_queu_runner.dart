@@ -40,6 +40,13 @@ class WorkflowQueuRunner extends WorkflowRunner {
       ..channelId = Uuid().v4()
       ..workflowRev = workflow.rev;
 
+    if( doNotRunList.isNotEmpty ){
+      workflowTask.stepsToRun.addAll( workflow.steps
+          .where((s) => !doNotRunList.contains(s.id))
+          .map((s) => s.id)
+          .toList());
+    }
+
     workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
 
     workflowTask =

@@ -513,7 +513,7 @@ class WorkflowRunner with ProgressDialog {
 
   bool shouldResetStep(sci.Step step) {
     if (initStepIds.isEmpty) {
-      return step.kind == "DataStep";
+      return false;
     } else {
       return initStepIds.contains(step.id);
     }
@@ -736,10 +736,10 @@ class WorkflowRunner with ProgressDialog {
         }
       }
 
-      if (doNotRunList.contains(stp.id)) {
-        stp.state.taskState = sci.DoneState();
-        stp.state.taskId = "";
-      }
+      // if (doNotRunList.contains(stp.id)) {
+      //   stp.state.taskState = sci.DoneState();
+      //   stp.state.taskId = "";
+      // }
 
       if (multiDsMap.containsKey(stp.id)) {
         var tmpStp = stp as sci.DataStep;
@@ -945,7 +945,7 @@ class WorkflowRunner with ProgressDialog {
       ..workflowId = workflow.id
       ..workflowRev = workflow.rev;
 
-    // workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
+    workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
 
     if (stepsToRun != null) {
       // workflowTask.stepsToRun.clear();
