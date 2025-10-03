@@ -413,7 +413,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
   Future<bool> _hasRunningTasks() async {
     _runningTasks = (await tercen.ServiceFactory()
         .taskService
-        .getTasks(["RunWorkflowTask", "RunComputationTask", "CubeQueryTask"]));
+        .getTasks(["RunWorkflowTask", "RunComputationTask"]));
 
     return _runningTasks.isNotEmpty;
   }
