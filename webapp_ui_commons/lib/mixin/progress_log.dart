@@ -48,10 +48,10 @@ mixin ProgressDialog {
       // Dialog with this ID is already open or context is not mounted
       return;
     }
+    Logger().log(level: Logger.FINER, message: "Opening dialog with id $id");
     dialogMap[id] = LogObject(context: context);
 
     showDialog(
-        
         useRootNavigator: true,
         barrierDismissible: false,
         context: context,
@@ -167,7 +167,7 @@ mixin ProgressDialog {
   // }
 
   Future<void> closeLog({required String id}) async {
-    await Future.delayed(Duration(milliseconds: 250));
+    // await Future.delayed(Duration(milliseconds: 250));
     if( !dialogMap.containsKey(id) ) {
       Logger().log(level:Logger.WARN, message: "Dialog with id $id not found. Cannot close dialog.");
       return;
@@ -194,6 +194,8 @@ mixin ProgressDialog {
       // } catch (e) {
         // Handle case where dialog was already closed externally
       // }
+    }else{
+      Logger().log(level:Logger.WARN, message: "Context for dialog with id $id is not mounted. Cannot close dialog.");
     }
 
     dialogMap[id]?.dispose();

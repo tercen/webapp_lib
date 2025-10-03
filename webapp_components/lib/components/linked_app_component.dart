@@ -70,10 +70,12 @@ class LinkedAppComponent
         .listen((evt) async {
       if (evt.type == "quit") {
         print("Received quit event: $dialogContext");
+        await onClose(isCancel: false);
         if (dialogContext != null) {
           // _iframe.src = 'about:blank';
-          Navigator.of(dialogContext!).pop();
-          await onClose(isCancel: false);
+          
+          Navigator.of(dialogContext!, rootNavigator: true).pop();
+          
           dialogContext = null;
           notifyListeners();
           
