@@ -71,12 +71,12 @@ class LinkedAppComponent
       if (evt.type == "quit") {
         print("Received quit event: $dialogContext");
         if (dialogContext != null) {
-          _iframe.src = 'about:blank';
+          // _iframe.src = 'about:blank';
           Navigator.of(dialogContext!).pop();
-          
+          await onClose(isCancel: false);
           dialogContext = null;
           notifyListeners();
-          onClose(isCancel: false);
+          
         }
       }
     });
