@@ -537,9 +537,14 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
                 (ev) => ev.meta.firstWhere((m) => m.key == "workflow.id").value)
             .toSet()
             .toList();
-
-        final workflow =
+        var workflow = sci.Workflow();
+        try {
+        workflow =
             await WorkflowDataService().fetch(uniqueWorkflowIds.first);
+        } catch (e) {
+          print("[ERROR] Error fetching workflow ${uniqueWorkflowIds.first}: $e");
+          continue;
+        }
         final steps = workflow.steps
             .where((step) => uniqueStepIds.contains(step.id))
             .toList();
