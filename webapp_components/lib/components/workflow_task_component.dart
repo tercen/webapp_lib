@@ -112,7 +112,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
 
   Future<void> _listenToChannel(
       {required String channelId, required String taskType, required taskId}) async {
-    if (_channelsOnListen.contains(channelId) || _closedChannels.contains(channelId)) {
+    if (!_channelsOnListen.contains(channelId) || _closedChannels.contains(channelId)) {
       return;
     }
     var factory = tercen.ServiceFactory();
@@ -133,7 +133,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
           _processedEvents.add(evtId);
           markedForReload = true;
         
-
+        _updateTaskState(taskId, evt.state.kind);
         
         
         

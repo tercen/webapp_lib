@@ -39,6 +39,8 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
   bool isFetchingTask = false;
   late final Timer workflowRefreshTimer;
   final Map<String, int> _offsetMaps = {};
+  int _lastHash = 0;
+  WebappTable _oldTable = WebappTable();
 
   @override
   String getScreenId() {
@@ -411,9 +413,10 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
 
   List<sci.Task> _runningTasks = [];
   Future<bool> _hasRunningTasks() async {
+    print("${DateTime.now().toIso8601String()} Fetching tasks");
     _runningTasks = (await tercen.ServiceFactory()
         .taskService
-        .getTasks(["RunWorkflowTask", "RunComputationTask", "CubeQueryTask"]));
+        .getTasks(["RunWorkflowTask", "RunComputationTask"]));
 
     return _runningTasks.isNotEmpty;
   }
@@ -435,6 +438,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
   }
 
   Future<WebappTable> fetchTasks() async {
+    print("${DateTime.now().toIso8601String()} Fetching tasks");
     var comp = getComponent("tasks") as WorkflowTaskComponent;
 
     final res = WebappTable();
@@ -451,7 +455,16 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
     final List<String> projectId = [];
     final List<String> projectName = [];
 
+    final currentHash = _runningTasks.map((t) => t.id).toList().hashCode;
+    if( currentHash == _lastHash ){
+      print("\tSkipping fetch, no changes detected");
+      return _oldTable;
+    }else{
+      _lastHash = currentHash;
+    }
+
     if (tasks.isNotEmpty) {
+      print("\tTasks found: ${tasks.length}");
       running = true;
       for (var t in tasks.where((t) => t.kind == "RunWorkflowTask")) {
         //RunWorkflowTask are not really needed, but we add it to the lists to know there is still a workflow task running
@@ -539,6 +552,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
 
           if (!(latestEv.state.kind == "DoneState" ||
               latestEv.state.kind == "FailedState" ||
+              latestEv.state.kind == "InitState" ||
               latestEv.state.kind == "CancelledState")) {
             running = true;
             comp.markedForReload = false;
@@ -555,6 +569,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
           }
         }
       }
+      
     }
 
     res.addColumn("TaskId", data: taskIds);
@@ -567,6 +582,8 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
     res.addColumn("ChannelId", data: channelIds);
     res.addColumn("ProjectId", data: projectId);
     res.addColumn("ProjectName", data: projectName);
+    _oldTable = res;
+    print("\tfinal task table rows: ${res.nRows}");
 
     return res;
   }
