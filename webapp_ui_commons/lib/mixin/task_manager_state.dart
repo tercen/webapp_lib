@@ -469,6 +469,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
       for (var t in tasks.where((t) => t.kind == "RunWorkflowTask")) {
         //RunWorkflowTask are not really needed, but we add it to the lists to know there is still a workflow task running
         // (the list of events for the workflow tasks comes empty)
+        try {
         final workflow = await WorkflowDataService()
             .fetch((t as sci.RunWorkflowTask).workflowId);
         final project = await ProjectDataService()
@@ -484,6 +485,11 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
           channelIds.add(t.channelId);
           projectId.add(project.id);
           projectName.add(project.name);
+        }
+        } catch (e) {
+          //If workflow was deleted, but the task is still running, this can lead to error
+          print("[ERROR] Error fetching workflow ${(t as sci.RunWorkflowTask).workflowId}: $e");
+          continue;
         }
       }
 
