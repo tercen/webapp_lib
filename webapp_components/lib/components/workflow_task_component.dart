@@ -127,7 +127,7 @@ class WorkflowTaskComponent extends ActionTableComponent {
           _channelsOnListen.remove(channelId);
           _closedChannels.add(channelId);
           if (taskType == "RunWorkflowTask") {
-            // onEmptyQueu!();
+            onEmptyQueu!();
           }
         }
           _processedEvents.add(evtId);
@@ -143,6 +143,8 @@ class WorkflowTaskComponent extends ActionTableComponent {
           // await _reloadOp?.cancel();
           // _reloadOp = CancelableOperation.fromFuture(reload(), onCancel: () => print("Cancelling previous reload"),);
         }
+      }else{
+        print("Event type: ${evt.kind}");
       }
     }
   }

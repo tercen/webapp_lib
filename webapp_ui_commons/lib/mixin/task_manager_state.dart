@@ -17,7 +17,6 @@ import 'package:webapp_components/extra/row_color_formatter.dart';
 import 'package:webapp_components/screens/screen_base.dart';
 
 import 'package:webapp_components/widgets/wait_indicator.dart';
-import 'package:webapp_model/webapp_data_base.dart';
 
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/mixin/progress_log.dart';
@@ -370,8 +369,11 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
   }
 
   Future onEmptyQueu() async {
-    var comp = getComponent("tasks") as WorkflowTaskComponent;
-    comp.markedForReload = false;
+    var comp = getComponent("workflows") as ActionTableComponent?;
+    comp?.reset();
+    
+    // var comp = getComponent("tasks") as WorkflowTaskComponent;
+    // comp.markedForReload = false;
     // try {
     //   Future.delayed(const Duration(milliseconds: 500), () async {
     //     print("Calling onEmptyQueu");
