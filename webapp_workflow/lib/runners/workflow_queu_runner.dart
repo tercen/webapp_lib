@@ -19,15 +19,15 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
 
   @override
-  Future<sci.Workflow> doRun(BuildContext? context, sci.Workflow workflow, {String? runId}) async {
+  Future<sci.Workflow> doRun(BuildContext? context, sci.Workflow workflow, {String? runId, List<String> stepsToRun = const [], List<String> stepsToReset = const[]}) async {
     try {
-      return _doRun(context, workflow);
+      return _doRun(context, workflow, stepsToRun: stepsToRun, stepsToReset: stepsToReset);
     } catch (e) {
       Logger().log(level: Logger.WARN, message: "WorkflowQueuRunner.doRun failed");
       return sci.Workflow();
     }
   }
-  Future<sci.Workflow> _doRun(BuildContext? context, sci.Workflow workflow) async {
+  Future<sci.Workflow> _doRun(BuildContext? context, sci.Workflow workflow,{ List<String> stepsToRun = const [], List<String> stepsToReset = const[]}) async {
     var factory = tercen.ServiceFactory();
     //-----------------------------------------
     // Task preparation and running
@@ -40,12 +40,19 @@ class WorkflowQueuRunner extends WorkflowRunner {
       ..channelId = Uuid().v4()
       ..workflowRev = workflow.rev;
 
-    if( doNotRunList.isNotEmpty ){
-      workflowTask.stepsToRun.addAll( workflow.steps
-          .where((s) => !doNotRunList.contains(s.id))
-          .map((s) => s.id)
-          .toList());
+    if (stepsToRun.isNotEmpty) {
+      workflowTask.stepsToRun.addAll(stepsToRun);
     }
+
+    if (stepsToReset.isNotEmpty) {
+      workflowTask.stepsToReset.addAll(stepsToReset);
+    }
+    // if( doNotRunList.isNotEmpty ){
+    //   workflowTask.stepsToRun.addAll( workflow.steps
+    //       .where((s) => !doNotRunList.contains(s.id))
+    //       .map((s) => s.id)
+    //       .toList());
+    // }
 
     workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
 
