@@ -686,11 +686,6 @@ class WorkflowRunner with ProgressDialog {
 
     setupFilters(workflow);
 
-    if (template.projectId == workflow.projectId) {
-      // await factory.workflowService.delete(template.id, template.rev);
-      // workflow.id = "";
-      // workflow.rev = "";
-    }
 
     for (var stepToRemove in stepsToRemove) {
       workflow = removeStepFromWorkflow(stepToRemove, workflow);
@@ -699,9 +694,8 @@ class WorkflowRunner with ProgressDialog {
     for (var meta in workflowMeta) {
       workflow.addMeta(meta.key, meta.value);
     }
-    // addIdPostRun(reEnableSteps);
 
-    // print(xAxisCoord);
+
     //-----------------------------------------
     // Step-specific setup
     //-----------------------------------------
@@ -800,7 +794,6 @@ class WorkflowRunner with ProgressDialog {
 
     if (inPlace) {
       workflow.rev = await factory.workflowService.update(workflow);
-      // workflow = await factory.workflowService.get(workflow.id);
     } else {
       if (folderId == null) {
         sci.FolderDocument folder = await createFolder(
@@ -937,8 +930,8 @@ class WorkflowRunner with ProgressDialog {
     var factory = tercen.ServiceFactory();
 
     runTitle ??= workflow.name;
-    //NEeds the steps2run, but only part of the sci_api_model, not client...
-    sci.RunWorkflowTask workflowTask = sci.RunWorkflowTask()
+
+    var workflowTask = sci.RunWorkflowTask()
       ..state = sci.InitState()
       ..owner = AppUser().teamname
       ..projectId = AppUser().projectId
@@ -948,12 +941,10 @@ class WorkflowRunner with ProgressDialog {
     workflowTask.meta.add(sci.Pair.from("channel.persistent", "true"));
 
     if (stepsToRun != null) {
-      // workflowTask.stepsToRun.clear();
       workflowTask.stepsToRun.addAll(stepsToRun);
     }
 
     if (stepsToReset != null) {
-      // workflowTask.stepsToReset.clear();
       workflowTask.stepsToReset.addAll(stepsToReset);
     }
 
@@ -961,7 +952,6 @@ class WorkflowRunner with ProgressDialog {
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
 
     workflow.addMeta("run.workflow.task.id", workflowTask.id);
-    // workflow.addMeta("run.task.id", workflowTask.id);
     workflow.rev = await factory.workflowService.update(workflow);
 
     var taskStream = factory.eventService.channel(workflowTask.channelId);
@@ -983,7 +973,7 @@ class WorkflowRunner with ProgressDialog {
     await for (var evt in taskStream) {
       if (evt is sci.PatchRecords) {
         // try {
-        //   workflow = evt.apply(workflow);
+        workflow = evt.apply(workflow);
         // } catch (e) {
         //   print("Failed to apply: ");
         //   print(evt.toJson());
@@ -1024,14 +1014,13 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
-    final patches = await factory.patchRecordService.findByChannelIdAndSequence(
-        startKey: [workflowTask.channelId, 0],
-        endKey: [workflowTask.channelId, 9999]);
+    // final patches = await factory.patchRecordService.findByChannelIdAndSequence(
+    //     startKey: [workflowTask.channelId, 0],
+    //     endKey: [workflowTask.channelId, 9999]);
 
-    for (var patch in patches.reversed) {
-      // print("Applying patch ${patch.oR}");
-      workflow = patch.apply(workflow);
-    }
+    // for (var patch in patches.reversed) {
+    //   workflow = patch.apply(workflow);
+    // }
 
     // print("Patching done");
     workflow.rev = await factory.workflowService.update(workflow);
