@@ -1030,7 +1030,7 @@ class WorkflowRunner with ProgressDialog {
   }
 
   Future<sci.Workflow> doRunStep(BuildContext? context, sci.Workflow workflow,
-      String stepId, String? runId) async {
+      String stepId, String? runId, ) async {
     runId = runId ?? "${workflow.name}_${stepId}";
     if (context != null) {
       openDialog(context, id: runId);
@@ -1076,7 +1076,7 @@ class WorkflowRunner with ProgressDialog {
   }
 
   Future<sci.Workflow> doRun(BuildContext? context, sci.Workflow workflow,
-      {String? runId}) async {
+      {String? runId, List<String> stepsToRun = const [], List<String> stepsToReset = const[]}) async {
     runId = runId ?? workflow.name;
     if (context != null) {
       openDialog(context, id: runId);
@@ -1087,7 +1087,7 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
-    workflow = await runWorkflowTask(context, workflow, runId: runId);
+    workflow = await runWorkflowTask(context, workflow, runId: runId, stepsToRun: stepsToRun, stepsToReset: stepsToReset);
 
     log(runId, "$stepProgressMessage\n\n \nRunning final updates",
         dialogTitle: runTitle);
