@@ -27,6 +27,10 @@ class OperatorSettingsComponentGenerator extends SettingComponentGenerator {
     final opProperties = SettingsDataService()
         .getOperatorProperties(fExpr.operatorUrl, fExpr.operatorVersion);
 
+    // print("Read the following properties:");
+    // for( var prop in opProperties ){
+      // print("\t* ${prop.name} -- ${prop.kind} (${_shouldInclude(prop, filters.toList())})");
+    // }
     return opProperties
         .where((prop) => _shouldInclude(prop, filters.toList()))
         .map((prop) => _toSetting(prop, step))

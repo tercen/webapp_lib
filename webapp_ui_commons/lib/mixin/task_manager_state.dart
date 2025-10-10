@@ -415,7 +415,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
 
   List<sci.Task> _runningTasks = [];
   Future<bool> _hasRunningTasks() async {
-    print("${DateTime.now().toIso8601String()} Fetching tasks");
+    // print("${DateTime.now().toIso8601String()} Fetching tasks");
     _runningTasks = (await tercen.ServiceFactory()
         .taskService
         .getTasks(["RunWorkflowTask", "RunComputationTask"]));
@@ -440,7 +440,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
   }
 
   Future<WebappTable> fetchTasks() async {
-    print("${DateTime.now().toIso8601String()} Fetching tasks");
+    // print("${DateTime.now().toIso8601String()} Fetching tasks");
     var comp = getComponent("tasks") as WorkflowTaskComponent;
 
     final res = WebappTable();
@@ -466,7 +466,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
     }
 
     if (tasks.isNotEmpty) {
-      print("\tTasks found: ${tasks.length}");
+      // print("\tTasks found: ${tasks.length}");
       running = true;
       for (var t in tasks.where((t) => t.kind == "RunWorkflowTask")) {
         //RunWorkflowTask are not really needed, but we add it to the lists to know there is still a workflow task running
@@ -596,7 +596,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
     res.addColumn("ProjectId", data: projectId);
     res.addColumn("ProjectName", data: projectName);
     _oldTable = res;
-    print("\tfinal task table rows: ${res.nRows}");
+    // print("\tfinal task table rows: ${res.nRows}");
 
     return res;
   }

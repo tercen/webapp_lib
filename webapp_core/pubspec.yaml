@@ -1,0 +1,25 @@
+name: webapp_core
+
+description: API model implementation.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+  
+
+dependencies:
+  jwt_decoder: ^2.0.1
+  intl: ^0.19.0
+  sci_tercen_client:
+    git:
+      ref: 1.4.0
+      url: https://github.com/tercen/sci_tercen_client
+      path: sci_tercen_client
+
+
+dev_dependencies:
+  test:
+  lints: ^5.0.0
+
+

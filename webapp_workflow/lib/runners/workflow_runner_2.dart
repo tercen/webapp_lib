@@ -52,7 +52,7 @@
 //   bool isRunningStep = false;
 
 //   String stepProgressMessage = "";
-
+ 
 //   var addTimestamp = true;
   
 //   var isInit = false;

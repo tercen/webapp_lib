@@ -1,0 +1,39 @@
+import 'package:intl/intl.dart';
+import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+import 'package:webapp_core/runner/utils/functions/logger.dart';
+import 'package:webapp_core/runner/utils/workflow/workflow_folder_config.dart';
+import 'package:webapp_core/service/workflow_data_service.dart';
+
+class WorkflowSettingsUtils {
+  static sci.Workflow updateEnv(
+      {required sci.Workflow workflow,
+      required String stepId,
+      required String env,
+      required String value}) {
+    final step = workflow.steps
+        .whereType<sci.DataStep>()
+        .where((step) => step.id == stepId)
+        .firstOrNull;
+    if (step == null) {
+      Logger().log(
+          level: Logger.WARN,
+          message:
+              "Step Id $stepId not found in workflow ${workflow.id}. $env will not be set");
+      return workflow;
+    }
+
+    final ei = step.model.operatorSettings.environment.indexWhere((p) => p.key == env);
+    if (ei < 0) {
+      Logger().log(
+          level: Logger.FINER,
+          message:
+              " $env not present in step Id $stepId not found in workflow ${workflow.id}. It will be added with value $value");
+      step.model.operatorSettings.environment.add(sci.Pair.from(env, value));
+    } else {
+      step.model.operatorSettings.environment[ei].value = value;
+    }
+
+    return workflow;
+  }
+}
