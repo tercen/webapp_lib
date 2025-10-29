@@ -42,6 +42,8 @@ class CacheObject {
     _cacheTime[key] = DateTime.now();
   }
 
+  //TODO Clear cache based on time (Seconds, or minutes)
+
   void clearCache(){
     _cacheMap.clear();
     _cacheTime.clear();

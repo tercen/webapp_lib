@@ -23,7 +23,8 @@ class WorkflowSettingsUtils {
       return workflow;
     }
 
-    final ei = step.model.operatorSettings.environment.indexWhere((p) => p.key == env);
+    final ei =
+        step.model.operatorSettings.environment.indexWhere((p) => p.key == env);
     if (ei < 0) {
       Logger().log(
           level: Logger.FINER,
@@ -33,6 +34,30 @@ class WorkflowSettingsUtils {
     } else {
       step.model.operatorSettings.environment[ei].value = value;
     }
+
+    return workflow;
+  }
+
+  sci.Workflow updateSetting(
+      {required sci.Workflow workflow,
+      required String stepId,
+      required String settingName,
+      required String value}) {
+    final step = workflow.steps
+        .whereType<sci.DataStep>()
+        .where((step) => step.id == stepId)
+        .firstOrNull;
+
+    if (step == null) {
+      throw sci.ServiceError(404, "step.not.found",
+          "Step $stepId could not be found when updating setting");
+    }
+
+    final propIdx = step.model.operatorSettings.operatorRef.propertyValues.indexWhere((prop) => prop.name == settingName);
+    if( propIdx == -1){
+      throw sci.ServiceError(404, "property.not.found", "property $settingName has not been found in step ${step.name} ($stepId)");
+    }
+    step.model.operatorSettings.operatorRef.propertyValues[propIdx].value = value;
 
     return workflow;
   }
