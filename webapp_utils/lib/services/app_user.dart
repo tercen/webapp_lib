@@ -1,5 +1,3 @@
-import 'dart:html' as html;
-
 import 'package:jwt_decoder/jwt_decoder.dart';
 // import 'package:jwt_decoder/jwt_decoder.dart';
 // import 'package:kumo_analysis_app/left_menu.dart';
