@@ -2,7 +2,7 @@ name: webapp_workflow
 
 
 description: API model implementation.
-version: 0.1.0
+version: 0.3.0
 publish_to: none
 
 environment:
@@ -27,7 +27,7 @@ dependencies:
 
   sci_tercen_client:
     git:
-      ref: 1.4.0
+      ref: 1.4.9
       url: https://github.com/tercen/sci_tercen_client
       path: sci_tercen_client
 
