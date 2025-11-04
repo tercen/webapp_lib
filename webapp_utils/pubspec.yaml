@@ -12,12 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   fluttertoast: ^8.0.9
-    
-  sci_tercen_client:
-    git:
-      ref: 1.4.0
-      url: https://github.com/tercen/sci_tercen_client
-      path: sci_tercen_client
+
 
   json_string: ^3.0.1
   

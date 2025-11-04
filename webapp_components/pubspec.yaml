@@ -26,13 +26,6 @@ dependencies:
   
   flutter:
     sdk: flutter
-    
-  sci_tercen_client:
-    git:
-      ref: 1.4.0
-      url: https://github.com/tercen/sci_tercen_client
-      path: sci_tercen_client
-  
 
 
 dev_dependencies:
