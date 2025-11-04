@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'dart:html' as html;
+import 'package:web/web.dart' as html;
 
 import 'package:flutter/material.dart';
 

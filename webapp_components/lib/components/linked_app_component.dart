@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:html';
+import 'package:web/web.dart';
+
 
 import 'dart:ui_web';
 import 'package:flutter/material.dart';

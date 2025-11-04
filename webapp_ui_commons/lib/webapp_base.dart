@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:html' as html;
+import 'package:web/web.dart' as html;
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
