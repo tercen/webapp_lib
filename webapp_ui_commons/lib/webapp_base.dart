@@ -74,7 +74,7 @@ class WebAppBase with ChangeNotifier {
   }
 
   Future<void> postInit() async {
-    html.window.history.pushState({}, '', AppUser().projectUrl);
+    html.window.history.pushState(null, '', AppUser().projectUrl);
     isInitialized = true;
   }
 

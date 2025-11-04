@@ -17,7 +17,7 @@ class ExportPageContent {
   ExportPageContent(this.title, this.content, {this.contentType = "image"});
 }
 
-class ImageListComponent extends ListComponent with ProgressDialog{
+class ImageListComponent extends ListComponent with ProgressDialog {
   final List<dynamic> widgetExportContent = [];
 
   ImageListComponent(String super.id, String super.groupId,
@@ -37,10 +37,13 @@ class ImageListComponent extends ListComponent with ProgressDialog{
       var font = pd.PdfStandardFont(pd.PdfFontFamily.helvetica, 40);
       var titleSz = font.measureString(content.title);
       var bmp = pd.PdfBitmap(content.content);
-      var hMargin = pdfDoc.pageSettings.margins.left+pdfDoc.pageSettings.margins.right;
-      var vMargin = pdfDoc.pageSettings.margins.top+pdfDoc.pageSettings.margins.bottom;
+      var hMargin = pdfDoc.pageSettings.margins.left +
+          pdfDoc.pageSettings.margins.right;
+      var vMargin = pdfDoc.pageSettings.margins.top +
+          pdfDoc.pageSettings.margins.bottom;
       pdfDoc.pageSettings.size =
-          Size((bmp.height as double) + titleSz.height + 10 + vMargin, (bmp.width as double)+hMargin);
+          Size((bmp.height as double) + titleSz.height + 10 + vMargin,
+              (bmp.width as double) + hMargin);
       if (bmp.height > bmp.width) {
         pdfDoc.pageSettings.orientation = pd.PdfPageOrientation.portrait;
       } else {
@@ -48,7 +51,7 @@ class ImageListComponent extends ListComponent with ProgressDialog{
       }
 
       var page = pdfDoc.pages.add();
-      
+
 
       page.graphics.drawString(content.title, font,
           bounds: Rect.fromLTWH(0, 0, titleSz.width, titleSz.height));
@@ -62,14 +65,14 @@ class ImageListComponent extends ListComponent with ProgressDialog{
   }
 
   Future<void> doDownload(pd.PdfDocument pdfDoc) async {
-    
     List<int> saveBytes = List.from(await pdfDoc.save());
     pdfDoc.dispose();
     const mimetype = "application/octet-stream";
     const filename = "analysis_report.pdf";
     var base64Bytes = base64.encode(saveBytes);
 
-    html.AnchorElement(href: 'data:$mimetype;base64,$base64Bytes')
+    html.HTMLAnchorElement()
+      ..href = 'data:$mimetype;base64,$base64Bytes'
       ..target = 'blank'
       ..download = filename
       ..click();
@@ -78,7 +81,7 @@ class ImageListComponent extends ListComponent with ProgressDialog{
   Widget downloadActionWidget(BuildContext context) {
     return IconButton(
         onPressed: () async {
-          openDialog(context, id: this.id );
+          openDialog(context, id: this.id);
           log(this.id, "Preparing download. Please wait");
 
           var pdfDoc = pd.PdfDocument();
@@ -118,7 +121,7 @@ class ImageListComponent extends ListComponent with ProgressDialog{
     String titleColName = dataTable.colNames
         .firstWhere((e) => e.contains("filename"), orElse: () => "");
     String dataColName =
-        dataTable.colNames.firstWhere((e) => e.contains("data"), orElse: () => "");
+    dataTable.colNames.firstWhere((e) => e.contains("data"), orElse: () => "");
 
     List<Widget> wdgList = [];
 
@@ -126,7 +129,7 @@ class ImageListComponent extends ListComponent with ProgressDialog{
       var title = dataTable.columns[titleColName]![ri];
       if (shouldIncludeEntry(title)) {
         var imgData =
-            Uint8List.fromList(dataTable.columns[dataColName]![ri].codeUnits);
+        Uint8List.fromList(dataTable.columns[dataColName]![ri].codeUnits);
         Widget wdg = createImageListEntry(title, imgData);
 
         widgetExportContent.add(ExportPageContent(title, imgData));

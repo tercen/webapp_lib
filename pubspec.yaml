@@ -1,0 +1,8 @@
+name: webapp_lib
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dev_dependencies:
+  melos: ^7.3.0

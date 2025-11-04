@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:web/web.dart';
+import 'package:web/web.dart' as web;
 
 
 import 'dart:ui_web';
@@ -44,7 +44,7 @@ class LinkedAppComponent
   bool enabled = true;
 
   BuildContext? dialogContext;
-  static final IFrameElement _iframe = IFrameElement();
+  static final web.HTMLIFrameElement _iframe = web.HTMLIFrameElement();
   static bool _iframeInitialized = false;
 
   LinkedAppComponent(id, groupId, componentLabel, this.baseUri, this.onOpen,
@@ -129,7 +129,7 @@ class LinkedAppComponent
             _iframe.style.border = 'none';
             LinkedAppComponent._iframeInitialized = true;
 
-            PlatformViewRegistry().registerViewFactory(
+            platformViewRegistry.registerViewFactory(
               'iframeElement',
               (int viewId) => _iframe,
             );
