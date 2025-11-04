@@ -19,10 +19,6 @@ dependencies:
   webapp_model:
     path: ../webapp_model
 
-  sci_tercen_client: any
-  jwt_decoder: any
-  intl: any
-  collection: any
 dev_dependencies:
   test:
   lints: ^5.0.0

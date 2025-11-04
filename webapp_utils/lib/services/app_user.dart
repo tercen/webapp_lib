@@ -3,6 +3,8 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 // import 'package:kumo_analysis_app/left_menu.dart';
 // import 'package:kumo_analysis_app/util/tercen_util.dart';
 
+import 'package:web/web.dart' as html;
+
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 

@@ -17,10 +17,6 @@ dependencies:
       url: https://github.com/tercen/sci_tercen_client
       path: sci_tercen_client
 
-
-  tson: any
-  uuid: any
-  sci_http_client: any
 dev_dependencies:
   test:
   lints: ^5.0.0

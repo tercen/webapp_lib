@@ -26,13 +26,6 @@ dependencies:
   
   flutter:
     sdk: flutter
-
-
-  sci_tercen_client: any
-  uuid: any
-  async: any
-  web: any
-  sci_tercen_model: any
 dev_dependencies:
   test:
   lints: ^5.0.0

@@ -22,11 +22,6 @@ dependencies:
   webapp_utils:
     path: ../webapp_utils
 
-  json_string: any
-  web: any
-  sci_http_client: any
-  sci_tercen_client: any
-  sci_tercen_model: any
 dev_dependencies:
   test:
   lints: ^5.0.0
