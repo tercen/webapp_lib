@@ -37,7 +37,7 @@ class ProjectDataService {
           allFolders.add(obj as FolderDocument);
         } else {
           // print("\t${obj.name}");
-          allDocs.add(obj as ProjectDocument);
+          allDocs.add(obj);
         }
       }
 

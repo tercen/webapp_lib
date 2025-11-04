@@ -3,7 +3,6 @@
 
 import 'package:intl/intl.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
-import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:webapp_core/runner/utils/functions/string_utils.dart';
 import 'package:webapp_core/service/project_data_service.dart';
 // import 'package:webapp_utils/functions/string_utils.dart';

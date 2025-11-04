@@ -1,6 +1,5 @@
 import 'package:webapp_components/definitions/validator_result.dart';
 import 'package:webapp_components/validators/validator_base.dart';
-import 'package:webapp_model/id_element.dart';
 
 mixin InputValidator {
   final List<ValidatorBase> validators = [];

@@ -48,6 +48,8 @@ dependencies:
   
   
 
+  flutter: any
+  json_string: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

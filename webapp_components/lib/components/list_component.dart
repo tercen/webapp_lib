@@ -13,7 +13,7 @@ class ListComponent extends FetchComponent implements Component {
 
   //ACTION Controls
 
-  final List<ExpansionTileController> expansionControllers = [];
+  final List<ExpansibleController> expansionControllers = [];
   final TextEditingController filterController = TextEditingController();
   bool expandAll = false;
   //END OF ACTION Controls
@@ -75,7 +75,7 @@ class ListComponent extends FetchComponent implements Component {
   }
 
   Widget collapsibleWrap(int row, String title, Widget wdg) {
-    expansionControllers.add(ExpansionTileController());
+    expansionControllers.add(ExpansibleController());
 
     var expTile = ExpansionTile(
       key: GlobalKey(),

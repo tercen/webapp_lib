@@ -7,9 +7,6 @@ import 'package:webapp_components/components/action_table_component.dart';
 import 'package:webapp_components/definitions/list_action.dart';
 import 'package:webapp_model/webapp_table.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
-import 'package:webapp_utils/cache_object.dart';
-import 'package:webapp_utils/functions/formatter_utils.dart';
-import 'package:webapp_utils/functions/list_utils.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_model/sci_model.dart' as sci;

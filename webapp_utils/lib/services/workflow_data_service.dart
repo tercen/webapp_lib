@@ -483,7 +483,7 @@ class WorkflowDataService {
       var shouldIncludeStep =
           includeStepId.isEmpty || includeStepId.contains(stp.id);
       if (stp.kind == "DataStep" && shouldIncludeStep) {
-        DataStep dStp = stp as DataStep;
+        DataStep dStp = stp;
         var relList = getSimpleRelations(dStp.computedRelation);
         rels.addAll(relList);
         stepRelationMap[dStp.id] = relList.map((e) => e.id).toList();

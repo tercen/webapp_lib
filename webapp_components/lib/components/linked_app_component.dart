@@ -13,7 +13,6 @@ import 'package:webapp_components/mixins/infobox_component.dart';
 
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_client/sci_client.dart' as sci;
-import 'package:webapp_ui_commons/mixin/progress_log.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
 import 'package:webapp_utils/services/app_user.dart';
