@@ -42,8 +42,8 @@ class ImageListComponent extends ListComponent with ProgressDialog {
       var vMargin = pdfDoc.pageSettings.margins.top +
           pdfDoc.pageSettings.margins.bottom;
       pdfDoc.pageSettings.size =
-          Size((bmp.height as double) + titleSz.height + 10 + vMargin,
-              (bmp.width as double) + hMargin);
+          Size((bmp.height).toDouble() + titleSz.height + 10 + vMargin,
+              (bmp.width).toDouble() + hMargin);
       if (bmp.height > bmp.width) {
         pdfDoc.pageSettings.orientation = pd.PdfPageOrientation.portrait;
       } else {
@@ -57,8 +57,8 @@ class ImageListComponent extends ListComponent with ProgressDialog {
           bounds: Rect.fromLTWH(0, 0, titleSz.width, titleSz.height));
       page.graphics.drawImage(
           bmp,
-          Rect.fromLTWH(0, titleSz.height + 10, bmp.width as double,
-              bmp.height as double));
+          Rect.fromLTWH(0, titleSz.height + 10, (bmp.width).toDouble(),
+              (bmp.height).toDouble()));
     }
 
     return pdfDoc;

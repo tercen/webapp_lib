@@ -149,9 +149,9 @@ class WorkflowTaskComponent extends ActionTableComponent {
   List<double> _updateColumnWidths(
       {required List<double> widths, required List<String> displayEls}) {
     if (widths.isEmpty) {
-      widths.addAll(displayEls.map((el) => el.length as double));
+      widths.addAll(displayEls.map((el) => el.length.toDouble()));
     } else {
-      var tmp = displayEls.map((el) => el.length as double).toList();
+      var tmp = displayEls.map((el) => el.length.toDouble()).toList();
 
       for (var k = 0; k < widths.length; k++) {
         widths[k] = widths[k] + tmp[k];

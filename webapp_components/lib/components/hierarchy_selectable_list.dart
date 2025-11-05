@@ -429,7 +429,7 @@ class HierarchySelectableListComponent extends FetchComponent
       BuildContext context, HierarchyNode node, WebappTable rowEls,
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
-    var offset = node.level * 25 as double;
+    var offset = (node.level * 25).toDouble();
 
     // Check if this node has children to show chevron
     bool hasChildren = node.children.isNotEmpty;
@@ -653,8 +653,8 @@ class HierarchySelectableListComponent extends FetchComponent
       BuildContext context, HierarchyNode node, WebappTable rowVals,
       {bool isEven = true, bool bold = false}) {
     var clr = isEven ? Colors.white : Color.fromARGB(255, 240, 248, 255);
-    var offset = node.level * 25 as double;
-    var offsetExtra = node.children.isEmpty ? 50 : 0;
+    var offset = (node.level * 25).toDouble();
+    var offsetExtra = node.children.isEmpty ? 50.0 : 0.0;
     return Container(
       color: clr,
       width: double.infinity,

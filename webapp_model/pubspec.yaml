@@ -18,10 +18,11 @@ dependencies:
   
   json_annotation: ^4.9.0
   json_serializable: ^6.9.0
-  
+  # sci_tercen_client:
+    # path: ../../../sci_tercen_client/sci_tercen_client
   sci_tercen_client:
     git:
-      ref: 1.4.9
+      ref: 1.4.12
       url: https://github.com/tercen/sci_tercen_client
       path: sci_tercen_client
   

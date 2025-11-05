@@ -1,3 +1,11 @@
 pubspec_overrides.yaml
 .idea
 .dart_tool
+.vscode/
+
+# Flutter generated files
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Lock files for library packages
+**/pubspec.lock

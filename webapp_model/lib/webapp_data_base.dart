@@ -338,6 +338,37 @@ class WebAppDataBase with ChangeNotifier {
 
       for (var wkfPair in workflowsToFetch) {
         var workflow = workflows.firstWhere((w) => w.id == wkfPair.value);
+        
+        // Find the required template for this workflow to get the version from repos.json
+        var reqTemplate = requiredWorkflows.firstWhere(
+          (req) => req.iid == wkfPair.key,
+          orElse: () => RequiredTemplate(iid: "", name: "", url: "", version: ""),
+        );
+        
+
+        Logger().log(
+          level: Logger.FINER,
+          message: "Adding required workflow ${workflow.name} [${workflow.id}] for template ${reqTemplate.url} [${reqTemplate.version}]");
+        // Update workflow version with template version 
+        var idx = workflow.meta.indexWhere((m) => m.key == "document.template.repo.version");
+        if (idx >= 0) {
+          workflow.meta[idx].value = reqTemplate.version;
+        } else {
+          workflow.meta.add(Pair.from("document.template.repo.version", reqTemplate.version));
+        }
+
+        Logger().log(
+          level: Logger.FINER,
+          message: "\tUPDATED to: ${workflow.meta.firstWhere((meta) => meta.key == "document.template.repo.version", orElse: () => Pair.from("VERSION", "NOT FOUND")).value}");
+
+        // // Override workflow version with the one from repos.json if specified
+        // if (reqTemplate.version.isNotEmpty && reqTemplate.version != workflow.version) {
+        //   Logger().log(
+        //     level: Logger.FINER,
+        //     message: "Overriding workflow version from ${workflow.version} to ${reqTemplate.version} for ${workflow.name}");
+        //   workflow.version = reqTemplate.version;
+        // }
+        
         workflowService.addWorkflow(wkfPair.key, workflow);
       }
     }

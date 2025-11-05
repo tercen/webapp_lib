@@ -273,11 +273,11 @@ class ActionTableComponent extends FetchComponent
           .map((col) => table.columns[col]![ri])
           .toList();
       if (widths.isEmpty) {
-        widths.addAll(displayEls.map((el) => el.length as double));
+        widths.addAll(displayEls.map((el) => el.length.toDouble()));
 
         // widths = widths.map((w) => (w/totalWidth) * 0.9).toList();
       } else {
-        var tmp = displayEls.map((el) => el.length as double).toList();
+        var tmp = displayEls.map((el) => el.length.toDouble()).toList();
 
         for (var k = 0; k < widths.length; k++) {
           widths[k] = widths[k] + tmp[k];

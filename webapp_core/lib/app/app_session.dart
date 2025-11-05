@@ -1,6 +1,6 @@
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sci_http_client/http_client.dart' as http_api;
-import 'package:sci_http_client/http_browser_client.dart' as io_http;
+import 'package:sci_http_client/http_io_client.dart' as io_http;
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_http_client/http_auth_client.dart' as auth_http;
@@ -30,7 +30,7 @@ class AppSession {
     }
 
     var authClient =
-        auth_http.HttpAuthClient(token, io_http.HttpBrowserClient());
+        auth_http.HttpAuthClient(token, io_http.HttpIOClient());
 
     var factory = sci.ServiceFactory();
 
@@ -48,8 +48,8 @@ class AppSession {
     tercen.ServiceFactory.CURRENT = factory;
   }
 
-  Future<sci.UserSession> createUserSession() async {
-    var tercenToken = _getTercenToken();
+  Future<sci.UserSession> createUserSession({String? token}) async {
+    var tercenToken = token ?? _getTercenToken();
 
     if (tercenToken.isEmpty) {
       throw 'Tercen token not found -- String.fromEnvironment("TERCEN_TOKEN")';
@@ -63,10 +63,20 @@ class AppSession {
       ..token = (sci.Token()..token = tercenToken);
   }
 
-  Future<void> initSession({bool force = false}) async {
+  Future<void> initSession({bool force = false, String? token, String? serviceUrl}) async {
     if (!isInitialized || force) {
-      _currentSession = await createUserSession();
+      _currentSession = await createUserSession(token: token);
       await initFactory(_currentSession.token.token);
+      
+      // Override service URL if provided
+      if (serviceUrl != null && serviceUrl.isNotEmpty) {
+        var authClient = auth_http.HttpAuthClient(_currentSession.token.token, io_http.HttpIOClient());
+        var factory = sci.ServiceFactory();
+        await factory.initializeWith(Uri.parse(serviceUrl), authClient);
+        http_api.HttpClient.setCurrent(authClient);
+        tercen.ServiceFactory.CURRENT = factory;
+      }
+      
       await (tercen.ServiceFactory().userService as sci.UserService)
           .setSession(_currentSession);
     }

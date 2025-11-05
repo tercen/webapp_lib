@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:webapp_ui_commons/styles/style_base.dart';
 
@@ -26,9 +25,9 @@ class DefaultStyle extends StyleBase {
     styleMap["evenRow"] = Color.fromARGB(30, 255, 255, 255);
     styleMap["oddRow"] = Color.fromARGB(30, 120, 240, 255);
 
-    styleMap["paddingSmall"] = 5;
-    styleMap["paddingMedium"] = 15;
-    styleMap["paddingLarge"] = 25;
+    styleMap["paddingSmall"] = 5.0;
+    styleMap["paddingMedium"] = 15.0;
+    styleMap["paddingLarge"] = 25.0;
 
     styleMap["borderRounding"] = BorderRadius.circular(8.0);
     styleMap["textH1"] = TextStyle(

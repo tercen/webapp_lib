@@ -8,6 +8,26 @@ import 'package:webapp_components/definitions/component.dart';
 import 'package:webapp_components/widgets/wait_indicator.dart';
 import 'package:webapp_ui_commons/styles/styles.dart';
 
+/// Lightweight controller used to programmatically expand/collapse
+/// entries in this ListComponent. It holds optional callbacks that
+/// update the component state when expand()/collapse() are called.
+class ExpansibleController {
+  final void Function()? _onExpand;
+  final void Function()? _onCollapse;
+
+  ExpansibleController({void Function()? onExpand, void Function()? onCollapse})
+      : _onExpand = onExpand,
+        _onCollapse = onCollapse;
+
+  void expand() {
+    _onExpand?.call();
+  }
+
+  void collapse() {
+    _onCollapse?.call();
+  }
+}
+
 class ListComponent extends FetchComponent implements Component {
   final List<int> expandedRows = [];
 
@@ -75,7 +95,17 @@ class ListComponent extends FetchComponent implements Component {
   }
 
   Widget collapsibleWrap(int row, String title, Widget wdg) {
-    expansionControllers.add(ExpansibleController());
+    expansionControllers.add(ExpansibleController(onExpand: () {
+      if (!expandedRows.contains(row)) {
+        expandedRows.add(row);
+      }
+      notifyListeners();
+    }, onCollapse: () {
+      if (expandedRows.contains(row)) {
+        expandedRows.remove(row);
+      }
+      notifyListeners();
+    }));
 
     var expTile = ExpansionTile(
       key: GlobalKey(),
@@ -84,7 +114,6 @@ class ListComponent extends FetchComponent implements Component {
         style: Styles()["textH2"],
       ),
       controlAffinity: ListTileControlAffinity.leading,
-      controller: expansionControllers.last,
       initiallyExpanded: expandedRows.contains(row),
       onExpansionChanged: (isExpanded) {
         if (isExpanded) {

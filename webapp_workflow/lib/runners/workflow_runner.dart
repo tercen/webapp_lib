@@ -684,6 +684,20 @@ class WorkflowRunner with ProgressDialog {
     print("\t\tdoSetup :: copyApp :: ${stopwatch.elapsedMilliseconds} ms");
     stopwatch.reset();
 
+    // Copy template version meta to the new workflow
+    var templateVersionMeta = template.meta.firstWhere(
+      (m) => m.key == "document.template.repo.version",
+      orElse: () => sci.Pair.from("", ""),
+    );
+    if (templateVersionMeta.key != "") {
+      var idx = workflow.meta.indexWhere((m) => m.key == "document.template.repo.version");
+      if (idx >= 0) {
+        workflow.meta[idx].value = templateVersionMeta.value;
+      } else {
+        workflow.meta.add(sci.Pair.from("document.template.repo.version", templateVersionMeta.value));
+      }
+    }
+
     setupFilters(workflow);
 
 
