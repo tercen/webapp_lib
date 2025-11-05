@@ -720,7 +720,13 @@ class WorkflowDataService {
     var doc = await factory.fileService.get(document.id);
     Stream<List> dataStream =
         Stream.fromIterable(Iterable.castFrom([utf8.encode(readmeTxt)]));
-    factory.fileService.upload(doc, dataStream);
+    try {
+      // Ensure we await the upload and catch errors so post-run callbacks
+      // don't propagate server errors to the UI.
+      await factory.fileService.upload(doc, dataStream);
+    } catch (e) {
+      Logger().log(level: Logger.WARN, message: "Failed to upload readme: $e");
+    }
   }
 
   Future<void> deleteWorkflow(String workflowId,

@@ -398,7 +398,13 @@ class WebAppDataBase with ChangeNotifier {
       // print(
           // "File name containing ${lowerFileName} not found for workflow id $workflowId");
     } else {
-      workflowService.updateFile(document, text);
+      try {
+        await workflowService.updateFile(document, text);
+      } catch (e) {
+        // Suppress upload errors coming from post-run callbacks so the UI
+        // is not interrupted by server-side failures (e.g. missing content-type).
+        Logger().log(level: Logger.WARN, message: "updateTextFile suppressed error: $e");
+      }
     }
   }
 }

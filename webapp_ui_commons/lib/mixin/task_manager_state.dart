@@ -400,17 +400,23 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
 
   sci.TaskStateEvent _getLatestStepEvent(
       String stepId, List<sci.TaskStateEvent> events) {
-    for (var ev in events) {
+    // Filter events for this specific step
+    final stepEvents = events.where((ev) {
       final evStepId = ev.meta.firstWhere(
         (m) => m.key == "step.id",
         orElse: () => sci.Pair(),
       );
-      if (evStepId.value == stepId) {
-        return ev;
-      }
+      return evStepId.value == stepId;
+    }).toList();
+
+    if (stepEvents.isEmpty) {
+      return events.first;
     }
 
-    return events.first;
+    // Sort by date descending to get the latest event
+    stepEvents.sort((a, b) => b.date.value.compareTo(a.date.value));
+    
+    return stepEvents.first;
   }
 
   List<sci.Task> _runningTasks = [];
@@ -476,7 +482,8 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
             .fetch((t as sci.RunWorkflowTask).workflowId);
         final project = await ProjectDataService()
             .fetchProject(projectId: workflow.projectId);
-        if (!t.state.isFinal) {
+        // Only show workflow tasks that are actually running (not in final or init state)
+        if (!t.state.isFinal && t.state.kind != "InitState") {
           taskIds.add(t.id);
           taskTypes.add("Workflow Task");
           workflowNames.add(workflow.name);
@@ -496,7 +503,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
       }
 
       final uniqueChannelIds = tasks
-          .where((task) => !task.state.isFinal)
+          .where((task) => !task.state.isFinal && task.kind == "RunComputationTask")
           .map((t) => t.channelId)
           .toSet()
           .toList();
