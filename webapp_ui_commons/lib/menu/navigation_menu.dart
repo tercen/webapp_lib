@@ -25,15 +25,21 @@ class NavigationMenu with ChangeNotifier {
 
   Widget _createMenuEntry(MenuItem item) {
     bool isSelected = item.label == selectedScreen;
+    bool isEnabled = item.isEnabled();
+    
+    // Debug logging for menu item enabled state
+    if (item.label == "Train UMAP" || item.label == "Train SVM/LGBM") {
+      print('[NavigationMenu] Menu item "${item.label}" enabled: $isEnabled');
+    }
 
-    var bgColor = item.isEnabled() && isSelected
+    var bgColor = isEnabled && isSelected
         ? Styles()["selectedMenuBg"]
         : Colors.white;
     var textStyle =
         isSelected ? Styles()["menuTextSelected"] : Styles()["menuText"];
 
     var padding = const EdgeInsets.symmetric(vertical: 5, horizontal: 5);
-    if (!item.isEnabled()) {
+    if (!isEnabled) {
       textStyle = Styles()["menuTextDisabled"];
     }
 

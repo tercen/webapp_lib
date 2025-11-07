@@ -6,6 +6,7 @@ import 'package:webapp_ui_commons/styles/styles.dart';
 import 'package:webapp_utils/functions/logger.dart';
 import 'package:webapp_utils/services/app_user.dart';
 import 'package:webapp_workflow/runners/workflow_runner.dart';
+import 'package:webapp_workflow/services/task_manager.dart';
 import 'package:sci_tercen_client/sci_client.dart' as sci;
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
@@ -61,6 +62,14 @@ class WorkflowQueuRunner extends WorkflowRunner {
 
     workflow.addMeta("run.workflow.task.id", workflowTask.id);
     workflow.rev = await factory.workflowService.update(workflow);
+
+    // Initialize TaskManager and register this workflow task
+    await TaskManager().initialize();
+    await TaskManager().registerWorkflowTask(
+      workflow.id, 
+      workflowTask.id, 
+      workflowTask.channelId
+    );
 
     var taskStream = factory.eventService.channel(workflowTask.channelId);
 

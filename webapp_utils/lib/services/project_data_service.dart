@@ -41,7 +41,7 @@ class ProjectDataService {
         }
       }
 
-      if (folderId == null || folderId.isEmpty) {
+      // if (folderId == null || folderId.isEmpty) {
         folderTreeRoot.children.clear();
         folderTreeRoot.children =
             _buildChildrenList(folderTreeRoot, allFolders, true);
@@ -50,11 +50,11 @@ class ProjectDataService {
         structureLoaded = true;
         // print("After full reload");
         // folderTreeRoot.printStructure();
-      } else {
-        _updatePartialTree(folderId, allFolders, allDocs);
+      // } else {
+        // _updatePartialTree(folderId, allFolders, allDocs);
         // print("After partial update");
         // folderTreeRoot.printStructure();
-      }
+      // }
     }
   }
 
@@ -78,12 +78,12 @@ class ProjectDataService {
   }
 
   Future<List<sci.ProjectDocument>> _fetchProjectObjects({String? reloadRoot}) async {
-    final startFolder = "\ufff0"; //reloadRoot == null ? "\ufff0" : reloadRoot;
-    final endFolder = reloadRoot == null ? "" : reloadRoot;
+    final startFolder = reloadRoot == null ? "" : reloadRoot;
+    final endFolder = "\ufff0"; //reloadRoot == null ? "" : reloadRoot;
 
     return  await tercen.ServiceFactory().projectDocumentService.findProjectObjectsByFolderAndName( 
-          startKey: [AppUser().projectId, startFolder, "\ufff0"],
-          endKey: [AppUser().projectId, endFolder, ""], limit: 10000, useFactory: true);
+          startKey: [AppUser().projectId, startFolder, startFolder],
+          endKey: [AppUser().projectId, endFolder, "\ufff0"], limit: 10000, useFactory: true, descending: false);
   }
 
   void _updatePartialTree(String folderId, List<FolderDocument> allFolders, List<ProjectDocument> allDocs) {
