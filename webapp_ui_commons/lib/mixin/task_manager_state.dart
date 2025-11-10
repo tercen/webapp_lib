@@ -155,7 +155,7 @@ mixin TaskManagerStateMixin<T extends StatefulWidget> on State<T>
               workflowInfo)
         ],
         hideColumns: ["Id", "ProjectName"],
-        widths: [3, 1, 1, 1],
+        widths: [3, 1, 1, 1, 1],
         onEmptyQueu: onEmptyQueu);
 
     comp.markedForReload = true;

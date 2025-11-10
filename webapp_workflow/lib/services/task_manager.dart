@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:sci_tercen_model/sci_model.dart' as sci;
+import 'package:webapp_utils/services/project_data_service.dart';
 
 /// Singleton service that tracks running tasks and their step information
 /// This service runs in the background and maintains up-to-date task information
@@ -70,6 +71,25 @@ class TaskManager {
     _taskFinishedCallbacks.remove(callback);
   }
 
+  /// Helper method to fetch project information for a workflow
+  Future<Map<String, String>> _getProjectInfo(String workflowId) async {
+    try {
+      final factory = tercen.ServiceFactory();
+      final workflow = await factory.workflowService.get(workflowId);
+      final project = await ProjectDataService().fetchProject(projectId: workflow.projectId);
+      return {
+        'projectId': project.id,
+        'projectName': project.name,
+      };
+    } catch (e) {
+      print('[TaskManager] Failed to fetch project info for workflow $workflowId: $e');
+      return {
+        'projectId': '',
+        'projectName': 'Unknown Project',
+      };
+    }
+  }
+
   /// Register a new workflow task (called by WorkflowRunner when starting a workflow)
   Future<void> registerWorkflowTask(String workflowId, String taskId, String channelId) async {
     print('[TaskManager] Registering workflow task: $taskId for workflow: $workflowId');
@@ -78,6 +98,7 @@ class TaskManager {
       final factory = tercen.ServiceFactory();
       final workflow = await factory.workflowService.get(workflowId);
       final task = await factory.taskService.get(taskId);
+      final projectInfo = await _getProjectInfo(workflowId);
       
       final taskData = TaskData(
         taskId: taskId,
@@ -88,6 +109,8 @@ class TaskManager {
         state: task.state.kind,
         channelId: channelId,
         lastUpdate: task.lastModifiedDate,
+        projectId: projectInfo['projectId']!,
+        projectName: projectInfo['projectName']!,
       );
       
       _runningTasks[taskId] = taskData;
@@ -108,6 +131,7 @@ class TaskManager {
       final factory = tercen.ServiceFactory();
       final workflow = await factory.workflowService.get(workflowId);
       final task = await factory.taskService.get(taskId);
+      final projectInfo = await _getProjectInfo(workflowId);
       
       // Find the step name
       final step = workflow.steps.firstWhere(
@@ -126,6 +150,8 @@ class TaskManager {
         state: task.state.kind,
         channelId: channelId,
         lastUpdate: task.lastModifiedDate,
+        projectId: projectInfo['projectId']!,
+        projectName: projectInfo['projectName']!,
       );
       
       _runningTasks[taskId] = taskData;
@@ -180,6 +206,7 @@ class TaskManager {
       for (var entry in workflowTaskMap.entries) {
         try {
           final workflow = await factory.workflowService.get(entry.key);
+          final projectInfo = await _getProjectInfo(entry.key);
           
           for (var task in entry.value) {
             String stepName = '';
@@ -208,6 +235,8 @@ class TaskManager {
               state: task.state.kind,
               channelId: task.channelId,
               lastUpdate: task.lastModifiedDate,
+              projectId: projectInfo['projectId']!,
+              projectName: projectInfo['projectName']!,
             );
             
             _runningTasks[task.id] = taskData;
@@ -349,6 +378,8 @@ class TaskManager {
             state: event.state.kind,
             channelId: task.channelId,
             lastUpdate: task.lastModifiedDate,
+            projectId: '', // TODO: Set actual project ID
+            projectName: '', // TODO: Set actual project name
           );
           
           _runningTasks[taskId] = taskData;
@@ -430,6 +461,8 @@ class TaskData {
   final String state;
   final String channelId;
   final sci.Date lastUpdate;
+  final String projectId;
+  final String projectName;
 
   TaskData({
     required this.taskId,
@@ -440,6 +473,8 @@ class TaskData {
     required this.state,
     required this.channelId,
     required this.lastUpdate,
+    required this.projectId,
+    required this.projectName,
   });
 
   TaskData copyWith({
@@ -451,6 +486,8 @@ class TaskData {
     String? state,
     String? channelId,
     sci.Date? lastUpdate,
+    String? projectId,
+    String? projectName,
   }) {
     return TaskData(
       taskId: taskId ?? this.taskId,
@@ -461,12 +498,14 @@ class TaskData {
       state: state ?? this.state,
       channelId: channelId ?? this.channelId,
       lastUpdate: lastUpdate ?? this.lastUpdate,
+      projectId: projectId ?? this.projectId,
+      projectName: projectName ?? this.projectName,
     );
   }
 
   @override
   String toString() {
-    return 'TaskData(taskId: $taskId, workflowName: $workflowName, stepName: $stepName, type: $taskType, state: $state)';
+    return 'TaskData(taskId: $taskId, workflowName: $workflowName, stepName: $stepName, type: $taskType, state: $state, project: $projectName)';
   }
 }
 
