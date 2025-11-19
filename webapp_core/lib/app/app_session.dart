@@ -63,10 +63,45 @@ class AppSession {
       ..token = (sci.Token()..token = tercenToken);
   }
 
-  Future<void> initSession({bool force = false, String? token, String? serviceUrl}) async {
+  // var factory = ServiceFactory();
+  // await factory.initializeWith(
+  // Uri.parse('http://127.0.0.1:5400'), io_http.HttpIOClient());
+  // tercen.ServiceFactory.CURRENT = factory;
+  //
+  // var userSession =
+  // await tercen.ServiceFactory().userService.connect('test', 'test');
+  //
+  // print(JsonEncoder.withIndent('  ').convert(userSession.toJson()));
+  //
+  // var token = userSession.token.token;
+  //
+  // var authClient = auth_http.HttpAuthClient(token, io_http.HttpIOClient());
+  // await factory.initializeWith(
+  // Uri.parse('http://127.0.0.1:5400'), authClient);
+
+  Future<sci.UserSession> _connectToUserSession({
+    required String user, required String passw, required String serviceUrl
+}) async {
+    var factory = sci.ServiceFactory();
+    await factory.initializeWith(
+    Uri.parse(serviceUrl), io_http.HttpIOClient());
+    tercen.ServiceFactory.CURRENT = factory;
+    return   await tercen.ServiceFactory().userService.connect(user, passw);
+
+  }
+
+  Future<void> initSession({bool force = false, String? token, String? serviceUrl,
+    String? user, String? passw}) async {
+
     if (!isInitialized || force) {
-      _currentSession = await createUserSession(token: token);
+      if( token == null && user != null && passw != null && serviceUrl != null){
+        _currentSession = await _connectToUserSession(user: user, passw: passw, serviceUrl: serviceUrl);
+      }else{
+        _currentSession = await createUserSession(token: token);
+      }
+
       await initFactory(_currentSession.token.token);
+
       
       // Override service URL if provided
       if (serviceUrl != null && serviceUrl.isNotEmpty) {
