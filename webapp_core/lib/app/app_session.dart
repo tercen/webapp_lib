@@ -86,7 +86,7 @@ class AppSession {
     await factory.initializeWith(
     Uri.parse(serviceUrl), io_http.HttpIOClient());
     tercen.ServiceFactory.CURRENT = factory;
-    return   await tercen.ServiceFactory().userService.connect(user, passw);
+    return   await tercen.ServiceFactory().userService.connect2(serviceUrl, user, passw);
 
   }
 
