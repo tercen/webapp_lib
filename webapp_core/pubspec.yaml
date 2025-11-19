@@ -13,7 +13,7 @@ dependencies:
   intl: ^0.19.0
   sci_tercen_client:
     git:
-      ref: 1.4.9
+      ref: 1.4.14
       url: https://github.com/tercen/sci_tercen_client
       path: sci_tercen_client
 

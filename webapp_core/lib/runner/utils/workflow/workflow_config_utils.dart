@@ -1,4 +1,5 @@
 import 'package:sci_tercen_client/sci_client.dart' as sci;
+import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 
 class WorkflowConfigUtils {
   static List<String> _getTableFactorNames(sci.CrosstabTable table) {
@@ -28,8 +29,10 @@ class WorkflowConfigUtils {
           }
         }
 
-        factors.addAll(WorkflowConfigUtils._getTableFactorNames(dataStp.model.columnTable));
-        factors.addAll(WorkflowConfigUtils._getTableFactorNames(dataStp.model.rowTable));
+        factors.addAll(WorkflowConfigUtils._getTableFactorNames(
+            dataStp.model.columnTable));
+        factors.addAll(
+            WorkflowConfigUtils._getTableFactorNames(dataStp.model.rowTable));
       }
     }
     return factors;
@@ -77,4 +80,52 @@ class WorkflowConfigUtils {
 
     return factors;
   }
+
+  static Future<sci.Workflow> copyTemplateFromLibrary(
+      {required String templateUrl, required String projectId,
+        required String user, String? version}) async {
+    final templateWorkflow = (await tercen.ServiceFactory()
+        .documentService
+        .getLibrary('', [], ["Workflow"], [], 0, -1))
+        .where((wkf) => wkf.url.uri == templateUrl)
+        .where((wkf) => version != null && wkf.version == version)
+        .firstOrNull;
+
+    if (templateWorkflow == null) {
+      throw sci.ServiceError(404, "workflow.not.found",
+          "Template $templateUrl has not been found in the library");
+    }
+
+    return await  copyToProject(projectId: projectId,
+        workflowId: templateWorkflow.id, teamName: user);
+  }
+
+
+  static Future<sci.Workflow> copyToProject(
+      {required String projectId,
+        required String workflowId,
+        String folderId = "",
+        String? workflowName,
+        required String teamName}) async {
+    final  factory = tercen.ServiceFactory();
+
+    var workflow = await tercen.ServiceFactory()
+        .workflowService
+        .copyApp(workflowId, projectId);
+
+    workflow.folderId = folderId;
+    workflow.name = workflowName ?? workflow.name;
+    workflow.acl = (sci.Acl()..owner = teamName);
+    workflow.isHidden = false;
+    workflow.isDeleted = false;
+    workflow.projectId = projectId;
+
+    workflow.id = "";
+    workflow.rev = "";
+
+    workflow = await factory.workflowService.create(workflow);
+
+    return workflow;
+  }
+
 }
