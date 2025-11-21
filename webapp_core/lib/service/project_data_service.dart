@@ -183,8 +183,8 @@ class ProjectDataService {
     if (useCache && CacheObject().hasCachedValue(key)) {
       return CacheObject().getCachedValue(key);
       }else{
-        final projects = await tercen.ServiceFactory().projectService.findByIsPublicAndLastModifiedDate(
-          startKey: [false, "0000"], endKey: [true, "9999"]);
+        final projects = await tercen.ServiceFactory().projectService.findByTeamAndIsPublicAndLastModifiedDate(
+          startKey: [owner, false, "0000"], endKey: [owner, true, "9999"]);
 
 
      projects.retainWhere(
