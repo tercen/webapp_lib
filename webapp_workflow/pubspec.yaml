@@ -1,6 +1,6 @@
 name: webapp_workflow
 description: API model implementation.
-version: 0.4.0
+version: 0.4.1
 publish_to: none
 
 environment:
