@@ -21,6 +21,7 @@ class UserDataService {
           ..acl.owner = owner
           ..name = teamName;
       team.meta.add(sci.Pair.from("is.library", isLibrary == true ? "true" : "false"));
+      team.addRefIds({owner, "admin"});
       await tercen.ServiceFactory().teamService.create(team);
     }
 
