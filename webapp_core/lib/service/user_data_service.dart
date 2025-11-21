@@ -10,21 +10,24 @@ class UserDataService {
   }
   UserDataService._internal();
 
-  Future<void> createTeam({required String teamName, required String owner, bool isLibrary = false}) async {
-    try{
+  Future<void> createTeam(
+      {required String teamName,
+      required String owner,
+      bool isLibrary = false}) async {
+    try {
       await tercen.ServiceFactory().teamService.get(teamName);
       //Team exists, nothing to do
       return;
-    }catch (e){
+    } catch (e) {
       final team = sci.Team()
-          ..id = teamName
-          ..acl.owner = owner
-          ..name = teamName;
-      team.meta.add(sci.Pair.from("is.library", isLibrary == true ? "true" : "false"));
-      team.addRefIds({owner, "admin"});
+        ..id = teamName
+        ..acl.owner = owner
+        ..name = teamName;
+      team.meta.add(
+          sci.Pair.from("is.library", isLibrary == true ? "true" : "false"));
+
       await tercen.ServiceFactory().teamService.create(team);
     }
-
   }
 
   Future<List<String>> fetchUserList(

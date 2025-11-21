@@ -82,13 +82,14 @@ class WorkflowConfigUtils {
   }
 
   static Future<sci.Workflow> copyTemplateFromLibrary(
-      {required String templateUrl, required String projectId,
+      {required String templateUrl, required String projectId, String? workflowName,
         required String user, String? version}) async {
     final templateWorkflow = (await tercen.ServiceFactory()
         .documentService
         .getLibrary('', [], ["Workflow"], [], 0, -1))
         .where((wkf) => wkf.url.uri == templateUrl)
-        .where((wkf) => version != null && wkf.version == version)
+        .where((wkf) => version == null || wkf.version == version)
+        .where((wkf) => workflowName == null || wkf.name == workflowName)
         .firstOrNull;
 
     if (templateWorkflow == null) {
