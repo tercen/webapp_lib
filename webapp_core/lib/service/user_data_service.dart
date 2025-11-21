@@ -18,7 +18,7 @@ class UserDataService {
     }catch (e){
       final team = sci.Team()
           ..id = teamName
-          ..acl.owner = owner;
+          ..acl.owner = owner
           ..name = teamName;
       team.meta.add(sci.Pair.from("is.library", isLibrary == true ? "true" : "false"));
       await tercen.ServiceFactory().teamService.create(team);
