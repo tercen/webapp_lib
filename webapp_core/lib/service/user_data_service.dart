@@ -1,5 +1,6 @@
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
 import 'package:webapp_core/runner/utils/cache_object.dart';
+import 'package:sci_tercen_client/sci_client.dart' as sci;
 
 class UserDataService {
   static final UserDataService _singleton = UserDataService._internal();
@@ -8,6 +9,21 @@ class UserDataService {
     return _singleton;
   }
   UserDataService._internal();
+
+  Future<void> createTeam({required String teamName, bool isLibrary = false}) async {
+    try{
+      await tercen.ServiceFactory().teamService.get(teamName);
+      //Team exists, nothing to do
+      return;
+    }catch (e){
+      final team = sci.Team()
+          ..id = teamName
+          ..name = teamName;
+      team.meta.add(sci.Pair.from("is.library", isLibrary == true ? "true" : "false"));
+      await tercen.ServiceFactory().teamService.create(team);
+    }
+
+  }
 
   Future<List<String>> fetchUserList(
       {required String username,
