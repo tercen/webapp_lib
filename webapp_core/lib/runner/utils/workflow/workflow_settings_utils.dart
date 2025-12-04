@@ -80,10 +80,21 @@ class WorkflowSettingsUtils {
     final opObject = await tercen.ServiceFactory().operatorService.get(selectedOperator.id);
     final opRef = sci.OperatorRef()
       ..operatorId = opObject.id
+      ..name = opObject.name
       ..version = opObject.version
       ..operatorKind = opObject.kind
       ..operatorSpec = opObject.operatorSpec
       ..url = opObject.url;
+
+    opRef.propertyValues.addAll(
+        opObject.properties.map((prop) => sci.PropertyValue()
+          ..name = prop.name
+          ..value = prop.get("defaultValue")?.toString() as String ?? ""
+        )
+    );
+
+    // opRef.propertyValues = [];
+
 
     step.model.operatorSettings.operatorRef = opRef;
     return workflow;
