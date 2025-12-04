@@ -2,9 +2,10 @@ import 'package:sci_tercen_client/sci_client.dart';
 import 'package:webapp_core/runner/utils/functions/logger.dart';
 import 'package:webapp_core/service/project_data_service.dart';
 import 'package:sci_tercen_client/sci_client_service_factory.dart' as tercen;
+import 'package:sci_tercen_client/sci_client.dart' as sci;
 
 class LibraryDataService {
-  static Future<void> installOperator({
+  static Future<sci.Project> installOperator({
     required String url,
     required String team,
     String? projectName,
@@ -25,6 +26,8 @@ class LibraryDataService {
 
       await _installFromGit(team, proj, authToken, branch, url, tag);
     }
+
+    return proj;
   }
 
   static Future<void> _installFromGit(String team, Project proj,
