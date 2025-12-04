@@ -43,6 +43,8 @@ class LibraryDataService {
 
     if (tag != null) {
       importTask.meta.add(Pair.from("GIT_TAG", tag));
+    } else if (branch != null) {
+      importTask.meta.add(Pair.from("GIT_TAG", branch));
     }
 
     var task = await tercen.ServiceFactory().taskService.create(importTask);
