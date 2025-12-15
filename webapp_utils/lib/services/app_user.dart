@@ -87,6 +87,7 @@ class AppUser {
   }
 
   String get devServiceUri => const String.fromEnvironment("SERVICE_URI");
+  String get devPort => const String.fromEnvironment("WEBAPP_PORT");
   String get devToken => const String.fromEnvironment("TERCEN_TOKEN");
 
   String _readProjectId() {

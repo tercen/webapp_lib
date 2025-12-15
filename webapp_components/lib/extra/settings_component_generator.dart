@@ -8,6 +8,9 @@ import 'package:webapp_model/webapp_data_base.dart';
 import 'package:webapp_utils/model/workflow_setting.dart';
 
 class SettingComponentGenerator {
+  final bool saveState;
+
+  SettingComponentGenerator({this.saveState = true});
   List<Component> getScreenSettings(
       String screenName, WebAppDataBase modelLayer,
       {bool applyFilter = true, String? block}) {
@@ -97,7 +100,7 @@ class SettingComponentGenerator {
   Component createTextNumericComponent(
       WorkflowSetting setting, String groupId) {
     var comp =
-        InputTextComponent(createComponentKey(setting), groupId, setting.name);
+        InputTextComponent(createComponentKey(setting), groupId, setting.name, saveState: saveState);
     comp.setComponentValue(setting.value);
     comp.description = setting.description;
     comp.addMeta("setting.name", setting.name);
@@ -111,7 +114,7 @@ class SettingComponentGenerator {
   Component createBooleanComponent(
       WorkflowSetting setting, String groupId) {
     var comp =
-        BooleanComponent(createComponentKey(setting), groupId, setting.name);
+        BooleanComponent(createComponentKey(setting), groupId, setting.name, shouldSave: saveState);
     
     comp.setComponentValue( bool.parse( setting.value) );
     comp.description = setting.description;
@@ -127,7 +130,7 @@ class SettingComponentGenerator {
       WorkflowSetting setting, String groupId) {
 
     var comp = MultiCheckComponent(
-        createComponentKey(setting), groupId, setting.name,
+        createComponentKey(setting), groupId, setting.name, saveState: saveState,
         columns: 5);
     comp.setOptions(setting.options);
     comp.setComponentValue(setting.value.split(","));
@@ -141,7 +144,7 @@ class SettingComponentGenerator {
 
   Component createSingleListComponent(WorkflowSetting setting, String groupId) {
     var comp = SelectDropDownComponent(
-        createComponentKey(setting), groupId, setting.name);
+        createComponentKey(setting), groupId, setting.name, saveState: saveState);
     comp.setComponentValue(setting.value);
     comp.setOptions(setting.options);
     comp.description = setting.description;

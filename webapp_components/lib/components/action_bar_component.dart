@@ -25,21 +25,54 @@ class ActionBarComponent
   }
 
   Widget buildActionWidget(ListAction action, BuildContext context) {
+    var icon = action.getIcon();
+    var rszIcon = Icon(icon.icon, size: 32, color: icon.color);
 
-    var rszIcon =   Icon(action.getIcon(  ).icon, size: 32, color: action.getIcon().color,);
-    var actionIcon = IconButton(
-      onPressed: () async {
-        if( action.isEnabled( WebappTable()) ){
-          action.callAction(WebappTable(), context: context);
-        }
-        
-      },
-      icon: rszIcon,
-      tooltip: action.description,
-    );
+    // Build the icon widget (either with or without underLabel)
+    Widget iconWidget;
+    if (action.underLabel != null) {
+      // Column layout: icon on top, underLabel below
+      iconWidget = InkWell(
+        onTap: () async {
+          if (action.isEnabled(WebappTable())) {
+            action.callAction(WebappTable(), context: context);
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              rszIcon,
+              const SizedBox(height: 4),
+              Text(
+                action.underLabel!,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: icon.color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      // Original IconButton without underLabel
+      iconWidget = IconButton(
+        onPressed: () async {
+          if (action.isEnabled(WebappTable())) {
+            action.callAction(WebappTable(), context: context);
+          }
+        },
+        icon: rszIcon,
+        tooltip: action.description,
+      );
+    }
+
     List<Widget> row = [];
+    row.add(iconWidget);
 
-    row.add(actionIcon);
     if (action.buttonLabel != null) {
       row.add(createButtonLabel(action.buttonLabel!));
     }

@@ -10,11 +10,12 @@ typedef RowActionCallback = Future<void> Function( WebappTable row ) ;
 
 class ListAction{
   final Icon actionIcon;
-  
+
   final CheckActionCallback? enabledCallback;
   final RowActionCallback callback;
   final String? description;
   final String? buttonLabel;
+  final String? underLabel;
 
   final String confirmationMessage;
 
@@ -25,7 +26,7 @@ class ListAction{
 
   late Icon disabledIcon;
 
-  ListAction(this.actionIcon, this.callback, {this.enabledCallback, this.description, this.buttonLabel, this.toggleIcon, this.confirmationMessage = ""}){
+  ListAction(this.actionIcon, this.callback, {this.enabledCallback, this.description, this.buttonLabel, this.underLabel, this.toggleIcon, this.confirmationMessage = ""}){
     toggle = toggleIcon != null;
     disabledIcon = Icon( actionIcon.icon, color: Styles()["gray"],);
   }

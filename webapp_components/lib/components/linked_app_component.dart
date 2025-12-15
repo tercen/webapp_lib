@@ -108,7 +108,6 @@ class LinkedAppComponent
                 "LinkedAppComponent $id missing workflow and step",
                 "'workflowId' and 'stepId' must be defined");
           }
-
           final cacheBreaker = "t=${DateTime.now().millisecondsSinceEpoch}";
           var src = AppUser().isDev
               ? '${AppUser().devServiceUri}/_w3op/$operatorId?mode=auto-stats&workflowId=$workflowId&stepId=$stepId&channelId=$channel&$cacheBreaker&token=${AppUser().devToken}'

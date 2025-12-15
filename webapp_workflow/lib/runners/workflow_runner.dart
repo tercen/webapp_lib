@@ -13,6 +13,8 @@ import 'package:webapp_utils/functions/string_utils.dart';
 import 'package:webapp_utils/model/step_setting.dart';
 import 'package:webapp_utils/services/app_user.dart';
 
+import '../services/task_manager.dart';
+
 enum TimestampType { full, short }
 
 typedef PostRunCallback = Future<void> Function();
@@ -967,6 +969,14 @@ class WorkflowRunner with ProgressDialog {
 
     workflow.addMeta("run.workflow.task.id", workflowTask.id);
     workflow.rev = await factory.workflowService.update(workflow);
+
+    // Register with TaskManager to track this workflow task
+    await TaskManager().initialize();
+    await TaskManager().registerWorkflowTask(
+      workflow.id, 
+      workflowTask.id, 
+      workflowTask.channelId
+    );
 
     var taskStream = factory.eventService.channel(workflowTask.channelId);
 

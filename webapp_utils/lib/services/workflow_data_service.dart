@@ -81,20 +81,23 @@ class WorkflowDataService {
 
       final status = <String>[];
       final error = <String>[];
+      final types = <String>[];
 
       for (var w in workflows) {
         var sw = await WorkflowDataService().getWorkflowStatus(w);
-
+        
         status.add(sw["status"]!);
         error.add(sw["error"]!);
+        types.add(WorkflowDataService().getWorkflowType(w));
       }
 
       res.addColumn("Id", data: workflows.map((w) => w.id).toList());
       res.addColumn("Name", data: workflows.map((w) => w.name).toList());
       res.addColumn("Status", data: status);
+      res.addColumn("Type", data: types);
       res.addColumn("Last Update",
           data: workflows
-              .map((w) => DateFormatter.formatShort(w.lastModifiedDate))
+              .map((w) => DateFormatter.format(w.lastModifiedDate))
               .toList());
 
       return res;
@@ -804,6 +807,23 @@ class WorkflowDataService {
             .toList());
 
     return res;
+  }
+
+  String getWorkflowType(sci.Workflow workflow) {
+    switch (workflow.getMeta("workflow.type")) {
+      case  "ml":
+        return "SVM/LGBM";
+      case  "umap":
+        return "UMAP";
+      case  "gating":
+        return "Gating";
+      case  "dataPrep":
+        return "Data Prep";
+      case  "data prep":
+        return "Data Prep";
+      default:
+        return "Other";
+    }
   }
 
   Future<Map<String, String>> getWorkflowStatus(sci.Workflow workflow) async {

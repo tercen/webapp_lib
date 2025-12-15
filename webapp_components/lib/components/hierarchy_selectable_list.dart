@@ -74,7 +74,24 @@ class HierarchyNode {
 
   @override
   bool operator ==(Object other) {
-    return other is HierarchyNode && id == other.id;
+    if (other is! HierarchyNode) return false;
+
+    // Two nodes are equal if they have the same ID AND the same parent chain
+    if (id != other.id) return false;
+    if (level != other.level) return false;
+
+    // Compare parent chains
+    var thisParent = parent;
+    var otherParent = other.parent;
+
+    while (thisParent != null && otherParent != null) {
+      if (thisParent.id != otherParent.id) return false;
+      thisParent = thisParent.parent;
+      otherParent = otherParent.parent;
+    }
+
+    // Both should reach null at the same time (same depth)
+    return thisParent == null && otherParent == null;
   }
 
   @override
@@ -140,19 +157,21 @@ class HierarchyNode {
       }
       pNode = pNode.parent;
     }
+
+    print("[HierarchyNode] Building level=$level, vals.length=${vals.length}, vals=$vals");
+    final columns = selectionCols.getRange(0, level).toList();
+    print("[HierarchyNode] Using columns for filter: $columns (should match vals.length)");
+
     final levelTable = parent == null
         ? table
-        : selectTableRow(
-            table,
-            vals,
-            selectionCols
-                .getRange(0, level + 1)
-                .toList()); // table.selectByColValue([selectionHierarchy[level-1]], [parent.id]);
+        : selectTableRow(table, vals, columns);
 
     for (var i = 0; i < levelTable.nRows; i++) {
       final row = levelTable.select([i]);
       final id = row[selectionCols[level]].first;
       final label = row[columnHierarchy[level]].first;
+
+      print("[HierarchyNode] Creating node at level=$level, id=$id, label=$label, parentId=${parent?.id ?? 'null'}");
 
       if (!addedIds.contains(id)) {
         addedIds.add(id);
@@ -163,6 +182,8 @@ class HierarchyNode {
             level + 1, table, columnHierarchy, selectionHierarchy,
             parent: newNode));
         levelNodes.add(newNode);
+      } else {
+        print("[HierarchyNode] WARNING: Duplicate ID detected! id=$id already exists at level=$level");
       }
     }
 
@@ -186,7 +207,16 @@ class HierarchyNode {
   }
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode {
+    // Hash code must consider the full parent chain to match operator==
+    var hash = id.hashCode;
+    var p = parent;
+    while (p != null && p.level >= 0) {
+      hash = hash ^ p.id.hashCode;
+      p = p.parent;
+    }
+    return hash;
+  }
 
   String toStringMap() {
     return "{'id':'$id', 'label':'$label', 'level':$level, 'columnName':'$columnName', 'selectionColumnName':'$selectionColumnName', 'parent':${parent?.id ?? "null"}}";
@@ -465,13 +495,26 @@ class HierarchySelectableListComponent extends FetchComponent
   }
 
   bool isSelected(HierarchyNode node) {
-    return selectedNodes.contains(node);
+    final result = selectedNodes.contains(node);
+    print("[isSelected] Checking node: id=${node.id}, label=${node.label}, level=${node.level}, result=$result, selectedCount=${selectedNodes.length}");
+    if (result) {
+      // Find which node in selectedNodes matched
+      final matchedNode = selectedNodes.firstWhere((n) => n == node);
+      print("[isSelected] Matched with: id=${matchedNode.id}, label=${matchedNode.label}");
+    }
+    return result;
   }
 
   void select(HierarchyNode node) {
     if (!isSelected(node)) {
-      print("Selecting node: ${node.id} at level ${node.level}");
+      print("[select] Selecting node: id=${node.id}, label=${node.label}, level=${node.level}");
       selectedNodes.add(node);
+      print("[select] selectedNodes now contains ${selectedNodes.length} nodes");
+      for (var n in selectedNodes) {
+        print("[select]   - id=${n.id}, label=${n.label}");
+      }
+    } else {
+      print("[select] Node already selected: id=${node.id}, label=${node.label}");
     }
   }
 
@@ -543,6 +586,7 @@ class HierarchySelectableListComponent extends FetchComponent
     bool hasChildren = node.children.isNotEmpty;
 
     return SizedBox(
+      key: ValueKey(node.id),
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -556,6 +600,7 @@ class HierarchySelectableListComponent extends FetchComponent
             ),
           if (hasChildren) SizedBox(width: 4),
           Checkbox(
+              key: ValueKey('${node.id}_checkbox'),
               value: isSelected(node),
               checkColor: Styles()["black"],
               side: WidgetStateBorderSide.resolveWith((states) => BorderSide(
