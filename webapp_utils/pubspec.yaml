@@ -16,7 +16,8 @@ dependencies:
   sci_tercen_client:
     git:
       url: https://github.com/tercen/sci_tercen_client
-      ref: 1.7.1
+      ref: 1.8.0
+      path: sci_tercen_client
 
   json_string: ^3.0.1
   
