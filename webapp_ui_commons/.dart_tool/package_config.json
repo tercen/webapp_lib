@@ -9,7 +9,7 @@
     },
     {
       "name": "_macros",
-      "rootUri": "file:///usr/bin/flutter/bin/cache/dart-sdk/pkg/_macros",
+      "rootUri": "file:///home/thiago/.asdf/installs/flutter/3.24.5-stable/bin/cache/dart-sdk/pkg/_macros",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -135,7 +135,7 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///usr/bin/flutter/packages/flutter",
+      "rootUri": "file:///home/thiago/.asdf/installs/flutter/3.24.5-stable/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -165,7 +165,7 @@
     },
     {
       "name": "flutter_web_plugins",
-      "rootUri": "file:///usr/bin/flutter/packages/flutter_web_plugins",
+      "rootUri": "file:///home/thiago/.asdf/installs/flutter/3.24.5-stable/packages/flutter_web_plugins",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -351,25 +351,25 @@
     },
     {
       "name": "sci_base",
-      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_base",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-da991d03002d6c820f0bca9875c4e2a3d29f40d2/sci_base",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "sci_http_client",
-      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_http_client",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-da991d03002d6c820f0bca9875c4e2a3d29f40d2/sci_http_client",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "sci_tercen_client",
-      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_tercen_client",
+      "rootUri": "../../../sci_tercen_client/sci_tercen_client",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "sci_tercen_model",
-      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-efc72648473c40ef9021eeaec5b684addcb1cc76/sci_tercen_model",
+      "rootUri": "file:///home/thiago/.pub-cache/git/sci_tercen_client-da991d03002d6c820f0bca9875c4e2a3d29f40d2/sci_tercen_model",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -399,7 +399,7 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///usr/bin/flutter/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///home/thiago/.asdf/installs/flutter/3.24.5-stable/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -495,7 +495,7 @@
     },
     {
       "name": "tson",
-      "rootUri": "file:///home/thiago/.pub-cache/git/dtson-7bb00fa9ac17c5df1f12e2c3c636d6def94e579a/",
+      "rootUri": "file:///home/thiago/.pub-cache/git/dtson-dd0f955405bbeca6b2a26ea6053a71fe8f6b6c43/",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -638,10 +638,10 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2025-03-21T19:03:02.840001Z",
+  "generated": "2026-01-20T17:27:33.661003Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
-  "flutterRoot": "file:///usr/bin/flutter",
+  "flutterRoot": "file:///home/thiago/.asdf/installs/flutter/3.24.5-stable",
   "flutterVersion": "3.24.5",
   "pubCache": "file:///home/thiago/.pub-cache"
 }

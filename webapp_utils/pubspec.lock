@@ -460,38 +460,36 @@ packages:
     dependency: transitive
     description:
       path: sci_base
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.7.0"
+      resolved-ref: da991d03002d6c820f0bca9875c4e2a3d29f40d2
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.7.0"
   sci_http_client:
     dependency: transitive
     description:
       path: sci_http_client
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.7.0"
+      resolved-ref: da991d03002d6c820f0bca9875c4e2a3d29f40d2
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.7.0"
   sci_tercen_client:
     dependency: "direct main"
     description:
-      path: sci_tercen_client
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
-      url: "https://github.com/tercen/sci_tercen_client"
-    source: git
-    version: "1.3.1"
+      path: "../../sci_tercen_client/sci_tercen_client"
+      relative: true
+    source: path
+    version: "1.7.1"
   sci_tercen_model:
     dependency: transitive
     description:
       path: sci_tercen_model
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.7.0"
+      resolved-ref: da991d03002d6c820f0bca9875c4e2a3d29f40d2
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.7.0"
   shelf:
     dependency: transitive
     description:
@@ -653,11 +651,11 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: "1.4.1"
-      resolved-ref: "7bb00fa9ac17c5df1f12e2c3c636d6def94e579a"
+      ref: "1.5.1"
+      resolved-ref: dd0f955405bbeca6b2a26ea6053a71fe8f6b6c43
       url: "https://github.com/tercen/dtson"
     source: git
-    version: "1.4.1"
+    version: "1.5.1"
   typed_data:
     dependency: transitive
     description:
@@ -784,21 +782,21 @@ packages:
       path: "../webapp_components"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   webapp_model:
     dependency: "direct main"
     description:
       path: "../webapp_model"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   webapp_ui_commons:
     dependency: transitive
     description:
       path: "../webapp_ui_commons"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   webkit_inspection_protocol:
     dependency: transitive
     description:

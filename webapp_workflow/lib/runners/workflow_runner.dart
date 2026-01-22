@@ -596,29 +596,30 @@ class WorkflowRunner with ProgressDialog {
     await setupRun(context);
     var runTitle = getWorkflowName(template);
 
-    List<String> stepsToRestore = [];
+    // List<String> stepsToRestore = [];
     var stpName = "STEP";
     for (var stp in workflow.steps) {
-      if (!(stp is sci.TableStep ||
-          stp.state.taskState is sci.DoneState ||
-          stp.state.taskState is sci.FailedState)) {
+      // if (!(stp is sci.TableStep ||
+          // stp.state.taskState is sci.DoneState ||
+          // stp.state.taskState is sci.FailedState)) {
         if (stp.id == stepId) {
-          stp.state.taskState = sci.InitState();
+          // stp.state.taskState = sci.InitState();
           stpName = stp.name;
-        } else {
-          stp.state.taskState = sci.DoneState();
-          stepsToRestore.add(stp.id);
-        }
+        // } else {
+        //   stp.state.taskState = sci.DoneState();
+        //   stepsToRestore.add(stp.id);
+        // }
       }
     }
 
-    await factory.workflowService.update(workflow);
+    // workflow.rev = await factory.workflowService.update(workflow);
 
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
-    workflow = await runWorkflowTask(workflow, runTitle:runTitle, stepName: stpName);
+    workflow = await runWorkflowTask(workflow, runTitle:runTitle, stepName: stpName, stepsToRun: [stepId]);
 
+    workflow.rev = await factory.workflowService.update(workflow);
 
     log("Running $stpName\n\n \nRunning final updates",
         dialogTitle: runTitle);
@@ -626,14 +627,14 @@ class WorkflowRunner with ProgressDialog {
     for (var f in postRunCallbacks) {
       await f();
     }
-
-    for (var stp in workflow.steps) {
-      if (stepsToRestore.contains(stp.id)) {
-        stp.state.taskState = sci.InitState();
-      }
-    }
-
-    await factory.workflowService.update(workflow);
+    //
+    // for (var stp in workflow.steps) {
+    //   if (stepsToRestore.contains(stp.id)) {
+    //     stp.state.taskState = sci.InitState();
+    //   }
+    // }
+    //
+    // workflow.rev = await factory.workflowService.update(workflow);
 
     await Future.delayed(const Duration(milliseconds: 1000), () {
       closeLog();
@@ -646,7 +647,7 @@ class WorkflowRunner with ProgressDialog {
   }
 
   Future<sci.Workflow> runWorkflowTask(sci.Workflow workflow,
-      {String? runTitle, String? stepName}) async {
+      {String? runTitle, String? stepName, List<String> stepsToRun = const []}) async {
     var factory = tercen.ServiceFactory();
 
     runTitle ??= workflow.name;
@@ -656,7 +657,12 @@ class WorkflowRunner with ProgressDialog {
       ..owner = teamName
       ..projectId = projectId
       ..workflowId = workflow.id
+      ..channelId = Uuid().v4()
       ..workflowRev = workflow.rev;
+
+    if( stepsToRun.isNotEmpty ){
+      workflowTask.stepsToRun.addAll(stepsToRun);
+    }
 
     workflowTask =
         await factory.taskService.create(workflowTask) as sci.RunWorkflowTask;
@@ -665,9 +671,11 @@ class WorkflowRunner with ProgressDialog {
 
     await factory.taskService.runTask(workflowTask.id);
 
-    workflow.addMeta("workflow.task.id", workflowTask.id);
-    workflow.addMeta("run.task.id", workflowTask.id);
-    await factory.workflowService.update(workflow);
+    // Get workflow after starting task
+    // workflow = await factory.workflowService.get(workflow.id);
+    // workflow.addMeta("workflow.task.id", workflowTask.id);
+    // workflow.addMeta("run.task.id", workflowTask.id);
+    // workflow.rev = await factory.workflowService.update(workflow);
 
     if (stepName == null) {
       updateStepProgress(workflow);
@@ -676,15 +684,44 @@ class WorkflowRunner with ProgressDialog {
       log("Running ${stepName}", dialogTitle: runTitle);
     }
 
+
+    var needsSync = true;
     await for (var evt in taskStream) {
+      if (needsSync) {
+        // First event received - server has started, fetch current state
+        workflow = await factory.workflowService.get(workflow.id);
+        needsSync = false;
+      }
+
       // Task is Done
       if (evt is sci.PatchRecords) {
-        workflow = evt.apply(workflow);
-        if (stepName == null) {
-          updateStepProgress(workflow);
-          log(stepProgressMessage, dialogTitle: runTitle);
+        try {
+          workflow = evt.apply(workflow);
+          if (stepName == null) {
+            updateStepProgress(workflow);
+            log(stepProgressMessage, dialogTitle: runTitle);
+          }
+        } catch (e, stackTrace) {
+          //Handles server mismatch (cases where workflow is saved remotely)
+          try{
+            workflow = await factory.workflowService.get(workflow.id);
+            workflow = evt.apply(workflow);
+          }catch (e2, stackTrace2) {
+            late sci.PatchRecord rc;
+            // var someVar = await factory.patchRecordService.findByChannelIdAndSequence(startKey: [workflowTask.channelId,0], endKey: [workflowTask.channelId, 200]);
+            print('DEBUG: Workflow type: ${workflow.runtimeType}');
+            print('DEBUG: Workflow has meta: ${workflow.toJson().containsKey("meta")}');
+
+            print("DEBUG: Error applying patch: $e");
+            print("DEBUG: Stack trace: $stackTrace");
+
+          }
+
+
+          // rethrow;
         }
       }
+      print(evt.toJson());
       if (evt is sci.TaskStateEvent) {
         if (evt.state.isFinal && evt.taskId == workflowTask.id) {
           break;
@@ -709,7 +746,7 @@ class WorkflowRunner with ProgressDialog {
       }
     }
 
-    // var doneWorkflow = await factory.workflowService.get(workflow.id);
+    // workflow = await factory.workflowService.get(workflow.id);
 
     for (var stp in workflow.steps) {
       if( stp.state.taskState is! sci.InitState){
@@ -721,7 +758,7 @@ class WorkflowRunner with ProgressDialog {
     return workflow;
   }
 
-  Future<sci.Workflow> doRun(BuildContext context) async {
+  Future<sci.Workflow> doRun(BuildContext context, {List<String> stepsToRun = const []}) async {
     openDialog(context);
     await setupRun(context);
     var runTitle = getWorkflowName(template);
@@ -729,7 +766,7 @@ class WorkflowRunner with ProgressDialog {
     //-----------------------------------------
     // Task preparation and running
     //-----------------------------------------
-    workflow = await runWorkflowTask(workflow);
+    workflow = await runWorkflowTask(workflow, stepsToRun: stepsToRun);
 
 
     log("$stepProgressMessage\n\n \nRunning final updates",

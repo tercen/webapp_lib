@@ -93,8 +93,8 @@ class WebAppBase with ChangeNotifier {
 
       if (devProjectId != "") {
         print("Running in DEV mode");
-        var tok = Uri.base.queryParameters["token"] ?? '';
-        Map<String, dynamic> decodedToken = JwtDecoder.decode(tok);
+        var tok = const String.fromEnvironment("TERCEN_TOKEN", defaultValue: "");
+        Map<String, dynamic> decodedToken =  JwtDecoder.decode(tok);
         username = decodedToken['data']['u'];
         projectId = devProjectId;
         session = sci.UserSession()

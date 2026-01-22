@@ -190,14 +190,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.7"
-  fake_async:
-    dependency: transitive
-    description:
-      name: fake_async
-      sha256: "511392330127add0b769b75a987850d136345d9227c6b94c96a04cf4a391bf78"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.1"
   ffi:
     dependency: transitive
     description:
@@ -275,11 +267,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.24"
-  flutter_test:
-    dependency: "direct dev"
-    description: flutter
-    source: sdk
-    version: "0.0.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -405,30 +392,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
-  leak_tracker:
-    dependency: transitive
-    description:
-      name: leak_tracker
-      sha256: "3f87a60e8c63aecc975dda1ceedbc8f24de75f09e4856ea27daf8958f2f0ce05"
-      url: "https://pub.dev"
-    source: hosted
-    version: "10.0.5"
-  leak_tracker_flutter_testing:
-    dependency: transitive
-    description:
-      name: leak_tracker_flutter_testing
-      sha256: "932549fb305594d82d7183ecd9fa93463e9914e1b67cacc34bc40906594a1806"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.5"
-  leak_tracker_testing:
-    dependency: transitive
-    description:
-      name: leak_tracker_testing
-      sha256: "6ba465d5d76e67ddf503e1161d1f4a6bc42306f9d66ca1e8f079a47290fb06d3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   lints:
     dependency: transitive
     description:
@@ -553,38 +516,36 @@ packages:
     dependency: transitive
     description:
       path: sci_base
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.7.0"
+      resolved-ref: da991d03002d6c820f0bca9875c4e2a3d29f40d2
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.7.0"
   sci_http_client:
     dependency: transitive
     description:
       path: sci_http_client
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.7.0"
+      resolved-ref: da991d03002d6c820f0bca9875c4e2a3d29f40d2
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.7.0"
   sci_tercen_client:
     dependency: "direct main"
     description:
-      path: sci_tercen_client
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
-      url: "https://github.com/tercen/sci_tercen_client"
-    source: git
-    version: "1.3.1"
+      path: "../../sci_tercen_client/sci_tercen_client"
+      relative: true
+    source: path
+    version: "1.7.1"
   sci_tercen_model:
     dependency: transitive
     description:
       path: sci_tercen_model
-      ref: "1.3.1"
-      resolved-ref: efc72648473c40ef9021eeaec5b684addcb1cc76
+      ref: "1.7.0"
+      resolved-ref: da991d03002d6c820f0bca9875c4e2a3d29f40d2
       url: "https://github.com/tercen/sci_tercen_client"
     source: git
-    version: "1.3.1"
+    version: "1.7.0"
   shelf:
     dependency: transitive
     description:
@@ -714,11 +675,11 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: "1.4.1"
-      resolved-ref: "7bb00fa9ac17c5df1f12e2c3c636d6def94e579a"
+      ref: "1.5.1"
+      resolved-ref: dd0f955405bbeca6b2a26ea6053a71fe8f6b6c43
       url: "https://github.com/tercen/dtson"
     source: git
-    version: "1.4.1"
+    version: "1.5.1"
   typed_data:
     dependency: transitive
     description:
@@ -807,14 +768,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
-  vm_service:
-    dependency: transitive
-    description:
-      name: vm_service
-      sha256: "5c5f338a667b4c644744b661f309fb8080bb94b18a7e91ef1dbd343bed00ed6d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "14.2.5"
   watcher:
     dependency: transitive
     description:
@@ -845,21 +798,21 @@ packages:
       path: "../webapp_components"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   webapp_ui_commons:
     dependency: "direct main"
     description:
       path: "../webapp_ui_commons"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.1"
   webapp_utils:
     dependency: "direct main"
     description:
       path: "../webapp_utils"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.1"
   win32:
     dependency: transitive
     description:
